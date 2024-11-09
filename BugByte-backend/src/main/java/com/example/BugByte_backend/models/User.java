@@ -32,7 +32,7 @@ public class User {
         this.reputation = reputation;
     }
 
-    public long getId(Long id) {
+    public long getId() {
         return this.id;
     }
 

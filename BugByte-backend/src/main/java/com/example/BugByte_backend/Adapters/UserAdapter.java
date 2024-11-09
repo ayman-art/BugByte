@@ -22,10 +22,13 @@ public class UserAdapter implements IAdapter<User> {
 
     @Override
     public User fromMap(Map<String, Object> map) {
-        User user = new User((String) map.get("user_name"), (String) map.get("email"),
-                (String) map.get("password"), (Boolean) map.get("is_admin"));
+        String username = (String) map.get("user_name");
+        String email = (String) map.get("email");
+        String password = (String) map.get("password");
+        Boolean is_admin = (Boolean) map.get("is_admin");
+        User user = new User(username, email, password, is_admin);
         user.setId((Long) map.get("id"));
-        user.setReputation((Integer) map.get("reputation"));
+        user.setReputation((Long) map.get("reputation"));
         return user;
     }
 
