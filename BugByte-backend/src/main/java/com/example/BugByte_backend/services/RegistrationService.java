@@ -5,7 +5,11 @@ import com.example.BugByte_backend.repositories.UserRepository;
 
 public class RegistrationService {
 
-    private final UserRepository userRepository = new UserRepository();
+    private final UserRepository userRepository;
+
+    public RegistrationService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     //register new user
     public long registerUser(String email , String userName , String password) throws Exception{
