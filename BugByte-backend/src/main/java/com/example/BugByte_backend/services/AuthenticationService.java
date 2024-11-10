@@ -20,7 +20,6 @@ public class AuthenticationService {
         Date today = new Date(now);
         SignatureAlgorithm algorithm = SignatureAlgorithm.HS256;
         String envKey = dotenv.get("JWT_Key");
-        System.out.println(envKey);
         byte[] apiKeySecretBytes = Base64.getDecoder().decode(envKey);
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, algorithm.getJcaName());
         JwtBuilder builder = Jwts.builder()
@@ -37,9 +36,12 @@ public class AuthenticationService {
     public static Claims parseToken(String jwt){
 
         String envKey = dotenv.get("JWT_Key");
+        byte[] apiKeySecretBytes = Base64.getDecoder().decode(envKey);
+        Key signingKey = new SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.getJcaName());
         return Jwts.parser()
-                .setSigningKey(envKey)
+                .setSigningKey(signingKey)
                 .parseClaimsJws(jwt)
                 .getBody();
     }
+
 }
