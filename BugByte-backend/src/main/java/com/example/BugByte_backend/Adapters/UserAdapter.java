@@ -25,8 +25,7 @@ public class UserAdapter implements IAdapter<User> {
         String username = (String) map.get("user_name");
         String email = (String) map.get("email");
         String password = (String) map.get("password");
-        Boolean is_admin = (Boolean) map.get("is_admin");
-        User user = new User(username, email, password, is_admin);
+        User user = new User(username, email, password);
         user.setId((Long) map.get("id"));
         user.setReputation((Long) map.get("reputation"));
         return user;

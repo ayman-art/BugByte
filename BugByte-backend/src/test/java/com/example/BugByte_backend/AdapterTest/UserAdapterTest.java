@@ -13,7 +13,7 @@ public class UserAdapterTest {
     // test - 1
     @Test
     public void testToMap() {
-        User user = new User("user1", "user@gmail.com", "12345678", false);
+        User user = new User("user1", "user@gmail.com", "12345678");
         user.setReputation(10);
 
         Map<String, Object> userMap = userAdapter.toMap(user);
@@ -72,7 +72,7 @@ public class UserAdapterTest {
     // test - 4
     @Test
     public void testToJson(){
-        User user = new User("user1", "user@gmail.com", "12345678", false);
+        User user = new User("user1", "user@gmail.com", "12345678");
         user.setReputation(10);
         user.setId((long) 5);
 
@@ -89,7 +89,7 @@ public class UserAdapterTest {
     //test 5
     @Test
     public void testToJsonWithNullValues(){
-        User user = new User("user1", "user@gmail.com", "12345678", false);
+        User user = new User("user1", "user@gmail.com", "12345678");
 
         String userString = userAdapter.toJson(user);
 

@@ -9,11 +9,11 @@ public class User {
     private long reputation;
     private boolean is_admin;
 
-    public User(String user_name, String email,String password,boolean is_admin){
+    public User(String user_name, String email,String password){
         this.user_name = user_name;
         this.email = email;
         this.password = password;
-        this.is_admin = is_admin;
+        this.is_admin = false;
     }
 
     public void setUsername(String user_name) {
