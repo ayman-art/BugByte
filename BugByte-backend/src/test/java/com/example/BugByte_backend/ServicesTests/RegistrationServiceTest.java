@@ -2,7 +2,6 @@ package com.example.BugByte_backend.ServicesTests;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepository;
 import com.example.BugByte_backend.services.RegistrationService;
-import org.apache.kafka.common.protocol.types.Field;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -168,7 +167,7 @@ public class RegistrationServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(id)).thenReturn(null);
-        
+
         // Assert that an exception is thrown when the user doesn't exist
         assertThrows(Exception.class, () -> {
             registrationService.deleteUser(id);
