@@ -1,20 +1,28 @@
 package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.repositories.UserRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RegistrationService {
 
-    private final UserRepositoryImp userRepository;
+    @Autowired
+    private UserRepositoryImp userRepository;
 
-    public RegistrationService(UserRepositoryImp userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    //register new user
     public long registerUser(String email , String userName , String password) throws Exception{
+        RegistrationCOR registrationCOR = new RegistrationCOR();
         try {
+             if(!registrationCOR.validateEmail(email)){
+                 throw new Exception("email is not valid");
+             }
+             if(!registrationCOR.validateUserName(userName)){
+                 throw new Exception("userName is too short");
+             }
+             if(!registrationCOR.validatePassword(password)){
+                 throw new Exception("week password");
+             }
             //insert user in the database
             return userRepository.insertUser(userName , email , password);
         }
@@ -23,7 +31,6 @@ public class RegistrationService {
         }
     }
 
-    //login user
     public User loginUser(String identity , String password) throws Exception{
         try {
 
@@ -35,11 +42,11 @@ public class RegistrationService {
                 return user;
         }
         catch (Exception e){
-            throw new Exception("Error occurred while logging in user , user doesn't exist: " + e.getMessage());
+            throw new Exception("Error occurred while logging in user: " + e.getMessage());
         }
     }
 
-    //logout user
+
     public User logoutUser(long userId) throws Exception{
         try {
             //check if the user exists in the database
@@ -47,16 +54,14 @@ public class RegistrationService {
             if (user == null) {
                 throw new Exception("User doesn't exist");
             }
-            else {
                 return user;
-            }
         }
         catch (Exception e){
             throw new Exception("Error occurred while logging out user:  " + e.getMessage());
         }
     }
 
-    //delete user
+
     public boolean deleteUser(long userId) throws Exception{
         try {
             //check if the user exists in the database
@@ -64,17 +69,15 @@ public class RegistrationService {
             if (user == null) {
                 throw new Exception("User doesn't exist");
             }
-            else {
                 //delete the user
                 return userRepository.deleteUser(userId);
-            }
         }
         catch (Exception e){
             throw new Exception("Error occurred while deleting user:  " + e.getMessage());
         }
     }
 
-    //change password
+
     public boolean changePassword(long userId , String newPassword) throws Exception{
         try {
             //check if the user exists in the database
@@ -82,10 +85,8 @@ public class RegistrationService {
             if (user == null) {
                 throw new Exception("User doesn't exist");
             }
-            else {
                 //change the password
                 return userRepository.changePassword(userId , newPassword);
-            }
         }
         catch (Exception e){
             throw new Exception("Error occurred while changing password:  " + e.getMessage());

@@ -1,4 +1,4 @@
-package com.example.BugByte_backend.servicesTests;
+package com.example.BugByte_backend.ServicesTests;
 
 import com.example.BugByte_backend.services.AuthenticationService;
 import io.jsonwebtoken.Claims;
