@@ -45,6 +45,9 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public User findByIdentityAndPassword(String identity, String password) {
+        if (identity == null || password == null)
+            throw new NullPointerException("Identity or password is Null");
+
         User user = jdbcTemplate.queryForObject(SQL_FIND_BY_IDENTITY, userRowMapper, identity, identity);
         if (user != null && passwordEncoder.matches(password, user.getPassword()))
             return user;
@@ -61,6 +64,9 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public Long findIdByEmail(String email) {
+        if (email == null)
+            throw new NullPointerException("Email is Null");
+
         return jdbcTemplate.queryForObject(SQL_FIND_ID_BY_EMAIL, new Object[]{email}, Long.class);
     }
 
