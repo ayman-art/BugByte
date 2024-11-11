@@ -39,10 +39,12 @@ public class UserRepositoryTest {
         String password = "password";
 
         when(jdbcTemplate.update(anyString(), anyString(), anyString(), anyString())).thenReturn(1);
+        when(jdbcTemplate.queryForObject(anyString(), eq(new Object[]{email}), eq(Long.class))).thenReturn(7L);
+
         when(passwordEncoder.encode(anyString())).thenReturn(anyString());
 
-        Integer result = userRepository.insertUser(username, email, password);
-        assertEquals(1, result);
+        Long result = userRepository.insertUser(username, email, password);
+        assertEquals(7L, result);
     }
 
     @Test
@@ -52,8 +54,8 @@ public class UserRepositoryTest {
         String password = "password";
 
         when(jdbcTemplate.update(anyString(), anyString(), anyString(), anyString())).thenReturn(0);
-        Integer result = userRepository.insertUser(username, email, password);
-        assertEquals(0, result);
+
+        assertThrows(RuntimeException.class, () -> userRepository.insertUser(username, email, password));
     }
 
     @Test
