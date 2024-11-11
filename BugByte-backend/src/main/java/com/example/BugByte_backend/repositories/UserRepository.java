@@ -7,10 +7,6 @@ public interface UserRepository {
 
     User findByIdentityAndPassword(String identity, String password);
 
-    Integer getCountByEmail(String email);
-
-    Integer getCountByUsername(String userName);
-
     User findById(Long userId);
 
     Long findIdByEmail(String email);

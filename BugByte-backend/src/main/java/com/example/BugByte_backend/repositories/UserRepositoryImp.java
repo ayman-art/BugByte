@@ -16,8 +16,6 @@ public class UserRepositoryImp implements UserRepository {
                 VALUES
                     (?, ?, ?, 0, false);
             """;
-    private static final String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM users WHERE email = ?;";
-    private static final String SQL_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM users WHERE user_name = ?;";
     private static final String SQL_FIND_BY_ID = "SELECT * FROM users WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_EMAIL = "SELECT id FROM users WHERE email = ?;";
     private static final String SQL_FIND_BY_IDENTITY = "SELECT * FROM users WHERE email = ? OR user_name = ?;";
@@ -51,16 +49,6 @@ public class UserRepositoryImp implements UserRepository {
         if (user != null && passwordEncoder.matches(password, user.getPassword()))
             return user;
         return null;
-    }
-
-    @Override
-    public Integer getCountByEmail(String email) {
-        return jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, new Object[]{email}, Integer.class);
-    }
-
-    @Override
-    public Integer getCountByUsername(String userName) {
-        return jdbcTemplate.queryForObject(SQL_COUNT_BY_USERNAME, new Object[]{userName}, Integer.class);
     }
 
     @Override
