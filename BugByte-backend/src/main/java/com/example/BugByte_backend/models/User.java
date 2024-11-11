@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name="users")
-public class UserModel {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +25,16 @@ public class UserModel {
     @Column(nullable = false)
     private Boolean is_admin;
 
-    public UserModel(Long id, String user_name, String email, String password) {
+    public User(String user_name, String email, String password) {
+        this.id = 0L;
+        this.user_name = user_name;
+        this.email = email;
+        this.password = password;
+        this.reputation = 0L;
+        this.is_admin = false;
+    }
+
+    public User(Long id, String user_name, String email, String password) {
         this.id = id;
         this.user_name = user_name;
         this.email = email;
@@ -34,7 +43,7 @@ public class UserModel {
         this.is_admin = false;
     }
 
-    public UserModel(Long id, String user_name, String email, String password, Long reputation, Boolean is_admin) {
+    public User(Long id, String user_name, String email, String password, Long reputation, Boolean is_admin) {
         this.id = id;
         this.user_name = user_name;
         this.email = email;

@@ -1,6 +1,6 @@
 package com.example.BugByte_backend.repositories;
 
-import com.example.BugByte_backend.models.UserModel;
+import com.example.BugByte_backend.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -33,12 +33,13 @@ public class UserRepositoryImp implements UserRepository {
     @Override
     public Integer insertUser(String userName, String email, String password) {
         String hashedPassword = passwordEncoder.encode(password);
+        // TODO:
         return jdbcTemplate.update(SQL_INSERT_USER, userName, email, hashedPassword);
     }
 
     @Override
-    public UserModel findByIdentityAndPassword(String identity, String password) {
-        UserModel user = jdbcTemplate.queryForObject(SQL_FIND_BY_IDENTITY, userRowMapper, identity, identity);
+    public User findByIdentityAndPassword(String identity, String password) {
+        User user = jdbcTemplate.queryForObject(SQL_FIND_BY_IDENTITY, userRowMapper, identity, identity);
         if (user != null && passwordEncoder.matches(password, user.getPassword()))
             return user;
         return null;
@@ -55,7 +56,7 @@ public class UserRepositoryImp implements UserRepository {
     }
 
     @Override
-    public UserModel findById(Long userId) {
+    public User findById(Long userId) {
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, userRowMapper, userId);
     }
 
@@ -79,7 +80,12 @@ public class UserRepositoryImp implements UserRepository {
         return rows == 1;
     }
 
-    private final RowMapper<UserModel> userRowMapper = ((rs, rowNum) -> new UserModel(
+    @Override
+    public Boolean add_reset_code(Long userId, String code) {
+        return null;
+    }
+
+    private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
             rs.getLong("id"),
             rs.getString("user_name"),
             rs.getString("email"),

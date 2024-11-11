@@ -14,7 +14,7 @@ public class UserAdapterTest {
     @Test
     public void testToMap() {
         User user = new User("user1", "user@gmail.com", "12345678");
-        user.setReputation(10);
+        user.setReputation(10L);
 
         Map<String, Object> userMap = userAdapter.toMap(user);
 
@@ -39,10 +39,10 @@ public class UserAdapterTest {
 
         User user = userAdapter.fromMap(userMap);
 
-        assertEquals("user1", user.getUsername());
+        assertEquals("user1", user.get_user_name());
         assertEquals("user@gmail.com", user.getEmail());
         assertEquals("12345678", user.getPassword());
-        assertFalse(user.is_adminn());
+        assertFalse(user.get_is_admin());
         assertEquals(100, user.getReputation());
         assertEquals(1, user.getId());
     }
@@ -60,10 +60,10 @@ public class UserAdapterTest {
 
         User user = userAdapter.fromMap(userMap);
 
-        assertEquals("user1", user.getUsername());
+        assertEquals("user1", user.get_user_name());
         assertNull(user.getEmail());
         assertNull(user.getPassword());
-        assertFalse(user.is_adminn());
+        assertFalse(user.get_is_admin());
         assertEquals(50, user.getReputation());
         assertEquals(0 , user.getId());
     }
@@ -73,7 +73,7 @@ public class UserAdapterTest {
     @Test
     public void testToJson(){
         User user = new User("user1", "user@gmail.com", "12345678");
-        user.setReputation(10);
+        user.setReputation(10L);
         user.setId((long) 5);
 
         String userString = userAdapter.toJson(user);

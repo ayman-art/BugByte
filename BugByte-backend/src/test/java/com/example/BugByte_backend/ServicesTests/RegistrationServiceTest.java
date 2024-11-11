@@ -1,6 +1,7 @@
 package com.example.BugByte_backend.ServicesTests;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepository;
+import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.RegistrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import static org.mockito.Mockito.*;
 public class RegistrationServiceTest {
 
     @Mock
-    private UserRepository userRepositoryMock;
+    private UserRepositoryImp userRepositoryMock;
 
     @InjectMocks
     private RegistrationService registrationService;
@@ -36,7 +37,7 @@ public class RegistrationServiceTest {
         // Mock repository methods
         when(userRepositoryMock.getCountByEmail(eq(email))).thenReturn(0);
         when(userRepositoryMock.getCountByUsername(eq(userName))).thenReturn(0);
-        when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password))).thenReturn(expectedUserId);
+        when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password))).thenReturn((int) expectedUserId);
 
         long actualUserId = registrationService.registerUser(email, userName, password);
 
@@ -90,7 +91,7 @@ public class RegistrationServiceTest {
         User newUser = registrationService.loginUser(identity , password);
 
         // Assert the user is returned
-        assertEquals(newUser.getUsername() , user.getUsername());
+        assertEquals(newUser.get_user_name() , user.get_user_name());
         assertEquals(newUser.getEmail() , user.getEmail());
         assertEquals(newUser.getPassword() , user.getPassword());
 
@@ -105,7 +106,7 @@ public class RegistrationServiceTest {
         User newUser = registrationService.logoutUser(id);
 
         // Assert the user is returned
-        assertEquals(newUser.getUsername() , "user1");
+        assertEquals(newUser.get_user_name() , "user1");
         assertEquals(newUser.getEmail() , "user@example.com");
         assertEquals(newUser.getPassword() ,"12345678");
 

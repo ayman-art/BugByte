@@ -2,12 +2,13 @@ package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepository;
+import com.example.BugByte_backend.repositories.UserRepositoryImp;
 
 public class RegistrationService {
 
-    private final UserRepository userRepository;
+    private final UserRepositoryImp userRepository;
 
-    public RegistrationService(UserRepository userRepository) {
+    public RegistrationService(UserRepositoryImp userRepository) {
         this.userRepository = userRepository;
     }
 

@@ -12,10 +12,10 @@ public class UserAdapter implements IAdapter<User> {
     @Override
     public Map<String, Object> toMap(User user) {
         Map<String, Object> userMap = new HashMap<>();
-        userMap.put("user_name", user.getUsername());
+        userMap.put("user_name", user.get_user_name());
         userMap.put("email", user.getEmail());
         userMap.put("password", user.getPassword());
-        userMap.put("is_admin" , user.is_adminn());
+        userMap.put("is_admin" , user.get_is_admin());
         userMap.put("reputation" , user.getReputation());
         return userMap;
     }
