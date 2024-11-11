@@ -15,6 +15,8 @@ public class UserRepositoryImp implements UserRepository {
                 VALUES
                     (?, ?, ?, 0, false);
             """;
+    private static final String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM users WHERE email = ?;";
+    private static final String SQL_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM users WHERE user_name = ?;";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -35,12 +37,12 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public Integer getCountByEmail(String email) {
-        return null;
+        return jdbcTemplate.queryForObject(SQL_COUNT_BY_EMAIL, new Object[]{email}, Integer.class);
     }
 
     @Override
     public Integer getCountByUsername(String userName) {
-        return null;
+        return jdbcTemplate.queryForObject(SQL_COUNT_BY_USERNAME, new Object[]{userName}, Integer.class);
     }
 
     @Override
