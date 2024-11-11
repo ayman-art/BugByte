@@ -36,7 +36,8 @@ public class RegistrationServiceTest {
         long expectedUserId = 1L;
 
         // Mock repository methods
-        when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password))).thenReturn((int) expectedUserId);
+
+        when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password))).thenReturn(expectedUserId);
 
         long actualUserId = registrationService.registerUser(email, userName, password);
 
