@@ -19,6 +19,7 @@ public class UserRepositoryImp implements UserRepository {
     private static final String SQL_COUNT_BY_EMAIL = "SELECT COUNT(*) FROM users WHERE email = ?;";
     private static final String SQL_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM users WHERE user_name = ?;";
     private static final String SQL_FIND_BY_ID = "SELECT * FROM users WHERE id = ?;";
+    private static final String SQL_FIND_ID_BY_EMAIL = "SELECT id FROM users WHERE email = ?;";
     private static final String SQL_FIND_BY_IDENTITY = "SELECT * FROM users WHERE email = ? OR user_name = ?;";
     private static final String SQL_CHANGE_PASSWORD = "UPDATE users SET password = ? WHERE id = ?";
     private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
@@ -31,13 +32,17 @@ public class UserRepositoryImp implements UserRepository {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Integer insertUser(String userName, String email, String password) {
+    public Long insertUser(String userName, String email, String password) {
         if (userName == null || email == null || password == null)
             throw new NullPointerException("username or email or password is null");
 
         String hashedPassword = passwordEncoder.encode(password);
-        // TODO:
-        return jdbcTemplate.update(SQL_INSERT_USER, userName, email, hashedPassword);
+        int rows = jdbcTemplate.update(SQL_INSERT_USER, userName, email, hashedPassword);
+
+        if (rows == 0)
+            throw new RuntimeException("Invalid input");
+
+        return findIdByEmail(email);
     }
 
     @Override
@@ -64,6 +69,11 @@ public class UserRepositoryImp implements UserRepository {
             throw new NullPointerException("Null user id");
 
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, userRowMapper, userId);
+    }
+
+    @Override
+    public Long findIdByEmail(String email) {
+        return jdbcTemplate.queryForObject(SQL_FIND_ID_BY_EMAIL, new Object[]{email}, Long.class);
     }
 
     @Override
