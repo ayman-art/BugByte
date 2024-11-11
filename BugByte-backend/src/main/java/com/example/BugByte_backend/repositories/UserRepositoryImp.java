@@ -20,6 +20,9 @@ public class UserRepositoryImp implements UserRepository {
     private static final String SQL_COUNT_BY_USERNAME = "SELECT COUNT(*) FROM users WHERE user_name = ?;";
     private static final String SQL_FIND_BY_ID = "SELECT * FROM users WHERE id = ?;";
     private static final String SQL_FIND_BY_IDENTITY = "SELECT * FROM users WHERE email = ? OR user_name = ?;";
+    private static final String SQL_CHANGE_PASSWORD = "UPDATE users SET password = ? WHERE id = ?";
+    private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
+    private static final String SQL_MAKE_USER_ADMIN = "UPDATE users SET is_admin = true WHERE id = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -52,23 +55,28 @@ public class UserRepositoryImp implements UserRepository {
     }
 
     @Override
-    public UserModel findById(Integer userId) {
+    public UserModel findById(Long userId) {
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, userRowMapper, userId);
     }
 
     @Override
-    public Boolean changePassword(Integer userId, String newPassword) {
-        return null;
+    public Boolean changePassword(Long userId, String newPassword) {
+        String hashedPassword = passwordEncoder.encode(newPassword);
+
+        int rows = jdbcTemplate.update(SQL_CHANGE_PASSWORD, hashedPassword, userId);
+        return rows == 1;
     }
 
     @Override
-    public Boolean deleteUser(Integer userId) {
-        return null;
+    public Boolean deleteUser(Long userId) {
+        int rows = jdbcTemplate.update(SQL_DELETE_USER_BY_ID, userId);
+        return rows == 1;
     }
 
     @Override
-    public Boolean makeUserAdmin(Integer userId) {
-        return null;
+    public Boolean makeUserAdmin(Long userId) {
+        int rows = jdbcTemplate.update(SQL_MAKE_USER_ADMIN, userId);
+        return rows == 1;
     }
 
     private final RowMapper<UserModel> userRowMapper = ((rs, rowNum) -> new UserModel(

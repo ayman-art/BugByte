@@ -11,11 +11,11 @@ public interface UserRepository {
 
     Integer getCountByUsername(String userName);
 
-    UserModel findById(Integer userId);
+    UserModel findById(Long userId);
 
-    Boolean changePassword(Integer userId, String newPassword);
+    Boolean changePassword(Long userId, String newPassword);
 
-    Boolean deleteUser(Integer userId);
+    Boolean deleteUser(Long userId);
 
-    Boolean makeUserAdmin(Integer userId);
+    Boolean makeUserAdmin(Long userId);
 }
