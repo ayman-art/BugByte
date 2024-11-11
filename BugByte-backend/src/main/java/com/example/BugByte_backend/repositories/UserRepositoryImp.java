@@ -32,6 +32,9 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public Integer insertUser(String userName, String email, String password) {
+        if (userName == null || email == null || password == null)
+            throw new NullPointerException("username or email or password is null");
+
         String hashedPassword = passwordEncoder.encode(password);
         // TODO:
         return jdbcTemplate.update(SQL_INSERT_USER, userName, email, hashedPassword);
@@ -57,11 +60,17 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public User findById(Long userId) {
+        if (userId == null)
+            throw new NullPointerException("Null user id");
+
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, userRowMapper, userId);
     }
 
     @Override
     public Boolean changePassword(Long userId, String newPassword) {
+        if (userId == null || newPassword == null)
+            throw new NullPointerException("Null user id or password");
+
         String hashedPassword = passwordEncoder.encode(newPassword);
 
         int rows = jdbcTemplate.update(SQL_CHANGE_PASSWORD, hashedPassword, userId);
@@ -70,12 +79,18 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public Boolean deleteUser(Long userId) {
+        if (userId == null)
+            throw new NullPointerException("Null user id");
+
         int rows = jdbcTemplate.update(SQL_DELETE_USER_BY_ID, userId);
         return rows == 1;
     }
 
     @Override
     public Boolean makeUserAdmin(Long userId) {
+        if (userId == null)
+            throw new NullPointerException("Null user id");
+
         int rows = jdbcTemplate.update(SQL_MAKE_USER_ADMIN, userId);
         return rows == 1;
     }
