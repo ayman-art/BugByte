@@ -1,58 +1,93 @@
 package com.example.BugByte_backend.models;
 
-public class User {
-    private long id;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name="users")
+public class UserModel {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
     private String user_name;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
     private String password;
-    private long reputation;
-    private boolean is_admin;
 
-    public User(String user_name, String email,String password){
+    @Column(nullable = false)
+    private Long reputation;
+
+    @Column(nullable = false)
+    private Boolean is_admin;
+
+    public UserModel(Long id, String user_name, String email, String password) {
+        this.id = id;
         this.user_name = user_name;
         this.email = email;
         this.password = password;
+        this.reputation = 0L;
         this.is_admin = false;
     }
 
-    public void setUsername(String user_name) {
+    public UserModel(Long id, String user_name, String email, String password, Long reputation, Boolean is_admin) {
+        this.id = id;
         this.user_name = user_name;
-    }
-
-    public void setPassword(String password) {
+        this.email = email;
         this.password = password;
+        this.reputation = reputation;
+        this.is_admin = is_admin;
     }
 
-    public void setId(long id) {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public void setReputation(long reputation) {
-        this.reputation = reputation;
+    public String get_user_name() {
+        return user_name;
     }
 
-    public long getId() {
-        return this.id;
+    public void set_user_name(String user_name) {
+        this.user_name = user_name;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public String getUsername() {
-        return user_name;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public long getReputation() {
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Long getReputation() {
         return reputation;
     }
 
-    public boolean is_adminn() {
+    public void setReputation(Long reputation) {
+        this.reputation = reputation;
+    }
+
+    public Boolean get_is_admin() {
         return is_admin;
+    }
+
+    public void set_is_admin(Boolean is_admin) {
+        this.is_admin = is_admin;
     }
 }

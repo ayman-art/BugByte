@@ -1,35 +1,21 @@
 package com.example.BugByte_backend.repositories;
 
+import com.example.BugByte_backend.models.UserModel;
 
-import com.example.BugByte_backend.models.User;
+public interface UserRepository {
+    Integer insertUser(String userName, String email, String password);
 
-public class UserRepository {
-    public long insertUser(String userName , String email,String password){
-        return 0;
-    }
+    UserModel findByIdentityAndPassword(String identity, String password);
 
-    public User findByIdentityAndPassword(String identity , String password){
-        return new User("user1" , "user@gmail.com" , "12345678");
-    }
+    Integer getCountByEmail(String email);
 
-    public int getCountByEmail(String Email){
-        return 0;
-    }
+    Integer getCountByUsername(String userName);
 
-    public int getCountByUsername(String uaerName){
-        return 0;
-    }
+    UserModel findById(Long userId);
 
-    public User findById(long userId){
-        return new User("user1" , "user@gmail.com" , "12345678");
-    }
+    Boolean changePassword(Long userId, String newPassword);
 
-    public Boolean changePassword(long userId , String newPassword){
-        return true;
-    }
+    Boolean deleteUser(Long userId);
 
-    public Boolean deleteUser(long userId){
-        return true;
-    }
-
+    Boolean makeUserAdmin(Long userId);
 }
