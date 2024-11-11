@@ -15,38 +15,27 @@ public class RegistrationService {
     //register new user
     public long registerUser(String email , String userName , String password) throws Exception{
         try {
-            //check if the user already exists in the database
-            int userByEmail = userRepository.getCountByEmail(email);
-            int userByUserName = userRepository.getCountByUsername(userName);
-            if (userByEmail > 0 || userByUserName > 0) {
-                throw new Exception("UserName or Email already exists");
-            }
-            else {
-                //insert new user in the database
-                return userRepository.insertUser(userName , email , password);
-            }
+            //insert user in the database
+            return userRepository.insertUser(userName , email , password);
         }
         catch (Exception e){
-            throw new Exception("Error registering user: " + e.getMessage());
+            throw new Exception("Error registering user , user Already exists: " + e.getMessage());
         }
     }
 
     //login user
     public User loginUser(String identity , String password) throws Exception{
         try {
-            //check if the user exists in the database
-            int userByEmail = userRepository.getCountByEmail(identity);
-            int userByUserName = userRepository.getCountByUsername(identity);
-            if (userByEmail == 0 && userByUserName == 0) {
-                throw new Exception("User doesn't exist");
-            }
-            else {
-                //get the user from the database
-                return userRepository.findByIdentityAndPassword(identity , password);
-            }
+
+            //get the user from the database
+                User user = userRepository.findByIdentityAndPassword(identity , password);
+                if(user == null){
+                    throw new NullPointerException("User doesn't exist");
+                }
+                return user;
         }
         catch (Exception e){
-            throw new Exception("Error occurred while logging in user: " + e.getMessage());
+            throw new Exception("Error occurred while logging in user , user doesn't exist: " + e.getMessage());
         }
     }
 

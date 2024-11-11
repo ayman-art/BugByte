@@ -34,9 +34,8 @@ public class RegistrationServiceTest {
         String userName = "user1";
         String password = "12345678";
         long expectedUserId = 1L;
+
         // Mock repository methods
-        when(userRepositoryMock.getCountByEmail(eq(email))).thenReturn(0);
-        when(userRepositoryMock.getCountByUsername(eq(userName))).thenReturn(0);
         when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password))).thenReturn((int) expectedUserId);
 
         long actualUserId = registrationService.registerUser(email, userName, password);
@@ -45,15 +44,15 @@ public class RegistrationServiceTest {
     }
     //test register user if user exists
     @Test
-    public void testRegisterUser_UserNameAlreadyExists() {
+    public void testRegisterUser_UserAlreadyExists() {
         // create user data
         String email = "user@example.com";
         String userName = "user1";
         String password = "12345678";
 
         // Mock repository methods
-        when(userRepositoryMock.getCountByEmail(email)).thenReturn(0);
-        when(userRepositoryMock.getCountByUsername(userName)).thenReturn(1);
+        when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password)))
+                .thenThrow(new RuntimeException("User already exists"));
 
         // Assert that an exception is thrown when the username already exists
         assertThrows(Exception.class, () -> {
@@ -67,8 +66,8 @@ public class RegistrationServiceTest {
         String identity = "user@example.com";
         String password = "12345678";
         // Mock repository methods
-        when(userRepositoryMock.getCountByEmail(identity)).thenReturn(0);
-        when(userRepositoryMock.getCountByUsername(identity)).thenReturn(0);
+
+        when(userRepositoryMock.findByIdentityAndPassword(eq(identity) , eq(password))).thenReturn(null);
 
 
         // Assert that an exception is thrown when the user doesn't exist
@@ -84,8 +83,6 @@ public class RegistrationServiceTest {
         String password = "12345678";
         User user = new User("user1" , "user@example.com" , "12345678");
         // Mock repository methods
-        when(userRepositoryMock.getCountByEmail(identity)).thenReturn(1);
-        when(userRepositoryMock.getCountByUsername(identity)).thenReturn(0);
         when(userRepositoryMock.findByIdentityAndPassword(identity , password)).thenReturn(user);
 
         User newUser = registrationService.loginUser(identity , password);
