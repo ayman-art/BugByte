@@ -24,4 +24,70 @@ public class UserModel {
 
     @Column(nullable = false)
     private Boolean is_admin;
+
+    public UserModel(Long id, String user_name, String email, String password) {
+        this.id = id;
+        this.user_name = user_name;
+        this.email = email;
+        this.password = password;
+        this.reputation = 0L;
+        this.is_admin = false;
+    }
+
+    public UserModel(Long id, String user_name, String email, String password, Long reputation, Boolean is_admin) {
+        this.id = id;
+        this.user_name = user_name;
+        this.email = email;
+        this.password = password;
+        this.reputation = reputation;
+        this.is_admin = is_admin;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String get_user_name() {
+        return user_name;
+    }
+
+    public void set_user_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Long getReputation() {
+        return reputation;
+    }
+
+    public void setReputation(Long reputation) {
+        this.reputation = reputation;
+    }
+
+    public Boolean get_is_admin() {
+        return is_admin;
+    }
+
+    public void set_is_admin(Boolean is_admin) {
+        this.is_admin = is_admin;
+    }
 }
