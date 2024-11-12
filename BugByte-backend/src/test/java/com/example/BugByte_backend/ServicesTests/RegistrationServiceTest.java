@@ -1,18 +1,18 @@
 package com.example.BugByte_backend.ServicesTests;
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.repositories.UserRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.RegistrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class RegistrationServiceTest {
 
     @Mock
@@ -23,7 +23,7 @@ public class RegistrationServiceTest {
 
     @BeforeEach
     public void setup() {
-        // No additional setup needed as mocks are handled by annotations
+        MockitoAnnotations.openMocks(this);
     }
 
     //test registration if user doesn't exist
@@ -31,12 +31,12 @@ public class RegistrationServiceTest {
     public void testRegisterUser_UserDoesNotExist() throws Exception {
         // create user data
         String email = "user@example.com";
-        String userName = "user1";
-        String password = "12345678";
+        String userName = "user12";
+        String password = "12345678@";
         long expectedUserId = 1L;
+
         // Mock repository methods
-        when(userRepositoryMock.getCountByEmail(eq(email))).thenReturn(0);
-        when(userRepositoryMock.getCountByUsername(eq(userName))).thenReturn(0);
+
         when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password))).thenReturn(expectedUserId);
 
         long actualUserId = registrationService.registerUser(email, userName, password);
@@ -45,17 +45,69 @@ public class RegistrationServiceTest {
     }
     //test register user if user exists
     @Test
-    public void testRegisterUser_UserNameAlreadyExists() {
+    public void testRegisterUser_UserAlreadyExists() {
         // create user data
         String email = "user@example.com";
-        String userName = "user1";
-        String password = "12345678";
+        String userName = "user12";
+        String password = "12345678@";
 
         // Mock repository methods
-        when(userRepositoryMock.getCountByEmail(email)).thenReturn(0);
-        when(userRepositoryMock.getCountByUsername(userName)).thenReturn(1);
+        when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password)))
+                .thenThrow(new RuntimeException("User already exists"));
 
         // Assert that an exception is thrown when the username already exists
+        assertThrows(Exception.class, () -> {
+            registrationService.registerUser(email, userName, password);
+        });
+    }
+    //test registration if invalid email
+    @Test
+    public void testRegisterUser_EmailInvalid() throws Exception {
+        // create user data
+        String email = "user.com";
+        String userName = "user12";
+        String password = "12345678@";
+        long expectedUserId = 1L;
+
+        assertThrows(Exception.class, () -> {
+            registrationService.registerUser(email, userName, password);
+        });
+    }
+    //test registration if invalid email
+    @Test
+    public void testRegisterUser_EmailInvalid1() throws Exception {
+        // create user data
+        String email = "user@example@example.com";
+        String userName = "user12";
+        String password = "12345678@";
+        long expectedUserId = 1L;
+
+        assertThrows(Exception.class, () -> {
+            registrationService.registerUser(email, userName, password);
+        });
+    }
+    //test registration if invalid username
+    @Test
+    public void testRegisterUser_UserNameInvalid() throws Exception {
+        // create user data
+        String email = "user@example.com";
+        String userName = "123";
+        String password = "12345678@";
+        long expectedUserId = 1L;
+
+        assertThrows(Exception.class, () -> {
+            registrationService.registerUser(email, userName, password);
+        });
+    }
+    //test registration if invalid username
+    @Test
+    public void testRegisterUser_WeekPassword() throws Exception {
+        // create user data
+        String email = "user@example.com";
+        String userName = "user12";
+        String password = "12345678";
+        long expectedUserId = 1L;
+
         assertThrows(Exception.class, () -> {
             registrationService.registerUser(email, userName, password);
         });
@@ -65,10 +117,10 @@ public class RegistrationServiceTest {
     public void testLoginUser_UserDoesNotExist() throws Exception {
         // create user data
         String identity = "user@example.com";
-        String password = "12345678";
+        String password = "12345678@";
         // Mock repository methods
-        when(userRepositoryMock.getCountByEmail(identity)).thenReturn(0);
-        when(userRepositoryMock.getCountByUsername(identity)).thenReturn(0);
+
+        when(userRepositoryMock.findByIdentityAndPassword(eq(identity) , eq(password))).thenReturn(null);
 
 
         // Assert that an exception is thrown when the user doesn't exist
@@ -81,11 +133,9 @@ public class RegistrationServiceTest {
     public void testLoginUser_UserExists() throws Exception {
         // create user data
         String identity = "user@example.com";
-        String password = "12345678";
-        User user = new User("user1" , "user@example.com" , "12345678");
+        String password = "12345678@";
+        User user = new User("user12" , "user@example.com" , "12345678@");
         // Mock repository methods
-        when(userRepositoryMock.getCountByEmail(identity)).thenReturn(1);
-        when(userRepositoryMock.getCountByUsername(identity)).thenReturn(0);
         when(userRepositoryMock.findByIdentityAndPassword(identity , password)).thenReturn(user);
 
         User newUser = registrationService.loginUser(identity , password);
@@ -101,14 +151,14 @@ public class RegistrationServiceTest {
     public void logoutUser_UserExists() throws Exception {
         long id = 1L;
         // Mock repository methods
-        when(userRepositoryMock.findById(id)).thenReturn(new User("user1" , "user@example.com" , "12345678"));
+        when(userRepositoryMock.findById(id)).thenReturn(new User("user12" , "user@example.com" , "12345678@"));
 
         User newUser = registrationService.logoutUser(id);
 
         // Assert the user is returned
-        assertEquals(newUser.get_user_name() , "user1");
+        assertEquals(newUser.get_user_name() , "user12");
         assertEquals(newUser.getEmail() , "user@example.com");
-        assertEquals(newUser.getPassword() ,"12345678");
+        assertEquals(newUser.getPassword() ,"12345678@");
 
     }
     //test logout if user doesn't exist
@@ -128,7 +178,7 @@ public class RegistrationServiceTest {
     public void deleteUser_UserExists() throws Exception {
         long id = 1L;
         // Mock repository methods
-        when(userRepositoryMock.findById(id)).thenReturn(new User("user1" , "user@example.com" , "12345678"));
+        when(userRepositoryMock.findById(id)).thenReturn(new User("user12" , "user@example.com" , "12345678@"));
 
         when(userRepositoryMock.deleteUser(id)).thenReturn(true);
 
@@ -154,7 +204,7 @@ public class RegistrationServiceTest {
         String newPassword = "13579";
 
         // Mock repository methods
-        when(userRepositoryMock.findById(id)).thenReturn(new User("user1" , "user@example.com" , "12345678"));
+        when(userRepositoryMock.findById(id)).thenReturn(new User("user12" , "user@example.com" , "12345678@"));
         when(userRepositoryMock.changePassword(id , newPassword)).thenReturn(true);
 
         // Assert the user is deleted
