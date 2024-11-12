@@ -38,7 +38,7 @@ public class UserService {
         return user;
     }
     public void main(){
-        Long id = 10L;
+        long id = 10L;
         User user = new User(id,"name", "example@provider.com", "password");
         this.cacheUser(user);
         User user2 = getCachedUser(id+1);
