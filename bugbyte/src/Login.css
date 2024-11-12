@@ -1,0 +1,160 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #236F3B;
+}
+
+.formContainer {
+    background-color: white;
+    border-radius: 40px;
+    padding: 40px;
+    text-align: center;
+    width: 350px;
+    height:600px;
+}
+
+.logo {
+    width: 180px;
+    height: 150px;
+    align-items: center;
+    margin-top: -5px;
+}
+
+.title {
+    font-size: 36px;
+    font-weight:5;
+    color: #2E904D;
+    margin: 7px 0;
+    font-family: 'mali', Cursive;
+    margin-bottom: 10px;
+
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: -5px;
+}
+
+.label {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+    font-weight: 600;
+    transform: translateX(25%);
+}
+
+.input {
+    border: 7px solid #D9D9Df;
+    border-radius: 15px;
+    padding: 10px;
+    font-size: 16px;
+    width: 80%;
+    height: 10px;
+    align-self: center;
+    font-family: 'mali', Cursive;
+
+}
+
+.loginButton {
+    background-color: #F9C92A;
+    color: Black;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 45%;
+    align-self: center;
+    margin-top: 3px;
+    margin-bottom:-5px;
+}
+.loginButton:active {
+  background-color: #e2a80f; /* Darker yellow when button is pressed */
+  transform: scale(0.98); /* Slightly shrink the button */
+}
+.orSection {
+    margin: 20px 0;
+}
+
+.googleButton {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-right: 70px;
+    margin-top:-1px;
+    margin-bottom:-10px;
+    font-size:14px;
+}
+.googleButton:hover {
+  text-decoration: underline;
+}
+
+
+.googleIcon {
+    width: 30px;
+    height: 28px;
+    margin-right: 70px;
+    transform: translateX(200%);
+}
+
+.registerSection {
+  display: flex;
+  align-items: center;
+  margin-top: 3px;
+  margin-left:40px;
+}
+
+.registerLink {
+  color: #1B853C;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.registerLink:hover {
+  text-decoration: underline;
+}
+
+.registerLink:active {
+  font-weight: 550;
+}
+.errorMessage {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.forgotPasswordSection {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.forgotPasswordLink {
+  color: #1B853C;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.forgotPasswordLink:hover {
+  color: #007B0D;
+}
+
+.forgotPasswordLink:active {
+  font-weight: 550;
+}
