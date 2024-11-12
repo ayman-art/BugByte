@@ -104,6 +104,20 @@ public class UserRepositoryImp implements UserRepository {
         return null;
     }
 
+    public User findByIdentity(String identity){
+        // this function returns the user by identity to send code to the user's email
+        return null;
+    }
+
+    public boolean codeExists(String code){
+        // this function checks if the code already exist while generating a random code
+        return false;
+    }
+
+    public String getCodeById(long id){
+        return null;
+    }
+
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
             rs.getLong("id"),
             rs.getString("user_name"),

@@ -224,5 +224,58 @@ public class RegistrationServiceTest {
             registrationService.deleteUser(id);
         });
     }
+    //test send reset password code user exists
+    @Test
+    public void resetPassword_UserExists() throws Exception{
+        User user = new User("user12" , "user@gmail.com" , "12345678@");
+        user.setId(1L);
+        // Mock repository methods
+        when(userRepositoryMock.findByIdentity("user12")).thenReturn(user);
+        when(userRepositoryMock.codeExists(anyString())).thenReturn(false);
+
+        //Assert the email is sent
+        assertEquals(registrationService.sendResetPasswordCode("user12") , 1L);
+
+    }
+    //test send reset password code user doesn't exist
+    @Test
+    public void resetPassword_UserDoesNotExist() throws Exception{
+        User user = new User("user12" , "rowanmohammad667@gmail.com" , "12345678@");
+        user.setId(1L);
+        // Mock repository methods
+        when(userRepositoryMock.findByIdentity("user12")).thenReturn(null);
+        when(userRepositoryMock.codeExists(anyString())).thenReturn(false);
+
+        // Assert that an exception is thrown when the user doesn't exist
+        assertThrows(Exception.class, () -> {
+            registrationService.sendResetPasswordCode("user12");
+        });
+    }
+    //test validate code correct code
+    @Test
+    public void validateCode_CorrectCode() throws Exception{
+        User user = new User("user12" , "user@gmail.com" , "12345678@");
+        user.setId(1L);
+        String code = "ABCDEFGH";
+        // Mock repository methods
+        when(userRepositoryMock.findById(user.getId())).thenReturn(user);
+        when(userRepositoryMock.getCodeById(user.getId())).thenReturn(code);
+
+        //Assert the code is valid
+        assertTrue(registrationService.validateCode(user.getId() , code));
+    }
+    //test validate code wrong code
+    @Test
+    public void validateCode_WrongCode() throws Exception{
+        User user = new User("user12" , "user@gmail.com" , "12345678@");
+        user.setId(1L);
+        String code = "ABCDEFGF";
+        // Mock repository methods
+        when(userRepositoryMock.findById(user.getId())).thenReturn(user);
+        when(userRepositoryMock.getCodeById(user.getId())).thenReturn("ABCDEFGH");
+
+        //Assert the code is invalid
+        assertFalse(registrationService.validateCode(user.getId() , code));
+    }
 }
 

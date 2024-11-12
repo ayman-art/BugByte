@@ -12,6 +12,8 @@ public class RegistrationService {
     private UserRepositoryImp userRepository;
     RegistrationCOR registrationCOR = new RegistrationCOR();
 
+    EmailService emailService = new EmailService();
+
     public long registerUser(String email , String userName , String password) throws Exception{
         try {
              if(!registrationCOR.validateEmail(email)){
@@ -90,6 +92,42 @@ public class RegistrationService {
         }
         catch (Exception e){
             throw new Exception("Error occurred while changing password:  " + e.getMessage());
+        }
+    }
+
+    public long sendResetPasswordCode(String identity) throws Exception{
+        try {
+            User user = userRepository.findByIdentity(identity);
+            if (user == null) {
+                throw new Exception("User doesn't exist");
+            }
+            String code = registrationCOR.generateCode();
+            while (userRepository.codeExists(code)){
+                code = registrationCOR.generateCode();
+            }
+            if(emailService.sendCodeByEmail(user.getEmail() , code)){
+                return user.getId();
+            }
+            else{
+                throw new Exception("Error occurred while sending code");
+            }
+        }
+        catch (Exception e){
+            throw new Exception("Error occurred while sending code:  " + e.getMessage());
+        }
+    }
+
+    public boolean validateCode(long id , String code) throws Exception{
+        try{
+            User user = userRepository.findById(id);
+            if(user == null){
+                throw new Exception("User doesn't exist");
+            }
+            String userCode = userRepository.getCodeById(id);
+           return userCode.equals(code);
+        }
+        catch (Exception e){
+            throw new Exception("Error occurred while validation  " + e.getMessage());
         }
     }
 }
