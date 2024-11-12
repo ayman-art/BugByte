@@ -17,7 +17,6 @@ public class UserService {
     I Override the remove eldest entry function to trigger removal of the eldest element whenever the size exceeds
         the provided pool capacity
      */
-    @Autowired
     private final LinkedHashMap<Long, User> userPool = new LinkedHashMap<Long, User>(poolCapacity, 0.75f, true){
         @Override
         protected boolean removeEldestEntry(Map.Entry<Long, User> eldest) {
@@ -30,13 +29,20 @@ public class UserService {
     This will help avoiding dealing with null pointers
     when using getCachedUser function it is required to surround it with try catch blocks
      */
-    private void cacheUser(User user){
+    protected void cacheUser(User user){
         this.userPool.put(user.getId(), user);
     }
-    private User getCachedUser(long id) throws NullPointerException {
+    protected User getCachedUser(long id) throws NullPointerException {
         User user = this.userPool.get(id);
         if ( user == null ) throw new NullPointerException("User Not Cached");
         return user;
+    }
+    public void main(){
+        Long id = 10L;
+        User user = new User(id,"name", "example@provider.com", "password");
+        this.cacheUser(user);
+        User user2 = getCachedUser(id+1);
+        System.out.println(user2.getId());
     }
 
 }
