@@ -10,9 +10,9 @@ public class RegistrationService {
 
     @Autowired
     private UserRepositoryImp userRepository;
+    RegistrationCOR registrationCOR = new RegistrationCOR();
 
     public long registerUser(String email , String userName , String password) throws Exception{
-        RegistrationCOR registrationCOR = new RegistrationCOR();
         try {
              if(!registrationCOR.validateEmail(email)){
                  throw new Exception("email is not valid");

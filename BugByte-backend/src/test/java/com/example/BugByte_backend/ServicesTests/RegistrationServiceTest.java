@@ -73,12 +73,25 @@ public class RegistrationServiceTest {
             registrationService.registerUser(email, userName, password);
         });
     }
+    //test registration if invalid email
+    @Test
+    public void testRegisterUser_EmailInvalid1() throws Exception {
+        // create user data
+        String email = "user@example@example.com";
+        String userName = "user12";
+        String password = "12345678@";
+        long expectedUserId = 1L;
+
+        assertThrows(Exception.class, () -> {
+            registrationService.registerUser(email, userName, password);
+        });
+    }
     //test registration if invalid username
     @Test
     public void testRegisterUser_UserNameInvalid() throws Exception {
         // create user data
         String email = "user@example.com";
-        String userName = "user";
+        String userName = "123";
         String password = "12345678@";
         long expectedUserId = 1L;
 
