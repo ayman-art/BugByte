@@ -37,12 +37,5 @@ public class UserService {
         if ( user == null ) throw new NullPointerException("User Not Cached");
         return user;
     }
-    public void main(){
-        long id = 10L;
-        User user = new User(id,"name", "example@provider.com", "password");
-        this.cacheUser(user);
-        User user2 = getCachedUser(id+1);
-        System.out.println(user2.getId());
-    }
 
 }
