@@ -14,7 +14,7 @@ public class RegistrationService {
 
     EmailService emailService = new EmailService();
 
-    public long registerUser(String email , String userName , String password) throws Exception{
+    public User registerUser(String email , String userName , String password) throws Exception{
         try {
              if(!registrationCOR.validateEmail(email)){
                  throw new Exception("email is not valid");
@@ -26,7 +26,8 @@ public class RegistrationService {
                  throw new Exception("week password");
              }
             //insert user in the database
-            return userRepository.insertUser(userName , email , password);
+            long id  = userRepository.insertUser(userName , email , password);
+             return new User(id, userName, email, password);
         }
         catch (Exception e){
             throw new Exception("Error registering user , user Already exists: " + e.getMessage());

@@ -39,9 +39,12 @@ public class RegistrationServiceTest {
 
         when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password))).thenReturn(expectedUserId);
 
-        long actualUserId = registrationService.registerUser(email, userName, password);
+        User user  = registrationService.registerUser(email, userName, password);
 
-        assertEquals(expectedUserId, actualUserId);
+        assertEquals(user.getId(), expectedUserId);
+        assertEquals(user.get_user_name() , userName);
+        assertEquals(user.getEmail() , email);
+        assertEquals(user.getPassword() , password);
     }
     //test register user if user exists
     @Test
