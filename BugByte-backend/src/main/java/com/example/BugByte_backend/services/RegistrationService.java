@@ -81,7 +81,7 @@ public class RegistrationService {
     }
 
 
-    public void changePassword(long userId , String newPassword) throws Exception{
+    public boolean changePassword(long userId , String newPassword) throws Exception{
         try {
             //check if the user exists in the database
             User user = userRepository.findById(userId);
@@ -90,6 +90,7 @@ public class RegistrationService {
             }
                 //change the password
                 if(!userRepository.changePassword(userId , newPassword)) throw new Exception("Invalid Operation");
+                return true;
         }
         catch (Exception e){
             throw new Exception("Error occurred while changing password:  " + e.getMessage());
