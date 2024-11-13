@@ -8,6 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 @Service
 public class UserService {
+    // Applying singleton design pattern
+    private static UserService instance = null;
+
+    public static UserService getInstance(){
+        if(instance==null) instance = new UserService();
+        return instance;
+    }
+    // private constructor to avoid using it outside the class
+    private UserService(){}
+
     // setting up user pool initial and final capacity ( Cache size )
     private final int poolCapacity = 1000;
     // The user pool map for caching users
