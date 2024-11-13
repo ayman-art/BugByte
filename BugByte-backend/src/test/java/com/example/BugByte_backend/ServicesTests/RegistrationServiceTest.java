@@ -1,4 +1,4 @@
-package com.example.BugByte_backend.ServicesTests;
+package com.example.BugByte_backend.servicesTests;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.RegistrationService;
