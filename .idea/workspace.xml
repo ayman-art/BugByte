@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="36b92182-9ed7-498e-93c4-23898e871f15" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/bugbyte/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/bugbyte/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bugbyte/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/bugbyte/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bugbyte/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/bugbyte/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bugbyte/src/Login.css" beforeDir="false" afterPath="$PROJECT_DIR$/bugbyte/src/styles/Login.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bugbyte/src/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/bugbyte/src/component/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bugbyte/src/bugbyteLogo.png" beforeDir="false" afterPath="$PROJECT_DIR$/bugbyte/src/assets/bugbyteLogo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bugbyte/src/googlelogo.png" beforeDir="false" afterPath="$PROJECT_DIR$/bugbyte/src/assets/googlelogo.png" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "habibatarek26"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ayman-art/BugByte.git",
+    "accountId": "adde47fd-dab3-463f-8eda-323921b285bf"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 1
+}]]></component>
+  <component name="ProjectId" id="2olTIsEUKdz8Iga9UZxtz1L2rBF" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "BUGBYTE-81-Reset-password-FE",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.importing"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\matrix\Documents\GitHub\BugByte\bugbyte\src\styles" />
+      <recent name="C:\Users\matrix\Documents\GitHub\BugByte\bugbyte\src\component" />
+      <recent name="C:\Users\matrix\Documents\GitHub\BugByte\bugbyte\src\assets" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="36b92182-9ed7-498e-93c4-23898e871f15" name="Changes" comment="" />
+      <created>1731443086334</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1731443086334</updated>
+    </task>
+    <servers />
+  </component>
+</project>
