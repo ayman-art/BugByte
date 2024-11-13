@@ -124,7 +124,10 @@ public class RegistrationService {
                 throw new Exception("User doesn't exist");
             }
             String userCode = userRepository.getCodeById(id);
-           return userCode.equals(code);
+           if(userCode.equals(code)){
+               return userRepository.deleteCode(code);
+           }
+            throw new Exception("wrong code");
         }
         catch (Exception e){
             throw new Exception("Error occurred while validation  " + e.getMessage());

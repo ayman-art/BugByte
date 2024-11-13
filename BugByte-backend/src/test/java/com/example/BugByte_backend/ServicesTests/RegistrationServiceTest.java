@@ -240,7 +240,7 @@ public class RegistrationServiceTest {
     //test send reset password code user doesn't exist
     @Test
     public void resetPassword_UserDoesNotExist() throws Exception{
-        User user = new User("user12" , "rowanmohammad667@gmail.com" , "12345678@");
+        User user = new User("user12" , "user12@gmail.com" , "12345678@");
         user.setId(1L);
         // Mock repository methods
         when(userRepositoryMock.findByIdentity("user12")).thenReturn(null);
@@ -260,6 +260,7 @@ public class RegistrationServiceTest {
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.getCodeById(user.getId())).thenReturn(code);
+        when(userRepositoryMock.deleteCode(code)).thenReturn(true);
 
         //Assert the code is valid
         assertTrue(registrationService.validateCode(user.getId() , code));
@@ -274,8 +275,11 @@ public class RegistrationServiceTest {
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.getCodeById(user.getId())).thenReturn("ABCDEFGH");
 
-        //Assert the code is invalid
-        assertFalse(registrationService.validateCode(user.getId() , code));
+
+        // Assert that an exception is thrown when the code is wrong
+        assertThrows(Exception.class, () -> {
+            registrationService.validateCode(user.getId() , code);
+        });
     }
 }
 

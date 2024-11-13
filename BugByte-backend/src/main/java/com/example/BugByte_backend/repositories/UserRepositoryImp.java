@@ -113,6 +113,9 @@ public class UserRepositoryImp implements UserRepository {
         // this function checks if the code already exist while generating a random code
         return false;
     }
+    public boolean deleteCode(String code){
+        return true;
+    }
 
     public String getCodeById(long id){
         return null;
