@@ -81,7 +81,7 @@ public class RegistrationService {
     }
 
 
-    public boolean changePassword(long userId , String newPassword) throws Exception{
+    public void changePassword(long userId , String newPassword) throws Exception{
         try {
             //check if the user exists in the database
             User user = userRepository.findById(userId);
@@ -89,14 +89,14 @@ public class RegistrationService {
                 throw new Exception("User doesn't exist");
             }
                 //change the password
-                return userRepository.changePassword(userId , newPassword);
+                if(!userRepository.changePassword(userId , newPassword)) throw new Exception("Invalid Operation");
         }
         catch (Exception e){
             throw new Exception("Error occurred while changing password:  " + e.getMessage());
         }
     }
 
-    public long sendResetPasswordCode(String identity) throws Exception{
+    public String sendResetPasswordCode(String identity) throws Exception{
         try {
             User user = userRepository.findByIdentity(identity);
             if (user == null) {
@@ -107,7 +107,7 @@ public class RegistrationService {
                 code = registrationCOR.generateCode();
             }
             if(emailService.sendCodeByEmail(user.getEmail() , code)){
-                return user.getId();
+                return user.getEmail();
             }
             else{
                 throw new Exception("Error occurred while sending code");
@@ -118,15 +118,16 @@ public class RegistrationService {
         }
     }
 
-    public boolean validateCode(long id , String code) throws Exception{
+    public User validateCode(String email , String code) throws Exception{
         try{
-            User user = userRepository.findById(id);
+            User user = userRepository.findByIdentity(email);
             if(user == null){
                 throw new Exception("User doesn't exist");
             }
-            String userCode = userRepository.getCodeById(id);
+            String userCode = userRepository.getCodeById(user.getId());
            if(userCode.equals(code)){
-               return userRepository.deleteCode(code);
+               userRepository.deleteCode(code);
+               return user;
            }
             throw new Exception("wrong code");
         }
