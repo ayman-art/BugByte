@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class AdminstrativeFacade {
+public class AdministrativeFacade {
     @Autowired
     private UserService userService;
 
