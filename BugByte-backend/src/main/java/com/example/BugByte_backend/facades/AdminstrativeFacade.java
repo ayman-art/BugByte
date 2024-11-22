@@ -6,27 +6,17 @@ import com.example.BugByte_backend.services.RegistrationService;
 import com.example.BugByte_backend.services.UserService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
+@Component
 public class AdminstrativeFacade {
-    // Applying singleton design pattern
-    private static AdminstrativeFacade instance = null;
-
-    public static AdminstrativeFacade getInstance(){
-        if(instance==null) instance = new AdminstrativeFacade();
-        return instance;
-    }
-    // protected constructor to avoid using it outside the class
-    protected AdminstrativeFacade(){}
-
-
-    private  UserService userService = UserService.getInstance();
+    @Autowired
+    private UserService userService;
 
     @Autowired
-    private  RegistrationService registrationService;
+    private RegistrationService registrationService;
 
     /*
     Expected input format:
@@ -40,7 +30,7 @@ public class AdminstrativeFacade {
         - uses the registration service to insert/validate the user to database
         - generates a jwt for the client side to store
      */
-    public  Map<String, Object> registerUser(Map<String, Object> userdata) throws Exception {
+    public Map<String, Object> registerUser(Map<String, Object> userdata) throws Exception {
         UserAdapter adapter = new UserAdapter();
         Map<String, Object> userMap = adapter.toMap(registrationService.registerUser((String)userdata.get("email"),
                 (String)userdata.get("user_name"), (String)userdata.get("password")));
@@ -54,6 +44,7 @@ public class AdminstrativeFacade {
         );
 
     }
+
     public  String loginUser(Map<String, Object> userdata) throws Exception{
         UserAdapter adapter = new UserAdapter();
         Map<String, Object> userMap = adapter.toMap(registrationService.loginUser((String)userdata.get("email"),
@@ -61,17 +52,20 @@ public class AdminstrativeFacade {
         return AuthenticationService.generateJWT((long)userMap.get("id"),
                 (String)userMap.get("user_name"), (boolean)userMap.get("is_admin"));
     }
+
     public  void deleteUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
         registrationService.deleteUser(id);
     }
+
     public  String resetPassword(Map<String, Object> userdata) throws Exception {
         String email = (String) userdata.get("email");
         return registrationService.sendResetPasswordCode(email);
 
     }
+
     public String validateEmailedCode(Map<String, Object> userdata) throws Exception {
         UserAdapter adapter = new UserAdapter();
 
@@ -82,11 +76,11 @@ public class AdminstrativeFacade {
         return AuthenticationService.generateJWT((Long)userMap.get("id"),
                 (String)userMap.get("user_name"), (boolean)userMap.get("is_admin"));
     }
+
     public void changePassword(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
         registrationService.changePassword(id, (String)userdata.get("password"));
     }
-
 }

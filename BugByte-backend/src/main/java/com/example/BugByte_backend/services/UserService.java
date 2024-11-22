@@ -1,23 +1,15 @@
 package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.models.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 @Service
+@Scope("singleton")
 public class UserService {
-    // Applying singleton design pattern
-    private static UserService instance = null;
-
-    public static UserService getInstance(){
-        if(instance==null) instance = new UserService();
-        return instance;
-    }
-    // protected constructor to avoid using it outside the class
-    protected UserService(){}
-
     // setting up user pool initial and final capacity ( Cache size )
     private final int poolCapacity = 1000;
     // The user pool map for caching users
@@ -42,10 +34,10 @@ public class UserService {
     public void cacheUser(User user){
         this.userPool.put(user.getId(), user);
     }
+
     public User getCachedUser(long id) throws NullPointerException {
         User user = this.userPool.get(id);
         if ( user == null ) throw new NullPointerException("User Not Cached");
         return user;
     }
-
 }
