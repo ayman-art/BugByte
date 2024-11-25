@@ -18,11 +18,67 @@ public class RegistrationController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody Map<String, Object> userdata) {
         try {
-            System.out.println("registerUser from RegistrationController");
             Map<String, Object> response = administrativeFacade.registerUser(userdata);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, Object> userdata) {
+        try {
+            String jwt = administrativeFacade.loginUser(userdata);
+            Map<String, Object> response = Map.of("jwt", jwt);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUser(@RequestBody Map<String, Object> userdata, @RequestHeader("Authorization") String token){
+        token = token.replace("Bearer ", "");
+        userdata.put("jwt", token);
+        try {
+            administrativeFacade.deleteUser(userdata);
+            return new ResponseEntity<>("User Deleted Successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, Object> userdata) {
+        try {
+            String code = administrativeFacade.resetPassword(userdata);
+            Map<String, Object> response = Map.of("code", code);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping("/validate-email-code")
+    public ResponseEntity<?> validateEmailCode(@RequestBody Map<String, Object> userdata) {
+        try {
+            String token = administrativeFacade.validateEmailedCode(userdata);
+            Map<String, Object> response = Map.of("jwt", token);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, Object> userdata, @RequestHeader("Authorization") String token) {
+        token = token.replace("Bearer ", "");
+        userdata.put("jwt", token);
+        try {
+            administrativeFacade.changePassword(userdata);
+            return new ResponseEntity<>("Password Changed Successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
 }
