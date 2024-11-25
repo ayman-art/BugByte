@@ -5,23 +5,18 @@ import com.example.BugByte_backend.services.AuthenticationService;
 import com.example.BugByte_backend.services.RegistrationService;
 import com.example.BugByte_backend.services.UserService;
 import io.jsonwebtoken.Claims;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-public class AdminstrativeFacade {
-    // Applying singleton design pattern
-    private static AdminstrativeFacade instance = null;
+@Component
+public class AdministrativeFacade {
+    @Autowired
+    private UserService userService;
 
-    public static AdminstrativeFacade getInstance(){
-        if(instance==null) instance = new AdminstrativeFacade();
-        return instance;
-    }
-    // protected constructor to avoid using it outside the class
-    protected AdminstrativeFacade(){}
-
-
-    private static UserService userService = UserService.getInstance();
-    private static RegistrationService registrationService = new RegistrationService();
+    @Autowired
+    private RegistrationService registrationService;
 
     /*
     Expected input format:
@@ -35,32 +30,43 @@ public class AdminstrativeFacade {
         - uses the registration service to insert/validate the user to database
         - generates a jwt for the client side to store
      */
-    public static String registerUser(Map<String, Object> userdata) throws Exception {
+    public Map<String, Object> registerUser(Map<String, Object> userdata) throws Exception {
         UserAdapter adapter = new UserAdapter();
         Map<String, Object> userMap = adapter.toMap(registrationService.registerUser((String)userdata.get("email"),
                 (String)userdata.get("user_name"), (String)userdata.get("password")));
-        return AuthenticationService.generateJWT((long)userMap.get("id"),
+        String jwt = AuthenticationService.generateJWT((long)userMap.get("id"),
                 (String)userMap.get("user_name"), (boolean)userMap.get("is_admin"));
+        boolean isAdmin = (boolean)userMap.get("is_admin");
+
+        return Map.of(
+            "jwt", jwt,
+            "isAdmin", isAdmin
+        );
+
     }
-    public static String loginUser(Map<String, Object> userdata) throws Exception{
+
+    public  String loginUser(Map<String, Object> userdata) throws Exception{
         UserAdapter adapter = new UserAdapter();
         Map<String, Object> userMap = adapter.toMap(registrationService.loginUser((String)userdata.get("email"),
                 (String)userdata.get("password")));
         return AuthenticationService.generateJWT((long)userMap.get("id"),
                 (String)userMap.get("user_name"), (boolean)userMap.get("is_admin"));
     }
-    public static void deleteUser(Map<String, Object> userdata) throws Exception {
+
+    public  void deleteUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
         registrationService.deleteUser(id);
     }
-    public static String resetPassword(Map<String, Object> userdata) throws Exception {
+
+    public  String resetPassword(Map<String, Object> userdata) throws Exception {
         String email = (String) userdata.get("email");
         return registrationService.sendResetPasswordCode(email);
 
     }
-    public static String validateEmailedCode(Map<String, Object> userdata) throws Exception {
+
+    public String validateEmailedCode(Map<String, Object> userdata) throws Exception {
         UserAdapter adapter = new UserAdapter();
 
         String email = (String) userdata.get("email");
@@ -70,11 +76,11 @@ public class AdminstrativeFacade {
         return AuthenticationService.generateJWT((Long)userMap.get("id"),
                 (String)userMap.get("user_name"), (boolean)userMap.get("is_admin"));
     }
-    public static void changePassword(Map<String, Object> userdata) throws Exception {
+
+    public void changePassword(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
         registrationService.changePassword(id, (String)userdata.get("password"));
     }
-
 }
