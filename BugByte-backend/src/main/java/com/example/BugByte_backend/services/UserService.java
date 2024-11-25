@@ -8,6 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 @Service
 public class UserService {
+    // Applying singleton design pattern
+    private static UserService instance = null;
+
+    public static UserService getInstance(){
+        if(instance==null) instance = new UserService();
+        return instance;
+    }
+    // protected constructor to avoid using it outside the class
+    protected UserService(){}
+
     // setting up user pool initial and final capacity ( Cache size )
     private final int poolCapacity = 1000;
     // The user pool map for caching users
@@ -29,10 +39,10 @@ public class UserService {
     This will help avoiding dealing with null pointers
     when using getCachedUser function it is required to surround it with try catch blocks
      */
-    protected void cacheUser(User user){
+    public void cacheUser(User user){
         this.userPool.put(user.getId(), user);
     }
-    protected User getCachedUser(long id) throws NullPointerException {
+    public User getCachedUser(long id) throws NullPointerException {
         User user = this.userPool.get(id);
         if ( user == null ) throw new NullPointerException("User Not Cached");
         return user;
