@@ -29,6 +29,7 @@ public class UserRepositoryImp implements UserRepository {
                     (?, ?);
             """;
     private static final String SQL_DELETE_VALIDATION_CODE = "DELETE FROM validation_code WHERE code = ?;";
+    private static final String SQL_COUNT_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE code = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -135,7 +136,11 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public Boolean codeExists(String code) {
-        return null;
+        Integer count = jdbcTemplate.queryForObject(SQL_COUNT_VALIDATION_CODE, new Object[]{code}, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
+
+        return count == 1;
     }
 
     @Override
