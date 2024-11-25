@@ -7,6 +7,8 @@ public interface UserRepository {
 
     User findByIdentityAndPassword(String identity, String password);
 
+    User findByIdentity(String identity);
+
     User findById(Long userId);
 
     Long findIdByEmail(String email);
@@ -17,5 +19,11 @@ public interface UserRepository {
 
     Boolean makeUserAdmin(Long userId);
 
-    Boolean add_reset_code(Long userId, String code);
+    Boolean addResetCode(Long userId, String code);
+
+    Boolean deleteResetCode(String code);
+
+    Boolean codeExists(String code);
+    
+    String getCodeById(Long id);
 }
