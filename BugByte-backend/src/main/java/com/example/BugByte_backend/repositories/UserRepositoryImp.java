@@ -55,9 +55,17 @@ public class UserRepositoryImp implements UserRepository {
     }
 
     @Override
+    public User findByIdentity(String identity) {
+        if (identity == null)
+            throw new NullPointerException("Identity");
+
+        return jdbcTemplate.queryForObject(SQL_FIND_BY_IDENTITY, userRowMapper, identity, identity);
+    }
+
+    @Override
     public User findById(Long userId) {
         if (userId == null)
-            throw new NullPointerException("Null user id");
+            throw new NullPointerException("User id is Null");
 
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, userRowMapper, userId);
     }
@@ -100,24 +108,22 @@ public class UserRepositoryImp implements UserRepository {
     }
 
     @Override
-    public Boolean add_reset_code(Long userId, String code) {
+    public Boolean addResetCode(Long userId, String code) {
         return null;
     }
 
-    public User findByIdentity(String identity){
-        // this function returns the user by identity to send code to the user's email
+    @Override
+    public Boolean deleteResetCode(String code) {
         return null;
     }
 
-    public boolean codeExists(String code){
-        // this function checks if the code already exist while generating a random code
-        return false;
-    }
-    public boolean deleteCode(String code){
-        return true;
+    @Override
+    public Boolean codeExists(String code) {
+        return null;
     }
 
-    public String getCodeById(long id){
+    @Override
+    public String getCodeById(Long id) {
         return null;
     }
 
