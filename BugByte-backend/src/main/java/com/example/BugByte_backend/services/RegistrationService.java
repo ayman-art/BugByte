@@ -96,41 +96,44 @@ public class RegistrationService {
         }
     }
 
-    public long sendResetPasswordCode(String identity) throws Exception{
+    public long sendResetPasswordCode(String identity) throws Exception {
         try {
             User user = userRepository.findByIdentity(identity);
             if (user == null) {
                 throw new Exception("User doesn't exist");
             }
+
             String code = registrationCOR.generateCode();
-            while (userRepository.codeExists(code)){
+            while (userRepository.codeExists(code)) {
                 code = registrationCOR.generateCode();
             }
-            if(emailService.sendCodeByEmail(user.getEmail() , code)){
+
+            if (!userRepository.addResetCode(user.getId(), code))
+                throw new Exception("Couldn't insert reset code.");
+
+            if (emailService.sendCodeByEmail(user.getEmail() , code)) {
                 return user.getId();
-            }
-            else{
+            } else {
                 throw new Exception("Error occurred while sending code");
             }
-        }
-        catch (Exception e){
-            throw new Exception("Error occurred while sending code:  " + e.getMessage());
+        } catch (Exception e){
+            throw new Exception("Error occurred while sending code: " + e.getMessage());
         }
     }
 
-    public boolean validateCode(long id , String code) throws Exception{
-        try{
+    public boolean validateCode(long id, String code) throws Exception {
+        try {
             User user = userRepository.findById(id);
-            if(user == null){
+            if (user == null) {
                 throw new Exception("User doesn't exist");
             }
+
             String userCode = userRepository.getCodeById(id);
-           if(userCode.equals(code)){
-               return userRepository.deleteCode(code);
-           }
+            if(userCode.equals(code)) {
+                return userRepository.deleteResetCode(code);
+            }
             throw new Exception("wrong code");
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new Exception("Error occurred while validation  " + e.getMessage());
         }
     }
