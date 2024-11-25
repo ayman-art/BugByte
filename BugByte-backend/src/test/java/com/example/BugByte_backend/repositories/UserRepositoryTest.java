@@ -17,6 +17,27 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class UserRepositoryTest {
+    private static final String SQL_INSERT_USER = """
+                INSERT INTO users
+                    (user_name, email, password, reputation, is_admin)
+                VALUES
+                    (?, ?, ?, 0, false);
+            """;
+    private static final String SQL_FIND_BY_ID = "SELECT * FROM users WHERE id = ?;";
+    private static final String SQL_FIND_ID_BY_EMAIL = "SELECT id FROM users WHERE email = ?;";
+    private static final String SQL_FIND_BY_IDENTITY = "SELECT * FROM users WHERE email = ? OR user_name = ?;";
+    private static final String SQL_CHANGE_PASSWORD = "UPDATE users SET password = ? WHERE id = ?";
+    private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
+    private static final String SQL_MAKE_USER_ADMIN = "UPDATE users SET is_admin = true WHERE id = ?";
+    private static final String SQL_INSERT_VALIDATION_CODE = """
+                INSERT INTO validation_code
+                    (id, code)
+                VALUES
+                    (?, ?);
+            """;
+    private static final String SQL_DELETE_VALIDATION_CODE = "DELETE FROM validation_code WHERE code = ?;";
+    private static final String SQL_COUNT_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE code = ?";
+    private static final String SQL_FIND_VALIDATION_CODE_BY_ID = "SELECT code FROM validation_code WHERE id = ?;";
 
     @Mock
     private JdbcTemplate jdbcTemplate;
@@ -37,11 +58,12 @@ public class UserRepositoryTest {
         String username = "username";
         String email = "username@example.com";
         String password = "password";
+        String hashedPassword = "hashedPassword";
 
-        when(jdbcTemplate.update(anyString(), anyString(), anyString(), anyString())).thenReturn(1);
-        when(jdbcTemplate.queryForObject(anyString(), eq(new Object[]{email}), eq(Long.class))).thenReturn(7L);
+        when(jdbcTemplate.update(eq(SQL_INSERT_USER), eq(username), eq(email), eq(hashedPassword))).thenReturn(1);
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_ID_BY_EMAIL), eq(new Object[]{ email }), eq(Long.class))).thenReturn(7L);
 
-        when(passwordEncoder.encode(anyString())).thenReturn(anyString());
+        when(passwordEncoder.encode(eq(password))).thenReturn(hashedPassword);
 
         Long result = userRepository.insertUser(username, email, password);
         assertEquals(7L, result);
@@ -52,8 +74,10 @@ public class UserRepositoryTest {
         String username = "username";
         String email = "username@example.com";
         String password = "password";
+        String hashedPassword = "hashedPassword";
 
-        when(jdbcTemplate.update(anyString(), anyString(), anyString(), anyString())).thenReturn(0);
+        when(jdbcTemplate.update(eq(SQL_INSERT_USER), eq(username), eq(email), eq(hashedPassword))).thenReturn(0);
+        when(passwordEncoder.encode(eq(password))).thenReturn(hashedPassword);
 
         assertThrows(RuntimeException.class, () -> userRepository.insertUser(username, email, password));
     }
@@ -73,10 +97,11 @@ public class UserRepositoryTest {
         String username = "username";
         String email = "username@example.com";
         String password = "password";
-        User user = new User(id, username, email, password);
+        String hashedPassword = "hashedPassword";
+        User user = new User(id, username, email, hashedPassword);
 
-        when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), anyString(), anyString())).thenReturn(user);
-        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(email), eq(email))).thenReturn(user);
+        when(passwordEncoder.matches(eq(password), eq(hashedPassword))).thenReturn(true);
 
         User result = userRepository.findByIdentityAndPassword(email, password);
         assertEquals("username", result.get_user_name());
@@ -87,7 +112,7 @@ public class UserRepositoryTest {
         String username = "username";
         String password = "password";
 
-        when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), anyString(), anyString())).thenReturn(null);
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(username), eq(username))).thenReturn(null);
 
         User result = userRepository.findByIdentityAndPassword(username, password);
         assertNull(result);
@@ -98,9 +123,48 @@ public class UserRepositoryTest {
         String username = "username";
         String password = "password";
 
-        when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), anyString(), anyString())).thenReturn(new RuntimeException("User not found"));
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(username), eq(username))).thenThrow(new RuntimeException("User not found"));
 
         assertThrows(RuntimeException.class, () -> userRepository.findByIdentityAndPassword(username, password));
+    }
+
+    @Test
+    public void testFindByIdentity_withUsername() {
+        String identity = "username";
+        User expectedUser = new User(1L, identity, "email@example.com", "password");
+
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(identity), eq(identity)))
+                .thenReturn(expectedUser);
+
+        User result = userRepository.findByIdentity(identity);
+
+        assertNotNull(result);
+        assertEquals(expectedUser, result);
+    }
+
+    @Test
+    public void testFindByIdentity_withEmail() {
+        String identity = "email@example.com";
+        User expectedUser = new User(1L, "username", identity, "password");
+
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(identity), eq(identity)))
+                .thenReturn(expectedUser);
+
+        User result = userRepository.findByIdentity(identity);
+
+        assertNotNull(result);
+        assertEquals(expectedUser, result);
+    }
+
+    @Test
+    public void testFindByIdentity_notFound() {
+        String identity = "nonexistent";
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(identity), eq(identity)))
+                .thenReturn(null);
+
+        User result = userRepository.findByIdentity(identity);
+
+        assertNull(result);
     }
 
     @Test
@@ -112,7 +176,7 @@ public class UserRepositoryTest {
 
         User user = new User(id, username, email, password);
 
-        when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), anyLong())).thenReturn(user);
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_ID), any(RowMapper.class), eq(id))).thenReturn(user);
 
         User result = userRepository.findById(1L);
         assertEquals(1L, result.getId());
@@ -120,7 +184,8 @@ public class UserRepositoryTest {
 
     @Test
     public void testFindById_userNotFound() {
-        when(jdbcTemplate.queryForObject(anyString(), any(RowMapper.class), anyLong())).thenReturn(null);
+        Long id = 101L;
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_ID), any(RowMapper.class), eq(id))).thenReturn(null);
 
         User result = userRepository.findById(404L);
         assertNull(result);
@@ -133,18 +198,25 @@ public class UserRepositoryTest {
 
     @Test
     public void testChangePassword_success() {
-        when(jdbcTemplate.update(anyString(), anyString(), anyLong())).thenReturn(1);
-        when(passwordEncoder.encode(anyString())).thenReturn(anyString());
+        Long userId = 1L;
+        String password = "password";
+        String hashedPassword = "hashedPassword";
 
-        Boolean result = userRepository.changePassword(1L, "newPassword");
+        when(jdbcTemplate.update(eq(SQL_CHANGE_PASSWORD), eq(hashedPassword), eq(userId))).thenReturn(1);
+        when(passwordEncoder.encode(eq(password))).thenReturn(hashedPassword);
+
+        Boolean result = userRepository.changePassword(userId, password);
         assertTrue(result);
     }
 
     @Test
     public void testChangePassword_userNotFound() {
-        when(jdbcTemplate.update(anyString(), anyString(), anyLong())).thenReturn(0);
+        Long userId = 404L;
+        String password = "password";
+        String hashedPassword = "hashedPassword";
+        when(jdbcTemplate.update(eq(SQL_CHANGE_PASSWORD), eq(hashedPassword), eq(userId))).thenReturn(0);
 
-        Boolean result = userRepository.changePassword(404L, "newPassword");
+        Boolean result = userRepository.changePassword(userId, password);
         assertFalse(result);
     }
 
@@ -155,15 +227,17 @@ public class UserRepositoryTest {
 
     @Test
     public void testDeleteUser_success() {
-        when(jdbcTemplate.update(anyString(), any(Long.class))).thenReturn(1);
-        Boolean result = userRepository.deleteUser(1L);
+        Long userId = 1L;
+        when(jdbcTemplate.update(eq(SQL_DELETE_USER_BY_ID), eq(userId))).thenReturn(1);
+        Boolean result = userRepository.deleteUser(userId);
         assertTrue(result);
     }
 
     @Test
     public void testDeleteUser_userNotFound() {
-        when(jdbcTemplate.update(anyString(), any(Long.class))).thenReturn(0);
-        Boolean result = userRepository.deleteUser(404L);
+        Long userId = 404L;
+        when(jdbcTemplate.update(eq(SQL_DELETE_USER_BY_ID), eq(userId))).thenReturn(0);
+        Boolean result = userRepository.deleteUser(userId);
         assertFalse(result);
     }
 
@@ -174,20 +248,118 @@ public class UserRepositoryTest {
 
     @Test
     public void testMakeUserAdmin_success() {
-        when(jdbcTemplate.update(anyString(), any(Long.class))).thenReturn(1);
+        Long userId = 1L;
+        when(jdbcTemplate.update(eq(SQL_MAKE_USER_ADMIN), eq(userId))).thenReturn(1);
         Boolean result = userRepository.makeUserAdmin(1L);
         assertTrue(result);
     }
 
     @Test
     public void testMakeUserAdmin_userNotFound() {
-        when(jdbcTemplate.update(anyString(), any(Long.class))).thenReturn(0);
-        Boolean result = userRepository.makeUserAdmin(404L);
+        Long userId = 0L;
+        when(jdbcTemplate.update(eq(SQL_MAKE_USER_ADMIN), eq(userId))).thenReturn(0);
+        Boolean result = userRepository.makeUserAdmin(userId);
         assertFalse(result);
     }
 
     @Test
     public void testMakeUserAdmin_nullUserId() {
         assertThrows(NullPointerException.class, () -> userRepository.makeUserAdmin(null));
+    }
+
+    @Test
+    public void testAddResetCode_success() {
+        Long userId = 1L;
+        String code = "resetCode";
+
+        when(jdbcTemplate.update(eq(SQL_INSERT_VALIDATION_CODE), eq(userId), eq(code))).thenReturn(1);
+
+        Boolean result = userRepository.addResetCode(userId, code);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testAddResetCode_fail() {
+        Long userId = 1L;
+        String code = "resetCode";
+
+        when(jdbcTemplate.update(eq(SQL_INSERT_VALIDATION_CODE), eq(userId), eq(code))).thenReturn(0);
+
+        Boolean result = userRepository.addResetCode(userId, code);
+
+        assertFalse(result);
+    }
+
+    @Test
+    public void testDeleteResetCode_success() {
+        String code = "resetCode";
+
+        when(jdbcTemplate.update(eq(SQL_DELETE_VALIDATION_CODE), eq(code))).thenReturn(1);
+
+        Boolean result = userRepository.deleteResetCode(code);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testDeleteResetCode_fail() {
+        String code = "resetCode";
+
+        when(jdbcTemplate.update(eq(SQL_DELETE_VALIDATION_CODE), eq(code))).thenReturn(0);
+
+        Boolean result = userRepository.deleteResetCode(code);
+
+        assertFalse(result);
+    }
+
+    @Test
+    public void testCodeExists_true() {
+        String code = "resetCode";
+
+        when(jdbcTemplate.queryForObject(eq(SQL_COUNT_VALIDATION_CODE), eq(new Object[]{ code }), eq(Integer.class)))
+                .thenReturn(1);
+
+        Boolean result = userRepository.codeExists(code);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testCodeExists_false() {
+        String code = "resetCode";
+
+        when(jdbcTemplate.queryForObject(eq(SQL_COUNT_VALIDATION_CODE), eq(new Object[]{ code }), eq(Integer.class)))
+                .thenReturn(0);
+
+        Boolean result = userRepository.codeExists(code);
+
+        assertFalse(result);
+    }
+
+    @Test
+    public void testGetCodeById_success() {
+        Long id = 1L;
+        String expectedCode = "resetCode";
+
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_VALIDATION_CODE_BY_ID), eq(new Object[]{ id }), eq(String.class)))
+                .thenReturn(expectedCode);
+
+        String result = userRepository.getCodeById(id);
+
+        assertNotNull(result);
+        assertEquals(expectedCode, result);
+    }
+
+    @Test
+    public void testGetCodeById_notFound() {
+        Long id = 1L;
+
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_VALIDATION_CODE_BY_ID), eq(new Object[]{ id }), eq(String.class)))
+                .thenReturn(null);
+
+        String result = userRepository.getCodeById(id);
+
+        assertNull(result);
     }
 }

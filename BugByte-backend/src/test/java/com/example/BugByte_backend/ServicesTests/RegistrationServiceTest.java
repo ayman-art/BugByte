@@ -263,7 +263,7 @@ public class RegistrationServiceTest {
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.getCodeById(user.getId())).thenReturn(code);
-        when(userRepositoryMock.deleteCode(code)).thenReturn(true);
+        when(userRepositoryMock.deleteResetCode(code)).thenReturn(true);
 
         //Assert the code is valid
         assertTrue(registrationService.validateCode(user.getId() , code));
