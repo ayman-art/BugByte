@@ -22,6 +22,12 @@ public class UserRepositoryImp implements UserRepository {
     private static final String SQL_CHANGE_PASSWORD = "UPDATE users SET password = ? WHERE id = ?";
     private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
     private static final String SQL_MAKE_USER_ADMIN = "UPDATE users SET is_admin = true WHERE id = ?";
+    private static final String SQL_INSERT_VALIDATION_CODE = """
+                INSERT INTO validation_code
+                    (id, code)
+                VALUES
+                    (?, ?);
+            """;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -109,7 +115,12 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public Boolean addResetCode(Long userId, String code) {
-        return null;
+        if (userId == null || code == null)
+            throw new NullPointerException("userId or code is null");
+
+        int rows = jdbcTemplate.update(SQL_INSERT_USER, userId, code);
+
+        return rows == 1;
     }
 
     @Override
