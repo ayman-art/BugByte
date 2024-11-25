@@ -1,6 +1,7 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.User;
+import com.example.BugByte_backend.models.ValidationCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -30,6 +31,7 @@ public class UserRepositoryImp implements UserRepository {
             """;
     private static final String SQL_DELETE_VALIDATION_CODE = "DELETE FROM validation_code WHERE code = ?;";
     private static final String SQL_COUNT_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE code = ?";
+    private static final String SQL_FIND_VALIDATION_CODE_BY_ID = "SELECT code FROM validation_code WHERE id = ?;";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -145,7 +147,10 @@ public class UserRepositoryImp implements UserRepository {
 
     @Override
     public String getCodeById(Long id) {
-        return null;
+        if (id == null)
+            throw new NullPointerException("UserId is Null");
+
+        return jdbcTemplate.queryForObject(SQL_COUNT_VALIDATION_CODE, new Object[]{ id }, String.class);
     }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
