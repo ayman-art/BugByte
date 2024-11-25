@@ -1,11 +1,14 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.User;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 
 @Repository
@@ -118,6 +121,22 @@ public class UserRepositoryImp implements UserRepository {
     }
 
     public String getCodeById(long id){
+        return null;
+    }
+
+    public boolean follow(long userId , long followingId){
+        return true;
+    }
+    public boolean isFollowing(long userId , long followingId){
+        return false;
+    }
+    public boolean unfollow(long userId , long followingId){
+        return true;
+    }
+    public List<User> getFollowings(long userId){
+        return null;
+    }
+    public List<User> getFollowers(long userId){
         return null;
     }
 
