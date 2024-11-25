@@ -36,10 +36,10 @@ public class RegistrationController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteUser(@RequestBody Map<String, Object> userdata, @RequestHeader("Authorization") String token){
+    @DeleteMapping("/delete-user")
+    public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String token){
         token = token.replace("Bearer ", "");
-        userdata.put("jwt", token);
+        Map<String, Object> userdata = Map.of("jwt", token);
         try {
             administrativeFacade.deleteUser(userdata);
             return new ResponseEntity<>("User Deleted Successfully", HttpStatus.OK);
