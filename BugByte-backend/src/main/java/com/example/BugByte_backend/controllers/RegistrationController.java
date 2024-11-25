@@ -51,8 +51,8 @@ public class RegistrationController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, Object> userdata) {
         try {
-            String code = administrativeFacade.resetPassword(userdata);
-            Map<String, Object> response = Map.of("code", code);
+            String email = administrativeFacade.resetPassword(userdata);
+            Map<String, Object> response = Map.of("email", email);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
