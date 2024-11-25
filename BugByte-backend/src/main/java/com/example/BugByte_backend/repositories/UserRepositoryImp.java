@@ -122,7 +122,7 @@ public class UserRepositoryImp implements UserRepository {
         if (userId == null || code == null)
             throw new NullPointerException("UserId or code is null");
 
-        int rows = jdbcTemplate.update(SQL_INSERT_USER, userId, code);
+        int rows = jdbcTemplate.update(SQL_INSERT_VALIDATION_CODE, userId, code);
 
         return rows == 1;
     }
@@ -150,7 +150,7 @@ public class UserRepositoryImp implements UserRepository {
         if (id == null)
             throw new NullPointerException("UserId is Null");
 
-        return jdbcTemplate.queryForObject(SQL_COUNT_VALIDATION_CODE, new Object[]{ id }, String.class);
+        return jdbcTemplate.queryForObject(SQL_FIND_VALIDATION_CODE_BY_ID, new Object[]{ id }, String.class);
     }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
