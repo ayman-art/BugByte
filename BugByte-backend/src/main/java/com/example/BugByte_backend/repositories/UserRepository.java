@@ -24,6 +24,8 @@ public interface UserRepository {
     Boolean deleteResetCode(String code);
 
     Boolean codeExists(String code);
-    
+
+    Boolean userExists(Long userId);
+
     String getCodeById(Long id);
 }

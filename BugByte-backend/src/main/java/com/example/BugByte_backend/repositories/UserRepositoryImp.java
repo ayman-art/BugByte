@@ -1,7 +1,6 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.models.ValidationCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,6 +30,7 @@ public class UserRepositoryImp implements UserRepository {
             """;
     private static final String SQL_DELETE_VALIDATION_CODE = "DELETE FROM validation_code WHERE code = ?;";
     private static final String SQL_COUNT_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE code = ?";
+    private static final String SQL_COUNT_USER_IN_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE id = ?";
     private static final String SQL_FIND_VALIDATION_CODE_BY_ID = "SELECT code FROM validation_code WHERE id = ?;";
 
     @Autowired
@@ -139,6 +139,15 @@ public class UserRepositoryImp implements UserRepository {
     @Override
     public Boolean codeExists(String code) {
         Integer count = jdbcTemplate.queryForObject(SQL_COUNT_VALIDATION_CODE, new Object[]{code}, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
+
+        return count == 1;
+    }
+
+    @Override
+    public Boolean userExists(Long userId) {
+        Integer count = jdbcTemplate.queryForObject(SQL_COUNT_USER_IN_VALIDATION_CODE, new Object[]{ userId }, Integer.class);
         if (count == null)
             throw new RuntimeException("Invalid Input");
 
