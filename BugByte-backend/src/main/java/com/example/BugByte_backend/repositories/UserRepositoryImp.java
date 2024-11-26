@@ -22,6 +22,17 @@ public class UserRepositoryImp implements UserRepository {
     private static final String SQL_CHANGE_PASSWORD = "UPDATE users SET password = ? WHERE id = ?";
     private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
     private static final String SQL_MAKE_USER_ADMIN = "UPDATE users SET is_admin = true WHERE id = ?";
+    private static final String SQL_INSERT_VALIDATION_CODE = """
+                INSERT INTO validation_code
+                    (id, code)
+                VALUES
+                    (?, ?);
+            """;
+    private static final String SQL_DELETE_VALIDATION_CODE = "DELETE FROM validation_code WHERE code = ?;";
+    private static final String SQL_COUNT_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE code = ?";
+    private static final String SQL_COUNT_USER_IN_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE id = ?";
+    private static final String SQL_FIND_VALIDATION_CODE_BY_ID = "SELECT code FROM validation_code WHERE id = ?;";
+    private static final String SQL_UPDATE_VALIDATION_CODE = "UPDATE validation_code SET code = ? WHERE id = ?;";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -55,9 +66,17 @@ public class UserRepositoryImp implements UserRepository {
     }
 
     @Override
+    public User findByIdentity(String identity) {
+        if (identity == null)
+            throw new NullPointerException("Identity is Null");
+
+        return jdbcTemplate.queryForObject(SQL_FIND_BY_IDENTITY, userRowMapper, identity, identity);
+    }
+
+    @Override
     public User findById(Long userId) {
         if (userId == null)
-            throw new NullPointerException("Null user id");
+            throw new NullPointerException("UserId is Null");
 
         return jdbcTemplate.queryForObject(SQL_FIND_BY_ID, userRowMapper, userId);
     }
@@ -73,7 +92,7 @@ public class UserRepositoryImp implements UserRepository {
     @Override
     public Boolean changePassword(Long userId, String newPassword) {
         if (userId == null || newPassword == null)
-            throw new NullPointerException("Null user id or password");
+            throw new NullPointerException("UserId or password is Null");
 
         String hashedPassword = passwordEncoder.encode(newPassword);
 
@@ -84,7 +103,7 @@ public class UserRepositoryImp implements UserRepository {
     @Override
     public Boolean deleteUser(Long userId) {
         if (userId == null)
-            throw new NullPointerException("Null user id");
+            throw new NullPointerException("UserId is Null");
 
         int rows = jdbcTemplate.update(SQL_DELETE_USER_BY_ID, userId);
         return rows == 1;
@@ -93,32 +112,59 @@ public class UserRepositoryImp implements UserRepository {
     @Override
     public Boolean makeUserAdmin(Long userId) {
         if (userId == null)
-            throw new NullPointerException("Null user id");
+            throw new NullPointerException("UserId is Null");
 
         int rows = jdbcTemplate.update(SQL_MAKE_USER_ADMIN, userId);
         return rows == 1;
     }
 
     @Override
-    public Boolean add_reset_code(Long userId, String code) {
-        return null;
+    public Boolean addResetCode(Long userId, String code) {
+        if (userId == null || code == null)
+            throw new NullPointerException("UserId or code is null");
+
+        int rows = 0;
+        if (userExists(userId))
+            rows = jdbcTemplate.update(SQL_UPDATE_VALIDATION_CODE, code, userId);
+        else
+            rows = jdbcTemplate.update(SQL_INSERT_VALIDATION_CODE, userId, code);
+
+        return rows == 1;
     }
 
-    public User findByIdentity(String identity){
-        // this function returns the user by identity to send code to the user's email
-        return null;
+    @Override
+    public Boolean deleteResetCode(String code) {
+        if (code == null)
+            throw new NullPointerException("Code is Null");
+
+        int rows = jdbcTemplate.update(SQL_DELETE_VALIDATION_CODE, code);
+        return rows == 1;
     }
 
-    public boolean codeExists(String code){
-        // this function checks if the code already exist while generating a random code
-        return false;
-    }
-    public boolean deleteCode(String code){
-        return true;
+    @Override
+    public Boolean codeExists(String code) {
+        Integer count = jdbcTemplate.queryForObject(SQL_COUNT_VALIDATION_CODE, new Object[]{code}, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
+
+        return count == 1;
     }
 
-    public String getCodeById(long id){
-        return null;
+    @Override
+    public Boolean userExists(Long userId) {
+        Integer count = jdbcTemplate.queryForObject(SQL_COUNT_USER_IN_VALIDATION_CODE, new Object[]{ userId }, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
+
+        return count == 1;
+    }
+
+    @Override
+    public String getCodeById(Long id) {
+        if (id == null)
+            throw new NullPointerException("UserId is Null");
+
+        return jdbcTemplate.queryForObject(SQL_FIND_VALIDATION_CODE_BY_ID, new Object[]{ id }, String.class);
     }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(

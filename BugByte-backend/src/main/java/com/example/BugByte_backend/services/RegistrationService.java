@@ -56,7 +56,7 @@ public class RegistrationService {
             }
             return user;
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new Exception("Error occurred while logging out user:  " + e.getMessage());
         }
     }
@@ -97,6 +97,7 @@ public class RegistrationService {
             if (user == null) {
                 throw new Exception("User doesn't exist");
             }
+
             String code = registrationCOR.generateCode();
             while (userRepository.codeExists(code)) {
                 code = registrationCOR.generateCode();
@@ -119,7 +120,7 @@ public class RegistrationService {
             }
             String userCode = userRepository.getCodeById(user.getId());
             if(userCode.equals(code)){
-                userRepository.deleteCode(code);
+                userRepository.deleteResetCode(code);
                 return user;
             }
             throw new Exception("wrong code");
