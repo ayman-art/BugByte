@@ -14,31 +14,30 @@ public class RegistrationService {
 
     EmailService emailService = new EmailService();
 
-    public User registerUser(String email, String userName, String password) throws Exception {
+    public User registerUser(String email , String userName , String password) throws Exception {
         try {
-            if(!registrationCOR.validateEmail(email)){
-                throw new Exception("email is not valid");
-            }
-            if(!registrationCOR.validateUserName(userName)){
-                throw new Exception("userName is too short");
-            }
-            if(!registrationCOR.validatePassword(password)){
-                throw new Exception("week password");
-            }
-            //insert user in the database
-            long id  = userRepository.insertUser(userName, email, password);
-            return new User(id, userName, email, password);
-        }
-        catch (Exception e){
+             if(!registrationCOR.validateEmail(email)) {
+                 throw new Exception("email is not valid");
+             }
+             if(!registrationCOR.validateUserName(userName)) {
+                 throw new Exception("userName is too short");
+             }
+             if(!registrationCOR.validatePassword(password)) {
+                 throw new Exception("weak password");
+             }
+             //insert user in the database
+             long id  = userRepository.insertUser(userName , email , password);
+             return new User(id, userName, email, password);
+        } catch (Exception e) {
             throw new Exception("Error registering user , user Already exists: " + e.getMessage());
         }
     }
 
-    public User loginUser(String identity, String password) throws Exception {
+    public User loginUser(String identity , String password) throws Exception {
         try {
             //get the user from the database
-            User user = userRepository.findByIdentityAndPassword(identity, password);
-            if(user == null) {
+            User user = userRepository.findByIdentityAndPassword(identity , password);
+            if(user == null){
                 throw new NullPointerException("User doesn't exist");
             }
             return user;
@@ -77,7 +76,7 @@ public class RegistrationService {
         }
     }
 
-    public boolean changePassword(long userId, String newPassword) throws Exception {
+    public boolean changePassword(long userId , String newPassword) throws Exception {
         try {
             //check if the user exists in the database
             User user = userRepository.findById(userId);
@@ -85,14 +84,14 @@ public class RegistrationService {
                 throw new Exception("User doesn't exist");
             }
             //change the password
-            return userRepository.changePassword(userId, newPassword);
-        }
-        catch (Exception e){
+            if (!userRepository.changePassword(userId , newPassword)) throw new Exception("Invalid Operation");
+            return true;
+        } catch (Exception e){
             throw new Exception("Error occurred while changing password:  " + e.getMessage());
         }
     }
 
-    public long sendResetPasswordCode(String identity) throws Exception {
+    public String sendResetPasswordCode(String identity) throws Exception {
         try {
             User user = userRepository.findByIdentity(identity);
             if (user == null) {
@@ -103,33 +102,29 @@ public class RegistrationService {
             while (userRepository.codeExists(code)) {
                 code = registrationCOR.generateCode();
             }
-
-            if (!userRepository.addResetCode(user.getId(), code))
-                throw new Exception("Couldn't insert reset code.");
-
-            if (emailService.sendCodeByEmail(user.getEmail() , code)) {
-                return user.getId();
-            } else {
+            if(emailService.sendCodeByEmail(user.getEmail(), code)){
+                return user.getEmail();
+            } else{
                 throw new Exception("Error occurred while sending code");
             }
-        } catch (Exception e){
-            throw new Exception("Error occurred while sending code: " + e.getMessage());
+        } catch (Exception e) {
+            throw new Exception("Error occurred while sending code:  " + e.getMessage());
         }
     }
 
-    public boolean validateCode(long id, String code) throws Exception {
-        try {
-            User user = userRepository.findById(id);
-            if (user == null) {
+    public User validateCode(String email , String code) throws Exception {
+        try{
+            User user = userRepository.findByIdentity(email);
+            if(user == null){
                 throw new Exception("User doesn't exist");
             }
-
-            String userCode = userRepository.getCodeById(id);
-            if(userCode.equals(code)) {
-                return userRepository.deleteResetCode(code);
+            String userCode = userRepository.getCodeById(user.getId());
+            if(userCode.equals(code)){
+                userRepository.deleteResetCode(code);
+                return user;
             }
             throw new Exception("wrong code");
-        } catch (Exception e) {
+        } catch (Exception e){
             throw new Exception("Error occurred while validation  " + e.getMessage());
         }
     }

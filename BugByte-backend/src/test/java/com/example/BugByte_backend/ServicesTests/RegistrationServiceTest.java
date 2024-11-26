@@ -1,4 +1,4 @@
-package com.example.BugByte_backend.servicesTests;
+package com.example.BugByte_backend.ServicesTests;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.RegistrationService;
@@ -237,7 +237,7 @@ public class RegistrationServiceTest {
         when(userRepositoryMock.codeExists(anyString())).thenReturn(false);
 
         //Assert the email is sent
-        assertEquals(registrationService.sendResetPasswordCode("user12") , 1L);
+        assertEquals(registrationService.sendResetPasswordCode("user12") , user.getEmail());
 
     }
     //test send reset password code user doesn't exist
@@ -261,12 +261,15 @@ public class RegistrationServiceTest {
         user.setId(1L);
         String code = "ABCDEFGH";
         // Mock repository methods
-        when(userRepositoryMock.findById(user.getId())).thenReturn(user);
+        when(userRepositoryMock.findByIdentity(user.getEmail())).thenReturn(user);
         when(userRepositoryMock.getCodeById(user.getId())).thenReturn(code);
         when(userRepositoryMock.deleteResetCode(code)).thenReturn(true);
+        User newUser = registrationService.validateCode(user.getEmail(), code);
 
         //Assert the code is valid
-        assertTrue(registrationService.validateCode(user.getId() , code));
+        assertEquals(user.getEmail() , newUser.getEmail());
+        assertEquals(user.getPassword() , newUser.getPassword());
+        assertEquals(user.get_user_name() , newUser.get_user_name());
     }
     //test validate code wrong code
     @Test
@@ -275,13 +278,13 @@ public class RegistrationServiceTest {
         user.setId(1L);
         String code = "ABCDEFGF";
         // Mock repository methods
-        when(userRepositoryMock.findById(user.getId())).thenReturn(user);
+        when(userRepositoryMock.findByIdentity(user.getEmail())).thenReturn(user);
         when(userRepositoryMock.getCodeById(user.getId())).thenReturn("ABCDEFGH");
 
 
         // Assert that an exception is thrown when the code is wrong
         assertThrows(Exception.class, () -> {
-            registrationService.validateCode(user.getId() , code);
+            registrationService.validateCode(user.getEmail() , code);
         });
     }
 }

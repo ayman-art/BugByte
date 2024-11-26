@@ -1,12 +1,14 @@
 package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.models.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 @Service
+@Scope("singleton")
 public class UserService {
     // setting up user pool initial and final capacity ( Cache size )
     private final int poolCapacity = 1000;
@@ -29,13 +31,13 @@ public class UserService {
     This will help avoiding dealing with null pointers
     when using getCachedUser function it is required to surround it with try catch blocks
      */
-    protected void cacheUser(User user){
+    public void cacheUser(User user){
         this.userPool.put(user.getId(), user);
     }
-    protected User getCachedUser(long id) throws NullPointerException {
+
+    public User getCachedUser(long id) throws NullPointerException {
         User user = this.userPool.get(id);
         if ( user == null ) throw new NullPointerException("User Not Cached");
         return user;
     }
-
 }
