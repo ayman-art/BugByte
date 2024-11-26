@@ -32,6 +32,7 @@ public class UserRepositoryImp implements UserRepository {
     private static final String SQL_COUNT_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE code = ?";
     private static final String SQL_COUNT_USER_IN_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE id = ?";
     private static final String SQL_FIND_VALIDATION_CODE_BY_ID = "SELECT code FROM validation_code WHERE id = ?;";
+    private static final String SQL_UPDATE_VALIDATION_CODE = "UPDATE validation_code SET code = ? WHERE id = ?;";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -122,7 +123,11 @@ public class UserRepositoryImp implements UserRepository {
         if (userId == null || code == null)
             throw new NullPointerException("UserId or code is null");
 
-        int rows = jdbcTemplate.update(SQL_INSERT_VALIDATION_CODE, userId, code);
+        int rows = 0;
+        if (userExists(userId))
+            rows = jdbcTemplate.update(SQL_UPDATE_VALIDATION_CODE, code, userId);
+        else
+            rows = jdbcTemplate.update(SQL_INSERT_VALIDATION_CODE, userId, code);
 
         return rows == 1;
     }
