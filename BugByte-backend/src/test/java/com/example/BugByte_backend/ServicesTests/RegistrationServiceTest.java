@@ -1,4 +1,4 @@
-package com.example.BugByte_backend.servicesTests;
+package com.example.BugByte_backend.ServicesTests;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.RegistrationService;
@@ -263,7 +263,7 @@ public class RegistrationServiceTest {
         // Mock repository methods
         when(userRepositoryMock.findByIdentity(user.getEmail())).thenReturn(user);
         when(userRepositoryMock.getCodeById(user.getId())).thenReturn(code);
-        when(userRepositoryMock.deleteCode(code)).thenReturn(true);
+        when(userRepositoryMock.deleteResetCode(code)).thenReturn(true);
         User newUser = registrationService.validateCode(user.getEmail(), code);
 
         //Assert the code is valid
