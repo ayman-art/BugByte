@@ -13,7 +13,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const handleRegisterClick = () => {
-    // navigate('/SignUp');
+    navigate('/SignUp');
   };
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

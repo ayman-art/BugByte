@@ -123,7 +123,7 @@ const RegistrationForm: React.FC = () => {
                     </button>
                 </form>
                 <div className="mt-4 text-center text-sm text-gray-600">
-                    Already registered? <a href="/login">Login</a>
+                    Already registered? <a href="/LogIn">Login</a>
                 </div>
 
                 <div className="registration-form-google-signin">
