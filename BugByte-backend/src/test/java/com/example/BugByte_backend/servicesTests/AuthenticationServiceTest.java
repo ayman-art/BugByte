@@ -1,12 +1,7 @@
 package com.example.BugByte_backend.ServicesTests;
-
 import com.example.BugByte_backend.services.AuthenticationService;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Date;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -59,6 +54,25 @@ public class AuthenticationServiceTest {
         Claims claim = AuthenticationService.parseToken(jwt);
         String name = claim.getSubject();
         assertEquals("porvah", name);
+    }
+
+    @Test
+    void TestRefreshTokenExpiration() throws InterruptedException {
+        String oldJwt = AuthenticationService.generateJWT(1000, "Habiba", false);
+        Thread.sleep(1000);
+        String newJwt = AuthenticationService.refreshToken(oldJwt);
+        assertNotEquals(oldJwt, newJwt);
+
+    }
+    @Test
+    void TestRefreshTokenUsername() throws InterruptedException {
+        String oldJwt = AuthenticationService.generateJWT(1000, "Habiba", false);
+        Claims oldClaims = AuthenticationService.parseToken(oldJwt);
+        String oldUsername = oldClaims.getSubject();
+        String newJwt = AuthenticationService.refreshToken(oldJwt);
+        Claims newClaims = AuthenticationService.parseToken(newJwt);
+        String newUsername = newClaims.getSubject();
+        assertEquals(oldUsername, newUsername);
     }
 
 }
