@@ -31,7 +31,7 @@ const Login = () => {
      setError("Email required to reset password.")
    else
       {
-         const response = await fetch('https://users?username=${username}', {
+         const response = await fetch('https://users/reset-password?username=${username}', {
                   method: 'GET',
                   headers: {
                     'Content-Type': 'application/json',
@@ -47,7 +47,6 @@ const Login = () => {
                   setPassword('');
                   setError('Wrong username or email!');
                 }
-//setShowPopup(true);
      }
   };
 
