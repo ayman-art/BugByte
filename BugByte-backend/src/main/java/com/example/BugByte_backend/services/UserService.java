@@ -143,7 +143,7 @@ public class UserService {
             return userRepository.makeUserAdmin(user.getId());
         }
         catch (Exception e) {
-            throw new Exception("Couldn't make this user admin:  " + e.getMessage());
+            throw new Exception("Error happened while making this user an admin:  " + e.getMessage());
         }
     }
 }
