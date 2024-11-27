@@ -1,0 +1,74 @@
+.registration-form{
+    margin-left: 864px;
+    height: 100vh;
+    padding: 2rem;
+    background-color: #f5f5f5;
+
+}
+
+.registration-form-logo {
+    width: 100px;
+    height: 100px;
+    float: left;
+    margin-top: 130px;
+    margin-left: -65px;
+}
+
+.registration-form-desc {
+    width: 450px;
+    height: 200px;
+    color: white;
+    font-family: "unispace", sans-serif;
+    float: left;
+    margin-top: 280px;
+    margin-left: -200px;
+}
+
+.registration-form-Title1 {
+    width: 200px;
+    height: 200px;
+    color: white;
+    font: 28px "hooge 05_53", "Bauhaus 93";
+    float: left;
+    margin-top: 175px; /* Adjusts the top margin */
+    margin-left: 200px;
+}
+
+
+.registration-form input{
+    width: 80%;
+    padding: 0.5rem;
+    margin-left: 4rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+}
+
+.registration-form button{
+    width: 25%; /* Make the button 25% of the width of the parent container */
+    padding: 0.5rem;
+    background-color: #F9C92A;
+    font-family: "Microsoft New Tai Lue", serif;
+    color: black;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-left: 38%;
+}
+
+.registration-form-google-logo{
+    width: 56px;
+    height: 30px;
+    margin-top: 30px;
+    margin-left: 190px;
+}
+
+
+.registration-form-google-signin{
+    width: 350px;
+    height: 200px;
+    float: right;
+    margin-right: 220px;
+}
+
+
