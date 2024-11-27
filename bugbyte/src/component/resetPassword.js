@@ -137,7 +137,7 @@ const ResetPasswordPopup = ({ setShowPopup }) => {
             <button type="submit" className="resetPasswordButton">Verify Code</button>
             <button className="resetPasswordButton"
               type="button"
-              className="resendCodeButton"
+           //   className="resendCodeButton"
               onClick={handleResendCode}
               disabled={!canResend}
             >

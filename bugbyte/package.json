@@ -15,13 +15,10 @@
     "gapi-script": "^1.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-<<<<<<< HEAD
+    "react-google-login": "^5.2.2",
     "react-router-dom": "^6.28.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
-=======
-    "react-google-login": "^5.2.2"
->>>>>>> 5909d104db2afc50d8ce702207316eda01c8053c
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
