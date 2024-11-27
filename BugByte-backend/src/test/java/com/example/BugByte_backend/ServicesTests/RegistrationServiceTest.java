@@ -1,4 +1,4 @@
-package com.example.BugByte_backend.ServicesTests;
+package com.example.BugByte_backend.servicesTests;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.RegistrationService;
@@ -39,9 +39,12 @@ public class RegistrationServiceTest {
 
         when(userRepositoryMock.insertUser(eq(userName), eq(email), eq(password))).thenReturn(expectedUserId);
 
-        long actualUserId = registrationService.registerUser(email, userName, password);
+        User user  = registrationService.registerUser(email, userName, password);
 
-        assertEquals(expectedUserId, actualUserId);
+        assertEquals(user.getId(), expectedUserId);
+        assertEquals(user.get_user_name() , userName);
+        assertEquals(user.getEmail() , email);
+        assertEquals(user.getPassword() , password);
     }
     //test register user if user exists
     @Test
@@ -222,6 +225,66 @@ public class RegistrationServiceTest {
         // Assert that an exception is thrown when the user doesn't exist
         assertThrows(Exception.class, () -> {
             registrationService.deleteUser(id);
+        });
+    }
+    //test send reset password code user exists
+    @Test
+    public void resetPassword_UserExists() throws Exception{
+        User user = new User("user12" , "user@gmail.com" , "12345678@");
+        user.setId(1L);
+        // Mock repository methods
+        when(userRepositoryMock.findByIdentity("user12")).thenReturn(user);
+        when(userRepositoryMock.codeExists(anyString())).thenReturn(false);
+
+        //Assert the email is sent
+        assertEquals(registrationService.sendResetPasswordCode("user12") , user.getEmail());
+
+    }
+    //test send reset password code user doesn't exist
+    @Test
+    public void resetPassword_UserDoesNotExist() throws Exception{
+        User user = new User("user12" , "user12@gmail.com" , "12345678@");
+        user.setId(1L);
+        // Mock repository methods
+        when(userRepositoryMock.findByIdentity("user12")).thenReturn(null);
+        when(userRepositoryMock.codeExists(anyString())).thenReturn(false);
+
+        // Assert that an exception is thrown when the user doesn't exist
+        assertThrows(Exception.class, () -> {
+            registrationService.sendResetPasswordCode("user12");
+        });
+    }
+    //test validate code correct code
+    @Test
+    public void validateCode_CorrectCode() throws Exception{
+        User user = new User("user12" , "user@gmail.com" , "12345678@");
+        user.setId(1L);
+        String code = "ABCDEFGH";
+        // Mock repository methods
+        when(userRepositoryMock.findByIdentity(user.getEmail())).thenReturn(user);
+        when(userRepositoryMock.getCodeById(user.getId())).thenReturn(code);
+        when(userRepositoryMock.deleteCode(code)).thenReturn(true);
+        User newUser = registrationService.validateCode(user.getEmail(), code);
+
+        //Assert the code is valid
+        assertEquals(user.getEmail() , newUser.getEmail());
+        assertEquals(user.getPassword() , newUser.getPassword());
+        assertEquals(user.get_user_name() , newUser.get_user_name());
+    }
+    //test validate code wrong code
+    @Test
+    public void validateCode_WrongCode() throws Exception{
+        User user = new User("user12" , "user@gmail.com" , "12345678@");
+        user.setId(1L);
+        String code = "ABCDEFGF";
+        // Mock repository methods
+        when(userRepositoryMock.findByIdentity(user.getEmail())).thenReturn(user);
+        when(userRepositoryMock.getCodeById(user.getId())).thenReturn("ABCDEFGH");
+
+
+        // Assert that an exception is thrown when the code is wrong
+        assertThrows(Exception.class, () -> {
+            registrationService.validateCode(user.getEmail() , code);
         });
     }
 }

@@ -1,4 +1,4 @@
-package com.example.BugByte_backend.ServicesTests;
+package com.example.BugByte_backend.servicesTests;
 
 import com.example.BugByte_backend.services.AuthenticationService;
 import io.jsonwebtoken.Claims;
@@ -10,7 +10,6 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-@SpringBootTest
 public class AuthenticationServiceTest {
     @Test
     void TestJWTForNonAdmin(){
