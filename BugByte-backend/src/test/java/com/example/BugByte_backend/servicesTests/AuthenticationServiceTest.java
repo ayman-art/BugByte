@@ -10,7 +10,6 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-@SpringBootTest
 public class AuthenticationServiceTest {
     @Test
     void TestJWTForNonAdmin(){

@@ -8,9 +8,10 @@ import java.util.Base64;
 import java.security.Key;
 import java.util.Date;
 import io.jsonwebtoken.JwtBuilder;
+import org.springframework.stereotype.Service;
 
 
-
+@Service
 public class AuthenticationService {
     static Dotenv dotenv = Dotenv.configure().load();
 
