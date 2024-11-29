@@ -3,23 +3,21 @@ package com.example.BugByte_backend.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="followers")
+@IdClass(FollowerId.class)
+@Table(name = "followers")
 public class Follower {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-
     @ManyToOne
     @JoinColumn(name = "follower_id", nullable = false)
     private User follower;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "followed_id", nullable = false)
     private User followed;
 
-    public Follower() {
-    }
+    public Follower() {}
 
     public Follower(User follower, User followed) {
         this.follower = follower;

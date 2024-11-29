@@ -56,7 +56,7 @@ public class userProfileRepository {
         return rows != 0;
     }
 
-    public Boolean isFollowing(long userId , long followingId){
+    public Boolean isFollowing(Long userId , Long followingId){
         return  jdbcTemplate.queryForObject(
                 SQL_IS_FOLLOWING,
                 new Object[]{userId, followingId},

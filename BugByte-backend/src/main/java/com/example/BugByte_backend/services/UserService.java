@@ -2,6 +2,7 @@ package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
+import com.example.BugByte_backend.repositories.userProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ public class UserService {
 
     @Autowired
     private UserRepositoryImp userRepository;
+
+    private userProfileRepository userProfileRep;
     // The user pool map for caching users
     /*
     The reason behind using a linked hash map is that it maintains order of access provided in constructor
@@ -70,10 +73,10 @@ public class UserService {
             else if (following == null){
                 throw new Exception("following doesn't Exist");
             }
-            else if (userRepository.isFollowing(userId , following.getId())){
+            else if (userProfileRep.isFollowing(userId , following.getId())){
                 throw new Exception("User is Already following this user");
             }
-            return userRepository.followUser(userId , following.getId());
+            return userProfileRep.followUser(userId , following.getId());
         }
         catch (Exception e){
             throw new Exception("Error occurred while following user:  " + e.getMessage());
@@ -89,10 +92,10 @@ public class UserService {
             else if (following == null){
                 throw new Exception("following doesn't Exist");
             }
-            else if (!userRepository.isFollowing(userId , following.getId())){
+            else if (!userProfileRep.isFollowing(userId , following.getId())){
                 throw new Exception("User isn't following this user");
             }
-            return userRepository.unfollowUser(userId , following.getId());
+            return userProfileRep.unfollowUser(userId , following.getId());
         }
         catch (Exception e){
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
@@ -105,7 +108,7 @@ public class UserService {
             if(user == null){
                 throw new Exception("User doesn't Exist");
             }
-            return userRepository.getFollowings(user.getId());
+            return userProfileRep.getFollowings(user.getId());
         }
         catch (Exception e) {
             throw new Exception("Couldn't get the following users:  " + e.getMessage());
@@ -118,7 +121,7 @@ public class UserService {
             if(user == null){
                 throw new Exception("User doesn't Exist");
             }
-            return userRepository.getFollowers(user.getId());
+            return userProfileRep.getFollowers(user.getId());
         }
         catch (Exception e) {
             throw new Exception("Couldn't get the followers:  " + e.getMessage());
