@@ -170,21 +170,6 @@ public class UserRepositoryImp implements UserRepository {
         return jdbcTemplate.queryForObject(SQL_FIND_VALIDATION_CODE_BY_ID, new Object[]{ id }, String.class);
     }
 
-    public boolean follow(long userId , long followingId){
-        return true;
-    }
-    public boolean isFollowing(long userId , long followingId){
-        return false;
-    }
-    public boolean unfollow(long userId , long followingId){
-        return true;
-    }
-    public List<User> getFollowings(long userId){
-        return null;
-    }
-    public List<User> getFollowers(long userId){
-        return null;
-    }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
             rs.getLong("id"),

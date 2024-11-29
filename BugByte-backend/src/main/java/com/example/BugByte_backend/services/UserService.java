@@ -1,8 +1,10 @@
 package com.example.BugByte_backend.services;
 
+import com.example.BugByte_backend.Adapters.UserAdapter;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
+import com.example.BugByte_backend.repositories.userProfileRepository;
 import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -19,7 +21,10 @@ public class UserService {
     private final int poolCapacity = 1000;
 
     @Autowired
-    private UserRepositoryImp userRepository;
+    private userProfileRepository userRepository;
+
+    @Autowired
+    private UserRepositoryImp userRepositoryImp;
     // The user pool map for caching users
     /*
     The reason behind using a linked hash map is that it maintains order of access provided in constructor
@@ -49,13 +54,19 @@ public class UserService {
         return user;
     }
 
-    public User getProfile(String userName) throws Exception{
+    public Map<String,Object> getProfile(String userName) throws Exception{
         try {
-            User user = userRepository.findByIdentity(userName);
+            User user = userRepositoryImp.findByIdentity(userName);
             if(user == null){
                 throw new Exception("User doesn't Exist");
             }
-            return user;
+            UserAdapter userAdapter = new UserAdapter();
+            Map<String,Object> userData =  userAdapter.toMap(user);
+            int followersCount = userRepository.getFollowersCount(user.getId());
+            int followingsCount = userRepository.getFollowingsCount(user.getId());
+            userData.put("followersCount" , followersCount);
+            userData.put("followingsCount" , followingsCount);
+            return userData;
         }
         catch (Exception e){
             throw new Exception("Couldn't get the user's profile:  " + e.getMessage());
@@ -64,8 +75,8 @@ public class UserService {
 
     public boolean followUser(long userId , String followingName) throws Exception{
         try {
-            User follower = userRepository.findById(userId);
-            User following = userRepository.findByIdentity(followingName);
+            User follower = userRepositoryImp.findById(userId);
+            User following = userRepositoryImp.findByIdentity(followingName);
             if(follower == null){
                 throw new Exception("follower doesn't Exist");
             }
@@ -75,7 +86,7 @@ public class UserService {
             else if (userRepository.isFollowing(userId , following.getId())){
                 throw new Exception("User is Already following this user");
             }
-            return userRepository.follow(userId , following.getId());
+            return userRepository.followUser(userId , following.getId());
         }
         catch (Exception e){
             throw new Exception("Error occurred while following user:  " + e.getMessage());
@@ -83,8 +94,8 @@ public class UserService {
     }
     public boolean unfollowUser(long userId , String followingName) throws Exception{
         try {
-            User follower = userRepository.findById(userId);
-            User following = userRepository.findByIdentity(followingName);
+            User follower = userRepositoryImp.findById(userId);
+            User following = userRepositoryImp.findByIdentity(followingName);
             if(follower == null){
                 throw new Exception("follower doesn't Exist");
             }
@@ -94,7 +105,7 @@ public class UserService {
             else if (!userRepository.isFollowing(userId , following.getId())){
                 throw new Exception("User isn't following this user");
             }
-            return userRepository.unfollow(userId , following.getId());
+            return userRepository.unfollowUser(userId , following.getId());
         }
         catch (Exception e){
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
@@ -103,7 +114,7 @@ public class UserService {
 
     public List<User> getFollowings(String userName) throws Exception{
         try {
-            User user = userRepository.findByIdentity(userName);
+            User user = userRepositoryImp.findByIdentity(userName);
             if(user == null){
                 throw new Exception("User doesn't Exist");
             }
@@ -116,7 +127,7 @@ public class UserService {
 
     public List<User> getFollowers(String userName) throws Exception{
         try {
-            User user = userRepository.findByIdentity(userName);
+            User user = userRepositoryImp.findByIdentity(userName);
             if(user == null){
                 throw new Exception("User doesn't Exist");
             }
@@ -129,8 +140,8 @@ public class UserService {
 
     public boolean makeAdmin(long adminId , String userName) throws Exception{
         try {
-            User admin = userRepository.findById(adminId);
-            User user = userRepository.findByIdentity(userName);
+            User admin = userRepositoryImp.findById(adminId);
+            User user = userRepositoryImp.findByIdentity(userName);
             if(user == null){
                 throw new Exception("User doesn't exist");
             }
@@ -140,7 +151,7 @@ public class UserService {
             if (!admin.get_is_admin()){
                 throw new Exception("The user does not have the authority to assign admins");
             }
-            return userRepository.makeUserAdmin(user.getId());
+            return userRepositoryImp.makeUserAdmin(user.getId());
         }
         catch (Exception e) {
             throw new Exception("Error happened while making this user an admin:  " + e.getMessage());
