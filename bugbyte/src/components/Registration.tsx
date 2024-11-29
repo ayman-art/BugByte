@@ -3,6 +3,7 @@ import { User } from '../types';
 import { useTypewriter } from 'react-simple-typewriter';
 import { useGoogleLogin } from '@react-oauth/google';
 import '../styles/components.css';
+import { fetchGoogleUserInfo } from '../API/SignUpApi';
 
 const RegistrationForm: React.FC = () => {
     const [formData, setFormData] = useState<User>({
@@ -12,28 +13,19 @@ const RegistrationForm: React.FC = () => {
     });
 
     // Handle Google login
-    const googleLogin = useGoogleLogin({
-        onSuccess: async (response) => {
-            try {
-                // Get user info from Google
-                const userInfoResponse = await fetch(
-                    'https://www.googleapis.com/oauth2/v3/userinfo',
-                    {
-                        headers: {
-                            Authorization: `Bearer ${response.access_token}`,
-                        },
-                    }
-                );
-                const userInfo = await userInfoResponse.json();
-                console.log('Google user info:', userInfo);
-            } catch (error) {
-                console.error('Error fetching Google user info:', error);
-            }
-        },
-        onError: () => {
-            console.error('Google Login Failed');
-        },
-    });
+   const googleLogin = useGoogleLogin({
+     onSuccess: async (response) => {
+       try {
+         const userInfo = await fetchGoogleUserInfo(response.access_token);
+         console.log('Google user info:', userInfo);
+       } catch (error) {
+         console.error('Error fetching Google user info:', error);
+       }
+     },
+     onError: () => {
+       console.error('Google Login Failed');
+     },
+   });
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();

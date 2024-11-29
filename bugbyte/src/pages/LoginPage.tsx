@@ -4,6 +4,7 @@ import bugbyteLogo from '../assets/bugbyteLogo.png';
 import GoogleLogo from '../assets/googlelogo.png';
 import ResetPasswordPopup from './PasswordReset';
 import '../styles/Login.css';
+ import { logIn ,resetPassword} from '../API/LoginApi';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -29,77 +30,62 @@ const Login: React.FC = () => {
   const handleForgotPasswordClick = async () => {
     if (!username) {
       setError('Email required to reset password.');
-    } else {
-      try {
-        const response = await fetch(
-          `https://users/reset-password?username=${username}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+      return;
+    }
 
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem('userId', data.userId);
-          setShowPopup(true);
-        } else {
-          setPassword('');
-          setError('Wrong username or email!');
-        }
-      } catch (error) {
-        console.error('Error during password reset:', error);
+    try {
+      const data = await resetPassword(username);
+      localStorage.setItem('userId', data.userId);
+      setShowPopup(true);
+    } catch (error) {
+      console.error('Error during password reset:', error);
+      if (error.message.includes('Password reset failed')) {
+        setPassword('');
+        setError('Wrong username or email!');
+      } else {
         setError('Something went wrong. Please try again later.');
       }
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
 
-    if (!username && !password) {
-      setError('Both username and password are required.');
-      return;
-    }
 
-    if (!password) {
-      setError('Please enter your password');
-      return;
-    }
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+   e.preventDefault();
 
-    if (!username) {
-      setError('Please enter your username');
-      return;
-    }
+   if (!username && !password) {
+     setError('Both username and password are required.');
+     return;
+   }
 
-    try {
-      const response = await fetch('https://users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
+   if (!password) {
+     setError('Please enter your password');
+     return;
+   }
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('authToken', data.token);
-        console.log('Login successful:', data);
-        // navigate('/home');
-      } else {
-        setPassword('');
-        setError('Wrong username or password!');
-      }
-    } catch (error) {
-      console.error('Error during login:', error);
-      setError('Something went wrong. Please try again later.');
-    }
-  };
+   if (!username) {
+     setError('Please enter your username');
+     return;
+   }
+
+   try {
+     const data = await logIn(username, password);
+
+     localStorage.setItem('authToken', data.token);
+     console.log('Login successful:', data);
+     // navigate('/home');
+   } catch (error) {
+     console.error('Error during login:', error);
+
+     if (error.message.includes('Login failed')) {
+       setPassword('');
+       setError('Wrong username or password!');
+     } else {
+       setError('Something went wrong. Please try again later.');
+     }
+   }
+ };
+
 
   return (
     <div className="container">
@@ -142,7 +128,10 @@ const Login: React.FC = () => {
           <span>OR</span>
           <button className="googleButton">
             <img src={GoogleLogo} alt="Google logo" className="googleIcon" />
-            Log in with Google
+                    <div>
+Log in with Google
+        </div>
+
           </button>
         </div>
         <div className="registerSection">
