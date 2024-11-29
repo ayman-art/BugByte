@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/resetPassword.css';
+import { validateEmailCode, resetPassword, resendVerificationCode } from '../API/ResetPasswordApi';
 
 interface ResetPasswordPopupProps {
   setShowPopup: React.Dispatch<React.SetStateAction<boolean>>;
@@ -38,89 +39,69 @@ const ResetPasswordPopup: React.FC<ResetPasswordPopupProps> = ({ setShowPopup })
     setConfirmPassword(e.target.value);
   };
 
-  const handleVerificationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('https://users/validate-email-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: localStorage.getItem('userId'),
-          verificationCode,
-        }),
-      });
+const handleVerificationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Code is correct', data);
-        setStep(2);
-      } else {
-        setError('Invalid verification code!');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('An error occurred. Please try again.');
+  if (!verificationCode) {
+    setError('Verification code is required.');
+    return;
+  }
+
+  try {
+    const response = await validateEmailCode(userId, verificationCode);
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Code is correct', data);
+      setStep(2);
+    } else {
+      setError('Invalid verification code!');
     }
-  };
+  } catch (error) {
+    console.error('Error:', error);
+    setError(error.message || 'An error occurred. Please try again.');
+  }
+};
 
-  const handleResetPasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match!');
-      return;
+const handleResetPasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  if (newPassword !== confirmPassword) {
+    setError('Passwords do not match!');
+    return;
+  }
+
+  try {
+    const response = await resetPassword(userId, newPassword);
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Password reset successful', data);
+    } else {
+      setError('Failed to reset password.');
     }
+  } catch (error) {
+    console.error('Error:', error);
+    setError(error.message || 'An error occurred. Please try again.');
+  }
+};
 
-    try {
-      const response = await fetch('https://users/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: localStorage.getItem('userId'),
-          newPassword,
-        }),
-      });
+const handleResendCode = async () => {
+  setCanResend(false);
+  setTimer(60);
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Reset success', data);
-      } else {
-        setError('Failed to reset password.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('An error occurred. Please try again.');
+  try {
+    const response = await resendVerificationCode(userId);
+
+    if (response.ok) {
+      console.log('Code resent successfully');
+    } else {
+      setError('Failed to resend code. Please try again.');
     }
-  };
-
-  const handleResendCode = async () => {
-    setCanResend(false);
-    setTimer(60);
-
-    try {
-      const response = await fetch('https://users/resendCode', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: localStorage.getItem('userId'),
-        }),
-      });
-
-      if (response.ok) {
-        console.log('Code resent successfully');
-      } else {
-        setError('Failed to resend code. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('An error occurred. Please try again.');
-    }
-  };
+  } catch (error) {
+    console.error('Error:', error);
+    setError(error.message || 'An error occurred. Please try again.');
+  }
+};
 
   return (
     <div className="popup">
