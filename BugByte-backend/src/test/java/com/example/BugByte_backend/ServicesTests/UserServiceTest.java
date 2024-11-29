@@ -64,7 +64,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
         when(userRepositoryMock.isFollowing(user.getId() , following.getId())).thenReturn(false);
-        when(userRepositoryMock.follow(user.getId() , following.getId())).thenReturn(true);
+        when(userRepositoryMock.followUser(user.getId() , following.getId())).thenReturn(true);
 
         assertTrue(userService.followUser(user.getId() , following.get_user_name()));
     }
@@ -124,7 +124,7 @@ public class UserServiceTest {
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
         when(userRepositoryMock.isFollowing(user.getId() , following.getId())).thenReturn(true);
-        when(userRepositoryMock.unfollow(user.getId() , following.getId())).thenReturn(true);
+        when(userRepositoryMock.unfollowUser(user.getId() , following.getId())).thenReturn(true);
 
         assertTrue(userService.unfollowUser(user.getId() , following.get_user_name()));
     }

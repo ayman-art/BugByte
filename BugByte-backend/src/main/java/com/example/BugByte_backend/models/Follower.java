@@ -1,6 +1,5 @@
 package com.example.BugByte_backend.models;
 
-import com.example.BugByte_backend.models.User;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,35 +9,36 @@ public class Follower {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @ManyToOne
     @JoinColumn(name = "follower_id", nullable = false)
-    private User follower_id;
+    private User follower;
 
     @ManyToOne
     @JoinColumn(name = "followed_id", nullable = false)
-    private User followed_id;
+    private User followed;
 
-
-    public Follower(User follower, User followed) {
-        this.follower_id = follower;
-        this.followed_id = followed;
+    public Follower() {
     }
 
+    public Follower(User follower, User followed) {
+        this.follower = follower;
+        this.followed = followed;
+    }
 
     public User getFollower() {
-        return follower_id;
+        return follower;
     }
 
     public void setFollower(User follower) {
-        this.follower_id = follower;
+        this.follower = follower;
     }
 
     public User getFollowed() {
-        return followed_id;
+        return followed;
     }
 
     public void setFollowed(User followed) {
-        this.followed_id = followed;
+        this.followed = followed;
     }
-
 }

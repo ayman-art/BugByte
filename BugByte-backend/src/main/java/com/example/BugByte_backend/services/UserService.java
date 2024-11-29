@@ -1,9 +1,7 @@
 package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.repositories.UserRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -75,7 +73,7 @@ public class UserService {
             else if (userRepository.isFollowing(userId , following.getId())){
                 throw new Exception("User is Already following this user");
             }
-            return userRepository.follow(userId , following.getId());
+            return userRepository.followUser(userId , following.getId());
         }
         catch (Exception e){
             throw new Exception("Error occurred while following user:  " + e.getMessage());
@@ -94,7 +92,7 @@ public class UserService {
             else if (!userRepository.isFollowing(userId , following.getId())){
                 throw new Exception("User isn't following this user");
             }
-            return userRepository.unfollow(userId , following.getId());
+            return userRepository.unfollowUser(userId , following.getId());
         }
         catch (Exception e){
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
