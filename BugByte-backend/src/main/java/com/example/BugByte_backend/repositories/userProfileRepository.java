@@ -4,10 +4,11 @@ import com.example.BugByte_backend.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-
+@Repository
 public class userProfileRepository {
 
     private static final String SQL_FOLLOW_USER = """
@@ -42,7 +43,7 @@ public class userProfileRepository {
     private JdbcTemplate jdbcTemplate;
 
 
-    public Boolean followUser(Long userId , Long followingId){
+    public Boolean followUser(Long userId, Long followingId) {
         if (userId == null || followingId == null)
             throw new NullPointerException("User or following id is null");
 
@@ -56,14 +57,14 @@ public class userProfileRepository {
         return rows != 0;
     }
 
-    public Boolean isFollowing(Long userId , Long followingId){
+    public Boolean isFollowing(Long userId, Long followingId) {
         return  jdbcTemplate.queryForObject(
                 SQL_IS_FOLLOWING,
                 new Object[]{userId, followingId},
                 (rs, rowNum) -> true) != null;
     }
 
-    public Boolean unfollowUser(Long userId , Long followingId){
+    public Boolean unfollowUser(Long userId, Long followingId) {
         if (userId == null || followingId == null)
             throw new NullPointerException("UserId or FollowingId is Null");
 
@@ -71,14 +72,14 @@ public class userProfileRepository {
         return rows == 1;
     }
 
-    public List<User> getFollowings(Long userId){
+    public List<User> getFollowings(Long userId) {
         if (userId == null)
             throw new NullPointerException("UserId is Null");
 
         return jdbcTemplate.query(SQL_GET_FOLLOWINGS, userRowMapper, userId);
     }
 
-    public List<User> getFollowers(Long userId){
+    public List<User> getFollowers(Long userId) {
         if (userId == null)
             throw new NullPointerException("UserId is Null");
 

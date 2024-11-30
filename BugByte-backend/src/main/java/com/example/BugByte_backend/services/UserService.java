@@ -20,6 +20,7 @@ public class UserService {
     @Autowired
     private UserRepositoryImp userRepository;
 
+    @Autowired
     private userProfileRepository userProfileRep;
     // The user pool map for caching users
     /*
@@ -63,49 +64,49 @@ public class UserService {
         }
     }
 
-    public boolean followUser(long userId , String followingName) throws Exception{
+    public boolean followUser(long userId, String followingName) throws Exception{
         try {
             User follower = userRepository.findById(userId);
             User following = userRepository.findByIdentity(followingName);
-            if(follower == null){
+            if(follower == null) {
                 throw new Exception("follower doesn't Exist");
             }
-            else if (following == null){
+            else if (following == null) {
                 throw new Exception("following doesn't Exist");
             }
-            else if (userProfileRep.isFollowing(userId , following.getId())){
+            else if (userProfileRep.isFollowing(userId, following.getId())) {
                 throw new Exception("User is Already following this user");
             }
-            return userProfileRep.followUser(userId , following.getId());
+            return userProfileRep.followUser(userId, following.getId());
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new Exception("Error occurred while following user:  " + e.getMessage());
         }
     }
-    public boolean unfollowUser(long userId , String followingName) throws Exception{
+    public boolean unfollowUser(long userId, String followingName) throws Exception {
         try {
             User follower = userRepository.findById(userId);
             User following = userRepository.findByIdentity(followingName);
-            if(follower == null){
+            if(follower == null) {
                 throw new Exception("follower doesn't Exist");
             }
-            else if (following == null){
+            else if (following == null) {
                 throw new Exception("following doesn't Exist");
             }
-            else if (!userProfileRep.isFollowing(userId , following.getId())){
+            else if (!userProfileRep.isFollowing(userId , following.getId())) {
                 throw new Exception("User isn't following this user");
             }
             return userProfileRep.unfollowUser(userId , following.getId());
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
         }
     }
 
-    public List<User> getFollowings(String userName) throws Exception{
+    public List<User> getFollowings(String userName) throws Exception {
         try {
             User user = userRepository.findByIdentity(userName);
-            if(user == null){
+            if(user == null) {
                 throw new Exception("User doesn't Exist");
             }
             return userProfileRep.getFollowings(user.getId());
@@ -115,10 +116,10 @@ public class UserService {
         }
     }
 
-    public List<User> getFollowers(String userName) throws Exception{
+    public List<User> getFollowers(String userName) throws Exception {
         try {
             User user = userRepository.findByIdentity(userName);
-            if(user == null){
+            if(user == null) {
                 throw new Exception("User doesn't Exist");
             }
             return userProfileRep.getFollowers(user.getId());
@@ -128,17 +129,17 @@ public class UserService {
         }
     }
 
-    public boolean makeAdmin(long adminId , String userName) throws Exception{
+    public boolean makeAdmin(long adminId, String userName) throws Exception {
         try {
             User admin = userRepository.findById(adminId);
             User user = userRepository.findByIdentity(userName);
-            if(user == null){
+            if(user == null) {
                 throw new Exception("User doesn't exist");
             }
-            if (admin == null){
+            if (admin == null) {
                 throw new Exception("Admin doesn't exist");
             }
-            if (!admin.get_is_admin()){
+            if (!admin.get_is_admin()) {
                 throw new Exception("The user does not have the authority to assign admins");
             }
             return userRepository.makeUserAdmin(user.getId());
