@@ -1,6 +1,7 @@
 package com.example.BugByte_backend.facades;
 
 import com.example.BugByte_backend.Adapters.UserAdapter;
+import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.services.AuthenticationService;
 import com.example.BugByte_backend.services.RegistrationService;
 import com.example.BugByte_backend.services.UserService;
@@ -8,6 +9,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -82,5 +84,42 @@ public class AdministrativeFacade {
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
         registrationService.changePassword(id, (String)userdata.get("password"));
+    }
+
+    // User Profile Section
+    public Map<String, Object> getProfile(Map<String, Object> userdata) throws Exception {
+        return userService.getProfile((String)userdata.get("user-name"));
+    }
+    public boolean followUser(Map<String, Object> userdata) throws Exception {
+        String token = (String) userdata.get("jwt");
+        Claims claim  = AuthenticationService.parseToken(token);
+        long id = Long.parseLong(claim.getId());
+        return userService.followUser(id, (String)userdata.get("user-name"));
+    }
+
+    public boolean unfollowUser(Map<String, Object> userdata) throws Exception {
+        String token = (String) userdata.get("jwt");
+        Claims claim  = AuthenticationService.parseToken(token);
+        long id = Long.parseLong(claim.getId());
+        return userService.unfollowUser(id, (String)userdata.get("user-name"));
+    }
+
+    public List<Map<String, Object>> getFollowers(Map<String, Object> userdata) throws Exception {
+        List<User> followers = userService.getFollowers((String)userdata.get("user-name"));
+        UserAdapter adapter = new UserAdapter();
+        return followers.stream().map(adapter::toMap).toList();
+    }
+
+    public List<Map<String, Object>> getFollowings(Map<String, Object> userdata) throws Exception {
+        List<User> followings = userService.getFollowings((String)userdata.get("user-name"));
+        UserAdapter adapter = new UserAdapter();
+        return followings.stream().map(adapter::toMap).toList();
+    }
+
+    public boolean makeAdmin(Map<String, Object> userdata) throws Exception {
+        String token = (String) userdata.get("jwt");
+        Claims claim  = AuthenticationService.parseToken(token);
+        long id = Long.parseLong(claim.getId());
+        return userService.makeAdmin(id, (String)userdata.get("user-name"));
     }
 }

@@ -62,6 +62,10 @@ public class UserService {
             }
             UserAdapter userAdapter = new UserAdapter();
             Map<String,Object> userData =  userAdapter.toMap(user);
+            // removing sensitive and unnecessary data
+            userData.remove("password");
+            userData.remove("email");
+            userData.remove("id");
             int followersCount = userRepository.getFollowersCount(user.getId());
             int followingsCount = userRepository.getFollowingsCount(user.getId());
             userData.put("followersCount" , followersCount);
