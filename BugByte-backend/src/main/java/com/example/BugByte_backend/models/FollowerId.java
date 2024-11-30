@@ -1,8 +1,11 @@
 package com.example.BugByte_backend.models;
 
+import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
 import java.util.Objects;
 
+@Embeddable
 public class FollowerId implements Serializable {
 
     private Long followerId;

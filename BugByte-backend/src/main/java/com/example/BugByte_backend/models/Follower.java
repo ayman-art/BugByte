@@ -3,18 +3,18 @@ package com.example.BugByte_backend.models;
 import jakarta.persistence.*;
 
 @Entity
-@IdClass(FollowerId.class)
 @Table(name = "followers")
 public class Follower {
 
-    @Id
+    @EmbeddedId
+    private FollowerId id;
+
+    @MapsId("followerId")
     @ManyToOne
-    @JoinColumn(name = "follower_id", nullable = false)
     private User follower;
 
-    @Id
+    @MapsId("followedId")
     @ManyToOne
-    @JoinColumn(name = "followed_id", nullable = false)
     private User followed;
 
     public Follower() {}
