@@ -1,7 +1,6 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.User;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -168,22 +167,6 @@ public class UserRepositoryImp implements UserRepository {
             throw new NullPointerException("UserId is Null");
 
         return jdbcTemplate.queryForObject(SQL_FIND_VALIDATION_CODE_BY_ID, new Object[]{ id }, String.class);
-    }
-
-    public boolean follow(long userId , long followingId){
-        return true;
-    }
-    public boolean isFollowing(long userId , long followingId){
-        return false;
-    }
-    public boolean unfollow(long userId , long followingId){
-        return true;
-    }
-    public List<User> getFollowings(long userId){
-        return null;
-    }
-    public List<User> getFollowers(long userId){
-        return null;
     }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
