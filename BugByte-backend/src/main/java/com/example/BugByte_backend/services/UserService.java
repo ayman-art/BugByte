@@ -2,7 +2,6 @@ package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.Adapters.UserAdapter;
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.repositories.UserRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.repositories.userProfileRepository;
 import org.apache.kafka.common.protocol.types.Field;
@@ -21,10 +20,10 @@ public class UserService {
     private final int poolCapacity = 1000;
 
     @Autowired
-    private userProfileRepository userRepository;
+    private UserRepositoryImp userRepository;
 
     @Autowired
-    private UserRepositoryImp userRepositoryImp;
+    private userProfileRepository userProfileRep;
     // The user pool map for caching users
     /*
     The reason behind using a linked hash map is that it maintains order of access provided in constructor
@@ -73,82 +72,82 @@ public class UserService {
         }
     }
 
-    public boolean followUser(long userId , String followingName) throws Exception{
+    public boolean followUser(long userId, String followingName) throws Exception{
         try {
-            User follower = userRepositoryImp.findById(userId);
-            User following = userRepositoryImp.findByIdentity(followingName);
-            if(follower == null){
+            User follower = userRepository.findById(userId);
+            User following = userRepository.findByIdentity(followingName);
+            if(follower == null) {
                 throw new Exception("follower doesn't Exist");
             }
-            else if (following == null){
+            else if (following == null) {
                 throw new Exception("following doesn't Exist");
             }
-            else if (userRepository.isFollowing(userId , following.getId())){
+            else if (userProfileRep.isFollowing(userId, following.getId())) {
                 throw new Exception("User is Already following this user");
             }
-            return userRepository.followUser(userId , following.getId());
+            return userProfileRep.followUser(userId, following.getId());
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new Exception("Error occurred while following user:  " + e.getMessage());
         }
     }
-    public boolean unfollowUser(long userId , String followingName) throws Exception{
+    public boolean unfollowUser(long userId, String followingName) throws Exception {
         try {
-            User follower = userRepositoryImp.findById(userId);
-            User following = userRepositoryImp.findByIdentity(followingName);
-            if(follower == null){
+            User follower = userRepository.findById(userId);
+            User following = userRepository.findByIdentity(followingName);
+            if(follower == null) {
                 throw new Exception("follower doesn't Exist");
             }
-            else if (following == null){
+            else if (following == null) {
                 throw new Exception("following doesn't Exist");
             }
-            else if (!userRepository.isFollowing(userId , following.getId())){
+            else if (!userProfileRep.isFollowing(userId , following.getId())) {
                 throw new Exception("User isn't following this user");
             }
-            return userRepository.unfollowUser(userId , following.getId());
+            return userProfileRep.unfollowUser(userId , following.getId());
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
         }
     }
 
-    public List<User> getFollowings(String userName) throws Exception{
+    public List<User> getFollowings(String userName) throws Exception {
         try {
-            User user = userRepositoryImp.findByIdentity(userName);
-            if(user == null){
+            User user = userRepository.findByIdentity(userName);
+            if(user == null) {
                 throw new Exception("User doesn't Exist");
             }
-            return userRepository.getFollowings(user.getId());
+            return userProfileRep.getFollowings(user.getId());
         }
         catch (Exception e) {
             throw new Exception("Couldn't get the following users:  " + e.getMessage());
         }
     }
 
-    public List<User> getFollowers(String userName) throws Exception{
+    public List<User> getFollowers(String userName) throws Exception {
         try {
-            User user = userRepositoryImp.findByIdentity(userName);
-            if(user == null){
+            User user = userRepository.findByIdentity(userName);
+            if(user == null) {
                 throw new Exception("User doesn't Exist");
             }
-            return userRepository.getFollowers(user.getId());
+            return userProfileRep.getFollowers(user.getId());
         }
         catch (Exception e) {
             throw new Exception("Couldn't get the followers:  " + e.getMessage());
         }
     }
 
-    public boolean makeAdmin(long adminId , String userName) throws Exception{
+    public boolean makeAdmin(long adminId, String userName) throws Exception {
         try {
-            User admin = userRepositoryImp.findById(adminId);
-            User user = userRepositoryImp.findByIdentity(userName);
-            if(user == null){
+            User admin = userRepository.findById(adminId);
+            User user = userRepository.findByIdentity(userName);
+            if(user == null) {
                 throw new Exception("User doesn't exist");
             }
-            if (admin == null){
+            if (admin == null) {
                 throw new Exception("Admin doesn't exist");
             }
-            if (!admin.get_is_admin()){
+            if (!admin.get_is_admin()) {
                 throw new Exception("The user does not have the authority to assign admins");
             }
             return userRepositoryImp.makeUserAdmin(user.getId());

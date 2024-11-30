@@ -1,7 +1,6 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.User;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

@@ -44,5 +44,17 @@ public class AuthenticationService {
                 .parseClaimsJws(jwt)
                 .getBody();
     }
+    public static String refreshToken(String oldJwt) {
+        try {
+            Claims claims = parseToken(oldJwt);
+            long id = Long.parseLong(claims.getId());
+            String username = claims.getSubject();
+            Object isAdmin = claims.get("is_admin");
+            return generateJWT(id, username,(boolean) isAdmin);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to refresh token: " + e.getMessage());
+        }
+    }
+
 
 }
