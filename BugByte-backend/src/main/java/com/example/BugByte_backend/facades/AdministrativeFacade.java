@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -82,5 +83,27 @@ public class AdministrativeFacade {
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
         registrationService.changePassword(id, (String)userdata.get("password"));
+    }
+    public Map<String, Object> getProfile(Map<String, Object> userdata) throws Exception {
+        return null;
+    }
+    public boolean followUser(Map<String, Object> userdata) throws Exception {
+        return true;
+    }
+
+    public boolean unfollowUser(Map<String, Object> userdata) throws Exception {
+        return true;
+    }
+
+    public List<Map<String, Object>> getFollowers(Map<String, Object> userdata) throws Exception {
+        return null;
+    }
+
+    public List<Map<String, Object>> getFollowings(Map<String, Object> userdata) throws Exception {
+        return null;
+    }
+
+    public boolean makeAdmin(Map<String, Object> userdata) throws Exception {
+        return true;
     }
 }
