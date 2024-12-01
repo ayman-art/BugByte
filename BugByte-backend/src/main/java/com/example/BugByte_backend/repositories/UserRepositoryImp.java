@@ -169,6 +169,7 @@ public class UserRepositoryImp implements UserRepository {
         return jdbcTemplate.queryForObject(SQL_FIND_VALIDATION_CODE_BY_ID, new Object[]{ id }, String.class);
     }
 
+
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
             rs.getLong("id"),
             rs.getString("user_name"),

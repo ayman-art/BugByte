@@ -11,6 +11,13 @@ import java.util.List;
 @Repository
 public class userProfileRepository {
 
+    public int getFollowersCount(long userId){
+        return 0;
+    }
+    public int getFollowingsCount(long userId){
+        return 0;
+    }
+
     private static final String SQL_FOLLOW_USER = """
                 INSERT INTO followers
                     (follower_id, followed_id)

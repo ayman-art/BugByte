@@ -1,8 +1,10 @@
-import React, { useState, FormEvent } from 'react';
+import React, {useState} from 'react';
 import { User } from '../types';
 import { useTypewriter } from 'react-simple-typewriter';
 import { useGoogleLogin } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
 import '../styles/components.css';
+import { fetchGoogleUserInfo, Signup } from '../API/SignUpApi';
 
 const RegistrationForm: React.FC = () => {
     const [formData, setFormData] = useState<User>({
@@ -10,35 +12,78 @@ const RegistrationForm: React.FC = () => {
         email: '',
         password: ''
     });
+    const [error, setError] = useState<string>('');
+    const navigate = useNavigate();
 
     // Handle Google login
-    const googleLogin = useGoogleLogin({
-        onSuccess: async (response) => {
-            try {
-                // Get user info from Google
-                const userInfoResponse = await fetch(
-                    'https://www.googleapis.com/oauth2/v3/userinfo',
-                    {
-                        headers: {
-                            Authorization: `Bearer ${response.access_token}`,
-                        },
-                    }
-                );
-                const userInfo = await userInfoResponse.json();
-                console.log('Google user info:', userInfo);
-            } catch (error) {
-                console.error('Error fetching Google user info:', error);
-            }
-        },
-        onError: () => {
-            console.error('Google Login Failed');
-        },
-    });
+   const googleLogin = useGoogleLogin({
+     onSuccess: async (response) => {
+       try {
+         const userInfo = await fetchGoogleUserInfo(response.access_token);
+         console.log('Google user info:', userInfo);
+       } catch (error) {
+         console.error('Error fetching Google user info:', error);
+       }
+     },
+     onError: () => {
+       console.error('Google Login Failed');
+     },
+   });
 
-    const handleSubmit = (e: FormEvent) => {
+    // const handleSubmit = (e: FormEvent) => {
+    //     e.preventDefault();
+    //     console.log('Registering user:', formData);
+    // };
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log('Registering user:', formData);
-    };
+     
+        if (!formData.username && !formData.password) {
+          setError('Both username and password are required.');
+          return;
+        }
+     
+        if (!formData.password) {
+          setError('Please enter your password');
+          return;
+        }
+     
+        if (!formData.username) {
+          setError('Please enter your username');
+          return;
+        }
+     
+        try {
+          const data = await Signup(formData.username,formData.email, formData.password);
+     
+          console.log('Login response:', data); 
+ 
+          const { jwt, isAdmin } = data;
+     
+          if (jwt) {
+            localStorage.setItem('authToken', jwt);
+            console.log('JWT Token:', jwt);
+            console.log('Is Admin:', isAdmin);
+          } else {
+            setError('No token received. Please try again.');
+          }
+          console.log('SignUp successful:', data);
+          navigate('/home');
+          
+        } catch (error: unknown) {
+         console.error('Error during SignUp:', error);
+     
+         if (error instanceof Error) {
+           if (error.message.includes('SignUp failed')) {
+             setFormData;
+             setError('User Already Exisits!');
+           } else {
+             setError('Something went wrong. Please try again later.');
+           }
+         } else {
+           setError('An unexpected error occurred.');
+         }
+        }
+      };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -123,7 +168,7 @@ const RegistrationForm: React.FC = () => {
                     </button>
                 </form>
                 <div className="mt-4 text-center text-sm text-gray-600">
-                    Already registered? <a href="/login">Login</a>
+                    Already registered? <a href="/LogIn">Login</a>
                 </div>
 
                 <div className="registration-form-google-signin">
