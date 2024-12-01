@@ -5,6 +5,7 @@ import GoogleLogo from '../assets/googlelogo.png';
 import ResetPasswordPopup from './PasswordReset';
 import '../styles/Login.css';
  import { logIn ,resetPassword} from '../API/LoginApi';
+import NavBar from '../components/NavBar';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -37,13 +38,18 @@ const Login: React.FC = () => {
       const data = await resetPassword(username);
       localStorage.setItem('userId', data.userId);
       setShowPopup(true);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error during password reset:', error);
-      if (error.message.includes('Password reset failed')) {
-        setPassword('');
-        setError('Wrong username or email!');
+    
+      if (error instanceof Error) {
+        if (error.message.includes('Password reset failed')) {
+          setPassword('');
+          setError('Wrong username or email!');
+        } else {
+          setError('Something went wrong. Please try again later.');
+        }
       } else {
-        setError('Something went wrong. Please try again later.');
+        setError('An unexpected error occurred.');
       }
     }
   };
@@ -74,15 +80,19 @@ const Login: React.FC = () => {
      localStorage.setItem('authToken', data.token);
      console.log('Login successful:', data);
      // navigate('/home');
-   } catch (error) {
-     console.error('Error during login:', error);
+   } catch (error: unknown) {
+    console.error('Error during login:', error);
 
-     if (error.message.includes('Login failed')) {
-       setPassword('');
-       setError('Wrong username or password!');
-     } else {
-       setError('Something went wrong. Please try again later.');
-     }
+    if (error instanceof Error) {
+      if (error.message.includes('Login failed')) {
+        setPassword('');
+        setError('Wrong username or password!');
+      } else {
+        setError('Something went wrong. Please try again later.');
+      }
+    } else {
+      setError('An unexpected error occurred.');
+    }
    }
  };
 

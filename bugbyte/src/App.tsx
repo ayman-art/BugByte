@@ -28,6 +28,8 @@ const App: React.FC = () => {
                 <Route path="/SignUp" element={<SignUpPage />} />
                 <Route path="/LogIn" element={<Login/>}/>
                 <Route path= "/Profile/:userName" element={<ProfilePage isCurrentUser={false} darkMode={true} user={user} />}/>
+                <Route path="/Home" element={<HomePage/>}/>
+
             </Routes>
         </BrowserRouter>
       );

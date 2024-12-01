@@ -1,5 +1,5 @@
 {
-  "name": "first-trial",
+  "name": "bug_byte",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,14 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@nextui-org/navbar": "^2.0.37",
+    "@nextui-org/react": "^2.4.8",
     "@react-oauth/google": "^0.12.1",
     "bootstrap": "^5.3.3",
     "gapi-script": "^1.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-google-login": "^5.2.2",
     "react-router-dom": "^6.28.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^3.0.1",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
