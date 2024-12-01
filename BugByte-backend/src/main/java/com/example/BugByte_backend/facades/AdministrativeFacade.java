@@ -87,6 +87,9 @@ public class AdministrativeFacade {
     public Map<String, Object> getProfile(Map<String, Object> userdata) throws Exception {
         return null;
     }
+    public Map<String, Object> updateProfile(Map<String, Object> userdata) throws Exception {
+        return null;
+    }
     public boolean followUser(Map<String, Object> userdata) throws Exception {
         return true;
     }
