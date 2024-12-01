@@ -29,10 +29,9 @@ export const Signup = async (userName: string,email: string, password: string): 
       body: JSON.stringify({ userName,email, password }),
     });
 
-    if (!response.ok) {
-      throw new Error(`Login failed: ${response.statusText}`);
+    if (response.status != 201) {
+      throw new Error(`Sign up failed: ${response.statusText}`);
     }
-
     return await response.json();
   } catch (error) {
     console.error('Error in SignUp:', error);
