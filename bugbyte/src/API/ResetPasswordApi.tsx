@@ -19,15 +19,15 @@ export const validateEmailCode = async (email: string, code: string) : Promise<a
   }
 };
 
-export const resetPassword = async (jwt: string, password: string) => {
+export const resetPassword = async (jwt: string, password: string) : Promise<any>  => {
   try {
     const response = await fetch(API_URLS.CHANGE_PASSWORD, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization' : `Bearer ${jwt}` 
       },
       body: JSON.stringify({
-        jwt,
         password,
       }),
     });
