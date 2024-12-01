@@ -25,6 +25,7 @@ public class RegistrationService {
              if(!registrationCOR.validatePassword(password)) {
                  throw new Exception("weak password");
              }
+            System.out.println("userName " + userName + "email " + email);
              //insert user in the database
              long id  = userRepository.insertUser(userName , email , password);
              return new User(id, userName, email, password);
@@ -102,6 +103,7 @@ public class RegistrationService {
             while (userRepository.codeExists(code)) {
                 code = registrationCOR.generateCode();
             }
+            userRepository.addResetCode(user.getId() , code);
             if(emailService.sendCodeByEmail(user.getEmail(), code)){
                 return user.getEmail();
             } else{

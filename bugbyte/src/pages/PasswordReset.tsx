@@ -39,69 +39,101 @@ const ResetPasswordPopup: React.FC<ResetPasswordPopupProps> = ({ setShowPopup })
     setConfirmPassword(e.target.value);
   };
 
-const handleVerificationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const handleVerificationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  if (!verificationCode) {
-    setError('Verification code is required.');
-    return;
-  }
-
-  try {
-    const response = await validateEmailCode(userId, verificationCode);
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Code is correct', data);
-      setStep(2);
-    } else {
-      setError('Invalid verification code!');
+    if (!verificationCode) {
+      setError('Verification code is required.');
+      return;
     }
-  } catch (error) {
-    console.error('Error:', error);
-    setError(error.message || 'An error occurred. Please try again.');
-  }
-};
 
-const handleResetPasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+    try {
+      const email = localStorage.getItem('email');
+      console.log(email)
+      if (!email) {
+        console.error('Email not found in localStorage');
+        setError('Email not found. Please check your session.');
+        return;
+      }
+      console.log(verificationCode)
+      const response = await validateEmailCode(email, verificationCode);
 
-  if (newPassword !== confirmPassword) {
-    setError('Passwords do not match!');
-    return;
-  }
-
-  try {
-    const response = await resetPassword(userId, newPassword);
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Password reset successful', data);
-    } else {
-      setError('Failed to reset password.');
+      if (response.ok) {
+        const data = await response.json();
+        const { jwt } = data;
+ 
+        if (jwt) {
+          localStorage.setItem('authToken', jwt);
+          console.log('JWT Token:', jwt);
+        } else {
+          setError('No token received. Please try again.');
+        }
+        console.log('Code is correct', data);
+        setStep(2);
+      } else {
+        setError('Invalid verification code!');
+      }
+    } catch (error: unknown) {
+      console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     }
-  } catch (error) {
-    console.error('Error:', error);
-    setError(error.message || 'An error occurred. Please try again.');
-  }
-};
+  };
 
-const handleResendCode = async () => {
-  setCanResend(false);
-  setTimer(60);
+  const handleResetPasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  try {
-    const response = await resendVerificationCode(userId);
-
-    if (response.ok) {
-      console.log('Code resent successfully');
-    } else {
-      setError('Failed to resend code. Please try again.');
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match!');
+      return;
     }
-  } catch (error) {
-    console.error('Error:', error);
-    setError(error.message || 'An error occurred. Please try again.');
-  }
-};
+
+    try {
+      const jwt = localStorage.getItem('authToken');
+      if (!jwt) {
+        console.error('Email not found in localStorage');
+        setError('Email not found. Please check your session.');
+        return;
+      }
+
+      const response = await resetPassword(jwt, newPassword);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Password reset successful', data);
+        setShowPopup(false);  // Close popup after success
+      } else {
+        setError('Failed to reset password.');
+      }
+    } catch (error: unknown) {
+      console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred. Please try again.');
+    }
+  };
+
+  const handleResendCode = async () => {
+    setCanResend(false);
+    setTimer(60);
+
+    try {
+      const email = localStorage.getItem('email');
+      if (!email) {
+        console.error('Email not found in localStorage');
+        setError('Email not found. Please check your session.');
+        return;
+      }
+
+      const response = await resendVerificationCode(email);
+
+      if (response.ok) {
+        console.log('Code resent successfully');
+      } else {
+        setError('Failed to resend code. Please try again.');
+      }
+    } catch (error: unknown) {
+      console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred. Please try again.');
+    }
+  };
 
   return (
     <div className="popup">
@@ -179,3 +211,4 @@ const handleResendCode = async () => {
 };
 
 export default ResetPasswordPopup;
+

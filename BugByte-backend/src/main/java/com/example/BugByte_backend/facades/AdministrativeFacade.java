@@ -22,7 +22,7 @@ public class AdministrativeFacade {
 
     /*
     Expected input format:
-        userMap.put("user_name", user.get_user_name()); -> do not include in log in
+        userMap.put("userName", user.get_userName()); -> do not include in log in
         userMap.put("email", user.getEmail()); -> can be used as email for sign up and as email or username in log in
         userMap.put("password", user.getPassword());
         userMap.put("jwt", token); -> pass the jwt token
@@ -35,10 +35,10 @@ public class AdministrativeFacade {
     public Map<String, Object> registerUser(Map<String, Object> userdata) throws Exception {
         UserAdapter adapter = new UserAdapter();
         Map<String, Object> userMap = adapter.toMap(registrationService.registerUser((String)userdata.get("email"),
-                (String)userdata.get("user_name"), (String)userdata.get("password")));
+                (String)userdata.get("userName"), (String)userdata.get("password")));
         String jwt = AuthenticationService.generateJWT((long)userMap.get("id"),
-                (String)userMap.get("user_name"), (boolean)userMap.get("is_admin"));
-        boolean isAdmin = (boolean)userMap.get("is_admin");
+                (String)userMap.get("userName"), (boolean)userMap.get("isAdmin"));
+        boolean isAdmin = (boolean)userMap.get("isAdmin");
 
         return Map.of(
             "jwt", jwt,
@@ -52,7 +52,7 @@ public class AdministrativeFacade {
         Map<String, Object> userMap = adapter.toMap(registrationService.loginUser((String)userdata.get("email"),
                 (String)userdata.get("password")));
         return AuthenticationService.generateJWT((long)userMap.get("id"),
-                (String)userMap.get("user_name"), (boolean)userMap.get("is_admin"));
+                (String)userMap.get("userName"), (boolean)userMap.get("isAdmin"));
     }
 
     public  void deleteUser(Map<String, Object> userdata) throws Exception {
@@ -76,7 +76,7 @@ public class AdministrativeFacade {
         Map<String, Object> userMap = adapter.toMap(registrationService.validateCode(email, code));
         Long id = (Long)userMap.get("id");
         return AuthenticationService.generateJWT((Long)userMap.get("id"),
-                (String)userMap.get("user_name"), (boolean)userMap.get("is_admin"));
+                (String)userMap.get("userName"), (boolean)userMap.get("isAdmin"));
     }
 
     public void changePassword(Map<String, Object> userdata) throws Exception {
@@ -89,6 +89,9 @@ public class AdministrativeFacade {
     // User Profile Section
     public Map<String, Object> getProfile(Map<String, Object> userdata) throws Exception {
         return userService.getProfile((String)userdata.get("user-name"));
+    }
+    public Map<String, Object> updateProfile(Map<String, Object> userdata) throws Exception {
+        return null;
     }
     public boolean followUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
@@ -107,13 +110,26 @@ public class AdministrativeFacade {
     public List<Map<String, Object>> getFollowers(Map<String, Object> userdata) throws Exception {
         List<User> followers = userService.getFollowers((String)userdata.get("user-name"));
         UserAdapter adapter = new UserAdapter();
-        return followers.stream().map(adapter::toMap).toList();
+        List <Map<String, Object>> followersMap = followers.stream().map(adapter::toMap).toList();
+        for (Map<String, Object> follower : followersMap) {
+            follower.remove("password");
+            follower.remove("email");
+            follower.remove("id");
+        }
+        return followersMap;
     }
+
 
     public List<Map<String, Object>> getFollowings(Map<String, Object> userdata) throws Exception {
         List<User> followings = userService.getFollowings((String)userdata.get("user-name"));
         UserAdapter adapter = new UserAdapter();
-        return followings.stream().map(adapter::toMap).toList();
+        List <Map<String, Object>> followingsMap = followings.stream().map(adapter::toMap).toList();
+        for (Map<String, Object> following : followingsMap) {
+            following.remove("password");
+            following.remove("email");
+            following.remove("id");
+        }
+        return followingsMap;
     }
 
     public boolean makeAdmin(Map<String, Object> userdata) throws Exception {

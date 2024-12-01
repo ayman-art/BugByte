@@ -76,7 +76,7 @@ public class RegistrationController {
         userdata.put("jwt", token);
         try {
             administrativeFacade.changePassword(userdata);
-            return new ResponseEntity<>("Password Changed Successfully", HttpStatus.OK);
+            return new ResponseEntity<>(Map.of("message","changed password successfully "), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }

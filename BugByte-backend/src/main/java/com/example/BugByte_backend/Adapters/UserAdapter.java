@@ -8,29 +8,29 @@ import java.util.Map;
 
 public class UserAdapter implements IAdapter<User> {
 
-
     @Override
     public Map<String, Object> toMap(User user) {
         Map<String, Object> userMap = new HashMap<>();
-        userMap.put("user_name", user.get_user_name());
+        userMap.put("userName", user.getUserName());
         userMap.put("email", user.getEmail());
         userMap.put("password", user.getPassword());
-        userMap.put("is_admin" , user.get_is_admin());
-        userMap.put("reputation" , user.getReputation());
-        userMap.put("id" , user.getId());
+        userMap.put("bio", user.getBio());
+        userMap.put("isAdmin", user.getIsAdmin());
+        userMap.put("reputation", user.getReputation());
+        userMap.put("id", user.getId());
         return userMap;
     }
 
     @Override
     public User fromMap(Map<String, Object> map) {
-        String username = (String) map.get("user_name");
+        String username = (String) map.get("userName");
         String email = (String) map.get("email");
         String password = (String) map.get("password");
+        String bio = (String) map.get("bio");
         long id = (long) map.get("id");
-        boolean is_admin = (boolean) map.get("is_admin");
+        boolean is_admin = (boolean) map.get("isAdmin");
         long reputation = (long) map.get("reputation");
-        User user = new User(id , username, email, password, reputation, is_admin);
-        return user;
+        return new User(id, username, email, password, bio, reputation, is_admin);
     }
 
     @Override

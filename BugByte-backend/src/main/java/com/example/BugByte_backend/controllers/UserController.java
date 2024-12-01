@@ -38,9 +38,10 @@ public class UserController {
     public ResponseEntity<?> updateProfile(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> userData) {
         token = token.replace("Bearer ", "");
         userData.put("jwt", token);
+
         try {
-            // Administrative facade calling update profile method
-            return null;
+            Map<String, Object> response = administrativeFacade.updateProfile(userData);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }

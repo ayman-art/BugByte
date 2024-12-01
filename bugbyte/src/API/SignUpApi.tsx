@@ -19,20 +19,19 @@ export const fetchGoogleUserInfo = async (accessToken: string) => {
   }
 };
 
-export const Signup = async (user_name: string,email: string, password: string): Promise<any> => {
+export const Signup = async (userName: string,email: string, password: string): Promise<any> => {
   try {
     const response = await fetch(API_URLS.SIGNUP, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ user_name,email, password }),
+      body: JSON.stringify({ userName,email, password }),
     });
 
-    if (!response.ok) {
-      throw new Error(`Login failed: ${response.statusText}`);
+    if (response.status != 201) {
+      throw new Error(`Sign up failed: ${response.statusText}`);
     }
-
     return await response.json();
   } catch (error) {
     console.error('Error in SignUp:', error);

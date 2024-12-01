@@ -1,37 +1,43 @@
 import { API_URLS } from './ApiUrls';
-
-export const logIn = async (username: string, password: string): Promise<any> => {
+export const logIn = async (email: string, password: string): Promise<any> => {
   try {
     const response = await fetch(API_URLS.LOGIN, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     });
+
+    console.log('Request to API:', API_URLS.LOGIN);
+    console.log('Request Body:', { email, password });
 
     if (!response.ok) {
       throw new Error(`Login failed: ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+
+
+    console.log('Login Response:', data);
+
+    return data;
   } catch (error) {
     console.error('Error in logIn:', error);
     throw error;
   }
 };
 
-export const resetPassword = async (username: string): Promise<any> => {
+
+export const resetPassword = async (email: string): Promise<any> => {
   try {
-    const response = await fetch(
-      `${API_URLS.FORGOT_PASSWORD}?username=${encodeURIComponent(username)}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await fetch(API_URLS.FORGOT_PASSWORD, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
 
     if (!response.ok) {
       throw new Error(`Password reset failed: ${response.statusText}`);
