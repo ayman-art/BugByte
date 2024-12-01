@@ -11,7 +11,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String user_name;
+    private String userName;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -20,36 +20,42 @@ public class User {
     private String password;
 
     @Column(nullable = false)
+    private String bio;
+
+    @Column(nullable = false)
     private Long reputation;
 
     @Column(nullable = false)
-    private Boolean is_admin;
+    private Boolean isAdmin;
 
-    public User(String user_name, String email, String password) {
-        this.id = 0L;
-        this.user_name = user_name;
-        this.email = email;
-        this.password = password;
-        this.reputation = 0L;
-        this.is_admin = false;
+    public User() {
+        this(0L, "", "", "", 0L, false);
     }
 
-    public User(Long id, String user_name, String email, String password) {
-        this.id = id;
-        this.user_name = user_name;
-        this.email = email;
-        this.password = password;
-        this.reputation = 0L;
-        this.is_admin = false;
+    public User(String userName, String email, String password) {
+        this(0L, userName, email, password, "", 0L, false);
     }
 
-    public User(Long id, String user_name, String email, String password, Long reputation, Boolean is_admin) {
+    public User(Long id, String userName, String email, String password) {
+        this(id, userName, email, password, "", 0L, false);
+    }
+
+    public User(Long id, String userName, String email, String password, String bio) {
+        this(id, userName, email, password, bio, 0L, false);
+    }
+
+    public User(Long id, String userName, String email, String password, Long reputation, Boolean isAdmin) {
+        this(id, userName, email, password, "", reputation, isAdmin);
+    }
+
+    public User(Long id, String userName, String email, String password, String bio, Long reputation, Boolean isAdmin) {
         this.id = id;
-        this.user_name = user_name;
+        this.userName = userName;
         this.email = email;
         this.password = password;
+        this.bio = bio;
         this.reputation = reputation;
-        this.is_admin = is_admin;
+        this.isAdmin = isAdmin;
     }
 
     public Long getId() {
@@ -60,12 +66,12 @@ public class User {
         this.id = id;
     }
 
-    public String get_user_name() {
-        return user_name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void set_user_name(String user_name) {
-        this.user_name = user_name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getEmail() {
@@ -84,6 +90,14 @@ public class User {
         this.password = password;
     }
 
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
     public Long getReputation() {
         return reputation;
     }
@@ -92,11 +106,11 @@ public class User {
         this.reputation = reputation;
     }
 
-    public Boolean get_is_admin() {
-        return is_admin;
+    public Boolean getIsAdmin() {
+        return isAdmin;
     }
 
-    public void set_is_admin(Boolean is_admin) {
-        this.is_admin = is_admin;
+    public void setIsAdmin(Boolean is_admin) {
+        this.isAdmin = is_admin;
     }
 }

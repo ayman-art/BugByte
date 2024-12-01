@@ -90,6 +90,9 @@ public class AdministrativeFacade {
     public Map<String, Object> getProfile(Map<String, Object> userdata) throws Exception {
         return userService.getProfile((String)userdata.get("user-name"));
     }
+    public Map<String, Object> updateProfile(Map<String, Object> userdata) throws Exception {
+        return null;
+    }
     public boolean followUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);

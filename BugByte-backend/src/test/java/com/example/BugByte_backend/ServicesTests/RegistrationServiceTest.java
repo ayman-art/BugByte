@@ -42,7 +42,7 @@ public class RegistrationServiceTest {
         User user  = registrationService.registerUser(email, userName, password);
 
         assertEquals(user.getId(), expectedUserId);
-        assertEquals(user.get_user_name() , userName);
+        assertEquals(user.getUserName() , userName);
         assertEquals(user.getEmail() , email);
         assertEquals(user.getPassword() , password);
     }
@@ -144,7 +144,7 @@ public class RegistrationServiceTest {
         User newUser = registrationService.loginUser(identity , password);
 
         // Assert the user is returned
-        assertEquals(newUser.get_user_name() , user.get_user_name());
+        assertEquals(newUser.getUserName() , user.getUserName());
         assertEquals(newUser.getEmail() , user.getEmail());
         assertEquals(newUser.getPassword() , user.getPassword());
 
@@ -159,7 +159,7 @@ public class RegistrationServiceTest {
         User newUser = registrationService.logoutUser(id);
 
         // Assert the user is returned
-        assertEquals(newUser.get_user_name() , "user12");
+        assertEquals(newUser.getUserName() , "user12");
         assertEquals(newUser.getEmail() , "user@example.com");
         assertEquals(newUser.getPassword() ,"12345678@");
 
@@ -269,7 +269,7 @@ public class RegistrationServiceTest {
         //Assert the code is valid
         assertEquals(user.getEmail() , newUser.getEmail());
         assertEquals(user.getPassword() , newUser.getPassword());
-        assertEquals(user.get_user_name() , newUser.get_user_name());
+        assertEquals(user.getUserName() , newUser.getUserName());
     }
     //test validate code wrong code
     @Test
