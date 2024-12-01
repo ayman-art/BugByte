@@ -107,13 +107,26 @@ public class AdministrativeFacade {
     public List<Map<String, Object>> getFollowers(Map<String, Object> userdata) throws Exception {
         List<User> followers = userService.getFollowers((String)userdata.get("user-name"));
         UserAdapter adapter = new UserAdapter();
-        return followers.stream().map(adapter::toMap).toList();
+        List <Map<String, Object>> followersMap = followers.stream().map(adapter::toMap).toList();
+        for (Map<String, Object> follower : followersMap) {
+            follower.remove("password");
+            follower.remove("email");
+            follower.remove("id");
+        }
+        return followersMap;
     }
+
 
     public List<Map<String, Object>> getFollowings(Map<String, Object> userdata) throws Exception {
         List<User> followings = userService.getFollowings((String)userdata.get("user-name"));
         UserAdapter adapter = new UserAdapter();
-        return followings.stream().map(adapter::toMap).toList();
+        List <Map<String, Object>> followingsMap = followings.stream().map(adapter::toMap).toList();
+        for (Map<String, Object> following : followingsMap) {
+            following.remove("password");
+            following.remove("email");
+            following.remove("id");
+        }
+        return followingsMap;
     }
 
     public boolean makeAdmin(Map<String, Object> userdata) throws Exception {
