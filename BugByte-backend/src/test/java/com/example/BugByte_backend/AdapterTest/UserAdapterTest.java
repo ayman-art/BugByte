@@ -15,12 +15,14 @@ public class UserAdapterTest {
     public void testToMap() {
         User user = new User("user1", "user@gmail.com", "12345678");
         user.setReputation(10L);
+        user.setBio("simple bio");
 
         Map<String, Object> userMap = userAdapter.toMap(user);
 
         assertEquals("user1", userMap.get("user_name"));
         assertEquals("user@gmail.com", userMap.get("email"));
         assertEquals("12345678", userMap.get("password"));
+        assertEquals("simple bio", userMap.get("bio"));
         assertEquals(false, userMap.get("is_admin"));
         assertEquals((long)10, userMap.get("reputation"));
     }
@@ -33,6 +35,7 @@ public class UserAdapterTest {
         userMap.put("user_name", "user1");
         userMap.put("email", "user@gmail.com");
         userMap.put("password", "12345678");
+        userMap.put("bio", "simple bio");
         userMap.put("is_admin", false);
         userMap.put("reputation", (long)100);
         userMap.put("id", (long)1);
@@ -42,6 +45,7 @@ public class UserAdapterTest {
         assertEquals("user1", user.getUserName());
         assertEquals("user@gmail.com", user.getEmail());
         assertEquals("12345678", user.getPassword());
+        assertEquals("simple bio", user.getBio());
         assertFalse(user.getIsAdmin());
         assertEquals(100, user.getReputation());
         assertEquals(1, user.getId());
@@ -54,6 +58,7 @@ public class UserAdapterTest {
         userMap.put("user_name", "user1");
         userMap.put("email", null);
         userMap.put("password", null);
+        userMap.put("bio", null);
         userMap.put("is_admin", false);
         userMap.put("reputation", (long)50);
         userMap.put("id", (long)0);
@@ -63,6 +68,7 @@ public class UserAdapterTest {
         assertEquals("user1", user.getUserName());
         assertNull(user.getEmail());
         assertNull(user.getPassword());
+        assertNull(user.getBio());
         assertFalse(user.getIsAdmin());
         assertEquals(50, user.getReputation());
         assertEquals(0 , user.getId());
@@ -75,11 +81,12 @@ public class UserAdapterTest {
         User user = new User("user1", "user@gmail.com", "12345678");
         user.setReputation(10L);
         user.setId((long) 5);
+        user.setBio("simple bio");
 
         String userString = userAdapter.toJson(user);
         String expected = "{\"id\":5,\"user_name\":\"" +
                 "user1\",\"email\":\"user@gmail.com\"," +
-                "\"password\":\"12345678\",\"reputation\":10,\"is_admin\":false}";
+                "\"password\":\"12345678\",\"bio\":\"simple bio\",\"reputation\":10,\"is_admin\":false}";
 
 
         assertEquals(userString , expected);
@@ -90,12 +97,13 @@ public class UserAdapterTest {
     @Test
     public void testToJsonWithNullValues(){
         User user = new User("user1", "user@gmail.com", "12345678");
+        user.setBio("simple bio");
 
         String userString = userAdapter.toJson(user);
 
         String expected = "{\"id\":0,\"user_name\":\"" +
                 "user1\",\"email\":\"user@gmail.com\"," +
-                "\"password\":\"12345678\",\"reputation\":0,\"is_admin\":false}";
+                "\"password\":\"12345678\",\"bio\":\"simple bio\",\"reputation\":0,\"is_admin\":false}";
 
 
         assertEquals(userString , expected);
