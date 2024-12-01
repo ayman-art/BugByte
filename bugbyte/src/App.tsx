@@ -5,17 +5,7 @@ import Login from './pages/LoginPage';
 import SignUpPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
 const isLoggedIn = true;
-const user = {
-    name: 'Ore4444',
-    avatarUrl: 'https://via.placeholder.com/100',
-    reputation: 9275,
-    communities: [
-      { name: 'Stack Overflow' },
-      { name: 'Super User' },
-      { name: 'Ask Ubuntu'},
-    ],
-    
-  };
+
 const App: React.FC = () => {
     return (
         <BrowserRouter>

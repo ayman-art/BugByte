@@ -37,7 +37,7 @@ const styles = {
     padding: '10px 10%',
     backgroundColor: '#099154',
     color: 'white',
-    height: '60px',
+    height: '80px',
   },
   logoContainer: {
     display: 'flex',
@@ -45,8 +45,8 @@ const styles = {
   },
   logo: {
     color: '#ffffff',
-    height: '40px',
-    width: '40px',
+    height: '80px',
+    width: '80px',
     marginRight: '10px',
   },
   brandName: {
@@ -58,8 +58,8 @@ const styles = {
     alignItems: 'center',
   },
   profileIcon: {
-    height: '40px',
-    width: '40px',
+    height: '50px',
+    width: '50px',
     borderRadius: '50%',
     marginRight: '10px',
   },
