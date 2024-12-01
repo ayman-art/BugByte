@@ -56,47 +56,55 @@ const Login: React.FC = () => {
 
 
 
- const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-   e.preventDefault();
-
-   if (!username && !password) {
-     setError('Both username and password are required.');
-     return;
-   }
-
-   if (!password) {
-     setError('Please enter your password');
-     return;
-   }
-
-   if (!username) {
-     setError('Please enter your username');
-     return;
-   }
-
-   try {
-     const data = await logIn(username, password);
-
-     localStorage.setItem('authToken', data.token);
-     console.log('Login successful:', data);
-     // navigate('/home');
-   } catch (error: unknown) {
-    console.error('Error during login:', error);
-
-    if (error instanceof Error) {
-      if (error.message.includes('Login failed')) {
-        setPassword('');
-        setError('Wrong username or password!');
-      } else {
-        setError('Something went wrong. Please try again later.');
-      }
-    } else {
-      setError('An unexpected error occurred.');
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+ 
+    if (!username && !password) {
+      setError('Both username and password are required.');
+      return;
     }
-   }
+ 
+    if (!password) {
+      setError('Please enter your password');
+      return;
+    }
+ 
+    if (!username) {
+      setError('Please enter your username');
+      return;
+    }
+ 
+    try {
+      const data = await logIn(username, password);
+      console.log('Login response:', data); 
+ 
+      const { jwt, isAdmin } = data;
+ 
+      if (jwt) {
+        localStorage.setItem('authToken', jwt);
+        console.log('JWT Token:', jwt);
+        console.log('Is Admin:', isAdmin);
+      } else {
+        setError('No token received. Please try again.');
+      }
+ 
+      navigate('/home');
+    } catch (error: unknown) {
+      console.error('Error during login:', error);
+ 
+      if (error instanceof Error) {
+        if (error.message.includes('Login failed') || error.message.includes('401')) {
+          setPassword('');
+          setError('Wrong username or password!');
+        } else {
+          setError('Something went wrong. Please try again later.');
+        }
+      } else {
+        setError('An unexpected error occurred.');
+      }
+    }
  };
-
-
+ 
   return (
     <div className="container">
       <div className="formContainer">

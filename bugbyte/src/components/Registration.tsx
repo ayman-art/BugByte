@@ -55,17 +55,27 @@ const RegistrationForm: React.FC = () => {
         try {
           const data = await Signup(formData.username,formData.email, formData.password);
      
-          localStorage.setItem('authToken', data.token);
+          console.log('Login response:', data); 
+ 
+          const { jwt, isAdmin } = data;
+     
+          if (jwt) {
+            localStorage.setItem('authToken', jwt);
+            console.log('JWT Token:', jwt);
+            console.log('Is Admin:', isAdmin);
+          } else {
+            setError('No token received. Please try again.');
+          }
           console.log('SignUp successful:', data);
           navigate('/home');
           
         } catch (error: unknown) {
-         console.error('Error during login:', error);
+         console.error('Error during SignUp:', error);
      
          if (error instanceof Error) {
-           if (error.message.includes('Login failed')) {
+           if (error.message.includes('SignUp failed')) {
              setFormData;
-             setError('Wrong username or password!');
+             setError('User Already Exisits!');
            } else {
              setError('Something went wrong. Please try again later.');
            }
