@@ -91,6 +91,7 @@ public class userProfileRepository {
             rs.getString("user_name"),
             rs.getString("email"),
             rs.getString("password"),
+            rs.getString("bio"),
             rs.getLong("reputation"),
             rs.getBoolean("is_admin")
     ));
