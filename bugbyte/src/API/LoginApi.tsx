@@ -24,7 +24,7 @@ export const logIn = async (username: string, password: string): Promise<any> =>
 export const resetPassword = async (username: string): Promise<any> => {
   try {
     const response = await fetch(
-      `${API_URLS.RESET_PASSWORD}?username=${encodeURIComponent(username)}`,
+      `${API_URLS.FORGOT_PASSWORD}?username=${encodeURIComponent(username)}`,
       {
         method: 'GET',
         headers: {

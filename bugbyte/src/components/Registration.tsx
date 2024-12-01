@@ -1,9 +1,10 @@
-import React, { useState, FormEvent } from 'react';
+import React, {useState} from 'react';
 import { User } from '../types';
 import { useTypewriter } from 'react-simple-typewriter';
 import { useGoogleLogin } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
 import '../styles/components.css';
-import { fetchGoogleUserInfo } from '../API/SignUpApi';
+import { fetchGoogleUserInfo, Signup } from '../API/SignUpApi';
 
 const RegistrationForm: React.FC = () => {
     const [formData, setFormData] = useState<User>({
@@ -11,6 +12,8 @@ const RegistrationForm: React.FC = () => {
         email: '',
         password: ''
     });
+    const [error, setError] = useState<string>('');
+    const navigate = useNavigate();
 
     // Handle Google login
    const googleLogin = useGoogleLogin({
@@ -27,10 +30,50 @@ const RegistrationForm: React.FC = () => {
      },
    });
 
-    const handleSubmit = (e: FormEvent) => {
+    // const handleSubmit = (e: FormEvent) => {
+    //     e.preventDefault();
+    //     console.log('Registering user:', formData);
+    // };
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log('Registering user:', formData);
-    };
+     
+        if (!formData.username && !formData.password) {
+          setError('Both username and password are required.');
+          return;
+        }
+     
+        if (!formData.password) {
+          setError('Please enter your password');
+          return;
+        }
+     
+        if (!formData.username) {
+          setError('Please enter your username');
+          return;
+        }
+     
+        try {
+          const data = await Signup(formData.username,formData.email, formData.password);
+     
+          localStorage.setItem('authToken', data.token);
+          console.log('SignUp successful:', data);
+          navigate('/home');
+          
+        } catch (error: unknown) {
+         console.error('Error during login:', error);
+     
+         if (error instanceof Error) {
+           if (error.message.includes('Login failed')) {
+             setFormData;
+             setError('Wrong username or password!');
+           } else {
+             setError('Something went wrong. Please try again later.');
+           }
+         } else {
+           setError('An unexpected error occurred.');
+         }
+        }
+      };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
