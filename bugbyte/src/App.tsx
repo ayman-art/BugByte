@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage';
 import Login from './pages/LoginPage';
 import SignUpPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
-const isLoggedIn = false;
+const isLoggedIn = true;
 const user = {
     name: 'Ore4444',
     avatarUrl: 'https://via.placeholder.com/100',
@@ -27,7 +27,7 @@ const App: React.FC = () => {
                 )}
                 <Route path="/SignUp" element={<SignUpPage />} />
                 <Route path="/LogIn" element={<Login/>}/>
-                <Route path= "/Profile/:userName" element={<ProfilePage isCurrentUser={false} darkMode={true} user={user} />}/>
+                <Route path= "/Profile/:userName" element={<ProfilePage/>}/>
                 <Route path="/Home" element={<HomePage/>}/>
 
             </Routes>

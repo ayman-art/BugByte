@@ -1,14 +1,13 @@
 import React from 'react';
-
+import Layout from '../layouts/MainLayout';
 const HomePage: React.FC = () => {
     return (
-        <div>
-            
+        <Layout>
             <div>
                 hi
 
             </div>
-        </div>
+        </Layout>
       );
 };
 

@@ -1,59 +1,44 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import NavBar from '../components/NavBar';
-
-interface ProfileProps {
-  isCurrentUser: boolean;
-  darkMode: boolean;
-  user: {
-    name: string;
-    avatarUrl: string;
-    reputation: number;
-    communities: Array<{ name: string}>;
-  };
+// Profile.tsx
+import React, { useState, useEffect } from 'react';
+import '../styles/ProfilePage.css'
+import {ReactComponent as ProfilePic} from '../assets/user-profile.svg'
+interface UserData {
+  name: string;
+  reputation: number;
+  about: string;
 }
 
-const ProfilePage: React.FC<ProfileProps> = ({ isCurrentUser, darkMode, user }) => {
-  const { userId } = useParams();
-  
-  console.log("User ID from route:", userId); // Access userId from the URL
+const Profile: React.FC = () => {
+  const [user, setUser] = useState<UserData | null>({
+    name: "Abdullah",
+    reputation: 1000,
+    about: "this is an engineer"
+  });
+  //useState<UserData | null>(null);
+
+  useEffect(() => {
+    // Fetch user data from the backend
+    const fetchUserData = async () => {
+      const response = await fetch('/api/user');
+      const userData = await response.json();
+      setUser(userData);
+    };
+    fetchUserData();
+  }, []);
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div>
-      <NavBar/>
-      <div
-        className={`profile-page ${darkMode ? 'dark' : ''}`}
-        style={{
-          backgroundColor: darkMode ? '#1a1a1a' : '#fff',
-          color: darkMode ? '#fff' : '#000',
-          padding: '1rem',
-          borderRadius: '10px',
-        }}
-      >
-        
-        <div className="header" style={{ display: 'flex', alignItems: 'center' }}>
-          <img
-            src={user.avatarUrl}
-            alt={`${user.name}'s avatar`}
-            style={{
-              width: '100px',
-              height: '100px',
-              borderRadius: '50%',
-              marginRight: '1rem',
-            }}
-          />
-          <div>
-            <h1>{user.name}</h1>
-          </div>
-        </div>
-
-        <div className="stats">
-          <h2>Stats</h2>
-          <p>Reputation: {user.reputation}</p>
-        </div>
+    <div className="p-4">
+      <div className="flex items-center mb-4">
+        <span className="text-xl font-bold">{user.name}</span>
       </div>
+      <p>Reputation: {user.reputation}</p>
+      <p>{user.about}</p>
     </div>
   );
 };
 
-export default ProfilePage;
+export default Profile;
