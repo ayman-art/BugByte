@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { User } from '../types';
 import { useTypewriter } from 'react-simple-typewriter';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import '../styles/components.css';
 import { fetchGoogleUserInfo, Signup } from '../API/SignUpApi';
+import GoogleSignIN from './GoogleSignIN';
 
 const RegistrationForm: React.FC = () => {
     const [formData, setFormData] = useState<User>({
@@ -16,19 +17,47 @@ const RegistrationForm: React.FC = () => {
     const navigate = useNavigate();
 
     // Handle Google login
-   const googleLogin = useGoogleLogin({
-     onSuccess: async (response) => {
-       try {
-         const userInfo = await fetchGoogleUserInfo(response.access_token);
-         console.log('Google user info:', userInfo);
-       } catch (error) {
-         console.error('Error fetching Google user info:', error);
-       }
-     },
-     onError: () => {
-       console.error('Google Login Failed');
-     },
-   });
+    const googleLogin = useGoogleLogin({
+      onSuccess: async (response) => {
+          try {
+              const userInfo = await fetchGoogleUserInfo(response.access_token);
+              console.log('Google user info:', userInfo);
+  
+              const { email, name } = userInfo;
+              console.log(email)
+              console.log(name)
+              try {
+                  const signupData = await Signup(name, email, 'Password12#!'); 
+  
+                  console.log('SignUp successful:', signupData);
+  
+                  // Store JWT Token
+                  const { jwt, isAdmin } = signupData;
+                  if (jwt) {
+                      localStorage.setItem('authToken', jwt);
+                      console.log('JWT Token:', jwt);
+                      console.log('Is Admin:', isAdmin);
+                  } else {
+                      setError('No token received. Please try again.');
+                  }
+                  navigate('/home');
+  
+              } catch (signupError) {
+                  console.error('Error during signup:', signupError);
+                  setError('Error during Google sign-up.');
+              }
+  
+          } catch (error) {
+              console.error('Error fetching Google user info:', error);
+              setError('Google Sign-In failed.');
+          }
+      },
+      onError: () => {
+          console.error('Google Login Failed');
+          setError('Google Login Failed');
+      },
+  });
+  
 
     // const handleSubmit = (e: FormEvent) => {
     //     e.preventDefault();
@@ -199,24 +228,14 @@ const RegistrationForm: React.FC = () => {
 
                 <div className="registration-form-google-signin">
                     <button
-                        onClick={() => googleLogin()}
+                        onClick={() => {googleLogin}}
                         className="flex items-center justify-center gap-2 bg-white px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-shadow"
                         style={{
                             border: '1px solid #dadce0',
                             width: '80%',
                             marginTop: '20px'
                         }}
-                    >
-                        <img
-                            src='src/assets/google_logo.png'
-                            alt='Google logo'
-                            style={{
-                                width: '50px',
-                                height: '25px',
-                                marginRight: '8px'
-                            }}
-                        />
-                        <span style={{ color: '#3c4043' }}>Sign in with Google</span>
+                    >   <GoogleSignIN/>
                     </button>
                 </div>
             </div>
