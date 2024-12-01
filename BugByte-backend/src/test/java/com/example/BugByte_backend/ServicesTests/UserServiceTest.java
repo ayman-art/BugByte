@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,12 +35,12 @@ public class UserServiceTest {
         User Expecteduser = new User(1L,"user12" , "user@gmail.com" , "12345678@");
 
         // Mock repository methods
-        when(userRepositoryMock.findByIdentity(Expecteduser.get_user_name())).thenReturn(Expecteduser);
+        when(userRepositoryMock.findByIdentity(Expecteduser.getUserName())).thenReturn(Expecteduser);
 
-        User user = userService.getProfile(Expecteduser.get_user_name());
+        User user = userService.getProfile(Expecteduser.getUserName());
 
         assertEquals(Expecteduser.getId(),user.getId());
-        assertEquals(Expecteduser.get_user_name(),user.get_user_name());
+        assertEquals(Expecteduser.getUserName(),user.getUserName());
         assertEquals(Expecteduser.getEmail(),user.getEmail());
     }
     //test getProfile user doesn't exist
@@ -64,11 +63,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
-        when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
+        when(userRepositoryMock.findByIdentity(following.getUserName())).thenReturn(following);
         when(userProfileRepo.isFollowing(user.getId(), following.getId())).thenReturn(false);
         when(userProfileRepo.followUser(user.getId(), following.getId())).thenReturn(true);
 
-        assertTrue(userService.followUser(user.getId(), following.get_user_name()));
+        assertTrue(userService.followUser(user.getId(), following.getUserName()));
     }
     //test follow user doesn't exist
     @Test
@@ -78,11 +77,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(null);
-        when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
+        when(userRepositoryMock.findByIdentity(following.getUserName())).thenReturn(following);
 
         // Assert that an exception is thrown when user doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.followUser(user.getId() , following.get_user_name());
+            userService.followUser(user.getId() , following.getUserName());
         });
     }
     //test follow following doesn't exist
@@ -93,11 +92,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
-        when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(null);
+        when(userRepositoryMock.findByIdentity(following.getUserName())).thenReturn(null);
 
         // Assert that an exception is thrown when following doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.followUser(user.getId(), following.get_user_name());
+            userService.followUser(user.getId(), following.getUserName());
         });
     }
     //test follow user already follow this user
@@ -108,12 +107,12 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
-        when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
+        when(userRepositoryMock.findByIdentity(following.getUserName())).thenReturn(following);
         when(userProfileRepo.isFollowing(user.getId(), following.getId())).thenReturn(true);
 
         // Assert that an exception is thrown
         assertThrows(Exception.class, () -> {
-            userService.followUser(user.getId(), following.get_user_name());
+            userService.followUser(user.getId(), following.getUserName());
         });
     }
     //test unfollow both exist
@@ -124,11 +123,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
-        when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
+        when(userRepositoryMock.findByIdentity(following.getUserName())).thenReturn(following);
         when(userProfileRepo.isFollowing(user.getId(), following.getId())).thenReturn(true);
         when(userProfileRepo.unfollowUser(user.getId(), following.getId())).thenReturn(true);
 
-        assertTrue(userService.unfollowUser(user.getId(), following.get_user_name()));
+        assertTrue(userService.unfollowUser(user.getId(), following.getUserName()));
     }
     //test follow user doesn't exist
     @Test
@@ -138,11 +137,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(null);
-        when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
+        when(userRepositoryMock.findByIdentity(following.getUserName())).thenReturn(following);
 
         // Assert that an exception is thrown when user doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.unfollowUser(user.getId(), following.get_user_name());
+            userService.unfollowUser(user.getId(), following.getUserName());
         });
     }
     //test unfollow following doesn't exist
@@ -153,11 +152,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
-        when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(null);
+        when(userRepositoryMock.findByIdentity(following.getUserName())).thenReturn(null);
 
         // Assert that an exception is thrown when following doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.unfollowUser(user.getId(), following.get_user_name());
+            userService.unfollowUser(user.getId(), following.getUserName());
         });
     }
     //test follow user doesn't follow this user
@@ -168,12 +167,12 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
-        when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
+        when(userRepositoryMock.findByIdentity(following.getUserName())).thenReturn(following);
         when(userProfileRepo.isFollowing(user.getId(), following.getId())).thenReturn(false);
 
         // Assert that an exception is thrown
         assertThrows(Exception.class, () -> {
-            userService.unfollowUser(user.getId(), following.get_user_name());
+            userService.unfollowUser(user.getId(), following.getUserName());
         });
     }
     //test getFollowings user Exists
@@ -187,10 +186,10 @@ public class UserServiceTest {
         followings.add(user2);
 
         // Mock repository methods
-        when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(user);
+        when(userRepositoryMock.findByIdentity(user.getUserName())).thenReturn(user);
         when(userProfileRepo.getFollowings(user.getId())).thenReturn(followings);
 
-        List<User> returnedFollowings = userService.getFollowings(user.get_user_name());
+        List<User> returnedFollowings = userService.getFollowings(user.getUserName());
         assertEquals(returnedFollowings , followings);
     }
     //test getFollowings user Doesn't Exist
@@ -199,11 +198,11 @@ public class UserServiceTest {
         User user = new User(1L , "user1" , "user1@example.com" , "12345678%");
 
         // Mock repository methods
-        when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(null);
+        when(userRepositoryMock.findByIdentity(user.getUserName())).thenReturn(null);
 
         // Assert that an exception is thrown when user doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.getFollowings(user.get_user_name());
+            userService.getFollowings(user.getUserName());
         });
     }
     //test getFollowers user Exists
@@ -217,10 +216,10 @@ public class UserServiceTest {
         followers.add(user2);
 
         // Mock repository methods
-        when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(user);
+        when(userRepositoryMock.findByIdentity(user.getUserName())).thenReturn(user);
         when(userProfileRepo.getFollowers(user.getId())).thenReturn(followers);
 
-        List<User> returnedFollowings = userService.getFollowers(user.get_user_name());
+        List<User> returnedFollowings = userService.getFollowers(user.getUserName());
         assertEquals(returnedFollowings, followers);
     }
     //test getFollowers user Doesn't Exist
@@ -229,11 +228,11 @@ public class UserServiceTest {
         User user = new User(1L , "user1" , "user1@example.com" , "12345678%");
 
         // Mock repository methods
-        when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(null);
+        when(userRepositoryMock.findByIdentity(user.getUserName())).thenReturn(null);
 
         // Assert that an exception is thrown when user doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.getFollowers(user.get_user_name());
+            userService.getFollowers(user.getUserName());
         });
     }
     //test make admin both exist
@@ -245,10 +244,10 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(admin.getId())).thenReturn(admin);
-        when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(user);
+        when(userRepositoryMock.findByIdentity(user.getUserName())).thenReturn(user);
         when(userRepositoryMock.makeUserAdmin(user.getId())).thenReturn(true);
 
-        assertTrue(userService.makeAdmin(admin.getId(), user.get_user_name()));
+        assertTrue(userService.makeAdmin(admin.getId(), user.getUserName()));
     }
     //test make admin user Doesn't exist
     @Test
@@ -259,11 +258,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(admin.getId())).thenReturn(admin);
-        when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(null);
+        when(userRepositoryMock.findByIdentity(user.getUserName())).thenReturn(null);
 
         // Assert that an exception is thrown when user doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.makeAdmin(admin.getId(), user.get_user_name());
+            userService.makeAdmin(admin.getId(), user.getUserName());
         });
     }
     //test make admin , admin Doesn't exist
@@ -275,11 +274,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(admin.getId())).thenReturn(null);
-        when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(user);
+        when(userRepositoryMock.findByIdentity(user.getUserName())).thenReturn(user);
 
         // Assert that an exception is thrown when admin doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.makeAdmin(admin.getId(), user.get_user_name());
+            userService.makeAdmin(admin.getId(), user.getUserName());
         });
     }
     //test make admin , admin doesn't have the authority
@@ -291,11 +290,11 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findById(admin.getId())).thenReturn(admin);
-        when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(user);
+        when(userRepositoryMock.findByIdentity(user.getUserName())).thenReturn(user);
 
         // Assert that an exception is thrown when admin doesn't exist
         assertThrows(Exception.class, () -> {
-            userService.makeAdmin(admin.getId(), user.get_user_name());
+            userService.makeAdmin(admin.getId(), user.getUserName());
         });
     }
 }

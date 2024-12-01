@@ -39,10 +39,10 @@ public class UserAdapterTest {
 
         User user = userAdapter.fromMap(userMap);
 
-        assertEquals("user1", user.get_user_name());
+        assertEquals("user1", user.getUserName());
         assertEquals("user@gmail.com", user.getEmail());
         assertEquals("12345678", user.getPassword());
-        assertFalse(user.get_is_admin());
+        assertFalse(user.getIsAdmin());
         assertEquals(100, user.getReputation());
         assertEquals(1, user.getId());
     }
@@ -60,10 +60,10 @@ public class UserAdapterTest {
 
         User user = userAdapter.fromMap(userMap);
 
-        assertEquals("user1", user.get_user_name());
+        assertEquals("user1", user.getUserName());
         assertNull(user.getEmail());
         assertNull(user.getPassword());
-        assertFalse(user.get_is_admin());
+        assertFalse(user.getIsAdmin());
         assertEquals(50, user.getReputation());
         assertEquals(0 , user.getId());
     }

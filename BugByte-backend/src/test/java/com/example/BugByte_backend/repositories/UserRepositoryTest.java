@@ -106,7 +106,7 @@ public class UserRepositoryTest {
         when(passwordEncoder.matches(eq(password), eq(hashedPassword))).thenReturn(true);
 
         User result = userRepository.findByIdentityAndPassword(email, password);
-        assertEquals("username", result.get_user_name());
+        assertEquals("username", result.getUserName());
     }
 
     @Test
