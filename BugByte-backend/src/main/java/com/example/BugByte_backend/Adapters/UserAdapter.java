@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class UserAdapter implements IAdapter<User> {
 
-
     @Override
     public Map<String, Object> toMap(User user) {
         Map<String, Object> userMap = new HashMap<>();
@@ -16,9 +15,9 @@ public class UserAdapter implements IAdapter<User> {
         userMap.put("email", user.getEmail());
         userMap.put("password", user.getPassword());
         userMap.put("bio", user.getBio());
-        userMap.put("isAdmin" , user.getIsAdmin());
-        userMap.put("reputation" , user.getReputation());
-        userMap.put("id" , user.getId());
+        userMap.put("isAdmin", user.getIsAdmin());
+        userMap.put("reputation", user.getReputation());
+        userMap.put("id", user.getId());
         return userMap;
     }
 
@@ -31,7 +30,7 @@ public class UserAdapter implements IAdapter<User> {
         long id = (long) map.get("id");
         boolean is_admin = (boolean) map.get("isAdmin");
         long reputation = (long) map.get("reputation");
-        return new User(id , username, email, password, bio, reputation, is_admin);
+        return new User(id, username, email, password, bio, reputation, is_admin);
     }
 
     @Override

@@ -50,6 +50,7 @@ public class UserAdapterTest {
         assertEquals(100, user.getReputation());
         assertEquals(1, user.getId());
     }
+    
     //test fromMap with null values
     // test - 3
     @Test
@@ -71,13 +72,13 @@ public class UserAdapterTest {
         assertNull(user.getBio());
         assertFalse(user.getIsAdmin());
         assertEquals(50, user.getReputation());
-        assertEquals(0 , user.getId());
+        assertEquals(0, user.getId());
     }
 
     //test toJson
     // test - 4
     @Test
-    public void testToJson(){
+    public void testToJson() {
         User user = new User("user1", "user@gmail.com", "12345678");
         user.setReputation(10L);
         user.setId((long) 5);
@@ -88,14 +89,13 @@ public class UserAdapterTest {
                 "user1\",\"email\":\"user@gmail.com\"," +
                 "\"password\":\"12345678\",\"bio\":\"simple bio\",\"reputation\":10,\"isAdmin\":false}";
 
-
-        assertEquals(userString , expected);
-
+        assertEquals(userString, expected);
     }
+
     //test toJson with null values
     //test 5
     @Test
-    public void testToJsonWithNullValues(){
+    public void testToJsonWithNullValues() {
         User user = new User("user1", "user@gmail.com", "12345678");
         user.setBio("simple bio");
 
@@ -105,11 +105,8 @@ public class UserAdapterTest {
                 "user1\",\"email\":\"user@gmail.com\"," +
                 "\"password\":\"12345678\",\"bio\":\"simple bio\",\"reputation\":0,\"isAdmin\":false}";
 
-
-        assertEquals(userString , expected);
-
+        assertEquals(userString, expected);
     }
-
 }
 
 
