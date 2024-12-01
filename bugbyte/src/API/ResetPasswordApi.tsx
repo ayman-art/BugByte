@@ -1,5 +1,5 @@
 import { API_URLS } from './ApiUrls';
-export const validateEmailCode = async (userId: string, verificationCode: string) => {
+export const validateEmailCode = async (email: string, code: string) : Promise<any>  => {
   try {
     const response = await fetch(API_URLS.VALIDATE_CODE, {
       method: 'POST',
@@ -7,8 +7,8 @@ export const validateEmailCode = async (userId: string, verificationCode: string
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userId,
-        verificationCode,
+        email,
+        code,
       }),
     });
 
@@ -19,7 +19,7 @@ export const validateEmailCode = async (userId: string, verificationCode: string
   }
 };
 
-export const resetPassword = async (userId: string, newPassword: string) => {
+export const resetPassword = async (jwt: string, password: string) => {
   try {
     const response = await fetch(API_URLS.CHANGE_PASSWORD, {
       method: 'POST',
@@ -27,8 +27,8 @@ export const resetPassword = async (userId: string, newPassword: string) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userId,
-        newPassword,
+        jwt,
+        password,
       }),
     });
 
@@ -39,15 +39,15 @@ export const resetPassword = async (userId: string, newPassword: string) => {
   }
 };
 
-export const resendVerificationCode = async (userId: string) => {
+export const resendVerificationCode = async (email: string) => {
   try {
-    const response = await fetch(API_URLS.RESEND_CODE, {
+    const response = await fetch(API_URLS.FORGOT_PASSWORD, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userId,
+        email,
       }),
     });
 
