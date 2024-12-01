@@ -36,7 +36,8 @@ const Login: React.FC = () => {
 
     try {
       const data = await resetPassword(username);
-      localStorage.setItem('userId', data.userId);
+      const {email} = data
+      localStorage.setItem('email', email);
       setShowPopup(true);
     } catch (error: unknown) {
       console.error('Error during password reset:', error);

@@ -29,17 +29,15 @@ export const logIn = async (email: string, password: string): Promise<any> => {
 };
 
 
-export const resetPassword = async (username: string): Promise<any> => {
+export const resetPassword = async (email: string): Promise<any> => {
   try {
-    const response = await fetch(
-      `${API_URLS.FORGOT_PASSWORD}?username=${encodeURIComponent(username)}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await fetch(API_URLS.FORGOT_PASSWORD, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
 
     if (!response.ok) {
       throw new Error(`Password reset failed: ${response.statusText}`);
