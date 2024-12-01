@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import profilePath from '../assets/user-profile.svg';
 import Layout from '../layouts/MainLayout';
+import TextPopUp from '../components/BioPopup'
 interface UserProfile {
   username: string;
   reputation: number;
@@ -44,8 +45,25 @@ const Profile: React.FC = () => {
   ]);
   const [profileLoading, setProfileLoading] = useState<boolean>(false);
   const [postsLoading, setPostsLoading] = useState<boolean>(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const loggedInUsername = localStorage.getItem('username') || '';
   const isAdmin = false;//localStorage.getItem('is_admin') === 'true';
+
+  const handleButtonClick = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handlePopupSubmit = (newText: string) => {
+    // PUT request HERE
+    let newUserProfile = userProfile;
+    newUserProfile!.bio = newText;
+    setUserProfile(newUserProfile);
+  };
+
+  const handlePopupClose = () => {
+    setIsPopupOpen(false);
+  };
+  
   // Fetch profile data
   // useEffect(() => {
   //   async function fetchProfile(): Promise<void> {
@@ -138,6 +156,21 @@ const Profile: React.FC = () => {
       border: '1px solid #ddd',
       borderRadius: '8px',
     },
+    openButton: {
+      padding: '8px 12px',
+      fontSize: '14px',
+      borderRadius: '5px',
+      border: 'none',
+      cursor: 'pointer',
+    },
+    editButton: {
+      backgroundColor: '#ADD8E6', // Light blue
+      color: '#333',
+      display: 'flex',
+      alignItems: 'center',
+      fontSize: '14px',
+      fontWeight: 'bold',
+    },
     postTitle: {
       margin: '0 0 5px 0',
       fontSize: '16px',
@@ -200,9 +233,21 @@ const Profile: React.FC = () => {
         </div>
 
         {/* Bio Section */}
-        <div style={styles.bio}>
-          <h3>About:</h3>
+          <div style={styles.bio}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>About:</h3>
+              <button onClick={handleButtonClick} style={{ ...styles.openButton, ...styles.editButton }}>
+                <span style={{ marginRight: '8px' }}>✏️</span> Edit
+              </button>
+          </div>
           <p>{userProfile.bio || 'No bio available.'}</p>
+          {isPopupOpen && (
+            <TextPopUp 
+              initialText={userProfile.bio}
+              onSubmit={handlePopupSubmit}
+              onClose={handlePopupClose}
+            />
+          )}
         </div>
 
         {/* Top Posts Section */}

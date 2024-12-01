@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage';
 import Login from './pages/LoginPage';
 import SignUpPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
-const isLoggedIn = true;
+const isLoggedIn = false;
 
 const App: React.FC = () => {
     return (
