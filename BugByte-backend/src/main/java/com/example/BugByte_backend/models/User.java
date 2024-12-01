@@ -40,6 +40,10 @@ public class User {
         this(id, userName, email, password, "", 0L, false);
     }
 
+    public User(Long id, String userName, String email, String password, String bio) {
+        this(id, userName, email, password, bio, 0L, false);
+    }
+
     public User(Long id, String userName, String email, String password, Long reputation, Boolean isAdmin) {
         this(id, userName, email, password, "", reputation, isAdmin);
     }
