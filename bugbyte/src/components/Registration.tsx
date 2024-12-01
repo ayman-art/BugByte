@@ -51,6 +51,35 @@ const RegistrationForm: React.FC = () => {
           setError('Please enter your username');
           return;
         }
+        if(formData.password.length < 8){
+          setError('week password');
+          return;
+        }
+        if(formData.password.length < 8){
+          setError('week password');
+          return;
+        }
+        const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
+        if (!specialCharacterRegex.test(formData.password)) {
+          setError('Password must contain at least one special character.');
+          return;
+        }
+        if(formData.username.length < 5){
+          setError('username is too short');
+          return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(formData.email)) {
+          setError('Email is not valid');
+          return;
+        }
+        
+        if (formData.email.split('@').length - 1 !== 1) {
+          setError('Email is not valid');
+          return;
+        }
+     
      
         try {
           const data = await Signup(formData.username,formData.email, formData.password);
@@ -70,7 +99,7 @@ const RegistrationForm: React.FC = () => {
           navigate('/home');
           
         } catch (error: unknown) {
-         console.error('Error during SignUp:', error);
+         console.error('Username or Email Already Exist', error);
      
          if (error instanceof Error) {
              setFormData;
