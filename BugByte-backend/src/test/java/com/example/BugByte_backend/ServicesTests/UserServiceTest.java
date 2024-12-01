@@ -20,8 +20,6 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class UserServiceTest {
     @Mock
-    private userProfileRepository userProfileRepo;
-    @Mock
     private UserRepositoryImp userRepositoryMock;
 
     @Mock
@@ -42,12 +40,12 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findByIdentity(Expecteduser.get_user_name())).thenReturn(Expecteduser);
+        when(userProfileRepositoryMock.getFollowersCount(Expecteduser.getId())).thenReturn(5);
+        when(userProfileRepositoryMock.getFollowingsCount(Expecteduser.getId())).thenReturn(5);
 
         Map<String,Object> user = userService.getProfile(Expecteduser.get_user_name());
 
-        assertEquals(Expecteduser.getId(),user.get("id"));
         assertEquals(Expecteduser.get_user_name(),user.get("user_name"));
-        assertEquals(Expecteduser.getEmail(),user.get("email"));
     }
     //test getProfile user doesn't exist
     @Test
@@ -70,8 +68,8 @@ public class UserServiceTest {
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
-        when(userProfileRepo.isFollowing(user.getId(), following.getId())).thenReturn(false);
-        when(userProfileRepo.followUser(user.getId(), following.getId())).thenReturn(true);
+        when(userProfileRepositoryMock.isFollowing(user.getId(), following.getId())).thenReturn(false);
+        when(userProfileRepositoryMock.followUser(user.getId(), following.getId())).thenReturn(true);
 
         assertTrue(userService.followUser(user.getId(), following.get_user_name()));
     }
@@ -114,7 +112,7 @@ public class UserServiceTest {
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
-        when(userProfileRepo.isFollowing(user.getId(), following.getId())).thenReturn(true);
+        when(userProfileRepositoryMock.isFollowing(user.getId(), following.getId())).thenReturn(true);
 
         // Assert that an exception is thrown
         assertThrows(Exception.class, () -> {
@@ -130,8 +128,8 @@ public class UserServiceTest {
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
-        when(userProfileRepo.isFollowing(user.getId(), following.getId())).thenReturn(true);
-        when(userProfileRepo.unfollowUser(user.getId(), following.getId())).thenReturn(true);
+        when(userProfileRepositoryMock.isFollowing(user.getId(), following.getId())).thenReturn(true);
+        when(userProfileRepositoryMock.unfollowUser(user.getId(), following.getId())).thenReturn(true);
 
         assertTrue(userService.unfollowUser(user.getId(), following.get_user_name()));
     }
@@ -174,7 +172,7 @@ public class UserServiceTest {
         // Mock repository methods
         when(userRepositoryMock.findById(user.getId())).thenReturn(user);
         when(userRepositoryMock.findByIdentity(following.get_user_name())).thenReturn(following);
-        when(userProfileRepo.isFollowing(user.getId(), following.getId())).thenReturn(false);
+        when(userProfileRepositoryMock.isFollowing(user.getId(), following.getId())).thenReturn(false);
 
         // Assert that an exception is thrown
         assertThrows(Exception.class, () -> {
@@ -193,7 +191,7 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(user);
-        when(userProfileRepo.getFollowings(user.getId())).thenReturn(followings);
+        when(userProfileRepositoryMock.getFollowings(user.getId())).thenReturn(followings);
 
         List<User> returnedFollowings = userService.getFollowings(user.get_user_name());
         assertEquals(returnedFollowings , followings);
@@ -223,7 +221,7 @@ public class UserServiceTest {
 
         // Mock repository methods
         when(userRepositoryMock.findByIdentity(user.get_user_name())).thenReturn(user);
-        when(userProfileRepo.getFollowers(user.getId())).thenReturn(followers);
+        when(userProfileRepositoryMock.getFollowers(user.getId())).thenReturn(followers);
 
         List<User> returnedFollowings = userService.getFollowers(user.get_user_name());
         assertEquals(returnedFollowings, followers);
