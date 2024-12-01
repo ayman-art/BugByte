@@ -73,12 +73,8 @@ const RegistrationForm: React.FC = () => {
          console.error('Error during SignUp:', error);
      
          if (error instanceof Error) {
-           if (error.message.includes('SignUp failed')) {
              setFormData;
-             setError('User Already Exisits!');
-           } else {
-             setError('Something went wrong. Please try again later.');
-           }
+             setError(error.message);
          } else {
            setError('An unexpected error occurred.');
          }
@@ -160,6 +156,7 @@ const RegistrationForm: React.FC = () => {
                             className="registration-form-input"
                         />
                     </div>
+                    {error && <div className="errorMessage">{error}</div>}
                     <button
                         type="submit"
                         className="registration-form-button"
