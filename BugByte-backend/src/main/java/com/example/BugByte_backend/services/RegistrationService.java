@@ -102,6 +102,7 @@ public class RegistrationService {
             while (userRepository.codeExists(code)) {
                 code = registrationCOR.generateCode();
             }
+            userRepository.addResetCode(user.getId() , code);
             if(emailService.sendCodeByEmail(user.getEmail(), code)){
                 return user.getEmail();
             } else{

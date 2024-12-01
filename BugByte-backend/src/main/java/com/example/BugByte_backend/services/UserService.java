@@ -1,5 +1,6 @@
 package com.example.BugByte_backend.services;
 
+import com.example.BugByte_backend.Adapters.UserAdapter;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.repositories.userProfileRepository;
@@ -21,7 +22,7 @@ public class UserService {
     private UserRepositoryImp userRepository;
 
     @Autowired
-    private userProfileRepository userProfileRep;
+    private userProfileRepository userProfileRepository;
     // The user pool map for caching users
     /*
     The reason behind using a linked hash map is that it maintains order of access provided in constructor
@@ -51,13 +52,23 @@ public class UserService {
         return user;
     }
 
-    public User getProfile(String userName) throws Exception{
+    public Map<String,Object> getProfile(String userName) throws Exception{
         try {
             User user = userRepository.findByIdentity(userName);
             if(user == null){
                 throw new Exception("User doesn't Exist");
             }
-            return user;
+            UserAdapter userAdapter = new UserAdapter();
+            Map<String,Object> userData =  userAdapter.toMap(user);
+            // removing sensitive and unnecessary data
+            userData.remove("password");
+            userData.remove("email");
+            userData.remove("id");
+            int followersCount = userProfileRepository.getFollowersCount(user.getId());
+            int followingsCount = userProfileRepository.getFollowingsCount(user.getId());
+            userData.put("followersCount" , followersCount);
+            userData.put("followingsCount" , followingsCount);
+            return userData;
         }
         catch (Exception e){
             throw new Exception("Couldn't get the user's profile:  " + e.getMessage());
@@ -74,10 +85,10 @@ public class UserService {
             else if (following == null) {
                 throw new Exception("following doesn't Exist");
             }
-            else if (userProfileRep.isFollowing(userId, following.getId())) {
+            else if (userProfileRepository.isFollowing(userId , following.getId())){
                 throw new Exception("User is Already following this user");
             }
-            return userProfileRep.followUser(userId, following.getId());
+            return userProfileRepository.followUser(userId, following.getId());
         }
         catch (Exception e) {
             throw new Exception("Error occurred while following user:  " + e.getMessage());
@@ -93,10 +104,10 @@ public class UserService {
             else if (following == null) {
                 throw new Exception("following doesn't Exist");
             }
-            else if (!userProfileRep.isFollowing(userId , following.getId())) {
+            else if (!userProfileRepository.isFollowing(userId , following.getId())) {
                 throw new Exception("User isn't following this user");
             }
-            return userProfileRep.unfollowUser(userId , following.getId());
+            return userProfileRepository.unfollowUser(userId , following.getId());
         }
         catch (Exception e) {
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
@@ -109,7 +120,7 @@ public class UserService {
             if(user == null) {
                 throw new Exception("User doesn't Exist");
             }
-            return userProfileRep.getFollowings(user.getId());
+            return userProfileRepository.getFollowings(user.getId());
         }
         catch (Exception e) {
             throw new Exception("Couldn't get the following users:  " + e.getMessage());
@@ -122,7 +133,7 @@ public class UserService {
             if(user == null) {
                 throw new Exception("User doesn't Exist");
             }
-            return userProfileRep.getFollowers(user.getId());
+            return userProfileRepository.getFollowers(user.getId());
         }
         catch (Exception e) {
             throw new Exception("Couldn't get the followers:  " + e.getMessage());
