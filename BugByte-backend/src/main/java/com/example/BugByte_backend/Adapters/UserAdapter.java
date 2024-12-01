@@ -12,11 +12,11 @@ public class UserAdapter implements IAdapter<User> {
     @Override
     public Map<String, Object> toMap(User user) {
         Map<String, Object> userMap = new HashMap<>();
-        userMap.put("user_name", user.getUserName());
+        userMap.put("userName", user.getUserName());
         userMap.put("email", user.getEmail());
         userMap.put("password", user.getPassword());
         userMap.put("bio", user.getBio());
-        userMap.put("is_admin" , user.getIsAdmin());
+        userMap.put("isAdmin" , user.getIsAdmin());
         userMap.put("reputation" , user.getReputation());
         userMap.put("id" , user.getId());
         return userMap;
@@ -24,12 +24,12 @@ public class UserAdapter implements IAdapter<User> {
 
     @Override
     public User fromMap(Map<String, Object> map) {
-        String username = (String) map.get("user_name");
+        String username = (String) map.get("userName");
         String email = (String) map.get("email");
         String password = (String) map.get("password");
         String bio = (String) map.get("bio");
         long id = (long) map.get("id");
-        boolean is_admin = (boolean) map.get("is_admin");
+        boolean is_admin = (boolean) map.get("isAdmin");
         long reputation = (long) map.get("reputation");
         return new User(id , username, email, password, bio, reputation, is_admin);
     }

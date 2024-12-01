@@ -32,7 +32,7 @@ public class UserServiceTest {
     //test getProfile user exists
     @Test
     public void testGetProfile_UserExists() throws Exception {
-        User Expecteduser = new User(1L,"user12" , "user@gmail.com" , "12345678@");
+        User Expecteduser = new User(1L,"user12" , "user@gmail.com" , "12345678@", "simple bio");
 
         // Mock repository methods
         when(userRepositoryMock.findByIdentity(Expecteduser.getUserName())).thenReturn(Expecteduser);
@@ -42,6 +42,7 @@ public class UserServiceTest {
         assertEquals(Expecteduser.getId(),user.getId());
         assertEquals(Expecteduser.getUserName(),user.getUserName());
         assertEquals(Expecteduser.getEmail(),user.getEmail());
+        assertEquals(Expecteduser.getBio(),user.getBio());
     }
     //test getProfile user doesn't exist
     @Test

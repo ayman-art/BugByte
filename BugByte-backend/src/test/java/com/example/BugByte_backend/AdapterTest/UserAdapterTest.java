@@ -19,11 +19,11 @@ public class UserAdapterTest {
 
         Map<String, Object> userMap = userAdapter.toMap(user);
 
-        assertEquals("user1", userMap.get("user_name"));
+        assertEquals("user1", userMap.get("userName"));
         assertEquals("user@gmail.com", userMap.get("email"));
         assertEquals("12345678", userMap.get("password"));
         assertEquals("simple bio", userMap.get("bio"));
-        assertEquals(false, userMap.get("is_admin"));
+        assertEquals(false, userMap.get("isAdmin"));
         assertEquals((long)10, userMap.get("reputation"));
     }
 
@@ -32,11 +32,11 @@ public class UserAdapterTest {
     @Test
     public void testFromMap() {
         Map<String, Object> userMap = new HashMap<>();
-        userMap.put("user_name", "user1");
+        userMap.put("userName", "user1");
         userMap.put("email", "user@gmail.com");
         userMap.put("password", "12345678");
         userMap.put("bio", "simple bio");
-        userMap.put("is_admin", false);
+        userMap.put("isAdmin", false);
         userMap.put("reputation", (long)100);
         userMap.put("id", (long)1);
 
@@ -55,11 +55,11 @@ public class UserAdapterTest {
     @Test
     public void testFromMapWithNullValues() {
         Map<String, Object> userMap = new HashMap<>();
-        userMap.put("user_name", "user1");
+        userMap.put("userName", "user1");
         userMap.put("email", null);
         userMap.put("password", null);
         userMap.put("bio", null);
-        userMap.put("is_admin", false);
+        userMap.put("isAdmin", false);
         userMap.put("reputation", (long)50);
         userMap.put("id", (long)0);
 
@@ -84,9 +84,9 @@ public class UserAdapterTest {
         user.setBio("simple bio");
 
         String userString = userAdapter.toJson(user);
-        String expected = "{\"id\":5,\"user_name\":\"" +
+        String expected = "{\"id\":5,\"userName\":\"" +
                 "user1\",\"email\":\"user@gmail.com\"," +
-                "\"password\":\"12345678\",\"bio\":\"simple bio\",\"reputation\":10,\"is_admin\":false}";
+                "\"password\":\"12345678\",\"bio\":\"simple bio\",\"reputation\":10,\"isAdmin\":false}";
 
 
         assertEquals(userString , expected);
@@ -101,9 +101,9 @@ public class UserAdapterTest {
 
         String userString = userAdapter.toJson(user);
 
-        String expected = "{\"id\":0,\"user_name\":\"" +
+        String expected = "{\"id\":0,\"userName\":\"" +
                 "user1\",\"email\":\"user@gmail.com\"," +
-                "\"password\":\"12345678\",\"bio\":\"simple bio\",\"reputation\":0,\"is_admin\":false}";
+                "\"password\":\"12345678\",\"bio\":\"simple bio\",\"reputation\":0,\"isAdmin\":false}";
 
 
         assertEquals(userString , expected);

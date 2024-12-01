@@ -19,9 +19,9 @@ import static org.mockito.Mockito.*;
 public class UserRepositoryTest {
     private static final String SQL_INSERT_USER = """
                 INSERT INTO users
-                    (user_name, email, password, reputation, is_admin)
+                    (user_name, email, password, bio, reputation, is_admin)
                 VALUES
-                    (?, ?, ?, 0, false);
+                    (?, ?, ?, "", 0, false);
             """;
     private static final String SQL_FIND_BY_ID = "SELECT * FROM users WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_EMAIL = "SELECT id FROM users WHERE email = ?;";
