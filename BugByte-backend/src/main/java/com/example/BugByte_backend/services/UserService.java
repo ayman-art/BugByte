@@ -139,7 +139,7 @@ public class UserService {
             if (admin == null) {
                 throw new Exception("Admin doesn't exist");
             }
-            if (!admin.get_is_admin()) {
+            if (!admin.getIsAdmin()) {
                 throw new Exception("The user does not have the authority to assign admins");
             }
             return userRepository.makeUserAdmin(user.getId());
