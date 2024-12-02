@@ -49,6 +49,12 @@ class UserProfileRepositoryTest {
                 WHERE f.follower_id = ?;
             """;
 
+    private static final String SQL_UPDATE_BIO = """
+                UPDATE users 
+                SET bio = ? 
+                WHERE id = ?;
+            """;
+
     @Mock
     private JdbcTemplate jdbcTemplate;
 
@@ -488,6 +494,60 @@ class UserProfileRepositoryTest {
         assertEquals(expectedFollowers, result);
     }
 
+    @Test
+    void updateBio_WhenSuccessful_ShouldReturnTrue() {
+        String newBio = "Updated bio";
+        Long userId = testUser1.getId();
+
+        when(jdbcTemplate.update(
+                eq(SQL_UPDATE_BIO),
+                eq(newBio),
+                eq(userId)
+        )).thenReturn(1);
+
+        boolean result = repository.updateBio(newBio, userId);
+
+        assertTrue(result);
+        verify(jdbcTemplate).update(
+                eq(SQL_UPDATE_BIO),
+                eq(newBio),
+                eq(userId)
+        );
+    }
+
+    @Test
+    void updateBio_WhenNoRowsAffected_ShouldReturnFalse() {
+        String newBio = "Updated bio";
+        Long userId = testUser1.getId();
+
+        when(jdbcTemplate.update(
+                eq(SQL_UPDATE_BIO),
+                eq(newBio),
+                eq(userId)
+        )).thenReturn(0);
+
+        boolean result = repository.updateBio(newBio, userId);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void updateBio_WhenUserIdIsNull_ShouldThrowException() {
+        String newBio = "Updated bio";
+
+        assertThrows(NullPointerException.class, () -> {
+            repository.updateBio(newBio, null);
+        });
+    }
+
+    @Test
+    void updateBio_WhenBioIsNull_ShouldThrowException() {
+        Long userId = testUser1.getId();
+
+        assertThrows(NullPointerException.class, () -> {
+            repository.updateBio(null, userId);
+        });
+    }
 }
 
 class FollowerIdTest {
