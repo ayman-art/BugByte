@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/components.css';
 import { fetchGoogleUserInfo, Signup } from '../API/SignUpApi';
 import GoogleSignIN from './GoogleSignIN';
+import GoogleLoginButton from './GoogleSignIN';
 
 const RegistrationForm: React.FC = () => {
     const [formData, setFormData] = useState<User>({
@@ -235,7 +236,7 @@ const RegistrationForm: React.FC = () => {
                             width: '80%',
                             marginTop: '20px'
                         }}
-                    >   <GoogleSignIN/>
+                    >   <GoogleLoginButton/>
                     </button>
                 </div>
             </div>

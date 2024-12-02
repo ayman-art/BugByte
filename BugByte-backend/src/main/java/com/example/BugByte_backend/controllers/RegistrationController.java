@@ -81,6 +81,7 @@ public class RegistrationController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+    
 }
 
 
