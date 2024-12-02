@@ -2,8 +2,10 @@ import React from 'react';
 import { API_URLS } from '../API/ApiUrls';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
-
-const GoogleLoginButton: React.FC = () => {
+interface googleButtonProps{
+    onLogin: ()=>void
+}
+const GoogleLoginButton: React.FC<googleButtonProps> = ({onLogin}) => {
   const navigate = useNavigate();
   const clientId = '40038768890-7h07ab156ebvn2aubqjdiup7ss8l7e05.apps.googleusercontent.com';
 
@@ -25,6 +27,7 @@ const GoogleLoginButton: React.FC = () => {
           localStorage.setItem('authToken', jwt);
           console.log('JWT Token:', jwt);
           console.log('Is Admin:', isAdmin);
+          onLogin()
           navigate('/home');
           
         }

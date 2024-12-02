@@ -194,7 +194,7 @@ const RegistrationForm: React.FC<registrationProps> = ({onLogin}) => {
                             width: '80%',
                             marginTop: '20px'
                         }}
-                    >   <GoogleLoginButton/>
+                    >   <GoogleLoginButton onLogin={onLogin}/>
                     </button>
                 </div>
             </div>
