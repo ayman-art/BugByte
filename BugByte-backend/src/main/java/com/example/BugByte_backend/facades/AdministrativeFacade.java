@@ -1,19 +1,25 @@
 package com.example.BugByte_backend.facades;
 
 import com.example.BugByte_backend.Adapters.UserAdapter;
+import com.example.BugByte_backend.controllers.GoogleAuthController;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.services.AuthenticationService;
 import com.example.BugByte_backend.services.RegistrationService;
 import com.example.BugByte_backend.services.UserService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class AdministrativeFacade {
+    private static final String CLIENT_ID = "40038768890-7h07ab156ebvn2aubqjdiup7ss8l7e05.apps.googleusercontent.com";
     @Autowired
     private UserService userService;
 
@@ -124,5 +130,30 @@ public class AdministrativeFacade {
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
         return userService.makeAdmin(id, (String)userdata.get("user-name"));
+    }
+    public Map<String, Object> googleOAuthSignUp(@RequestBody Map<String, String> requestBody) throws Exception {
+        String tokenRequest = requestBody.get("token");
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                new com.google.api.client.http.javanet.NetHttpTransport(),
+                new com.google.api.client.json.jackson2.JacksonFactory()
+        ).setAudience(Collections.singletonList(CLIENT_ID)).build();
+
+        GoogleIdToken idToken = verifier.verify(tokenRequest);
+        if (idToken != null) {
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+            String name = (String) payload.get("name");
+            UserAdapter adapter = new UserAdapter();
+            Map<String, Object> userMap = adapter.toMap(registrationService.registerUsingGoogle(name , email));
+            String jwt = AuthenticationService.generateJWT((long)userMap.get("id"),
+                    (String)userMap.get("userName"), (boolean)userMap.get("isAdmin"));
+            boolean isAdmin = (boolean)userMap.get("isAdmin");
+            return Map.of(
+                    "jwt", jwt,
+                    "isAdmin", isAdmin
+            );
+        } else {
+            throw new RuntimeException("Invalid token");
+        }
     }
 }

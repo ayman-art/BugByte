@@ -5,7 +5,6 @@ import GoogleLogo from '../assets/googlelogo.png';
 import ResetPasswordPopup from './PasswordReset';
 import '../styles/Login.css';
  import { logIn ,resetPassword} from '../API/LoginApi';
-import NavBar from '../components/NavBar';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
