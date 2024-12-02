@@ -521,7 +521,7 @@ class UserProfileRepositoryTest {
         Long userId = testUser1.getId();
 
         when(jdbcTemplate.update(
-                eq("UPDATE users SET bio = ? + WHERE id = ?;"),
+                eq(SQL_UPDATE_BIO),
                 eq(newBio),
                 eq(userId)
         )).thenReturn(0);
