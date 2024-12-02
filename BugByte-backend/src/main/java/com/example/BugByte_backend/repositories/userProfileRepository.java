@@ -11,6 +11,10 @@ import java.util.List;
 @Repository
 public class userProfileRepository {
 
+    public boolean updateBio(String newBio, Long userId) {
+      return true;
+    }
+
     public int getFollowersCount(long userId){
         return 0;
     }

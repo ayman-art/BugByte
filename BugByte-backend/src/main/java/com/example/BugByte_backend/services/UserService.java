@@ -126,6 +126,17 @@ public class UserService {
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
         }
     }
+    public boolean updateProfile(String newBio, long userId) throws Exception{
+        try {
+            User follower = userRepository.findById(userId);
+            if(follower == null) {
+                throw new Exception("follower doesn't Exist");
+            }
+            return userProfileRepository.updateBio(newBio , userId);
+        } catch (Exception e) {
+            throw new Exception("Error occurred while updating bio:  " + e.getMessage());
+        }
+    }
 
     public List<User> getFollowings(String userName) throws Exception {
         try {
