@@ -8,4 +8,5 @@ export const API_URLS = {
   FORGOT_PASSWORD:`${API_BASE_URL}/users/reset-password`,
   VALIDATE_CODE: `${API_BASE_URL}/users/validate-email-code`,
   CHANGE_PASSWORD: `${API_BASE_URL}/users/change-password`,
+  AUTHENTICATE_TOKEN: `${API_BASE_URL}/users/authorize`
 };

@@ -138,4 +138,9 @@ public class AdministrativeFacade {
         long id = Long.parseLong(claim.getId());
         return userService.makeAdmin(id, (String)userdata.get("user-name"));
     }
+
+    public void authorizeToken(String token){
+        Claims claim = AuthenticationService.parseToken(token);
+
+    }
 }
