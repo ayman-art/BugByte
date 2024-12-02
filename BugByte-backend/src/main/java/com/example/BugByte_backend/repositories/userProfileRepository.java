@@ -46,6 +46,12 @@ public class userProfileRepository {
                 WHERE f.follower_id = ?;
             """;
 
+    private static final String SQL_UPDATE_BIO = """
+                UPDATE users 
+                SET bio = ? 
+                WHERE id = ?;
+            """;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -91,6 +97,17 @@ public class userProfileRepository {
             throw new NullPointerException("UserId is Null");
 
         return jdbcTemplate.query(SQL_GET_FOLLOWERS, userRowMapper, userId);
+    }
+
+    public boolean updateBio(String newBio, Long userId) {
+        if (userId == null)
+            throw new NullPointerException("UserId is Null");
+
+        if (newBio == null)
+            throw new NullPointerException("Bio is Null");
+
+        int row = jdbcTemplate.update(SQL_UPDATE_BIO, newBio, userId);
+        return row > 0;
     }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
