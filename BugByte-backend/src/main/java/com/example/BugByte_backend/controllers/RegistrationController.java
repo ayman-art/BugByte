@@ -81,6 +81,7 @@ public class RegistrationController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+    
     @GetMapping("/authorize")
     public ResponseEntity<?> authorize(@RequestHeader("Authorization") String token) {
         token = token.replace("Bearer ", "");

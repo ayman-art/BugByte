@@ -71,8 +71,7 @@ public class UserRepositoryImp implements UserRepository {
     public User findByIdentity(String identity) {
         if (identity == null)
             throw new NullPointerException("Identity is Null");
-
-        return jdbcTemplate.queryForObject(SQL_FIND_BY_IDENTITY, userRowMapper, identity, identity);
+       return jdbcTemplate.queryForObject(SQL_FIND_BY_IDENTITY, userRowMapper, identity, identity);
     }
 
     @Override

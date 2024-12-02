@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
+import React, { useState} from 'react';
 import { User } from '../types';
 import { useTypewriter } from 'react-simple-typewriter';
-import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import '../styles/components.css';
-import { fetchGoogleUserInfo, Signup } from '../API/SignUpApi';
+import {Signup } from '../API/SignUpApi';
+import GoogleLoginButton from './GoogleSignIN';
+
+
 interface registrationProps{
     onLogin:()=>void
 }
@@ -16,21 +18,10 @@ const RegistrationForm: React.FC<registrationProps> = ({onLogin}) => {
     });
     const [error, setError] = useState<string>('');
     const navigate = useNavigate();
-
-    // Handle Google login
-   const googleLogin = useGoogleLogin({
-     onSuccess: async (response) => {
-       try {
-         const userInfo = await fetchGoogleUserInfo(response.access_token);
-         console.log('Google user info:', userInfo);
-       } catch (error) {
-         console.error('Error fetching Google user info:', error);
-       }
-     },
-     onError: () => {
-       console.error('Google Login Failed');
-     },
-   });
+    // const handleSubmit = (e: FormEvent) => {
+    //     e.preventDefault();
+    //     console.log('Registering user:', formData);
+    // };
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
      
@@ -48,6 +39,35 @@ const RegistrationForm: React.FC<registrationProps> = ({onLogin}) => {
           setError('Please enter your username');
           return;
         }
+        if(formData.password.length < 8){
+          setError('week password');
+          return;
+        }
+        if(formData.password.length < 8){
+          setError('week password');
+          return;
+        }
+        const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
+        if (!specialCharacterRegex.test(formData.password)) {
+          setError('Password must contain at least one special character.');
+          return;
+        }
+        if(formData.username.length < 5){
+          setError('username is too short');
+          return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(formData.email)) {
+          setError('Email is not valid');
+          return;
+        }
+        
+        if (formData.email.split('@').length - 1 !== 1) {
+          setError('Email is not valid');
+          return;
+        }
+     
      
         try {
           const data = await Signup(formData.username,formData.email, formData.password);
@@ -68,7 +88,7 @@ const RegistrationForm: React.FC<registrationProps> = ({onLogin}) => {
           navigate('/home');
           
         } catch (error: unknown) {
-         console.error('Error during SignUp:', error);
+         console.error('Username or Email Already Exist', error);
      
          if (error instanceof Error) {
              setFormData;
@@ -168,24 +188,13 @@ const RegistrationForm: React.FC<registrationProps> = ({onLogin}) => {
 
                 <div className="registration-form-google-signin">
                     <button
-                        onClick={() => googleLogin()}
                         className="flex items-center justify-center gap-2 bg-white px-4 py-2 rounded-md shadow-md hover:shadow-lg transition-shadow"
                         style={{
                             border: '1px solid #dadce0',
                             width: '80%',
                             marginTop: '20px'
                         }}
-                    >
-                        <img
-                            src='src/assets/google_logo.png'
-                            alt='Google logo'
-                            style={{
-                                width: '50px',
-                                height: '25px',
-                                marginRight: '8px'
-                            }}
-                        />
-                        <span style={{ color: '#3c4043' }}>Sign in with Google</span>
+                    >   <GoogleLoginButton/>
                     </button>
                 </div>
             </div>
