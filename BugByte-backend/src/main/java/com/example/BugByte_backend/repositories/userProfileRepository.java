@@ -41,7 +41,7 @@ public class userProfileRepository {
 
     private static final String SQL_UPDATE_BIO = """
                 UPDATE users 
-                SET bio = ? +
+                SET bio = ? 
                 WHERE id = ?;
             """;
 
