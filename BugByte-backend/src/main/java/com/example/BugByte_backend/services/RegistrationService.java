@@ -3,6 +3,7 @@ package com.example.BugByte_backend.services;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -128,6 +129,19 @@ public class RegistrationService {
             throw new Exception("wrong code");
         } catch (Exception e){
             throw new Exception("Error occurred while validation  " + e.getMessage());
+        }
+    }
+    public User registerUsingGoogle(String name , String email) throws Exception{
+        try{
+            User user = userRepository.findByIdentity(email);
+            return user;
+        } catch (EmptyResultDataAccessException e){
+            String password = registrationCOR.generateRandomPassword();
+            long id = userRepository.insertUser(name , email , password);
+            return new User(id, name, email, password);
+        }
+        catch (Exception e){
+            throw new Exception("Failed to register user " + e.getMessage());
         }
     }
 }

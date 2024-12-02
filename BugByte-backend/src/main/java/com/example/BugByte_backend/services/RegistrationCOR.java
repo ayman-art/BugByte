@@ -32,4 +32,24 @@ public class RegistrationCOR {
         return sb.toString();
     }
 
+    public String generateRandomPassword() {
+        String upperCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+        String numbers = "0123456789";
+        String specialCharacters = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+        String allCharacters = upperCaseLetters + lowerCaseLetters + numbers + specialCharacters;
+        StringBuilder password = new StringBuilder();
+        password.append(specialCharacters.charAt(RANDOM.nextInt(specialCharacters.length())));
+        for (int i = 1; i < 8; i++) {
+            password.append(allCharacters.charAt(RANDOM.nextInt(allCharacters.length())));
+        }
+        char[] passwordArray = password.toString().toCharArray();
+        for (int i = 0; i < passwordArray.length; i++) {
+            int randomIndex = RANDOM.nextInt(passwordArray.length);
+            char temp = passwordArray[i];
+            passwordArray[i] = passwordArray[randomIndex];
+            passwordArray[randomIndex] = temp;
+        }
+        return new String(passwordArray);
+    }
 }

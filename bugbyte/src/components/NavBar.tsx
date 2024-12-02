@@ -2,25 +2,28 @@
 import React from 'react';
 import logoPath from '../assets/bugbyteLogo.svg';
 import profilePath from '../assets/user-profile.svg';
-import { Link } from 'react-router-dom';
-
-
-const Navbar: React.FC = () => {
-  const onLogout = ()=>{
-
+import { Link, useNavigate } from 'react-router-dom';
+import { Cursor } from 'react-simple-typewriter';
+interface NavbarProps {
+  onLogout: () => void;
+}
+const Navbar: React.FC<NavbarProps> = ({onLogout}) => {
+  const visitProfile = ()=>{
+    const username = localStorage.getItem("name");
+    navigate(`/Profile/${username}`)
   }
-
+  const navigate = useNavigate()
   return (
     <nav style={styles.navbar}>
       {/* Logo and Brand Name */}
-      <div style={styles.logoContainer}>
+      <div style={styles.logoContainer} onClick={()=>navigate('/')}>
         <img src={logoPath} alt="Logo" style={styles.logo} />
         <span style={styles.brandName}>BugByte</span>
       </div>
 
       {/* Profile and Logout */}
       <div style={styles.rightContainer}>
-      <img src={profilePath} alt="Profile" style={styles.profileIcon} />
+      <img src={profilePath} alt="Profile" style={styles.profileIcon} onClick={visitProfile} />
       <button style={styles.logoutButton} onClick={onLogout}>
           Logout
         </button>
@@ -42,6 +45,7 @@ const styles = {
   logoContainer: {
     display: 'flex',
     alignItems: 'center',
+    cursor:'pointer'
   },
   logo: {
     color: '#ffffff',
@@ -52,6 +56,7 @@ const styles = {
   brandName: {
     fontSize: '1.5rem',
     fontWeight: 'bold',
+    userSelect:'none' as const
   },
   rightContainer: {
     display: 'flex',
@@ -62,6 +67,7 @@ const styles = {
     width: '50px',
     borderRadius: '50%',
     marginRight: '10px',
+    cursor: 'pointer'
   },
   logoutButton: {
     backgroundColor: '#ff4757',
