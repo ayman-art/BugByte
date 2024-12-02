@@ -1,63 +1,30 @@
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #048d54;
-    padding: 10px 20px;
-  }
-  
-  .navbar .logo {
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
-  }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 15px;
-  }
-  
-  .nav-links li a {
-    color: white;
-    text-decoration: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-  }
-  
-  .nav-links li a:hover {
-    background-color: #555;
-  }
-  
-  /* Hamburger menu (hidden by default) */
-  .hamburger {
-    display: none;
-    font-size: 28px;
-    color: white;
-    cursor: pointer;
-  }
-  
-  /* Media Query for smaller screens */
-  @media (max-width: 768px) {
-    .nav-links {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      background-color: #333;
-      position: absolute;
-      top: 60px;
-      right: 20px;
-      padding: 10px;
-      border-radius: 8px;
-    }
-  
-    .nav-links.open {
-      display: flex;
-    }
-  
-    .hamburger {
-      display: block;
-    }
-  }
-  
+/* Default Style */
+.default {
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  color: rgba(255, 255, 255, 1); /* PrimaryColour: &H00FFFFFF */
+  font-weight: bold; /* Bold: -1 means bold */
+  font-style: normal; /* Italic: 0 means not italic */
+  text-decoration: none; /* Underline: 0 means no underline */
+  transform: scale(1, 1); /* ScaleX and ScaleY: 100 means normal scale */
+  letter-spacing: 0px; /* Spacing: 0 */
+  writing-mode: horizontal-tb; /* Angle: 0 degrees */
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 1); /* Outline: 1, Shadow: 0 */
+  margin: 10px; /* Margins: MarginL, MarginR, MarginV */
+  text-align: center; /* Alignment: 2 means center alignment */
+}
+
+/* Fancy Style */
+.fancy {
+  font-family: "Comic Sans MS", sans-serif;
+  font-size: 30px;
+  color: rgba(255, 0, 255, 1); /* PrimaryColour: &H00FF00FF */
+  font-weight: bold; /* Bold: 1 means bold */
+  font-style: italic; /* Italic: 1 means italic */
+  text-decoration: none; /* Underline: 0 means no underline */
+  transform: scale(1.2, 1.2) rotate(45deg); /* ScaleX: 120, ScaleY: 120, Angle: 45 degrees */
+  letter-spacing: 2px; /* Spacing: 2 */
+  text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.5); /* Outline: 2, Shadow: 1 */
+  margin: 20px; /* Margins: MarginL, MarginR, MarginV */
+  text-align: right; /* Alignment: 8 means bottom-right alignment */
+}

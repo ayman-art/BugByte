@@ -6,7 +6,11 @@ import '../styles/components.css';
 import {Signup } from '../API/SignUpApi';
 import GoogleLoginButton from './GoogleSignIN';
 
-const RegistrationForm: React.FC = () => {
+
+interface registrationProps{
+    onLogin:()=>void
+}
+const RegistrationForm: React.FC<registrationProps> = ({onLogin}) => {
     const [formData, setFormData] = useState<User>({
         username: '',
         email: '',
@@ -80,6 +84,7 @@ const RegistrationForm: React.FC = () => {
             setError('No token received. Please try again.');
           }
           console.log('SignUp successful:', data);
+          onLogin()
           navigate('/home');
           
         } catch (error: unknown) {
