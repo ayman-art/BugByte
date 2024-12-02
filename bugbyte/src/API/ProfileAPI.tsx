@@ -92,3 +92,25 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
       throw error;
     }
   };
+  export const makeAdmin= async (username: string, token:string): Promise<any> => {
+    try {
+      const response = await fetch(`${API_URLS.ADMIN}?username=${username}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Admin operation Failed: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+  
+      return data;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  };

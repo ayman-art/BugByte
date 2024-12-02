@@ -82,7 +82,6 @@ const Login: React.FC<loginProps> = ({onLogin}) => {
       console.log('Login response:', data); 
  
       const { jwt, isAdmin } = data;
- 
       if (jwt) {
         localStorage.setItem('authToken', jwt);
         saveData(jwt)

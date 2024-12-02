@@ -35,6 +35,7 @@ export const saveData = (token:string)=>{
     // Parse the payload into a JavaScript object
     const decodedObj = JSON.parse(decodedPayload);
     localStorage.setItem("is_admin", decodedObj.is_admin)
+    console.log(decodedObj.is_admin);
     localStorage.setItem("name", decodedObj.sub)
     localStorage.setItem("id", decodedObj.id)
 }

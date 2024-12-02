@@ -12,5 +12,6 @@ export const API_URLS = {
   PROFILE: `${API_BASE_URL}/users/profile`,
   BIO_UPDATE: `${API_BASE_URL}/users/update-bio`,
   FOLLOW: `${API_BASE_URL}/users/follow`,
-  UNFOLLOW: `${API_BASE_URL}/users/unfollow`
+  UNFOLLOW: `${API_BASE_URL}/users/unfollow`,
+  ADMIN: `${API_BASE_URL}/users/make-admin`
 };

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import profilePath from '../assets/user-profile.svg';
 import Layout from '../layouts/MainLayout';
 import TextPopUp from '../components/BioPopup'
-import { followUser, getProfile, unfollowUser, updateBio } from '../API/ProfileAPI';
+import { followUser, getProfile, makeAdmin, unfollowUser, updateBio } from '../API/ProfileAPI';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useNavbar } from '@nextui-org/navbar';
 interface UserProfile {
@@ -93,7 +93,7 @@ const Profile: React.FC = () => {
     }
 
     fetchProfile();
-  }, []);
+  }, [userProfile?.is_following]);
   const handleFollow= async () => {
     try {
       const token = localStorage.getItem('authToken')
@@ -104,7 +104,9 @@ const Profile: React.FC = () => {
       //   console.log('Updated Profile:', updatedProfile);
       //   return updatedProfile;
       // });
-      window.location.reload();
+      setUserProfile((prevProfile) => 
+        prevProfile ? { ...prevProfile, is_following: true } : null
+      );
     } catch (error) {
       console.error('Error following user:', error);
     }
@@ -119,13 +121,30 @@ const Profile: React.FC = () => {
       //   console.log('Updated Profile:', updatedProfile);
       //   return updatedProfile;
       // });
-      window.location.reload();
+      setUserProfile((prevProfile) => 
+        prevProfile ? { ...prevProfile, is_following: true } : null
+      );
     } catch (error) {
       console.error('Error following user:', error);
     }
   }
-  const handleAdminize= (): React.MouseEventHandler<HTMLButtonElement> | undefined=> {
-    throw new Error('Function not implemented.');
+  const handleAdminize= async () => {
+    try {
+      const token = localStorage.getItem('authToken')
+      await makeAdmin(userName!, token!)
+      // Update state immutably
+      // setUserProfile((prevProfile) => {
+      //   const updatedProfile = { ...prevProfile!, is_following: true };
+      //   console.log('Updated Profile:', updatedProfile);
+      //   return updatedProfile;
+      // });
+      setUserProfile((prevProfile) => 
+        prevProfile ? { ...prevProfile, is_admin: true } : null
+      );
+      localStorage.setItem("is_admin",'true')
+    } catch (error) {
+      console.error('Error following user:', error);
+    }
   }
   // Fetch top posts data
   // useEffect(() => {

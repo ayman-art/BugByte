@@ -125,7 +125,7 @@ public class UserController {
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("jwt", token);
-        userData.put("user-name", username);
+        userData.put("userName", username);
 
         try {
             boolean res = administrativeFacade.makeAdmin(userData);
