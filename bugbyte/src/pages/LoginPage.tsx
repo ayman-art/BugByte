@@ -7,7 +7,10 @@ import '../styles/Login.css';
  import { logIn ,resetPassword} from '../API/LoginApi';
 import NavBar from '../components/NavBar';
 
-const Login: React.FC = () => {
+interface loginProps{
+  onLogin: ()=>void
+}
+const Login: React.FC<loginProps> = ({onLogin}) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -88,7 +91,7 @@ const Login: React.FC = () => {
       } else {
         setError('No token received. Please try again.');
       }
- 
+      onLogin()
       navigate('/home');
     } catch (error: unknown) {
       console.error('Error during login:', error);

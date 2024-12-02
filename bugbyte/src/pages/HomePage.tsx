@@ -2,12 +2,10 @@ import React from 'react';
 import Layout from '../layouts/MainLayout';
 const HomePage: React.FC = () => {
     return (
-        <Layout>
-            <div>
-                hi
+        <div>
+            hi
 
-            </div>
-        </Layout>
+        </div>
       );
 };
 

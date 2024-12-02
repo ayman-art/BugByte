@@ -1,16 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Login from './pages/LoginPage';
 import SignUpPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
 import { authorizeToken, saveData } from './API/HomeAPI';
+import Layout from './layouts/MainLayout';
+import { useNavbar } from '@nextui-org/navbar';
 
 const isLoggedIn = false;
 
 const App: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    const handleLogout = () => {
+      // Clear auth token and state
 
+      localStorage.removeItem('authToken');
+      setIsAuthenticated(false);
+    };
+    const handleLogin = () => {
+      // Clear auth token and state
+
+      setIsAuthenticated(true);
+    };
     useEffect(() => {
         const check = async () => {
           const token = localStorage.getItem('authToken');
@@ -36,20 +48,25 @@ const App: React.FC = () => {
         return <div>Loading...</div>; // Loading screen or spinner while checking token
       }
     return (
-        <BrowserRouter>
-            <Routes>
-                {isAuthenticated ? (
-                <Route path="/" element={<HomePage />} />
-                ) : (
-                <Route path="/" element={<Navigate to="/SignUp" />} />
-                )}
-                <Route path="/SignUp" element={<SignUpPage />} />
-                <Route path="/LogIn" element={<Login/>}/>
-                <Route path= "/Profile/:userName" element={<ProfilePage/>}/>
-                <Route path="/Home" element={<HomePage/>}/>
-
-            </Routes>
-        </BrowserRouter>
+      <BrowserRouter>
+      <Routes>
+        {isAuthenticated ? (
+          <>
+            <Route path="/" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />
+            <Route path="/Profile/:userName" element={<Layout onLogout={handleLogout}><ProfilePage /></Layout>} />
+            <Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />
+            <Route path="/SignUp" element={<Navigate to="/" />}/>
+            <Route path="/LogIn" element={<Navigate to="/" />} />
+          </>
+        ) : (
+          <>
+            <Route path="/" element={<Navigate to="/SignUp" />} />
+            <Route path="/SignUp" element={<SignUpPage onLogin={handleLogin}/>} />
+            <Route path="/LogIn" element={<Login onLogin={handleLogin}/>} />
+          </>
+        )}
+      </Routes>
+    </BrowserRouter>
       );
 };
 

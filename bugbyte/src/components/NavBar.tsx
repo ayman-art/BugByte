@@ -2,13 +2,11 @@
 import React from 'react';
 import logoPath from '../assets/bugbyteLogo.svg';
 import profilePath from '../assets/user-profile.svg';
-import { Link } from 'react-router-dom';
-
-
-const Navbar: React.FC = () => {
-  const onLogout = ()=>{
-
-  }
+import { Link, useNavigate } from 'react-router-dom';
+interface NavbarProps {
+  onLogout: () => void;
+}
+const Navbar: React.FC<NavbarProps> = ({onLogout}) => {
 
   return (
     <nav style={styles.navbar}>

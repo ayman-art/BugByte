@@ -1,16 +1,22 @@
 import React, { ReactNode } from 'react';
 import Navbar from '../components/NavBar';
+import { useNavigate } from 'react-router-dom';
 
 interface LayoutProps {
   children: ReactNode;
+  onLogout: () => void; 
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    onLogout()
+    navigate('/')
+  };
   return (
     <div style={styles.container}>
       {/* Navbar */}
-      <Navbar/>
-
+      <Navbar onLogout={handleLogout}/>
       {/* Main Content */}
       <div style={styles.main}>
         {/* Sidebar Links on Left */}

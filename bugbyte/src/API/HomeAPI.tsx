@@ -1,4 +1,3 @@
-import {jwtDecode} from  'jwt-decode';
 import { API_URLS } from './ApiUrls';
 
 export const authorizeToken = async(token :string)=> {

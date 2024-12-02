@@ -197,7 +197,6 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <Layout>
       <div style={styles.container}>
         {/* Profile Header */}
         <div style={styles.header}>
@@ -267,7 +266,6 @@ const Profile: React.FC = () => {
           )}
         </div>
       </div>
-    </Layout>
   );
 };
 

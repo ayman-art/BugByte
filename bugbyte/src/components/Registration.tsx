@@ -5,8 +5,10 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import '../styles/components.css';
 import { fetchGoogleUserInfo, Signup } from '../API/SignUpApi';
-
-const RegistrationForm: React.FC = () => {
+interface registrationProps{
+    onLogin:()=>void
+}
+const RegistrationForm: React.FC<registrationProps> = ({onLogin}) => {
     const [formData, setFormData] = useState<User>({
         username: '',
         email: '',
@@ -29,11 +31,6 @@ const RegistrationForm: React.FC = () => {
        console.error('Google Login Failed');
      },
    });
-
-    // const handleSubmit = (e: FormEvent) => {
-    //     e.preventDefault();
-    //     console.log('Registering user:', formData);
-    // };
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
      
@@ -67,6 +64,7 @@ const RegistrationForm: React.FC = () => {
             setError('No token received. Please try again.');
           }
           console.log('SignUp successful:', data);
+          onLogin()
           navigate('/home');
           
         } catch (error: unknown) {
