@@ -83,6 +83,7 @@ public class UserService {
             int followingsCount = userProfileRepository.getFollowingsCount(user.getId());
             userData.put("followersCount" , followersCount);
             userData.put("followingsCount" , followingsCount);
+
             return userData;
         } catch (Exception e){
             throw new Exception("Couldn't get the user's profile:  " + e.getMessage());
@@ -128,11 +129,16 @@ public class UserService {
     }
     public boolean updateProfile(String newBio, long userId) throws Exception{
         try {
-            User follower = userRepository.findById(userId);
-            if(follower == null) {
-                throw new Exception("follower doesn't Exist");
+            User user = userRepository.findById(userId);
+            if(user == null) {
+                throw new Exception("user doesn't Exist");
             }
-            return userProfileRepository.updateBio(newBio , userId);
+            boolean success = userProfileRepository.updateBio(newBio , userId) ;
+            if (success) {
+                user.setBio(newBio);
+                cacheUser(user);
+            }
+            return success;
         } catch (Exception e) {
             throw new Exception("Error occurred while updating bio:  " + e.getMessage());
         }

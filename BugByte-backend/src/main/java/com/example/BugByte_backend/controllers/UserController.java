@@ -24,7 +24,7 @@ public class UserController {
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("jwt", token);
-        userData.put("user-name", username);
+        userData.put("userName", username);
 
         try {
             Map<String, Object> response = administrativeFacade.getProfile(userData);
@@ -34,14 +34,14 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update-profile")
+    @PutMapping("/update-bio")
     public ResponseEntity<?> updateProfile(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> userData) {
         token = token.replace("Bearer ", "");
         userData.put("jwt", token);
 
         try {
-            Map<String, Object> response = administrativeFacade.updateProfile(userData);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            administrativeFacade.updateProfile(userData);
+            return new ResponseEntity<>(Map.of("message", "Bio updated successfully"), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import profilePath from '../assets/user-profile.svg';
 import Layout from '../layouts/MainLayout';
 import TextPopUp from '../components/BioPopup'
+import { getProfile, updateBio } from '../API/ProfileAPI';
+import { useParams } from 'react-router-dom';
 interface UserProfile {
   username: string;
   reputation: number;
@@ -10,7 +12,6 @@ interface UserProfile {
   bio: string;
   is_admin: boolean; // Add this to match the fetched user profile structure
 }
-
 interface Post {
   id: number;
   title: string;
@@ -18,14 +19,8 @@ interface Post {
 }
 
 const Profile: React.FC = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>({
-    username: 'string',
-    reputation: 100,
-    followers: 10,
-    following: 20,
-    bio: 'string',
-    is_admin: false,
-  });
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const {userName} = useParams<{ userName: string }>();
   const [topPosts, setTopPosts] = useState<Post[]>([
     {
       id: 1,
@@ -38,16 +33,18 @@ const Profile: React.FC = () => {
       content: "string"
     },
     {
-      id: 1,
+      id: 3,
       title: "string",
       content: "string"
     }
   ]);
-  const [profileLoading, setProfileLoading] = useState<boolean>(false);
+  const [profileLoading, setProfileLoading] = useState<boolean>(true);
   const [postsLoading, setPostsLoading] = useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const loggedInUsername = localStorage.getItem('username') || '';
-  const isAdmin = false;//localStorage.getItem('is_admin') === 'true';
+  const [error, setError] = useState<string>('');
+
+  const loggedInUsername = localStorage.getItem('name') || '';
+  const isAdmin = localStorage.getItem('is_admin') === 'true';
 
   const handleButtonClick = () => {
     setIsPopupOpen(true);
@@ -56,8 +53,14 @@ const Profile: React.FC = () => {
   const handlePopupSubmit = (newText: string) => {
     // PUT request HERE
     let newUserProfile = userProfile;
-    newUserProfile!.bio = newText;
-    setUserProfile(newUserProfile);
+    try{
+      const token = localStorage.getItem('authToken')
+      updateBio(newText, token!)
+      newUserProfile!.bio = newText;
+      setUserProfile(newUserProfile);
+    }catch ( e){
+      setError("Failed to update bio");
+    }
   };
 
   const handlePopupClose = () => {
@@ -65,23 +68,37 @@ const Profile: React.FC = () => {
   };
   
   // Fetch profile data
-  // useEffect(() => {
-  //   async function fetchProfile(): Promise<void> {
-  //     try {
-  //       const response = await fetch('/api/user-profile');
-  //       if (!response.ok) throw new Error('Failed to fetch user profile');
-  //       const data: UserProfile = await response.json();
-  //       setUserProfile(data);
-  //     } catch (error) {
-  //       console.error('Error fetching user profile:', error);
-  //     } finally {
-  //       setProfileLoading(false);
-  //     }
-  //   }
+  useEffect(() => {
+    async function fetchProfile(): Promise<void> {
+      try {
+        const token = localStorage.getItem('authToken')
+        const data = await getProfile(userName!, token!)
+        setUserProfile({
+          username: data['userName'],
+          reputation: data['reputation'],
+          followers: data['followersCount'],
+          following: data['followingsCount'],
+          bio: data['bio'],
+          is_admin: data['isAdmin'],
+        });
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      } finally {
+        setProfileLoading(false);
+      }
+    }
 
-  //   fetchProfile();
-  // }, []);
-
+    fetchProfile();
+  }, []);
+  const handleFollow= (): React.MouseEventHandler<HTMLButtonElement> | undefined => {
+    throw new Error('Function not implemented.');
+  }
+  const handleUnfollow= (): React.MouseEventHandler<HTMLButtonElement> | undefined =>{
+    throw new Error('Function not implemented.');
+  }
+  const handleAdminize= (): React.MouseEventHandler<HTMLButtonElement> | undefined=> {
+    throw new Error('Function not implemented.');
+  }
   // Fetch top posts data
   // useEffect(() => {
   //   async function fetchTopPosts(): Promise<void> {
@@ -110,6 +127,12 @@ const Profile: React.FC = () => {
 
   // Inline style definitions
   const styles = {
+    errorMessge: {
+      color: 'red',
+      fontSize: '12px', 
+      marginTop: '10px', 
+      textAlign: 'center' as 'center', 
+    },
     container: {
       margin: '0 auto',
       padding: '20px',
@@ -222,11 +245,13 @@ const Profile: React.FC = () => {
         </div>
         {/* Buttons */}
         <div style={{ display: 'flex', gap: '10px' }}>
-            {userProfile.username !== loggedInUsername && (
-              <button style={{ ...styles.button, ...styles.followButton }}>Follow</button>
-            )}
+            {userProfile.username !== loggedInUsername } (
+              <button style={{ ...styles.button, ...styles.followButton }} onClick={handleFollow}>Follow</button>
+            ) :(
+              <button style={{ ...styles.button, ...styles.followButton }} onClick={handleUnfollow}>Unfollow</button>
+            )
             {isAdmin && !userProfile.is_admin && (
-              <button style={{ ...styles.button, ...styles.adminButton }}>Make Admin</button>
+              <button style={{ ...styles.button, ...styles.adminButton }} onClick={handleAdminize}>Make Admin</button>
             )}
           </div>
         </div>
@@ -247,6 +272,7 @@ const Profile: React.FC = () => {
               onClose={handlePopupClose}
             />
           )}
+          {error && <div style={styles.errorMessge }>{error}</div>}
         </div>
 
         {/* Top Posts Section */}
@@ -270,3 +296,4 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
+

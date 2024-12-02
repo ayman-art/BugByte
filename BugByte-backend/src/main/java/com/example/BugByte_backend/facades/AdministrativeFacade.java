@@ -96,8 +96,16 @@ public class AdministrativeFacade {
     public Map<String, Object> getProfile(Map<String, Object> userdata) throws Exception {
         return userService.getProfile((String)userdata.get("userName"));
     }
-    public Map<String, Object> updateProfile(Map<String, Object> userdata) throws Exception {
-        return null;
+    public void updateProfile(Map<String, Object> userdata) throws Exception {
+        try {
+
+            Claims claim =AuthenticationService.parseToken((String) userdata.get("jwt"));
+            long id = Long.parseLong(claim.getId());
+            userService.updateProfile(String.valueOf(userdata.get("bio")), id);
+        }catch (Exception e){
+            throw new Exception("Unauthorized operation: "+ e.getMessage());
+        }
+
     }
     public boolean followUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
