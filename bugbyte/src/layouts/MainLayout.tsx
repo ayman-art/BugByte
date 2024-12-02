@@ -9,6 +9,10 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
   const navigate = useNavigate()
+  const visitProfile = ()=>{
+    const username = localStorage.getItem("name");
+    navigate(`/Profile/${username}`)
+  }
   const handleLogout = () => {
     onLogout()
     navigate('/')
@@ -22,9 +26,9 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
         {/* Sidebar Links on Left */}
         <aside style={styles.sidebar}>
           <ul style={styles.links}>
-            <li>Home</li>
-            <li>Profile</li>
-            <li>Communities</li>
+            <li onClick={()=>{navigate('/')}}>Home</li>
+            <li onClick={visitProfile}>Profile</li>
+            <li onClick={()=>{}}>Communities</li>
           </ul>
         </aside>
 
@@ -78,6 +82,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column', // Stack the links vertically
     gap: '10px',
     paddingTop: '100%', // Adjust this to control the 1:2 centering ratio
+    cursor:'pointer',
+    userSelect:'none'
   },
   content: {
     flex: 1,

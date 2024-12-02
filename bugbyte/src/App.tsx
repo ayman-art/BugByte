@@ -54,7 +54,7 @@ const App: React.FC = () => {
           <>
             <Route path="/" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />
             <Route path="/Profile/:userName" element={<Layout onLogout={handleLogout}><ProfilePage /></Layout>} />
-            <Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />
+            {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
             <Route path="/SignUp" element={<Navigate to="/" />}/>
             <Route path="/LogIn" element={<Navigate to="/" />} />
           </>

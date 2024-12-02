@@ -11,7 +11,6 @@ const GoogleLoginButton: React.FC<googleButtonProps> = ({onLogin}) => {
 
   const handleLoginSuccess = (credentialResponse: any) => {
     const token = credentialResponse.credential;
-    console.log('Login Success! Token:', token);
 
     fetch(API_URLS.LOGIN_BY_GOOGLE, {
       method: 'POST',
@@ -25,13 +24,10 @@ const GoogleLoginButton: React.FC<googleButtonProps> = ({onLogin}) => {
         const { jwt, isAdmin } = data;
         if (jwt) {
           localStorage.setItem('authToken', jwt);
-          console.log('JWT Token:', jwt);
-          console.log('Is Admin:', isAdmin);
           onLogin()
-          navigate('/home');
+          navigate('/');
           
         }
-        console.log('User Info from Backend:', data);
       })
       .catch((error) => {
         console.error('Error during token verification:', error);

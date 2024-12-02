@@ -5,7 +5,7 @@ import GoogleLogo from '../assets/googlelogo.png';
 import ResetPasswordPopup from './PasswordReset';
 import '../styles/Login.css';
  import { logIn ,resetPassword} from '../API/LoginApi';
-
+import { saveData } from '../API/HomeAPI';
 interface loginProps{
   onLogin: ()=>void
 }
@@ -85,13 +85,13 @@ const Login: React.FC<loginProps> = ({onLogin}) => {
  
       if (jwt) {
         localStorage.setItem('authToken', jwt);
-        console.log('JWT Token:', jwt);
-        console.log('Is Admin:', isAdmin);
+        saveData(jwt)
+        onLogin()
+        navigate('/');
       } else {
         setError('No token received. Please try again.');
       }
-      onLogin()
-      navigate('/home');
+      
     } catch (error: unknown) {
       console.error('Error during login:', error);
  

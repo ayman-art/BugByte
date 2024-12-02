@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/components.css';
 import {Signup } from '../API/SignUpApi';
 import GoogleLoginButton from './GoogleSignIN';
+import { saveData } from '../API/HomeAPI';
 
 
 interface registrationProps{
@@ -78,14 +79,14 @@ const RegistrationForm: React.FC<registrationProps> = ({onLogin}) => {
      
           if (jwt) {
             localStorage.setItem('authToken', jwt);
-            console.log('JWT Token:', jwt);
-            console.log('Is Admin:', isAdmin);
+            onLogin()
+            navigate('/');
+            saveData(jwt)
           } else {
             setError('No token received. Please try again.');
           }
-          console.log('SignUp successful:', data);
-          onLogin()
-          navigate('/home');
+          
+          
           
         } catch (error: unknown) {
          console.error('Username or Email Already Exist', error);
