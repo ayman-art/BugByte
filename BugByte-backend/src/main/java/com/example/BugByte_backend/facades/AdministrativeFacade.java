@@ -94,7 +94,7 @@ public class AdministrativeFacade {
 
     // User Profile Section
     public Map<String, Object> getProfile(Map<String, Object> userdata) throws Exception {
-        return userService.getProfile((String)userdata.get("user-name"));
+        return userService.getProfile((String)userdata.get("userName"));
     }
     public Map<String, Object> updateProfile(Map<String, Object> userdata) throws Exception {
         return null;
@@ -103,24 +103,24 @@ public class AdministrativeFacade {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
-        return userService.followUser(id, (String)userdata.get("user-name"));
+        return userService.followUser(id, (String)userdata.get("userName"));
     }
 
     public boolean unfollowUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
-        return userService.unfollowUser(id, (String)userdata.get("user-name"));
+        return userService.unfollowUser(id, (String)userdata.get("userName"));
     }
 
     public List<Map<String, Object>> getFollowers(Map<String, Object> userdata) throws Exception {
-        List<User> followers = userService.getFollowers((String)userdata.get("user-name"));
+        List<User> followers = userService.getFollowers((String)userdata.get("userName"));
         UserAdapter adapter = new UserAdapter();
         return followers.stream().map(adapter::toMap).toList();
     }
 
     public List<Map<String, Object>> getFollowings(Map<String, Object> userdata) throws Exception {
-        List<User> followings = userService.getFollowings((String)userdata.get("user-name"));
+        List<User> followings = userService.getFollowings((String)userdata.get("userName"));
         UserAdapter adapter = new UserAdapter();
         return followings.stream().map(adapter::toMap).toList();
     }
@@ -129,7 +129,7 @@ public class AdministrativeFacade {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
-        return userService.makeAdmin(id, (String)userdata.get("user-name"));
+        return userService.makeAdmin(id, (String)userdata.get("userName"));
     }
     public Map<String, Object> googleOAuthSignUp(@RequestBody Map<String, String> requestBody) throws Exception {
         String tokenRequest = requestBody.get("token");
