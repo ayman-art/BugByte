@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import profilePath from '../assets/user-profile.svg';
 import Layout from '../layouts/MainLayout';
 import TextPopUp from '../components/BioPopup'
-import { getProfile, updateBio } from '../API/ProfileAPI';
-import { useParams } from 'react-router-dom';
+import { followUser, getProfile, unfollowUser, updateBio } from '../API/ProfileAPI';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useNavbar } from '@nextui-org/navbar';
 interface UserProfile {
   username: string;
   reputation: number;
   followers: number;
   following: number;
   bio: string;
+  is_following: boolean;
   is_admin: boolean; // Add this to match the fetched user profile structure
 }
 interface Post {
@@ -19,6 +21,7 @@ interface Post {
 }
 
 const Profile: React.FC = () => {
+  const navigate = useNavigate()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const {userName} = useParams<{ userName: string }>();
   const [topPosts, setTopPosts] = useState<Post[]>([
@@ -80,6 +83,7 @@ const Profile: React.FC = () => {
           following: data['followingsCount'],
           bio: data['bio'],
           is_admin: data['isAdmin'],
+          is_following: data['is_following']
         });
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -90,11 +94,35 @@ const Profile: React.FC = () => {
 
     fetchProfile();
   }, []);
-  const handleFollow= (): React.MouseEventHandler<HTMLButtonElement> | undefined => {
-    throw new Error('Function not implemented.');
+  const handleFollow= async () => {
+    try {
+      const token = localStorage.getItem('authToken')
+      await followUser(userName!, token!)
+      // Update state immutably
+      // setUserProfile((prevProfile) => {
+      //   const updatedProfile = { ...prevProfile!, is_following: true };
+      //   console.log('Updated Profile:', updatedProfile);
+      //   return updatedProfile;
+      // });
+      window.location.reload();
+    } catch (error) {
+      console.error('Error following user:', error);
+    }
   }
-  const handleUnfollow= (): React.MouseEventHandler<HTMLButtonElement> | undefined =>{
-    throw new Error('Function not implemented.');
+  const handleUnfollow= async() =>{
+    try {
+      const token = localStorage.getItem('authToken')
+      await unfollowUser(userName!, token!)
+        // Update state immutably
+      // setUserProfile((prevProfile) => {
+      //   const updatedProfile = { ...prevProfile!, is_following: false };
+      //   console.log('Updated Profile:', updatedProfile);
+      //   return updatedProfile;
+      // });
+      window.location.reload();
+    } catch (error) {
+      console.error('Error following user:', error);
+    }
   }
   const handleAdminize= (): React.MouseEventHandler<HTMLButtonElement> | undefined=> {
     throw new Error('Function not implemented.');
@@ -245,11 +273,17 @@ const Profile: React.FC = () => {
         </div>
         {/* Buttons */}
         <div style={{ display: 'flex', gap: '10px' }}>
-            {userProfile.username !== loggedInUsername } (
-              <button style={{ ...styles.button, ...styles.followButton }} onClick={handleFollow}>Follow</button>
-            ) :(
-              <button style={{ ...styles.button, ...styles.followButton }} onClick={handleUnfollow}>Unfollow</button>
-            )
+        {userProfile.username !== loggedInUsername && (
+              userProfile.is_following ? (
+                <button style={{ ...styles.button, ...styles.followButton }} onClick={handleUnfollow}>
+                  Unfollow
+                </button>
+              ) : (
+                <button style={{ ...styles.button, ...styles.followButton }} onClick={handleFollow}>
+                  Follow
+                </button>
+              )
+            )}
             {isAdmin && !userProfile.is_admin && (
               <button style={{ ...styles.button, ...styles.adminButton }} onClick={handleAdminize}>Make Admin</button>
             )}
@@ -260,9 +294,9 @@ const Profile: React.FC = () => {
           <div style={styles.bio}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3>About:</h3>
-              <button onClick={handleButtonClick} style={{ ...styles.openButton, ...styles.editButton }}>
+              {userProfile.username === loggedInUsername && (<button onClick={handleButtonClick} style={{ ...styles.openButton, ...styles.editButton }}>
                 <span style={{ marginRight: '8px' }}>✏️</span> Edit
-              </button>
+              </button>)}
           </div>
           <p>{userProfile.bio || 'No bio available.'}</p>
           {isPopupOpen && (

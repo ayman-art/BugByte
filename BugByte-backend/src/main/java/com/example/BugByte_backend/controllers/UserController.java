@@ -53,7 +53,7 @@ public class UserController {
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("jwt", token);
-        userData.put("user-name", username);
+        userData.put("userName", username);
 
         try {
             boolean res = administrativeFacade.followUser(userData);
@@ -67,13 +67,13 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/unfollow")
+    @PutMapping("/unfollow")
     public ResponseEntity<?> unFollowUser(@RequestHeader("Authorization") String token, @RequestParam("username") String username) {
         token = token.replace("Bearer ", "");
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("jwt", token);
-        userData.put("user-name", username);
+        userData.put("userName", username);
 
         try {
             boolean res = administrativeFacade.unfollowUser(userData);

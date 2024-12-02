@@ -13,10 +13,18 @@ public class userProfileRepository {
 
 
     public int getFollowersCount(long userId){
-        return 0;
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{ userId }, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
+
+        return count;
     }
     public int getFollowingsCount(long userId){
-        return 0;
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_FOLLOWINGS_COUNT, new Object[]{ userId }, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
+
+        return count;
     }
 
     private static final String SQL_FOLLOW_USER = """
@@ -27,21 +35,32 @@ public class userProfileRepository {
             """;
 
     private static final String SQL_IS_FOLLOWING = """
-                SELECT follower_id, following_id FROM followers 
-                WHERE follower_id = ? AND following_id = ?;
+                SELECT COUNT(*) FROM followers
+                WHERE follower_id = ? AND followed_id = ?;
             """;
 
     private static final String SQL_DELETE_FOLLOWER = "DELETE FROM followers WHERE follower_id = ? AND followed_id = ?;";
-
+    private static final String SQL_GET_FOLLOWINGS_COUNT = """
+                SELECT COUNT(*)
+                FROM followers f
+                JOIN users u ON f.followed_id = u.id
+                WHERE f.follower_id = ?;
+            """;
+    private static final String SQL_GET_FOLLOWERS_COUNT = """
+                SELECT COUNT(* )
+                FROM followers f
+                JOIN users u ON f.follower_id = u.id
+                WHERE f.followed_id = ?;
+            """;
     private static final String SQL_GET_FOLLOWERS = """
-                SELECT u.* 
+                SELECT * 
                 FROM followers f
                 JOIN users u ON f.follower_id = u.id
                 WHERE f.followed_id = ?;
             """;
 
     private static final String SQL_GET_FOLLOWINGS = """
-                SELECT u.* 
+                SELECT * 
                 FROM followers f
                 JOIN users u ON f.followed_id = u.id
                 WHERE f.follower_id = ?;
@@ -72,17 +91,18 @@ public class userProfileRepository {
     }
 
     public Boolean isFollowing(Long userId, Long followingId) {
-        return  jdbcTemplate.queryForObject(
-                SQL_IS_FOLLOWING,
-                new Object[]{userId, followingId},
-                (rs, rowNum) -> true) != null;
+        Integer count = jdbcTemplate.queryForObject(SQL_IS_FOLLOWING, new Object[]{ userId, followingId }, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
+
+        return count == 1;
     }
 
     public Boolean unfollowUser(Long userId, Long followingId) {
         if (userId == null || followingId == null)
             throw new NullPointerException("UserId or FollowingId is Null");
 
-        int rows = jdbcTemplate.update(SQL_DELETE_FOLLOWER, userId);
+        int rows = jdbcTemplate.update(SQL_DELETE_FOLLOWER, userId, followingId);
         return rows == 1;
     }
 

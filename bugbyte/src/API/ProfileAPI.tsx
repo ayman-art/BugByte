@@ -46,3 +46,49 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
       throw error;
     }
   };
+
+  export const followUser = async (username: string, token:string): Promise<any> => {
+    try {
+      const response = await fetch(`${API_URLS.FOLLOW}?username=${username}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Follow operation Failed: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+  
+      return data;
+    } catch (error) {
+      console.error('Error in Following Profile:', error);
+      throw error;
+    }
+  };
+
+  export const unfollowUser = async (username: string, token:string): Promise<any> => {
+    try {
+      const response = await fetch(`${API_URLS.UNFOLLOW}?username=${username}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Follow operation Failed: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+  
+      return data;
+    } catch (error) {
+      console.error('Error in Following Profile:', error);
+      throw error;
+    }
+  };

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class UserService {
             // removing sensitive and unnecessary data
             userData.remove("password");
             userData.remove("email");
-            userData.remove("id");
+            //userData.remove("id");
             int followersCount = userProfileRepository.getFollowersCount(user.getId());
             int followingsCount = userProfileRepository.getFollowingsCount(user.getId());
             userData.put("followersCount" , followersCount);
@@ -88,6 +89,9 @@ public class UserService {
         } catch (Exception e){
             throw new Exception("Couldn't get the user's profile:  " + e.getMessage());
         }
+    }
+    public boolean isFollowing(long id1, long id2){
+        return userProfileRepository.isFollowing(id1,id2);
     }
 
     public boolean followUser(long userId, String followingName) throws Exception {

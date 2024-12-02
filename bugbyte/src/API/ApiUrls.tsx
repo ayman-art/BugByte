@@ -10,5 +10,7 @@ export const API_URLS = {
   CHANGE_PASSWORD: `${API_BASE_URL}/users/change-password`,
   AUTHENTICATE_TOKEN: `${API_BASE_URL}/users/authorize`,
   PROFILE: `${API_BASE_URL}/users/profile`,
-  BIO_UPDATE: `${API_BASE_URL}/users/update-bio`
+  BIO_UPDATE: `${API_BASE_URL}/users/update-bio`,
+  FOLLOW: `${API_BASE_URL}/users/follow`,
+  UNFOLLOW: `${API_BASE_URL}/users/unfollow`
 };

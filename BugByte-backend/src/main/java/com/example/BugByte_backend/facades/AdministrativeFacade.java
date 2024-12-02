@@ -94,7 +94,15 @@ public class AdministrativeFacade {
 
     // User Profile Section
     public Map<String, Object> getProfile(Map<String, Object> userdata) throws Exception {
-        return userService.getProfile((String)userdata.get("userName"));
+        String token = (String) userdata.get("jwt");
+        Claims claim = AuthenticationService.parseToken(token);
+        long id = Long.parseLong(claim.getId());
+        Map<String, Object> profileData= userService.getProfile((String)userdata.get("userName"));
+        long id2 = (long) profileData.get("id");
+        profileData.put("is_following",userService.isFollowing(id, id2));
+        profileData.remove("id");
+
+        return profileData;
     }
     public void updateProfile(Map<String, Object> userdata) throws Exception {
         try {
