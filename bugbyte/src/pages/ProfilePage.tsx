@@ -85,6 +85,8 @@ const Profile: React.FC = () => {
           is_admin: data['isAdmin'],
           is_following: data['is_following']
         });
+        console.log(userProfile);
+        
       } catch (error) {
         console.error('Error fetching user profile:', error);
       } finally {
