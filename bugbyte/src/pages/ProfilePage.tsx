@@ -93,7 +93,7 @@ const Profile: React.FC = () => {
     }
 
     fetchProfile();
-  }, [userProfile?.is_following]);
+  }, []);
   const handleFollow= async () => {
     try {
       const token = localStorage.getItem('authToken')
@@ -105,7 +105,11 @@ const Profile: React.FC = () => {
       //   return updatedProfile;
       // });
       setUserProfile((prevProfile) => 
-        prevProfile ? { ...prevProfile, is_following: true } : null
+        prevProfile ? { 
+          ...prevProfile, 
+          is_following: true, 
+          followers: prevProfile.followers + 1 
+        } : null
       );
     } catch (error) {
       console.error('Error following user:', error);
@@ -122,7 +126,11 @@ const Profile: React.FC = () => {
       //   return updatedProfile;
       // });
       setUserProfile((prevProfile) => 
-        prevProfile ? { ...prevProfile, is_following: true } : null
+        prevProfile ? { 
+          ...prevProfile, 
+          is_following: false, 
+          followers: prevProfile.followers - 1 
+        } : null
       );
     } catch (error) {
       console.error('Error following user:', error);
@@ -139,7 +147,10 @@ const Profile: React.FC = () => {
       //   return updatedProfile;
       // });
       setUserProfile((prevProfile) => 
-        prevProfile ? { ...prevProfile, is_admin: true } : null
+        prevProfile ? { 
+          ...prevProfile, 
+          is_admin: true, 
+        } : null
       );
       localStorage.setItem("is_admin",'true')
     } catch (error) {

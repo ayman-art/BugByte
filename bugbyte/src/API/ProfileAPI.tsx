@@ -61,7 +61,7 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
         throw new Error(`Follow operation Failed: ${response.statusText}`);
       }
   
-      const data = await response.json();
+      const data = await response.text();
   
       return data;
     } catch (error) {
@@ -84,7 +84,7 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
         throw new Error(`Follow operation Failed: ${response.statusText}`);
       }
   
-      const data = await response.json();
+      const data = await response.text();
   
       return data;
     } catch (error) {
@@ -106,7 +106,7 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
         throw new Error(`Admin operation Failed: ${response.statusText}`);
       }
   
-      const data = await response.json();
+      const data = await response.text();
   
       return data;
     } catch (error) {
