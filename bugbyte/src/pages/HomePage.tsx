@@ -3,11 +3,8 @@ import React from 'react';
 const HomePage: React.FC = () => {
     return (
         <div>
-            
-            <div>
-                hi
+            hi
 
-            </div>
         </div>
       );
 };

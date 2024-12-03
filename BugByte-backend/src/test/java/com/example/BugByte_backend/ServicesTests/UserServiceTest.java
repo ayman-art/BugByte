@@ -306,4 +306,31 @@ public class UserServiceTest {
             userService.makeAdmin(admin.getId(), user.getUserName());
         });
     }
+    //test updateprofile user exists
+    @Test
+    public void updateProfile_userExists() throws Exception{
+        User user = new User(1L , "user1" , "user1@example.com" , "12345678%");
+        String newPio = "newPio";
+
+
+        // Mock repository methods
+        when(userRepositoryMock.findById(user.getId())).thenReturn(user);
+        when(userProfileRepositoryMock.updateBio(newPio , user.getId())).thenReturn(true);
+
+        assertTrue(userService.updateProfile(newPio , user.getId()));
+    }
+    //test updateprofile Doesn't user exist
+    @Test
+    public void updateProfile_userDoesNotExist() throws Exception{
+        User user = new User(1L , "user1" , "user1@example.com" , "12345678%");
+        String newPio = "newPio";
+
+
+        // Mock repository methods
+        when(userRepositoryMock.findById(user.getId())).thenReturn(null);
+        // Assert that an exception is thrown when user doesn't exist
+        assertThrows(Exception.class, () -> {
+            userService.updateProfile(newPio , user.getId());
+        });
+    }
 }

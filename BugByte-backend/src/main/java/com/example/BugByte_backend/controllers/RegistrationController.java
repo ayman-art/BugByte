@@ -81,6 +81,16 @@ public class RegistrationController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+    
+    @GetMapping("/authorize")
+    public ResponseEntity<?> authorize(@RequestHeader("Authorization") String token) {
+        token = token.replace("Bearer ", "");
+        try {
+            return new ResponseEntity<>(Map.of("jwt",token), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
 }
 
 

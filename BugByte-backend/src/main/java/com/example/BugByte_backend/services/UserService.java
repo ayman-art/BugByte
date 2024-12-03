@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,15 +79,19 @@ public class UserService {
             // removing sensitive and unnecessary data
             userData.remove("password");
             userData.remove("email");
-            userData.remove("id");
+            //userData.remove("id");
             int followersCount = userProfileRepository.getFollowersCount(user.getId());
             int followingsCount = userProfileRepository.getFollowingsCount(user.getId());
             userData.put("followersCount" , followersCount);
             userData.put("followingsCount" , followingsCount);
+
             return userData;
         } catch (Exception e){
             throw new Exception("Couldn't get the user's profile:  " + e.getMessage());
         }
+    }
+    public boolean isFollowing(long id1, long id2){
+        return userProfileRepository.isFollowing(id1,id2);
     }
 
     public boolean followUser(long userId, String followingName) throws Exception {
@@ -124,6 +129,22 @@ public class UserService {
             return userProfileRepository.unfollowUser(userId , following.getId());
         } catch (Exception e) {
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
+        }
+    }
+    public boolean updateProfile(String newBio, long userId) throws Exception{
+        try {
+            User user = userRepository.findById(userId);
+            if(user == null) {
+                throw new Exception("user doesn't Exist");
+            }
+            boolean success = userProfileRepository.updateBio(newBio , userId) ;
+            if (success) {
+                user.setBio(newBio);
+                cacheUser(user);
+            }
+            return success;
+        } catch (Exception e) {
+            throw new Exception("Error occurred while updating bio:  " + e.getMessage());
         }
     }
 
@@ -167,7 +188,12 @@ public class UserService {
             if (!admin.getIsAdmin())
                 throw new Exception("The user does not have the authority to assign admins");
 
-            return userRepository.makeUserAdmin(user.getId());
+            boolean success = userRepository.makeUserAdmin(user.getId());
+            if (success) {
+                user.setIsAdmin(true);
+                cacheUser(user);
+            }
+            return success;
         } catch (Exception e) {
             throw new Exception("Error happened while making this user an admin:  " + e.getMessage());
         }
