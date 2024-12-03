@@ -21,9 +21,6 @@ const GoogleLoginButton: React.FC<googleButtonProps> = ({onLogin}) => {
         },
         body: JSON.stringify({ token }),
       });
-  
-      console.log('Request Body:', { token});
-  
       if (!response.ok) {
         throw new Error(`Login failed: ${response.statusText}`);
       }
