@@ -29,21 +29,32 @@ class UserProfileRepositoryTest {
             """;
 
     private static final String SQL_IS_FOLLOWING = """
-                SELECT follower_id, following_id FROM followers 
-                WHERE follower_id = ? AND following_id = ?;
+                SELECT COUNT(*) FROM followers
+                WHERE follower_id = ? AND followed_id = ?;
             """;
 
     private static final String SQL_DELETE_FOLLOWER = "DELETE FROM followers WHERE follower_id = ? AND followed_id = ?;";
-
+    private static final String SQL_GET_FOLLOWINGS_COUNT = """
+                SELECT COUNT(*)
+                FROM followers f
+                JOIN users u ON f.followed_id = u.id
+                WHERE f.follower_id = ?;
+            """;
+    private static final String SQL_GET_FOLLOWERS_COUNT = """
+                SELECT COUNT(* )
+                FROM followers f
+                JOIN users u ON f.follower_id = u.id
+                WHERE f.followed_id = ?;
+            """;
     private static final String SQL_GET_FOLLOWERS = """
-                SELECT u.* 
+                SELECT * 
                 FROM followers f
                 JOIN users u ON f.follower_id = u.id
                 WHERE f.followed_id = ?;
             """;
 
     private static final String SQL_GET_FOLLOWINGS = """
-                SELECT u.* 
+                SELECT * 
                 FROM followers f
                 JOIN users u ON f.followed_id = u.id
                 WHERE f.follower_id = ?;
@@ -54,6 +65,7 @@ class UserProfileRepositoryTest {
                 SET bio = ? 
                 WHERE id = ?;
             """;
+
 
     @Mock
     private JdbcTemplate jdbcTemplate;
@@ -87,8 +99,8 @@ class UserProfileRepositoryTest {
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser1.getId(), testUser2.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.update(
                 eq(SQL_FOLLOW_USER),
@@ -110,12 +122,93 @@ class UserProfileRepositoryTest {
     void unfollowUser_ShouldReturnTrue_WhenSuccessful() {
         when(jdbcTemplate.update(
                 eq(SQL_DELETE_FOLLOWER),
-                eq(testUser1.getId())
+                eq(testUser1.getId()), eq(testUser2.getId())
         )).thenReturn(1);
 
         Boolean result = repository.unfollowUser(testUser1.getId(), testUser2.getId());
 
         assertTrue(result);
+    }
+    @Test
+    void testGetFollowersCount_Success() {
+        // Mock JdbcTemplate
+
+        // Sample data
+        long userId = 1L;
+        int followersCount = 5;
+
+        // Mock behavior
+        when(jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class))
+                .thenReturn(followersCount);
+
+        // Call the method
+        int result = repository.getFollowersCount(userId);
+
+        // Validate results
+        assertEquals(followersCount, result);
+
+        // Verify interaction
+        verify(jdbcTemplate, times(1))
+                .queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class);
+    }
+
+    @Test
+    void testGetFollowersCount_InvalidInput() {
+        // Sample data
+        long userId = 1L;
+
+        // Mock behavior
+        when(jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class))
+                .thenReturn(null);
+
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            repository.getFollowersCount(userId);
+        });
+
+        assertEquals("Invalid Input", exception.getMessage());
+
+        // Verify interaction
+        verify(jdbcTemplate, times(1))
+                .queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class);
+    }
+
+    @Test
+    void testGetFollowingsCount_Success() {
+        // Sample data
+        long userId = 1L;
+        int followingsCount = 3;
+
+        // Mock behavior
+        when(jdbcTemplate.queryForObject(SQL_GET_FOLLOWINGS_COUNT, new Object[]{userId}, Integer.class))
+                .thenReturn(followingsCount);
+
+        int result = repository.getFollowingsCount(userId);
+
+        assertEquals(followingsCount, result);
+
+        verify(jdbcTemplate, times(1))
+                .queryForObject(SQL_GET_FOLLOWINGS_COUNT, new Object[]{userId}, Integer.class);
+    }
+
+    @Test
+    void testGetFollowingsCount_InvalidInput() {
+        // Sample data
+        long userId = 1L;
+
+        // Mock behavior
+        when(jdbcTemplate.queryForObject(SQL_GET_FOLLOWINGS_COUNT, new Object[]{userId}, Integer.class))
+                .thenReturn(null);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            repository.getFollowingsCount(userId);
+        });
+
+        assertEquals("Invalid Input", exception.getMessage());
+
+        // Verify interaction
+        verify(jdbcTemplate, times(1))
+                .queryForObject(SQL_GET_FOLLOWINGS_COUNT, new Object[]{userId}, Integer.class);
     }
 
     @Test
@@ -157,6 +250,12 @@ class UserProfileRepositoryTest {
     void followUser_WhenUserTriesToFollowThemself_ShouldReturnFalse() {
         Long userId = testUser1.getId();
 
+        when(jdbcTemplate.queryForObject(
+                eq(SQL_IS_FOLLOWING),
+                eq(new Object[]{ userId, userId }),
+                eq(Integer.class)
+        )).thenReturn(0);
+
         Boolean result = repository.followUser(userId, userId);
 
         assertFalse(result);
@@ -168,8 +267,8 @@ class UserProfileRepositoryTest {
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser1.getId(), testUser2.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.update(
                 eq(SQL_FOLLOW_USER),
@@ -194,8 +293,8 @@ class UserProfileRepositoryTest {
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser1.getId(), testUser2.getId()}),
-                eq(Boolean.class)
-        )).thenThrow(new RuntimeException("Database error"));
+                eq(Integer.class)
+        )).thenReturn(0);
 
         Boolean result = repository.isFollowing(testUser1.getId(), testUser2.getId());
 
@@ -265,32 +364,32 @@ class UserProfileRepositoryTest {
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser1.getId(), testUser2.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser1.getId(), testUser3.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser1.getId(), testUser4.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser1.getId(), testUser5.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser1.getId(), testUser6.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.update(
                 eq(SQL_FOLLOW_USER),
@@ -382,32 +481,32 @@ class UserProfileRepositoryTest {
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser2.getId(), testUser1.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser3.getId(), testUser1.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser4.getId(), testUser1.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser5.getId(), testUser1.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
                 eq(new Object[]{testUser6.getId(), testUser1.getId()}),
-                eq(Boolean.class)
-        )).thenReturn(null);
+                eq(Integer.class)
+        )).thenReturn(0);
 
         // Simulate the following action for each follower
         when(jdbcTemplate.update(
@@ -548,6 +647,7 @@ class UserProfileRepositoryTest {
             repository.updateBio(null, userId);
         });
     }
+
 }
 
 class FollowerIdTest {
