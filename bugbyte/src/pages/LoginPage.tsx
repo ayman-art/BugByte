@@ -6,6 +6,7 @@ import ResetPasswordPopup from './PasswordReset';
 import '../styles/Login.css';
  import { logIn ,resetPassword} from '../API/LoginApi';
 import { saveData } from '../API/HomeAPI';
+import GoogleLoginButton from '../components/GoogleSignIN';
 interface loginProps{
   onLogin: ()=>void
 }
@@ -146,13 +147,14 @@ const Login: React.FC<loginProps> = ({onLogin}) => {
         </form>
         <div className="orSection">
           <span>OR</span>
-          <button className="googleButton">
+          {/* <button className="googleButton">
             <img src={GoogleLogo} alt="Google logo" className="googleIcon" />
                     <div>
 Log in with Google
         </div>
 
-          </button>
+          </button> */}
+        <GoogleLoginButton onLogin={onLogin}/>
         </div>
         <div className="registerSection">
           <div>Don’t have an account? </div>
