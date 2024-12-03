@@ -188,7 +188,12 @@ public class UserService {
             if (!admin.getIsAdmin())
                 throw new Exception("The user does not have the authority to assign admins");
 
-            return userRepository.makeUserAdmin(user.getId());
+            boolean success = userRepository.makeUserAdmin(user.getId());
+            if (success) {
+                user.setIsAdmin(true);
+                cacheUser(user);
+            }
+            return success;
         } catch (Exception e) {
             throw new Exception("Error happened while making this user an admin:  " + e.getMessage());
         }
