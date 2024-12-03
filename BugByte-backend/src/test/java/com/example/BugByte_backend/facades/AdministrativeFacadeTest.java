@@ -89,16 +89,16 @@ public class AdministrativeFacadeTest {
         assertFalse(result.get(0).containsKey("id"));
         assertFalse(result.get(0).containsKey("password"));
         assertFalse(result.get(0).containsKey("email"));
-        assertEquals("test_user1", result.get(0).get("user_name"));
+        assertEquals("test_user1", result.get(0).get("userName"));
         assertEquals(100L, result.get(0).get("reputation"));
-        assertFalse((boolean) result.get(0).get("is_admin"));
+        assertFalse((boolean) result.get(0).get("isAdmin"));
 
         assertFalse(result.get(1).containsKey("id"));
         assertFalse(result.get(1).containsKey("password"));
         assertFalse(result.get(1).containsKey("email"));
-        assertEquals("test_user2", result.get(1).get("user_name"));
+        assertEquals("test_user2", result.get(1).get("userName"));
         assertEquals(200L, result.get(1).get("reputation"));
-        assertTrue((boolean) result.get(1).get("is_admin"));
+        assertTrue((boolean) result.get(1).get("isAdmin"));
 
         verify(userServiceMock, times(1)).getFollowers("test_user");
     }
@@ -133,16 +133,16 @@ public class AdministrativeFacadeTest {
         assertFalse(result.get(0).containsKey("id"));
         assertFalse(result.get(0).containsKey("password"));
         assertFalse(result.get(0).containsKey("email"));
-        assertEquals("test_user1", result.get(0).get("user_name"));
+        assertEquals("test_user1", result.get(0).get("userName"));
         assertEquals(100L, result.get(0).get("reputation"));
-        assertFalse((boolean) result.get(0).get("is_admin"));
+        assertFalse((boolean) result.get(0).get("isAdmin"));
 
         assertFalse(result.get(1).containsKey("id"));
         assertFalse(result.get(1).containsKey("password"));
         assertFalse(result.get(1).containsKey("email"));
-        assertEquals("test_user2", result.get(1).get("user_name"));
+        assertEquals("test_user2", result.get(1).get("userName"));
         assertEquals(200L, result.get(1).get("reputation"));
-        assertTrue((boolean) result.get(1).get("is_admin"));
+        assertTrue((boolean) result.get(1).get("isAdmin"));
 
         verify(userServiceMock, times(1)).getFollowings("test_user");
     }
