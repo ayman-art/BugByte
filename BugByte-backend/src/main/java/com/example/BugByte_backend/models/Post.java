@@ -11,7 +11,7 @@ public class Post {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "op_id", nullable = false)
+    @JoinColumn(name = "op_name",referencedColumnName = "username", nullable = false)
     private User creator;
 
     @Column(name = "md_content" ,nullable = false)
