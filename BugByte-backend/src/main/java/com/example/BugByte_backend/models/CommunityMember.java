@@ -8,12 +8,12 @@ import java.util.Date;
 public class CommunityMember {
 
     @Id
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "community_id", nullable = false)
     private Community community;
 
     @Id
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private User member;
 

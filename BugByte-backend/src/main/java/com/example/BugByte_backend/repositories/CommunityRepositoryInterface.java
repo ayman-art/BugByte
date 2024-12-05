@@ -1,6 +1,7 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.Community;
+import com.example.BugByte_backend.models.User;
 
 import java.util.List;
 
@@ -22,9 +23,9 @@ public interface CommunityRepositoryInterface {
 
     List<Community> findAllCommunities();
 
-    List<Long> findCommunityMembers(Long communityId);
+    List<Long> findCommunityMembersIds(Long communityId);
 
-    List<Long> findUserCommunities(Long memberId);
+    List<Long> findUserCommunitiesIds(Long memberId);
 
     boolean updateCommunityDescription(Long communityId, String description);
 
@@ -33,4 +34,10 @@ public interface CommunityRepositoryInterface {
     boolean deleteCommunityById(Long communityId);
 
     boolean deleteMemberById(Long memberId, Long communityId);
+
+    List<Community> getUserCommunities(Long userId);
+
+    List<User> getCommunityMembers(Long communityId);
+
+    boolean deleteCommunityMembers(Long communityId);
 }

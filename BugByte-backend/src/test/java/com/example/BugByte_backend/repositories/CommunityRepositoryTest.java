@@ -1,5 +1,4 @@
 package com.example.BugByte_backend.repositories;
-
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.CommunityMember;
 import com.example.BugByte_backend.models.User;
@@ -8,12 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import java.util.Date;
 import java.util.List;
+
+import static graphql.Assert.assertFalse;
 import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,6 +58,23 @@ public class CommunityRepositoryTest {
 
     private static final String SQL_DELETE_COMMUNITY_BY_ID = "DELETE FROM communities WHERE id = ?;";
     private static final String SQL_DELETE_MEMBER_BY_ID = "DELETE FROM community_members WHERE member_id = ? AND community_id=?;";
+    private static final String SQL_FIND_COMMUNITIES_BY_USER_ID = """
+    SELECT *
+    FROM communities c
+    INNER JOIN community_members cm ON c.id = cm.community_id
+    WHERE cm.member_id = ?;
+""";
+    private static final String SQL_FIND_USERS_BY_COMMUNITY_ID = """
+    SELECT * 
+    FROM users u
+    INNER JOIN community_members cm ON u.id = cm.member_id
+    WHERE cm.community_id = ?;
+""";
+    private static final String SQL_DELETE_COMMUNITY_MEMBERS = """
+    DELETE FROM community_members 
+    WHERE community_id = ?;
+""";
+
     private User admin;
     private User member1;
     private User member2;
@@ -95,16 +112,16 @@ public class CommunityRepositoryTest {
 
     @Test
     public void testInsertCommunity_Success() {
-        String name = "testComm";
+        String name = "habob";
         Long adminId = 1L;
-        Date creationDate = new Date();
-        when(jdbcTemplate.update(eq(SQL_INSERT_COMMUNITY), eq(name), eq(adminId), eq(creationDate)))
+        when(jdbcTemplate.update(eq(SQL_INSERT_COMMUNITY), eq(name), eq(adminId), any(Date.class)))
                 .thenReturn(1);
-        when(jdbcTemplate.queryForObject(eq(SQL_FIND_ID_BY_NAME), eq(new Object[]{name}), eq(Long.class)))
-                .thenReturn(12L);
+        when(jdbcTemplate.queryForObject(eq(SQL_FIND_ID_BY_NAME), any(Object[].class), eq(Long.class)))
+                .thenReturn(15L);
         Long result = communityRepository.insertCommunity(name, adminId);
-        assertEquals(Long.valueOf(12L), result);
+        assertEquals(Long.valueOf(15L), result);
     }
+
 
 
     @Test
@@ -274,39 +291,39 @@ public class CommunityRepositoryTest {
     }
 
     @Test
-    public void testFindCommunityMembers_Success() {
+    public void testFindCommunityMembers_Ids_Success() {
         Long communityId = 1L;
         List<Long> mockMemberIds = List.of(1L, 2L, 3L);
 
         when(jdbcTemplate.queryForList(eq(SQL_FIND_COMMUNITY_MEMBERS_ID), eq(new Object[]{communityId}), eq(Long.class)))
                 .thenReturn(mockMemberIds);
 
-        List<Long> result = communityRepository.findCommunityMembers(communityId);
+        List<Long> result = communityRepository.findCommunityMembersIds(communityId);
         assertEquals(mockMemberIds, result);
     }
 
     @Test
-    public void testFindCommunityMembers_Failure_NullId() {
+    public void testFindCommunityMembers_Ids_Failure_NullId() {
         Long communityId = null;
-        assertThrows(NullPointerException.class, () -> communityRepository.findCommunityMembers(communityId));
+        assertThrows(NullPointerException.class, () -> communityRepository.findCommunityMembersIds(communityId));
     }
 
     @Test
-    public void testFindUserCommunities_Success() {
+    public void testFindUserCommunities_Ids_Success() {
         Long userId = 1L;
         List<Long> mockCommunityIds = List.of(1L, 2L, 3L);
 
         when(jdbcTemplate.queryForList(eq(SQL_FIND_USER_COMMUNITIES_ID), eq(new Object[]{userId}), eq(Long.class)))
                 .thenReturn(mockCommunityIds);
 
-        List<Long> result = communityRepository.findUserCommunities(userId);
+        List<Long> result = communityRepository.findUserCommunitiesIds(userId);
         assertEquals(mockCommunityIds, result);
     }
 
     @Test
-    public void testFindUserCommunities_Failure_NullId() {
+    public void testFindUserCommunities_Ids_Failure_NullId() {
         Long userId = null;
-        assertThrows(NullPointerException.class, () -> communityRepository.findUserCommunities(userId));
+        assertThrows(NullPointerException.class, () -> communityRepository.findUserCommunitiesIds(userId));
     }
     @Test
     public void testUpdateCommunityDescription_Success() {
@@ -378,6 +395,91 @@ public class CommunityRepositoryTest {
         Long memberId = null;
         Long communityId = 12L;
         assertThrows(NullPointerException.class, () -> communityRepository.deleteMemberById(memberId, communityId));
+    }
+    @Test
+    public void testGetCommunityMembers_Success() {
+        Long communityId = 12L;
+        List<User> mockUsers = List.of(member1, member2);
+
+        when(jdbcTemplate.query(eq(SQL_FIND_USERS_BY_COMMUNITY_ID), eq(new Object[]{communityId}), any(RowMapper.class)))
+                .thenReturn(mockUsers);
+        List<User> result = communityRepository.getCommunityMembers(communityId);
+        assertEquals(mockUsers.size(), result.size());
+        assertEquals(mockUsers, result);
+    }
+
+    @Test
+    public void testGetCommunityMembers_Failure_NoMembersFound() {
+        Long communityId = 14L;
+
+        when(jdbcTemplate.query(eq(SQL_FIND_USERS_BY_COMMUNITY_ID), eq(new Object[]{communityId}), any(RowMapper.class)))
+                .thenReturn(List.of());
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> communityRepository.getCommunityMembers(communityId));
+        assertEquals("No users found in this community.", exception.getMessage());
+    }
+
+    @Test
+    public void testGetCommunityMembers_Failure_NullCommunityId() {
+        Long communityId = null;
+        assertThrows(NullPointerException.class, () -> communityRepository.getCommunityMembers(communityId));
+    }
+    @Test
+    public void testGetUserCommunities_Success() {
+        Long userId = 2L;
+        List<Community> mockCommunities = List.of(comm, comm2);
+        when(jdbcTemplate.query(eq(SQL_FIND_COMMUNITIES_BY_USER_ID), eq(new Object[]{userId}), any(RowMapper.class)))
+                .thenReturn(mockCommunities);
+        List<Community> result = communityRepository.getUserCommunities(userId);
+        assertEquals(mockCommunities.size(), result.size());
+        assertEquals(mockCommunities, result);
+    }
+
+    @Test
+    public void testGetUserCommunities_Failure_NoCommunitiesFound() {
+        Long userId = 4L;
+        when(jdbcTemplate.query(eq(SQL_FIND_COMMUNITIES_BY_USER_ID), eq(new Object[]{userId}), any(RowMapper.class)))
+                .thenReturn(List.of());
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> communityRepository.getUserCommunities(userId));
+        assertEquals("User is not a member of any communities.", exception.getMessage());
+    }
+
+    @Test
+    public void testGetUserCommunities_Failure_NullUserId() {
+        Long userId = null;
+        assertThrows(NullPointerException.class, () -> communityRepository.getUserCommunities(userId));
+    }
+
+    @Test
+    public void testDeleteCommunityMembers_Success() {
+        Long communityId = 12L;
+
+        when(jdbcTemplate.update(eq(SQL_DELETE_COMMUNITY_MEMBERS), eq(communityId)))
+                .thenReturn(1);
+
+        boolean result = communityRepository.deleteCommunityMembers(communityId);
+        assertTrue(result);
+        verify(jdbcTemplate).update(eq(SQL_DELETE_COMMUNITY_MEMBERS), eq(communityId));
+    }
+
+    @Test
+    public void testDeleteCommunityMembers_Failure_NoRowsAffected() {
+        Long communityId = 12L;
+
+        when(jdbcTemplate.update(eq(SQL_DELETE_COMMUNITY_MEMBERS), eq(communityId)))
+                .thenReturn(0);
+
+        boolean result = communityRepository.deleteCommunityMembers(communityId);
+        assertFalse(result);
+    }
+
+    @Test
+    public void testDeleteCommunityMembers_Failure_NullCommunityId() {
+        Long communityId = null;
+
+        NullPointerException exception = assertThrows(NullPointerException.class,
+                () -> communityRepository.deleteCommunityMembers(communityId));
+
+        assertEquals("communityId or memberId is null", exception.getMessage());
     }
 
 }
