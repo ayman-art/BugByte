@@ -99,7 +99,7 @@ public class PostingRepository implements IPostingRepository{
         if(userName == null)
             throw new NullPointerException("username is null");
         return jdbcTemplate.queryForObject(SQL_GET_POST_BY_USERNAME_AND_TIME,
-                new Object[]{userName , date}, Long.class);
+                new Object[]{date, userName}, Long.class);
     }
 
     @Override
