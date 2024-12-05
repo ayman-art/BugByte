@@ -6,8 +6,9 @@ import jakarta.persistence.*;
 @Table(name="questions")
 public class Question {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @OneToOne
+    @JoinColumn(name = "id" ,nullable = false)
+    private Post post;
 
     @ManyToOne
     @JoinColumn(name = "community_id" ,nullable = false)
@@ -23,20 +24,21 @@ public class Question {
     @JoinColumn(name = "validated_answer" ,nullable = true)
     private Answer validated_answer;
 
-    public Question(Long id, Community community, Long upVotes, Long downVotes, Answer validated_answer) {
-        this.id = id;
+    public Question(Post post, Community community, Long upVotes, Long downVotes, Answer validated_answer) {
+        this.post = post;
         this.community = community;
         this.upVotes = upVotes;
         this.downVotes = downVotes;
         this.validated_answer = validated_answer;
     }
 
-    public Long getId() {
-        return id;
+
+    public Post getPost() {
+        return post;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     public Community getCommunity() {

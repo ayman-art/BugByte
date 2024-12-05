@@ -6,25 +6,26 @@ import jakarta.persistence.*;
 @Table(name="replies")
 public class Reply {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @OneToOne
+    @JoinColumn(name = "id" ,nullable = false)
+    private Post post;
 
 
     @ManyToOne
     @JoinColumn(name = "answer_id", nullable = false)
     private Answer answer;
 
-    public Reply(Long id, Answer answer) {
-        this.id = id;
+    public Reply(Post post, Answer answer) {
+        this.post = post;
         this.answer = answer;
     }
 
-    public Long getId() {
-        return id;
+    public Post getPost() {
+        return post;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     public Answer getAnswer() {

@@ -6,8 +6,9 @@ import jakarta.persistence.*;
 @Table(name="answers")
 public class Answer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @OneToOne
+    @JoinColumn(name = "id" ,nullable = false)
+    private Post post;
 
     @ManyToOne
     @JoinColumn(name = "question_id" ,nullable = false)
@@ -19,19 +20,19 @@ public class Answer {
     @Column(name = "down_votes" ,nullable = false)
     private Long downVotes;
 
-    public Answer(Long id, Question question, Long upVotes, Long downVotes) {
-        this.id = id;
+    public Answer(Post post, Question question, Long upVotes, Long downVotes) {
+        this.post = post;
         this.question = question;
         this.upVotes = upVotes;
         this.downVotes = downVotes;
     }
 
-    public Long getId() {
-        return id;
+    public Post getPost() {
+        return post;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     public Question getQuestion() {
