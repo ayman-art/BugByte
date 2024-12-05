@@ -4,7 +4,6 @@ import com.example.BugByte_backend.models.Answer;
 import com.example.BugByte_backend.models.Post;
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.models.Reply;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
