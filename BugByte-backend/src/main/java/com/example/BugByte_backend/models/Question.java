@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name="questions")
-public class Question {
+public class Question extends Post{
     @Id
     @OneToOne
     @JoinColumn(name = "id" ,nullable = false)
@@ -31,6 +31,8 @@ public class Question {
         this.downVotes = downVotes;
         this.validated_answer = validated_answer;
     }
+    public Question(){}
+
 
 
     public Post getPost() {
