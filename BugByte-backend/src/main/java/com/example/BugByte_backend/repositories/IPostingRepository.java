@@ -31,6 +31,14 @@ public interface IPostingRepository {
 
      Boolean upVoteAnswer(Long AnswerId);
 
+     Boolean removeUpVoteFromAnswer(Long AnswerId);
+
+     Boolean removeDownVoteFromAnswer(Long AnswerId);
+
+     Boolean removeUpVoteFromQuestion(Long questionId);
+
+     Boolean removeDownVoteFromQuestion(Long questionId);
+
      Boolean downVoteAnswer(Long AnswerId);
 
      Boolean verifyAnswer(Long answerId);
@@ -46,5 +54,6 @@ public interface IPostingRepository {
      List<Answer> getAnswersForQuestion(Long questionId);
 
      List<Reply> getRepliesForAnswer(Long answerId);
-     
+
+     List<Question> getQuestionsByCommunity(Long communityId);
 }
