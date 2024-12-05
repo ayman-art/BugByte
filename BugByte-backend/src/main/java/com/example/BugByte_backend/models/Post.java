@@ -12,7 +12,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "op_name",referencedColumnName = "username", nullable = false)
-    private User creator;
+    private User creator = new User();
 
     @Column(name = "md_content" ,nullable = false)
     private String md_content;
@@ -27,11 +27,11 @@ public class Post {
         this.md_content = "";
         this.posted_on = new Date();
     }
-    public Post(Long id ,User creator ,String md_content) {
+    public Post(Long id ,String creator ,String md_content,Date posted_on) {
         this.id = id;
-        this.creator = creator;
+        this.creator.setUserName(creator);
         this.md_content = md_content;
-        this.posted_on = new Date();
+        this.posted_on = posted_on;
     }
     public Post(User creator, String md_content) {
         this.creator = creator;

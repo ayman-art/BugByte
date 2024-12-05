@@ -9,7 +9,9 @@ import java.util.Date;
 import java.util.List;
 
 public interface IPostingRepository {
-     Long insertPost(String md_content , String op_name , Date posted_on);
+     Long insertPost(String md_content , String op_name);
+
+     Long getPostByOpAndTime(String userName, Date date);
 
      Post getPostByID(Long postId);
 
@@ -45,15 +47,15 @@ public interface IPostingRepository {
 
      Boolean editPost(Long postId , String md_content);
 
-     List<Question> getQuestionsByUserName(String userName);
+     List<Question> getQuestionsByUserName(String userName,Integer limit,Integer offset);
 
-     List<Answer> getAnswersByUserName(String userName);
+     List<Answer> getAnswersByUserName(String userName,Integer limit,Integer offset);
 
-     List<Reply> getRepliesByUserName(String userName);
+     List<Reply> getRepliesByUserName(String userName,Integer limit,Integer offset);
 
-     List<Answer> getAnswersForQuestion(Long questionId);
+     List<Answer> getAnswersForQuestion(Long questionId,Integer limit,Integer offset);
 
-     List<Reply> getRepliesForAnswer(Long answerId);
+     List<Reply> getRepliesForAnswer(Long answerId,Integer limit,Integer offset);
 
-     List<Question> getQuestionsByCommunity(Long communityId);
+     List<Question> getQuestionsByCommunity(Long communityId,Integer limit,Integer offset);
 }

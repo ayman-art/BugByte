@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name="questions")
-public class Question extends Post{
+public class Question{
     @Id
     @OneToOne
     @JoinColumn(name = "id" ,nullable = false)
