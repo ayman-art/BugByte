@@ -20,7 +20,7 @@ public class Community {
 
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = false)
-    private User admin;
+    private User admin = new User();
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="creation_date",nullable = false)
@@ -31,14 +31,18 @@ public class Community {
         this.description = description;
         this.admin.setId(adminId);
         this.creationDate = creationDate;
-        this.id = 0L;
     }
     public Community(String name, String description, Long adminId) {
         this.name = name;
         this.description = description;
         this.admin.setId(adminId);
         this.creationDate = new Date();
-        this.id = 0L;
+    }
+    public Community(String name,Long adminId) {
+        this.name = name;
+        this.description = "";
+        this.admin.setId(adminId);
+        this.creationDate = new Date();
     }
 
     public Long getId() {

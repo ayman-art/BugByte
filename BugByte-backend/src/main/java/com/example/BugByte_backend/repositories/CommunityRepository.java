@@ -4,12 +4,10 @@ import com.example.BugByte_backend.models.Community;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.xml.crypto.Data;
 import java.util.Date;
 import java.util.List;
 
 public class CommunityRepository implements CommunityRepositoryInterface{
-
     private static final String SQL_INSERT_COMMUNITY = """
                 INSERT INTO communities
                     (name, description, admin_id, creation_date)
@@ -56,7 +54,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if (name == null || adminId == null)
             throw new NullPointerException("name or adminId is null");
 
-        int rows = jdbcTemplate.update(SQL_INSERT_COMMUNITY, name, adminId);
+        int rows = jdbcTemplate.update(SQL_INSERT_COMMUNITY, name, adminId,new Date());
         if (rows == 0)
             throw new RuntimeException("Invalid input");
           return findIdByName(name);
@@ -81,7 +79,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new NullPointerException("ID is Null");
         Long count = jdbcTemplate.queryForObject(SQL_COUNT_MEMBERS_IN_COMMUNITY, new Object[]{ id }, Long.class);
         if (count == null)
-            throw new RuntimeException("Invalid Input");
+            throw new RuntimeException("Invalid input: COUNT query returned null for community ID: " + id);
         return count;
     }
 
@@ -92,7 +90,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new NullPointerException("ID is Null");
         Long count = jdbcTemplate.queryForObject(SQL_COUNT_USER_COMMUNITIES, new Object[]{ id }, Long.class);
         if (count == null)
-            throw new RuntimeException("Invalid Input");
+            throw new RuntimeException("Invalid input: COUNT query returned null for member ID: " + id);
         return count;
     }
 
@@ -101,17 +99,21 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     {
         if(name==null)
             throw new NullPointerException("Name is Null");
-        return jdbcTemplate.queryForObject(SQL_FIND_ID_BY_NAME, new Object[]{name}, Long.class);
+        Long id =jdbcTemplate.queryForObject(SQL_FIND_ID_BY_NAME, new Object[]{name}, Long.class);
+        if(id== null)
+            throw new RuntimeException("No community with this name: " + name);
+        return id;
     }
+    //////////////////////////////////////////////////////
 
     @Override
-    public Community findIdById(Long id)
+    public Community findCommunityById(Long id)
     {
         if(id==null)
             throw new NullPointerException("id is Null");
         Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{id},Community.class);
         if(com== null)
-            throw new NullPointerException("No community with this id");
+            throw new RuntimeException("No community with this id: " + id);
         return com;
     }
 
@@ -122,7 +124,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new NullPointerException("name is Null");
         Community com= jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, new Object[]{name},Community.class);
         if(com== null)
-            throw new NullPointerException("No community with this name");
+            throw new NullPointerException("No community with this name:");
         return com;
     }
 
@@ -144,14 +146,20 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     public List<Long> findCommunityMembers(Long communityId) {
         if(communityId==null)
             throw new NullPointerException("communityId is null");
-        return jdbcTemplate.queryForList(SQL_FIND_COMMUNITY_MEMBERS_ID, new Object[]{communityId}, Long.class);
+        List<Long> result=jdbcTemplate.queryForList(SQL_FIND_COMMUNITY_MEMBERS_ID, new Object[]{communityId}, Long.class);
+        if(result==null)
+            throw new RuntimeException("No members in this community");
+        return result;
     }
 
     @Override
     public List<Long> findUserCommunities(Long memberId) {
         if(memberId==null)
             throw new NullPointerException("memberId is null");
-        return jdbcTemplate.queryForList(SQL_FIND_USER_COMMUNITIES_ID, new Object[]{memberId}, Long.class);
+        List<Long> result =jdbcTemplate.queryForList(SQL_FIND_USER_COMMUNITIES_ID, new Object[]{memberId}, Long.class);
+        if(result==null)
+            throw new RuntimeException("User is not in any community");
+        return result;
     }
 
     @Override
@@ -172,7 +180,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public boolean deleteCommunityById(Long communityId)
+    public  boolean deleteCommunityById(Long communityId)
     {
         if(communityId==null)
             throw new NullPointerException("communityId is null");

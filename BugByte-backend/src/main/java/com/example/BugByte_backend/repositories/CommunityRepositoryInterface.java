@@ -16,7 +16,7 @@ public interface CommunityRepositoryInterface {
 
     Long findIdByName(String name);
 
-    Community findIdById(Long id);
+    Community findCommunityById(Long id);
 
     Community findCommunityByName(String name);
 
