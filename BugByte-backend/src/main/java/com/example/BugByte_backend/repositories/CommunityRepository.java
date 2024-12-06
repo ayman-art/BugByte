@@ -56,6 +56,18 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     INNER JOIN community_members cm ON u.id = cm.member_id
     WHERE cm.community_id = ?;
 """;
+    private static final String SQL_FIND_COMMUNITIES_NAMES_BY_USER_ID = """
+    SELECT name
+    FROM communities c
+    INNER JOIN community_members cm ON c.id = cm.community_id
+    WHERE cm.member_id = ?;
+""";
+    private static final String SQL_FIND_MEMBERS_NAMES_BY_COMMUNITY_ID = """
+    SELECT user_name
+    FROM users u
+    INNER JOIN community_members cm ON u.id = cm.member_id
+    WHERE cm.community_id = ?;
+""";
     private static final String SQL_DELETE_COMMUNITY_MEMBERS = """
     DELETE FROM community_members 
     WHERE community_id = ?;
@@ -77,8 +89,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 
 
     @Override
-    public Boolean insertMember(Long memberId , Long communityId)
-    {
+    public Boolean insertMember(Long memberId , Long communityId) {
         if (memberId == null || communityId == null)
             throw new NullPointerException("memberId or communityId is null");
 
@@ -89,8 +100,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public Long numberOfCommunityMembers(Long id)
-    {
+    public Long numberOfCommunityMembers(Long id) {
         if(id==null)
             throw new NullPointerException("ID is Null");
         Long count = jdbcTemplate.queryForObject(SQL_COUNT_MEMBERS_IN_COMMUNITY, new Object[]{ id }, Long.class);
@@ -100,8 +110,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public Long numberOfUserCommunities(Long id)
-    {
+    public Long numberOfUserCommunities(Long id) {
         if(id==null)
             throw new NullPointerException("ID is Null");
         Long count = jdbcTemplate.queryForObject(SQL_COUNT_USER_COMMUNITIES, new Object[]{ id }, Long.class);
@@ -111,8 +120,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public Long findIdByName(String name)
-    {
+    public Long findIdByName(String name) {
         if(name==null)
             throw new NullPointerException("Name is Null");
         Long id =jdbcTemplate.queryForObject(SQL_FIND_ID_BY_NAME, new Object[]{name}, Long.class);
@@ -122,8 +130,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public Community findCommunityById(Long id)
-    {
+    public Community findCommunityById(Long id) {
         if(id==null)
             throw new NullPointerException("id is Null");
         Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{id},Community.class);
@@ -133,8 +140,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public Community findCommunityByName(String name)
-    {
+    public Community findCommunityByName(String name) {
         if(name==null)
             throw new NullPointerException("name is Null");
         Community com= jdbcTemplate.queryForObject(SQL_FIND_BY_NAME, new Object[]{name},Community.class);
@@ -186,8 +192,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public boolean updateCommunityName(Long communityId, String newName)
-    {
+    public boolean updateCommunityName(Long communityId, String newName) {
         if(newName==null || communityId==null)
             throw new NullPointerException("newName or communityId is null");
         int rows = jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME, newName, communityId);
@@ -195,8 +200,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public  boolean deleteCommunityById(Long communityId)
-    {
+    public  boolean deleteCommunityById(Long communityId) {
         if(communityId==null)
             throw new NullPointerException("communityId is null");
         boolean i = deleteCommunityMembers(communityId);
@@ -205,8 +209,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public boolean deleteMemberById(Long memberId, Long communityId)
-    {
+    public boolean deleteMemberById(Long memberId, Long communityId) {
         if(memberId==null || communityId==null)
             throw new NullPointerException("memberId or communityId is null");
         int rows = jdbcTemplate.update(SQL_DELETE_MEMBER_BY_ID, memberId, communityId);
@@ -259,6 +262,25 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new RuntimeException("User is not a member of any communities.");
         }
         return communities;
+    }
+    @Override
+    public List<String> getCommunityMembersNames(Long communityId) {
+        if(communityId==null)
+            throw new NullPointerException("memberId is null");
+        List<String> result =jdbcTemplate.queryForList(SQL_FIND_MEMBERS_NAMES_BY_COMMUNITY_ID, new Object[]{communityId}, String.class);
+        if(result.isEmpty())
+            throw new RuntimeException("No users found in this community.");
+        return result;
+    }
+
+    @Override
+    public List<String> getUserCommunitiesNames(Long userId) {
+        if(userId==null)
+            throw new NullPointerException("userId is null");
+        List<String> result =jdbcTemplate.queryForList(SQL_FIND_COMMUNITIES_NAMES_BY_USER_ID, new Object[]{userId}, String.class);
+        if(result.isEmpty())
+            throw new RuntimeException("User is not in any community");
+        return result;
     }
     @Override
     public boolean deleteCommunityMembers(Long communityId) {
