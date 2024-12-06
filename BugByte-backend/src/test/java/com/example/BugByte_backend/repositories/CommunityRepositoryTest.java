@@ -70,6 +70,18 @@ public class CommunityRepositoryTest {
     INNER JOIN community_members cm ON u.id = cm.member_id
     WHERE cm.community_id = ?;
 """;
+    private static final String SQL_FIND_COMMUNITIES_NAMES_BY_USER_ID = """
+    SELECT name
+    FROM communities c
+    INNER JOIN community_members cm ON c.id = cm.community_id
+    WHERE cm.member_id = ?;
+""";
+    private static final String SQL_FIND_MEMBERS_NAMES_BY_COMMUNITY_ID = """
+    SELECT user_name
+    FROM users u
+    INNER JOIN community_members cm ON u.id = cm.member_id
+    WHERE cm.community_id = ?;
+""";
     private static final String SQL_DELETE_COMMUNITY_MEMBERS = """
     DELETE FROM community_members 
     WHERE community_id = ?;
@@ -480,6 +492,26 @@ public class CommunityRepositoryTest {
                 () -> communityRepository.deleteCommunityMembers(communityId));
 
         assertEquals("communityId or memberId is null", exception.getMessage());
+    }
+    @Test
+    public void testGetUserCommunitiesNames_Success() {
+        Long userId = 2L;
+        List<String> mockCommunities = List.of("testComm", "test2Comm");
+        when(jdbcTemplate.queryForList(eq(SQL_FIND_COMMUNITIES_NAMES_BY_USER_ID), eq(new Object[]{userId}), eq(String.class)))
+                .thenReturn(mockCommunities);
+        List<String> result = communityRepository.getUserCommunitiesNames(userId);
+        assertEquals(mockCommunities.size(), result.size());
+        assertEquals(mockCommunities, result);
+    }
+    @Test
+    public void testGetCommunityMembersNames_Success() {
+        Long communityId = 12L;
+        List<String> mockUsers = List.of("admin", "member1","member2");
+        when(jdbcTemplate.queryForList(eq(SQL_FIND_MEMBERS_NAMES_BY_COMMUNITY_ID), eq(new Object[]{communityId}), eq(String.class)))
+                .thenReturn(mockUsers);
+        List<String> result = communityRepository.getCommunityMembersNames(communityId);
+        assertEquals(mockUsers.size(), result.size());
+        assertEquals(mockUsers, result);
     }
 
 }
