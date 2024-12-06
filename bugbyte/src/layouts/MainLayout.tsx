@@ -28,15 +28,15 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
           <center>
             <ul style={styles.links}>
               
-              <aside style={styles.link_option1}>
+              <aside >
                 <li onClick={()=>{navigate('/')}}>Home</li>
               </aside>
 
-              <aside style={styles.link_option2}>
+              <aside>
                 <li onClick={visitProfile}>Profile</li>
               </aside>
               
-              <aside style={styles.link_option3}>
+              <aside>
                 <li onClick={()=>{}}>Communities</li>
               </aside>
 
@@ -96,39 +96,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     paddingTop: '100%', // Adjust this to control the 1:2 centering ratio
     cursor:'pointer',
     userSelect:'none'
-  },
-
-  link_option1: {
-    marginTop: '50px',
-    height: '50px',
-    background: '#7DDDDE',
-    borderRadius: '15px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  
-  link_option2: {
-    marginTop: '50px',
-    height: '50px',
-    background: '#A5CFA1',
-    borderRadius: '15px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-
-  link_option3: {
-    marginTop: '50px',
-    height: '50px',
-    background: '#9EEA65',
-        borderRadius: '15px',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
   },
 
   content: {
