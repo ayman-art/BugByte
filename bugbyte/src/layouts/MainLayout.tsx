@@ -25,11 +25,23 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
       <div style={styles.main}>
         {/* Sidebar Links on Left */}
         <aside style={styles.sidebar}>
-          <ul style={styles.links}>
-            <li onClick={()=>{navigate('/')}}>Home</li>
-            <li onClick={visitProfile}>Profile</li>
-            <li onClick={()=>{}}>Communities</li>
-          </ul>
+          <center>
+            <ul style={styles.links}>
+              
+              <aside style={styles.link_option1}>
+                <li onClick={()=>{navigate('/')}}>Home</li>
+              </aside>
+
+              <aside style={styles.link_option2}>
+                <li onClick={visitProfile}>Profile</li>
+              </aside>
+              
+              <aside style={styles.link_option3}>
+                <li onClick={()=>{}}>Communities</li>
+              </aside>
+
+            </ul>
+          </center>
         </aside>
 
         {/* Page Content in Center */}
@@ -42,12 +54,10 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
   );
 };
 
-// Styles Object
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    height: '100vh',
     backgroundColor: '#f5f5f5', // Page background color
   },
   navbar: {
@@ -65,8 +75,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '0 10%',
   },
   sidebar: {
-    width: '200px',
+    fontSize: '20px',
     backgroundColor: '#f5f5f5', // Same background color as page background
+    marginLeft: '-100px',
+    width: '200px',
     padding: '10px',
     borderRadius: '5px',
     display: 'flex',
@@ -77,7 +89,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   links: {
     listStyle: 'none',
     padding: 0,
-    margin: 0,
+    marginTop: '-50px', 
     display: 'flex',
     flexDirection: 'column', // Stack the links vertically
     gap: '10px',
@@ -85,6 +97,40 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor:'pointer',
     userSelect:'none'
   },
+
+  link_option1: {
+    marginTop: '50px',
+    height: '50px',
+    background: '#7DDDDE',
+    borderRadius: '15px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  
+  link_option2: {
+    marginTop: '50px',
+    height: '50px',
+    background: '#A5CFA1',
+    borderRadius: '15px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+
+  link_option3: {
+    marginTop: '50px',
+    height: '50px',
+    background: '#9EEA65',
+        borderRadius: '15px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+
   content: {
     flex: 1,
     backgroundColor: 'white',
@@ -96,7 +142,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
   },
   emptySpace: {
-    width: '200px',  // You can adjust this width if needed
+    width: '50px',  // You can adjust this width if needed
   },
 };
 
