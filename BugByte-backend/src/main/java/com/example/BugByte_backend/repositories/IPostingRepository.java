@@ -27,21 +27,13 @@ public interface IPostingRepository {
 
      Boolean deleteReply(Long replyId);
 
-     Boolean upVoteQuestion(Long questionId);
+     Boolean upVoteQuestion(Long questionId, Integer value);
 
-     Boolean downVoteQuestion(Long questionId);
+     Boolean downVoteQuestion(Long questionId, Integer value);
 
-     Boolean upVoteAnswer(Long AnswerId);
+     Boolean upVoteAnswer(Long AnswerId, Integer value);
 
-     Boolean removeUpVoteFromAnswer(Long AnswerId);
-
-     Boolean removeDownVoteFromAnswer(Long AnswerId);
-
-     Boolean removeUpVoteFromQuestion(Long questionId);
-
-     Boolean removeDownVoteFromQuestion(Long questionId);
-
-     Boolean downVoteAnswer(Long AnswerId);
+     Boolean downVoteAnswer(Long AnswerId, Integer value);
 
      Boolean verifyAnswer(Long answerId);
 

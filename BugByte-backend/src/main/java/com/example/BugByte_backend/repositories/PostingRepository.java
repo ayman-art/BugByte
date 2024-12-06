@@ -41,21 +41,13 @@ public class PostingRepository implements IPostingRepository{
     private static final String SQL_DELETE_QUESTION_BY_ID = "DELETE FROM questions WHERE id = ?;";
     private static final String SQL_DELETE_ANSWER_BY_ID = "DELETE FROM answers WHERE id = ?;";
     private static final String SQL_DELETE_REPLY_BY_ID = "DELETE FROM replies WHERE id = ?;";
-    private static final String SQL_UPDATE_UP_VOTES_ANSWERS = "UPDATE answers SET up_votes = up_votes + 1" +
+    private static final String SQL_UPDATE_UP_VOTES_ANSWERS = "UPDATE answers SET up_votes = up_votes + ?" +
             "WHERE id = ?";
-    private static final String SQL_REMOVE_UP_VOTES_ANSWERS = "UPDATE answers SET up_votes = up_votes - 1" +
+    private static final String SQL_UPDATE_DOWN_VOTES_ANSWERS = "UPDATE answers SET down_votes = down_votes + ?" +
             "WHERE id = ?";
-    private static final String SQL_REMOVE_DOWN_VOTES_ANSWERS = "UPDATE answers SET down_votes = down_votes - 1" +
+    private static final String SQL_UPDATE_UP_VOTES_QUESTIONS = "UPDATE questions SET up_votes = up_votes + ?" +
             "WHERE id = ?";
-    private static final String SQL_UPDATE_DOWN_VOTES_ANSWERS = "UPDATE answers SET down_votes = down_votes + 1" +
-            "WHERE id = ?";
-    private static final String SQL_UPDATE_UP_VOTES_QUESTIONS = "UPDATE questions SET up_votes = up_votes + 1" +
-            "WHERE id = ?";
-    private static final String SQL_REMOVE_UP_VOTES_QUESTIONS = "UPDATE questions SET up_votes = up_votes - 1" +
-            "WHERE id = ?";
-    private static final String SQL_REMOVE_DOWN_VOTES_QUESTIONS = "UPDATE questions SET down_votes = down_votes - 1" +
-            "WHERE id = ?";
-    private static final String SQL_UPDATE_DOWN_VOTES_QUESTIONS = "UPDATE questions SET down_votes = down_votes + 1" +
+    private static final String SQL_UPDATE_DOWN_VOTES_QUESTIONS = "UPDATE questions SET down_votes = down_votes + ?" +
             "WHERE id = ?";
     private static final String SQL_VERIFY_ANSWER = "UPDATE questions SET validated_answer = ?" +
             "WHERE id = ?";
@@ -106,7 +98,7 @@ public class PostingRepository implements IPostingRepository{
     public Post getPostByID(Long postId) {
         if (postId == null)
             throw new NullPointerException("postId is null");
-        return jdbcTemplate.queryForObject(SQL_GET_POST_BY_ID, postRowMapper,postId);
+        return jdbcTemplate.queryForObject(SQL_GET_POST_BY_ID, new Object[]{postId},Post.class);
     }
 
     @Override
@@ -176,10 +168,10 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean upVoteQuestion(Long questionId) {
+    public Boolean upVoteQuestion(Long questionId, Integer value) {
         if(questionId == null)
             throw new NullPointerException("question id is null");
-        int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_QUESTIONS , questionId);
+        int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_QUESTIONS ,value, questionId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -187,10 +179,10 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean downVoteQuestion(Long questionId) {
+    public Boolean downVoteQuestion(Long questionId, Integer value) {
         if(questionId == null)
             throw new NullPointerException("question id is null");
-        int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_QUESTIONS , questionId);
+        int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_QUESTIONS ,value ,questionId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -198,10 +190,10 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean upVoteAnswer(Long AnswerId) {
+    public Boolean upVoteAnswer(Long AnswerId, Integer value) {
         if(AnswerId == null)
             throw new NullPointerException("answer id is null");
-        int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_ANSWERS , AnswerId);
+        int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_ANSWERS ,value ,AnswerId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -209,54 +201,10 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean removeUpVoteFromAnswer(Long AnswerId) {
+    public Boolean downVoteAnswer(Long AnswerId, Integer value) {
         if(AnswerId == null)
             throw new NullPointerException("answer id is null");
-        int rows = jdbcTemplate.update( SQL_REMOVE_UP_VOTES_ANSWERS , AnswerId);
-
-        if (rows == 0)
-            throw new RuntimeException("Invalid input");
-        return true;
-    }
-
-    @Override
-    public Boolean removeDownVoteFromAnswer(Long AnswerId) {
-        if(AnswerId == null)
-            throw new NullPointerException("answer id is null");
-        int rows = jdbcTemplate.update( SQL_REMOVE_DOWN_VOTES_ANSWERS , AnswerId);
-
-        if (rows == 0)
-            throw new RuntimeException("Invalid input");
-        return true;
-    }
-
-    @Override
-    public Boolean removeUpVoteFromQuestion(Long questionId) {
-        if(questionId == null)
-            throw new NullPointerException("answer id is null");
-        int rows = jdbcTemplate.update( SQL_REMOVE_UP_VOTES_QUESTIONS , questionId);
-
-        if (rows == 0)
-            throw new RuntimeException("Invalid input");
-        return true;
-    }
-
-    @Override
-    public Boolean removeDownVoteFromQuestion(Long questionId) {
-        if(questionId == null)
-            throw new NullPointerException("answer id is null");
-        int rows = jdbcTemplate.update( SQL_REMOVE_DOWN_VOTES_QUESTIONS , questionId);
-
-        if (rows == 0)
-            throw new RuntimeException("Invalid input");
-        return true;
-    }
-
-    @Override
-    public Boolean downVoteAnswer(Long AnswerId) {
-        if(AnswerId == null)
-            throw new NullPointerException("answer id is null");
-        int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS , AnswerId);
+        int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,AnswerId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -314,10 +262,5 @@ public class PostingRepository implements IPostingRepository{
     public List<Question> getQuestionsByCommunity(Long communityId,Integer limit,Integer offset) {
         return null;
     }
-    private final RowMapper<Post> postRowMapper = ((rs, rowNum) -> new Post(
-            rs.getLong("id"),
-            rs.getString("op_name"),
-            rs.getString("md_content"),
-            rs.getDate("posted_on")
-    ));
+
 }
