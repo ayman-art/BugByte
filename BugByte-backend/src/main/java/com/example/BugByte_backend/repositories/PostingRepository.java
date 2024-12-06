@@ -81,7 +81,6 @@ public class PostingRepository implements IPostingRepository{
     private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
 
-    
     @Autowired
     private JdbcTemplate jdbcTemplate ;
     @Override
