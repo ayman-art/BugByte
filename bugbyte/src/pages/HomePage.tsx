@@ -1,12 +1,12 @@
 import React from 'react';
 
 import CommunityPost from '../layouts/questionLayout';
+import { Container } from 'lucide-react';
 
 const HomePage: React.FC = () => {
     return (
             
-            <div>
-
+            <div style={styles.container}>
                 <div>
                 <CommunityPost 
                     postId="123"
@@ -43,5 +43,11 @@ const HomePage: React.FC = () => {
 
       );
 };
+
+const styles: { [key: string]: React.CSSProperties } = {
+    container: {
+        marginLeft: '80px'
+    }
+}
 
 export default HomePage;
