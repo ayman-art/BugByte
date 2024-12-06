@@ -25,11 +25,9 @@ public class PostingRepositoryPostTest {
     private static final String SQL_GET_POST_BY_ID = "SELECT * FROM posts WHERE id = ?;";
     private static final String SQL_GET_POST_BY_USERNAME_AND_TIME = "SELECT id FROM posts " +
             "WHERE posted_on = ? AND op_name = ?;";
+    private static final String SQL_EDIT_POST = "UPDATE posts SET md_content = ? WHERE ID = ?;";
     @Mock
     private JdbcTemplate jdbcTemplate;
-
-    @Mock
-    private PostingRepository postingRepositoryMock;
 
     @InjectMocks
     private PostingRepository postingRepository;
@@ -106,8 +104,30 @@ public class PostingRepositoryPostTest {
             exception = e;
         }
 
-        // Assert that a NullPointerException is thrown
         assertEquals(NullPointerException.class, exception.getClass());
         assertEquals("postId is null", exception.getMessage());
+    }
+    @Test
+    public void testEditPost_validInput() {
+        Long postId = 1L;
+        String md_content = "Updated content";
+        when(jdbcTemplate.update(eq(SQL_EDIT_POST), eq(postId)))
+                .thenReturn(1);
+
+        Boolean result = postingRepository.editPost(postId, md_content);
+        assertEquals(result , true);
+    }
+
+    @Test
+    public void testEditPost_nullPostId() {
+        Exception exception = null;
+
+        try {
+            postingRepository.editPost(null, "Some content");
+        } catch (Exception e) {
+            exception = e;
+        }
+        assertEquals(NullPointerException.class, exception.getClass());
+        assertEquals("post id is null", exception.getMessage());
     }
 }
