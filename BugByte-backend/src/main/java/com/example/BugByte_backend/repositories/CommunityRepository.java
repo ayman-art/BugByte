@@ -56,6 +56,18 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     INNER JOIN community_members cm ON u.id = cm.member_id
     WHERE cm.community_id = ?;
 """;
+    private static final String SQL_FIND_COMMUNITIES_NAMES_BY_USER_ID = """
+    SELECT name
+    FROM communities c
+    INNER JOIN community_members cm ON c.id = cm.community_id
+    WHERE cm.member_id = ?;
+""";
+    private static final String SQL_FIND_MEMBERS_NAMES_BY_COMMUNITY_ID = """
+    SELECT user_name
+    FROM users u
+    INNER JOIN community_members cm ON u.id = cm.member_id
+    WHERE cm.community_id = ?;
+""";
     private static final String SQL_DELETE_COMMUNITY_MEMBERS = """
     DELETE FROM community_members 
     WHERE community_id = ?;
@@ -250,6 +262,25 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new RuntimeException("User is not a member of any communities.");
         }
         return communities;
+    }
+    @Override
+    public List<String> getCommunityMembersNames(Long communityId) {
+        if(communityId==null)
+            throw new NullPointerException("memberId is null");
+        List<String> result =jdbcTemplate.queryForList(SQL_FIND_MEMBERS_NAMES_BY_COMMUNITY_ID, new Object[]{communityId}, String.class);
+        if(result.isEmpty())
+            throw new RuntimeException("No users found in this community.");
+        return result;
+    }
+
+    @Override
+    public List<String> getUserCommunitiesNames(Long userId) {
+        if(userId==null)
+            throw new NullPointerException("userId is null");
+        List<String> result =jdbcTemplate.queryForList(SQL_FIND_COMMUNITIES_NAMES_BY_USER_ID, new Object[]{userId}, String.class);
+        if(result.isEmpty())
+            throw new RuntimeException("User is not in any community");
+        return result;
     }
     @Override
     public boolean deleteCommunityMembers(Long communityId) {

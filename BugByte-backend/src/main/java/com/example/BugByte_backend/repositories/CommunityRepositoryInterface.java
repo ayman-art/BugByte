@@ -39,5 +39,9 @@ public interface CommunityRepositoryInterface {
 
     List<User> getCommunityMembers(Long communityId);
 
+    List<String> getCommunityMembersNames(Long communityId);
+
+    List<String> getUserCommunitiesNames(Long userId);
+
     boolean deleteCommunityMembers(Long communityId);
 }
