@@ -12,7 +12,7 @@ public class Answer {
 
     @ManyToOne
     @JoinColumn(name = "question_id" ,nullable = false)
-    private Question question;
+    private Question question = new Question();
 
     @Column(name = "up_votes" ,nullable = false)
     private Long upVotes;
@@ -20,9 +20,16 @@ public class Answer {
     @Column(name = "down_votes" ,nullable = false)
     private Long downVotes;
 
-    public Answer(Post post, Question question, Long upVotes, Long downVotes) {
+    public Answer(){
+        this.post = new Post();
+        this.question = new Question();
+        this.upVotes = 0L;
+        this.downVotes = 0L;
+    }
+
+    public Answer(Post post, Long question, Long upVotes, Long downVotes) {
         this.post = post;
-        this.question = question;
+        this.question.getPost().setId(question);
         this.upVotes = upVotes;
         this.downVotes = downVotes;
     }

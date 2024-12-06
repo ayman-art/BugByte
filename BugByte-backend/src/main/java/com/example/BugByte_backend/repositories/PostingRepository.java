@@ -43,37 +43,47 @@ public class PostingRepository implements IPostingRepository{
     private static final String SQL_DELETE_REPLY_BY_ID = "DELETE FROM replies WHERE id = ?;";
     private static final String SQL_UPDATE_UP_VOTES_ANSWERS = "UPDATE answers SET up_votes = up_votes + ?" +
             "WHERE id = ?";
-    private static final String SQL_UPDATE_DOWN_VOTES_ANSWERS = "UPDATE answers SET down_votes = down_votes + ?" +
+    private static final String SQL_UPDATE_DOWN_VOTES_ANSWERS = "UPDATE answers SET down_votes = down_votes + ? " +
             "WHERE id = ?";
-    private static final String SQL_UPDATE_UP_VOTES_QUESTIONS = "UPDATE questions SET up_votes = up_votes + ?" +
+    private static final String SQL_UPDATE_UP_VOTES_QUESTIONS = "UPDATE questions SET up_votes = up_votes + ? " +
             "WHERE id = ?";
-    private static final String SQL_UPDATE_DOWN_VOTES_QUESTIONS = "UPDATE questions SET down_votes = down_votes + ?" +
+    private static final String SQL_UPDATE_DOWN_VOTES_QUESTIONS = "UPDATE questions SET down_votes = down_votes + ? " +
             "WHERE id = ?";
     private static final String SQL_VERIFY_ANSWER = "UPDATE questions SET validated_answer = ?" +
             "WHERE id = ?";
     private static final String SQL_EDIT_POST = "UPDATE posts SET md_content = ? WHERE ID = ?;";
 
     private static final String SQL_GET_QUESTIONS_BY_USERNAME = "SELECT * FROM questions q " +
-            "LEFT JOIN posts p on p.id = q.id WHERE p.op_name = ? ORDER BY p.posted_on DESC" +
+            "LEFT JOIN posts p on p.id = q.id WHERE p.op_name = ? ORDER BY p.posted_on DESC " +
             "LIMIT ? OFFSET ?;";
     private static final String SQL_GET_ANSWERS_BY_USERNAME = "SELECT * FROM answers a " +
-            "LEFT JOIN posts p on p.id = a.id WHERE p.op_name = ? ORDER BY p.posted_on DESC" +
+            "LEFT JOIN posts p on p.id = a.id WHERE p.op_name = ? ORDER BY p.posted_on DESC " +
             "LIMIT ? OFFSET ?;";
     private static final String SQL_GET_REPLIES_BY_USERNAME = "SELECT * FROM replies r " +
-            "LEFT JOIN posts p on p.id = r.id WHERE p.op_name = ? ORDER BY p.posted_on DESC" +
+            "LEFT JOIN posts p on p.id = r.id WHERE p.op_name = ? ORDER BY p.posted_on DESC " +
             "LIMIT ? OFFSET ?;";
     private static final String SQL_GET_ANSWERS_FOR_QUESTION = "SELECT * FROM answers a " +
-            "LEFT JOIN posts p on p.id = a.id WHERE a.question_id = ? ORDER BY p.posted_on DESC" +
+            "LEFT JOIN posts p on p.id = a.id WHERE a.question_id = ? ORDER BY p.posted_on DESC " +
             "LIMIT ? OFFSET ?;";
     private static final String SQL_GET_REPLIES_FOR_ANSWER = "SELECT * FROM replies r " +
-            "LEFT JOIN posts p on p.id = r.id WHERE r.answer_id = ? ORDER BY p.posted_on DESC" +
+            "LEFT JOIN posts p on p.id = r.id WHERE r.answer_id = ? ORDER BY p.posted_on DESC " +
             "LIMIT ? OFFSET ?;";
     private static final String SQL_GET_QUESTIONS_BY_COMMUNITY = "SELECT * FROM questions q " +
-            "LEFT JOIN posts p on p.id = q.id WHERE q.community_id = ? ORDER BY p.posted_on DESC" +
+            "LEFT JOIN posts p on p.id = q.id WHERE q.community_id = ? ORDER BY p.posted_on DESC " +
             "LIMIT ? OFFSET ?;";
+    private static final String SQL_GET_QUESTION_BY_ID = "SELECT * FROM questions q " +
+            "LEFT JOIN posts p on p.id = q.id WHERE q.id = ?;";
+    private static final String SQL_GET_ANSWER_BY_ID = "SELECT * FROM answers a " +
+            "LEFT JOIN posts p on p.id = a.id WHERE a.id = ?;";
+    private static final String SQL_GET_REPLY_BY_ID = "SELECT * FROM replies r " +
+            "LEFT JOIN posts p on p.id = r.id WHERE r.id = ?;";
+    private static final String SQL_DELETE_ANSWERS_BY_QUESTION_ID = "DELETE FROM answers WHERE question_id = ?;";
+    private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
+    private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
 
+    
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate ;
     @Override
     public Long insertPost(String md_content, String op_name) {
         if(op_name == null)
@@ -98,7 +108,7 @@ public class PostingRepository implements IPostingRepository{
     public Post getPostByID(Long postId) {
         if (postId == null)
             throw new NullPointerException("postId is null");
-        return jdbcTemplate.queryForObject(SQL_GET_POST_BY_ID, new Object[]{postId},Post.class);
+        return jdbcTemplate.queryForObject(SQL_GET_POST_BY_ID, new Object[]{postId},postRowMapper);
     }
 
     @Override
@@ -138,10 +148,12 @@ public class PostingRepository implements IPostingRepository{
     public Boolean deleteQuestion(Long questionId) {
         if(questionId == null)
             throw new NullPointerException("question id is null");
+        jdbcTemplate.update(SQL_DELETE_ANSWERS_BY_QUESTION_ID, questionId);
         int rows = jdbcTemplate.update( SQL_DELETE_QUESTION_BY_ID , questionId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
+        jdbcTemplate.update(SQL_DELETE_POST_BY_ID, questionId);
         return true;
     }
 
@@ -149,10 +161,12 @@ public class PostingRepository implements IPostingRepository{
     public Boolean deleteAnswer(Long answerId) {
         if(answerId == null)
             throw new NullPointerException("answer id is null");
+        jdbcTemplate.update(SQL_DELETE_REPLIES_BY_ANSWER_ID, answerId);
         int rows = jdbcTemplate.update( SQL_DELETE_ANSWER_BY_ID , answerId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
+        jdbcTemplate.update(SQL_DELETE_POST_BY_ID, answerId);
         return true;
     }
 
@@ -164,6 +178,7 @@ public class PostingRepository implements IPostingRepository{
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
+        jdbcTemplate.update(SQL_DELETE_POST_BY_ID, replyId);
         return true;
     }
 
@@ -235,32 +250,116 @@ public class PostingRepository implements IPostingRepository{
 
     @Override
     public List<Question> getQuestionsByUserName(String userName,Integer limit,Integer offset) {
-        return null;
+        if(userName == null)
+            throw new NullPointerException("username is null");
+        return jdbcTemplate.query(SQL_GET_QUESTIONS_BY_USERNAME,new Object[]{userName, limit, offset},questionRowMapper);
     }
 
     @Override
     public List<Answer> getAnswersByUserName(String userName,Integer limit,Integer offset) {
-        return null;
+        if(userName == null)
+            throw new NullPointerException("username is null");
+        return jdbcTemplate.query(SQL_GET_ANSWERS_BY_USERNAME,new Object[]{userName, limit, offset},answerRowMapper);
     }
 
     @Override
     public List<Reply> getRepliesByUserName(String userName,Integer limit,Integer offset) {
-        return null;
+        if(userName == null)
+            throw new NullPointerException("username is null");
+        return jdbcTemplate.query(SQL_GET_REPLIES_BY_USERNAME,new Object[]{userName, limit, offset},replyRowMapper);
     }
 
     @Override
     public List<Answer> getAnswersForQuestion(Long questionId,Integer limit,Integer offset) {
-        return null;
+        if(questionId == null)
+            throw new NullPointerException("username is null");
+        return jdbcTemplate.query(SQL_GET_ANSWERS_FOR_QUESTION,new Object[]{questionId, limit, offset},answerRowMapper);
     }
 
     @Override
     public List<Reply> getRepliesForAnswer(Long answerId,Integer limit,Integer offset) {
-        return null;
+        if(answerId == null)
+            throw new NullPointerException("username is null");
+        return jdbcTemplate.query(SQL_GET_REPLIES_FOR_ANSWER,new Object[]{answerId, limit, offset},replyRowMapper);
     }
 
     @Override
     public List<Question> getQuestionsByCommunity(Long communityId,Integer limit,Integer offset) {
-        return null;
+        if(communityId == null)
+            throw new NullPointerException("username is null");
+        return jdbcTemplate.query(SQL_GET_QUESTIONS_BY_COMMUNITY,new Object[]{communityId, limit, offset},questionRowMapper);
     }
 
+    @Override
+    public Question getQuestionById(Long questionId) {
+        if (questionId == null)
+            throw new NullPointerException("questionId is null");
+        return jdbcTemplate.queryForObject(SQL_GET_QUESTION_BY_ID, new Object[]{questionId}, questionRowMapper);
+    }
+
+    @Override
+    public Answer getAnswerById(Long answerId) {
+        if (answerId == null)
+            throw new NullPointerException("questionId is null");
+        return jdbcTemplate.queryForObject(SQL_GET_ANSWER_BY_ID, new Object[]{answerId}, answerRowMapper);
+    }
+
+    @Override
+    public Reply getReplyById(Long replyId) {
+        if (replyId == null)
+            throw new NullPointerException("questionId is null");
+        return jdbcTemplate.queryForObject(SQL_GET_REPLY_BY_ID, new Object[]{replyId}, replyRowMapper);
+    }
+
+    private final RowMapper<Question> questionRowMapper = ((rs, rowNum) -> {
+        Post post = new Post(
+                rs.getLong("id"),
+                rs.getString("op_name"),
+                rs.getString("md_content"),
+                new Date(rs.getDate("posted_on").getTime())
+        );
+        Answer answer = new Answer();
+        answer.getPost().setId(rs.getLong("validated_answer"));
+        Question question = new Question(
+                post,
+                rs.getLong("community_id"),
+                rs.getLong("up_votes"),
+                rs.getLong("down_votes")
+        );
+        question.setValidated_answer(answer);
+        return question;
+    });
+    private final RowMapper<Answer> answerRowMapper = ((rs, rowNum) -> {
+        Post post = new Post(
+                rs.getLong("id"),
+                rs.getString("op_name"),
+                rs.getString("md_content"),
+                new Date(rs.getDate("posted_on").getTime())
+        );
+       return new Answer(
+                post,
+                rs.getLong("question_id"),
+                rs.getLong("up_votes"),
+                rs.getLong("down_votes")
+
+        );
+    });
+    private final RowMapper<Reply> replyRowMapper = ((rs, rowNum) -> {
+        Post post = new Post(
+                rs.getLong("id"),
+                rs.getString("op_name"),
+                rs.getString("md_content"),
+                new Date(rs.getDate("posted_on").getTime())
+        );
+        return new Reply(
+                post,
+                rs.getLong("answer_id")
+        );
+    });
+    private final RowMapper<Post> postRowMapper = ((rs, rowNum) -> new Post(
+            rs.getLong("id"),
+            rs.getString("op_name"),
+            rs.getString("md_content"),
+            new Date(rs.getDate("posted_on").getTime())
+    ));
 }

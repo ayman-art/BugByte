@@ -50,4 +50,10 @@ public interface IPostingRepository {
      List<Reply> getRepliesForAnswer(Long answerId,Integer limit,Integer offset);
 
      List<Question> getQuestionsByCommunity(Long communityId,Integer limit,Integer offset);
+
+     Question getQuestionById(Long questionId);
+
+     Answer getAnswerById(Long answerId);
+
+     Reply getReplyById(Long replyId);
 }

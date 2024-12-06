@@ -43,6 +43,12 @@ public class Community {
         this.admin.setId(adminId);
         this.creationDate = new Date();
     }
+    public Community(){
+        this.name = "";
+        this.description = "";
+        this.admin.setId(0L);
+        this.creationDate = new Date();
+    }
 
     public Long getId() {
         return id;
