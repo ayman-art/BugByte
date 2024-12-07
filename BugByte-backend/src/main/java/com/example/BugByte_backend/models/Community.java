@@ -1,6 +1,8 @@
 package com.example.BugByte_backend.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Entity
 @Table(name="communities")
+@Getter
+@Setter
 public class Community {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +33,6 @@ public class Community {
     @Column(name="creation_date",nullable = false)
     private Date creationDate;
 
-
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityMember> communityMembers;
 
@@ -40,6 +43,7 @@ public class Community {
         this.creationDate = creationDate;
         this.id = 0L;
     }
+
     public Community(String name, String description, Long adminId) {
         this.name = name;
         this.description = description;
@@ -47,57 +51,19 @@ public class Community {
         this.creationDate = new Date();
         this.id = 0L;
     }
+
     public Community(String name,Long adminId) {
         this.name = name;
         this.description = "";
         this.admin.setId(adminId);
         this.creationDate = new Date();
     }
+
     public Community(){
         this.name = "";
         this.description = "";
         this.admin.setId(0L);
         this.creationDate = new Date();
         this.id = 0L;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getAdminId() {
-        return admin.getId();
-    }
-
-    public void setAdminId(Long adminId) {
-        this.admin.setId(adminId);
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
     }
 }
