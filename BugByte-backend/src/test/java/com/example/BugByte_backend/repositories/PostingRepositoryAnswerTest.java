@@ -28,20 +28,42 @@ public class PostingRepositoryAnswerTest {
                     (?, ?, 0, 0);
             """;
     private static final String SQL_DELETE_ANSWER_BY_ID = "DELETE FROM answers WHERE id = ?;";
-    private static final String SQL_UPDATE_UP_VOTES_ANSWERS = "UPDATE answers SET up_votes = up_votes + ?" +
-            "WHERE id = ?";
-    private static final String SQL_UPDATE_DOWN_VOTES_ANSWERS = "UPDATE answers SET down_votes = down_votes + ? " +
-            "WHERE id = ?";
-    private static final String SQL_GET_ANSWERS_BY_USERNAME = "SELECT * FROM answers a " +
-            "LEFT JOIN posts p on p.id = a.id WHERE p.op_name = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_ANSWERS_FOR_QUESTION = "SELECT * FROM answers a " +
-            "LEFT JOIN posts p on p.id = a.id WHERE a.question_id = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_ANSWER_BY_ID = "SELECT * FROM answers a " +
-            "LEFT JOIN posts p on p.id = a.id WHERE a.id = ?;";
+    private static final String SQL_UPDATE_UP_VOTES_ANSWERS = """
+                UPDATE answers
+                SET up_votes = up_votes + ?
+                WHERE id = ?;
+            """;
+    private static final String SQL_UPDATE_DOWN_VOTES_ANSWERS = """
+                UPDATE answers
+                SET down_votes = down_votes + ?
+                WHERE id = ?;
+            """;
+    private static final String SQL_GET_ANSWERS_BY_USERNAME = """
+                SELECT *
+                FROM answers a
+                JOIN posts p on p.id = a.id
+                WHERE p.op_name = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+    private static final String SQL_GET_ANSWERS_FOR_QUESTION = """
+                SELECT *
+                FROM answers a
+                JOIN posts p on p.id = a.id
+                WHERE a.question_id = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ? OFFSET ?;
+            """;
+    private static final String SQL_GET_ANSWER_BY_ID = """
+                SELECT *
+                FROM answers a
+                JOIN posts p on p.id = a.id
+                WHERE a.id = ?;
+            """;
     private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
+
     @Mock
     private JdbcTemplate jdbcTemplate ;
     @InjectMocks
@@ -149,7 +171,7 @@ public class PostingRepositoryAnswerTest {
             exception = e;
         }
         assertEquals(NullPointerException.class, exception.getClass());
-        assertEquals("answer id is null", exception.getMessage());
+        assertEquals("answer id or value is null", exception.getMessage());
     }
 
     @Test
@@ -172,7 +194,7 @@ public class PostingRepositoryAnswerTest {
             exception = e;
         }
         assertEquals(NullPointerException.class, exception.getClass());
-        assertEquals("answer id is null", exception.getMessage());
+        assertEquals("answer id or value is null", exception.getMessage());
     }
     @Test
     public void testGetAnswersByUserName_validInput() {

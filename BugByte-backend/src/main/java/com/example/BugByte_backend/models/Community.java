@@ -32,7 +32,7 @@ public class Community {
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityMember> communityMembers;
-2
+
     public Community(String name, String description, Long adminId, Date creationDate) {
         this.name = name;
         this.description = description;
@@ -44,7 +44,7 @@ public class Community {
         this.name = name;
         this.description = description;
         this.admin.setId(adminId);
-        this.creationDate = new Date();=
+        this.creationDate = new Date();
         this.id = 0L;
     }
     public Community(String name,Long adminId) {

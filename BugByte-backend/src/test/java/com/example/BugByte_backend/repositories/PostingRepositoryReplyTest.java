@@ -28,16 +28,32 @@ public class PostingRepositoryReplyTest {
                     (?, ?);
             """;
     private static final String SQL_DELETE_REPLY_BY_ID = "DELETE FROM replies WHERE id = ?;";
-    private static final String SQL_GET_REPLIES_BY_USERNAME = "SELECT * FROM replies r " +
-            "LEFT JOIN posts p on p.id = r.id WHERE p.op_name = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_REPLIES_FOR_ANSWER = "SELECT * FROM replies r " +
-            "LEFT JOIN posts p on p.id = r.id WHERE r.answer_id = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_REPLY_BY_ID = "SELECT * FROM replies r " +
-            "LEFT JOIN posts p on p.id = r.id WHERE r.id = ?;";
-    private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
+    private static final String SQL_GET_REPLIES_BY_USERNAME = """
+                SELECT *
+                FROM replies r
+                JOIN posts p on p.id = r.id
+                WHERE p.op_name = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+    private static final String SQL_GET_REPLIES_FOR_ANSWER = """
+                SELECT *
+                FROM replies r
+                JOIN posts p on p.id = r.id
+                WHERE r.answer_id = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+    private static final String SQL_GET_REPLY_BY_ID = """
+                SELECT *
+                FROM replies r
+                JOIN posts p on p.id = r.id
+                WHERE r.id = ?;
+            """;
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
+
     @Mock
     private JdbcTemplate jdbcTemplate;
 

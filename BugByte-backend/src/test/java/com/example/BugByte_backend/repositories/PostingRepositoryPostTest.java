@@ -23,8 +23,10 @@ public class PostingRepositoryPostTest {
                     (?, ?, ?);
             """;
     private static final String SQL_GET_POST_BY_ID = "SELECT * FROM posts WHERE id = ?;";
-    private static final String SQL_GET_POST_BY_USERNAME_AND_TIME = "SELECT id FROM posts " +
-            "WHERE posted_on = ? AND op_name = ?;";
+    private static final String SQL_GET_POST_BY_USERNAME_AND_TIME = """
+                SELECT id FROM posts
+                "WHERE posted_on = ? AND op_name = ?;
+            """;
     private static final String SQL_EDIT_POST = "UPDATE posts SET md_content = ? WHERE ID = ?;";
     @Mock
     private JdbcTemplate jdbcTemplate;
@@ -55,7 +57,7 @@ public class PostingRepositoryPostTest {
             postingRepository.insertPost(md_content, op_name);
         });
 
-        assertEquals("username is null", exception.getMessage());
+        assertEquals("md content or username is null", exception.getMessage());
     }
     @Test
     public void testGetPostByOpAndTime_validInput() {
@@ -79,7 +81,7 @@ public class PostingRepositoryPostTest {
         NullPointerException exception = assertThrows(NullPointerException.class, () -> {
             postingRepository.getPostByOpAndTime(null,date);
         });
-        assertEquals("username is null", exception.getMessage());
+        assertEquals("username or date is null", exception.getMessage());
     }
     @Test
     public void testGetPostByID_validInput() {
@@ -128,6 +130,6 @@ public class PostingRepositoryPostTest {
             exception = e;
         }
         assertEquals(NullPointerException.class, exception.getClass());
-        assertEquals("post id is null", exception.getMessage());
+        assertEquals("post id or md content is null", exception.getMessage());
     }
 }
