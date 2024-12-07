@@ -148,11 +148,12 @@ public class PostingRepository implements IPostingRepository{
     @Autowired
     private JdbcTemplate jdbcTemplate ;
     @Override
-    public Long insertPost(String md_content, String op_name) {
-        if(op_name == null)
-            throw new NullPointerException("username is null");
+    public Long insertPost(String mdContent, String op_name) {
+        if (mdContent == null || op_name == null)
+            throw new NullPointerException("md content or username is null");
+
         Date date = new Date();
-        int rows = jdbcTemplate.update(SQL_INSERT_POST, op_name, md_content, date);
+        int rows = jdbcTemplate.update(SQL_INSERT_POST, op_name, mdContent, date);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -161,8 +162,9 @@ public class PostingRepository implements IPostingRepository{
 
     @Override
     public Long getPostByOpAndTime(String userName, Date date) {
-        if(userName == null)
-            throw new NullPointerException("username is null");
+        if(userName == null || date == null)
+            throw new NullPointerException("username or date is null");
+
         return jdbcTemplate.queryForObject(SQL_GET_POST_BY_USERNAME_AND_TIME,
                 new Object[]{date, userName}, Long.class);
     }
@@ -247,8 +249,9 @@ public class PostingRepository implements IPostingRepository{
 
     @Override
     public Boolean upVoteQuestion(Long questionId, Integer value) {
-        if(questionId == null)
-            throw new NullPointerException("question id is null");
+        if (questionId == null || value == null)
+            throw new NullPointerException("question id or value is null");
+
         int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_QUESTIONS ,value, questionId);
 
         if (rows == 0)
@@ -258,8 +261,9 @@ public class PostingRepository implements IPostingRepository{
 
     @Override
     public Boolean downVoteQuestion(Long questionId, Integer value) {
-        if(questionId == null)
-            throw new NullPointerException("question id is null");
+        if(questionId == null || value == null)
+            throw new NullPointerException("question id or value is null");
+
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_QUESTIONS ,value ,questionId);
 
         if (rows == 0)
@@ -268,10 +272,11 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean upVoteAnswer(Long AnswerId, Integer value) {
-        if(AnswerId == null)
-            throw new NullPointerException("answer id is null");
-        int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_ANSWERS ,value ,AnswerId);
+    public Boolean upVoteAnswer(Long answerId, Integer value) {
+        if (answerId == null)
+            throw new NullPointerException("answer id or value is null");
+
+        int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_ANSWERS ,value ,answerId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -279,10 +284,11 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean downVoteAnswer(Long AnswerId, Integer value) {
-        if(AnswerId == null)
-            throw new NullPointerException("answer id is null");
-        int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,AnswerId);
+    public Boolean downVoteAnswer(Long answerId, Integer value) {
+        if (answerId == null)
+            throw new NullPointerException("answer id or value is null");
+
+        int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,answerId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -293,6 +299,7 @@ public class PostingRepository implements IPostingRepository{
     public Boolean verifyAnswer(Long answerId) {
         if(answerId == null)
             throw new NullPointerException("answer id is null");
+
         int rows = jdbcTemplate.update( SQL_VERIFY_ANSWER, answerId);
 
         if (rows == 0)
@@ -301,9 +308,9 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean editPost(Long postId, String md_content) {
-        if(postId == null)
-            throw new NullPointerException("post id is null");
+    public Boolean editPost(Long postId, String mdContent) {
+        if (postId == null || mdContent == null)
+            throw new NullPointerException("post id or md content is null");
         int rows = jdbcTemplate.update( SQL_EDIT_POST, postId);
 
         if (rows == 0)
@@ -312,42 +319,42 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public List<Question> getQuestionsByUserName(String userName,Integer limit,Integer offset) {
+    public List<Question> getQuestionsByUserName(String userName, Integer limit, Integer offset) {
         if(userName == null)
             throw new NullPointerException("username is null");
         return jdbcTemplate.query(SQL_GET_QUESTIONS_BY_USERNAME,new Object[]{userName, limit, offset},questionRowMapper);
     }
 
     @Override
-    public List<Answer> getAnswersByUserName(String userName,Integer limit,Integer offset) {
+    public List<Answer> getAnswersByUserName(String userName, Integer limit, Integer offset) {
         if(userName == null)
             throw new NullPointerException("username is null");
         return jdbcTemplate.query(SQL_GET_ANSWERS_BY_USERNAME,new Object[]{userName, limit, offset},answerRowMapper);
     }
 
     @Override
-    public List<Reply> getRepliesByUserName(String userName,Integer limit,Integer offset) {
+    public List<Reply> getRepliesByUserName(String userName, Integer limit, Integer offset) {
         if(userName == null)
             throw new NullPointerException("username is null");
         return jdbcTemplate.query(SQL_GET_REPLIES_BY_USERNAME,new Object[]{userName, limit, offset},replyRowMapper);
     }
 
     @Override
-    public List<Answer> getAnswersForQuestion(Long questionId,Integer limit,Integer offset) {
+    public List<Answer> getAnswersForQuestion(Long questionId, Integer limit, Integer offset) {
         if(questionId == null)
             throw new NullPointerException("username is null");
         return jdbcTemplate.query(SQL_GET_ANSWERS_FOR_QUESTION,new Object[]{questionId, limit, offset},answerRowMapper);
     }
 
     @Override
-    public List<Reply> getRepliesForAnswer(Long answerId,Integer limit,Integer offset) {
+    public List<Reply> getRepliesForAnswer(Long answerId, Integer limit, Integer offset) {
         if(answerId == null)
             throw new NullPointerException("username is null");
         return jdbcTemplate.query(SQL_GET_REPLIES_FOR_ANSWER,new Object[]{answerId, limit, offset},replyRowMapper);
     }
 
     @Override
-    public List<Question> getQuestionsByCommunity(Long communityId,Integer limit,Integer offset) {
+    public List<Question> getQuestionsByCommunity(Long communityId, Integer limit, Integer offset) {
         if(communityId == null)
             throw new NullPointerException("username is null");
         return jdbcTemplate.query(SQL_GET_QUESTIONS_BY_COMMUNITY,new Object[]{communityId, limit, offset},questionRowMapper);
