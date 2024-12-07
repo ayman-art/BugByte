@@ -1,15 +1,18 @@
 package com.example.BugByte_backend.models;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Entity
 @Table(name="replies")
+@Getter
+@Setter
 public class Reply {
     @Id
     @OneToOne
     @JoinColumn(name = "id" ,nullable = false)
     private Post post;
-
 
     @ManyToOne
     @JoinColumn(name = "answer_id", nullable = false)
@@ -19,21 +22,5 @@ public class Reply {
         this.post = post;
         this.answer = new Answer();
         this.answer.getPost().setId(answer);
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public Answer getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(Answer answer) {
-        this.answer = answer;
     }
 }

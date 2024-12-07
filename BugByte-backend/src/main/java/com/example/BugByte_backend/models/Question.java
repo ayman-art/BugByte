@@ -1,9 +1,13 @@
 package com.example.BugByte_backend.models;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Entity
 @Table(name="questions")
+@Getter
+@Setter
 public class Question {
     @Id
     @OneToOne
@@ -38,45 +42,5 @@ public class Question {
         this.community.setId(1L);
         this.upVotes = 0L;
         this.downVotes = 0L;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public Community getCommunity() {
-        return community;
-    }
-
-    public void setCommunity(Community community) {
-        this.community = community;
-    }
-
-    public Long getUpVotes() {
-        return upVotes;
-    }
-
-    public void setUpVotes(Long upVotes) {
-        this.upVotes = upVotes;
-    }
-
-    public Long getDownVotes() {
-        return downVotes;
-    }
-
-    public void setDownVotes(Long downVotes) {
-        this.downVotes = downVotes;
-    }
-
-    public Answer getValidatedAnswer() {
-        return validatedAnswer;
-    }
-
-    public void setValidatedAnswer(Answer validatedAnswer) {
-        this.validatedAnswer = validatedAnswer;
     }
 }
