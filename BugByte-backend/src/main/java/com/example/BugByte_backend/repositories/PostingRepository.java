@@ -325,7 +325,7 @@ public class PostingRepository implements IPostingRepository{
                 rs.getLong("up_votes"),
                 rs.getLong("down_votes")
         );
-        question.setValidated_answer(answer);
+        question.setValidatedAnswer(answer);
         return question;
     });
     private final RowMapper<Answer> answerRowMapper = ((rs, rowNum) -> {
