@@ -13,10 +13,11 @@ public class Reply {
 
     @ManyToOne
     @JoinColumn(name = "answer_id", nullable = false)
-    private Answer answer = new Answer();
+    private Answer answer;
 
     public Reply(Post post, Long answer) {
         this.post = post;
+        this.answer = new Answer();
         this.answer.getPost().setId(answer);
     }
 
