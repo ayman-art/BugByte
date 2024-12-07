@@ -11,32 +11,34 @@ public class Post {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "op_name",referencedColumnName = "username", nullable = false)
+    @JoinColumn(name = "op_name", referencedColumnName = "username", nullable = false)
     private User creator = new User();
 
-    @Column(name = "md_content" ,nullable = false)
-    private String md_content;
+    @Column(name = "md_content", nullable = false)
+    private String mdContent;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "posted_on" ,nullable = false)
-    private Date posted_on;
+    @Column(name = "posted_on", nullable = false)
+    private Date postedOn;
 
     public Post(){
         this.id = 0L;
         this.creator = new User();
-        this.md_content = "";
-        this.posted_on = new Date();
+        this.mdContent = "";
+        this.postedOn = new Date();
     }
-    public Post(Long id ,String creator ,String md_content,Date posted_on) {
+
+    public Post(Long id , String creator, String mdContent, Date postedOn) {
         this.id = id;
         this.creator.setUserName(creator);
-        this.md_content = md_content;
-        this.posted_on = posted_on;
+        this.mdContent = mdContent;
+        this.postedOn = postedOn;
     }
-    public Post(User creator, String md_content) {
+
+    public Post(User creator, String mdContent) {
         this.creator = creator;
-        this.md_content = md_content;
-        this.posted_on = new Date();
+        this.mdContent = mdContent;
+        this.postedOn = new Date();
     }
 
     public Long getId() {
@@ -55,20 +57,19 @@ public class Post {
         this.creator = creator;
     }
 
-    public String getMd_content() {
-        return md_content;
+    public String getMdContent() {
+        return mdContent;
     }
 
-    public void setMd_content(String md_content) {
-        this.md_content = md_content;
+    public void setMdContent(String mdContent) {
+        this.mdContent = mdContent;
     }
 
-    public Date getPosted_on() {
-        return posted_on;
+    public Date getPostedOn() {
+        return postedOn;
     }
 
-    public void setPosted_on(Date posted_on) {
-        this.posted_on = posted_on;
+    public void setPostedOn(Date postedOn) {
+        this.postedOn = postedOn;
     }
-
 }
