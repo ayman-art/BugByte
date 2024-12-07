@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
 @Entity
 @Table(name="communities")
 public class Community {
@@ -28,9 +29,10 @@ public class Community {
     @Column(name="creation_date",nullable = false)
     private Date creationDate;
 
+
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityMember> communityMembers;
-
+2
     public Community(String name, String description, Long adminId, Date creationDate) {
         this.name = name;
         this.description = description;
@@ -42,13 +44,19 @@ public class Community {
         this.name = name;
         this.description = description;
         this.admin.setId(adminId);
-        this.creationDate = new Date();
+        this.creationDate = new Date();=
         this.id = 0L;
     }
     public Community(String name,Long adminId) {
         this.name = name;
         this.description = "";
         this.admin.setId(adminId);
+        this.creationDate = new Date();
+    }
+    public Community(){
+        this.name = "";
+        this.description = "";
+        this.admin.setId(0L);
         this.creationDate = new Date();
         this.id = 0L;
     }
