@@ -12,7 +12,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "op_name", referencedColumnName = "username", nullable = false)
-    private User creator = new User();
+    private User creator;
 
     @Column(name = "md_content", nullable = false)
     private String mdContent;
@@ -30,6 +30,7 @@ public class Post {
 
     public Post(Long id , String creator, String mdContent, Date postedOn) {
         this.id = id;
+        this.creator = new User();
         this.creator.setUserName(creator);
         this.mdContent = mdContent;
         this.postedOn = postedOn;
