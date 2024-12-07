@@ -740,7 +740,7 @@ class FollowerTest {
                 .isAdmin(false)
                 .build();
 
-        Follower relationship = new Follower(follower, followed);
+        Follower relationship = new Follower(null, follower, followed);
 
         assertEquals(follower, relationship.getFollower());
         assertEquals(followed, relationship.getFollowed());
