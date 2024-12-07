@@ -9,17 +9,17 @@ import java.util.Date;
 import java.util.List;
 
 public interface IPostingRepository {
-     Long insertPost(String md_content , String op_name);
+     Long insertPost(String md_content, String op_name);
 
      Long getPostByOpAndTime(String userName, Date date);
 
      Post getPostByID(Long postId);
 
-     Boolean insertQuestion(Long questionId , Long communityId);
+     Boolean insertQuestion(Long questionId, Long communityId);
 
-     Boolean insertAnswer(Long answerId , Long questionId);
+     Boolean insertAnswer(Long answerId, Long questionId);
 
-     Boolean insertReply(Long replyId , Long answerId);
+     Boolean insertReply(Long replyId, Long answerId);
 
      Boolean deleteQuestion(Long questionId);
 
@@ -37,19 +37,19 @@ public interface IPostingRepository {
 
      Boolean verifyAnswer(Long answerId);
 
-     Boolean editPost(Long postId , String md_content);
+     Boolean editPost(Long postId, String md_content);
 
-     List<Question> getQuestionsByUserName(String userName,Integer limit,Integer offset);
+     List<Question> getQuestionsByUserName(String userName, Integer limit, Integer offset);
 
-     List<Answer> getAnswersByUserName(String userName,Integer limit,Integer offset);
+     List<Answer> getAnswersByUserName(String userName, Integer limit, Integer offset);
 
-     List<Reply> getRepliesByUserName(String userName,Integer limit,Integer offset);
+     List<Reply> getRepliesByUserName(String userName, Integer limit, Integer offset);
 
-     List<Answer> getAnswersForQuestion(Long questionId,Integer limit,Integer offset);
+     List<Answer> getAnswersForQuestion(Long questionId, Integer limit, Integer offset);
 
-     List<Reply> getRepliesForAnswer(Long answerId,Integer limit,Integer offset);
+     List<Reply> getRepliesForAnswer(Long answerId, Integer limit, Integer offset);
 
-     List<Question> getQuestionsByCommunity(Long communityId,Integer limit,Integer offset);
+     List<Question> getQuestionsByCommunity(Long communityId, Integer limit, Integer offset);
 
      Question getQuestionById(Long questionId);
 
