@@ -36,47 +36,111 @@ public class PostingRepository implements IPostingRepository{
                     (?, ?);
             """;
     private static final String SQL_GET_POST_BY_ID = "SELECT * FROM posts WHERE id = ?;";
-    private static final String SQL_GET_POST_BY_USERNAME_AND_TIME = "SELECT id FROM posts " +
-            "WHERE posted_on = ? AND op_name = ?;";
+    private static final String SQL_GET_POST_BY_USERNAME_AND_TIME = """
+                SELECT id FROM posts
+                "WHERE posted_on = ? AND op_name = ?;
+            """;
     private static final String SQL_DELETE_QUESTION_BY_ID = "DELETE FROM questions WHERE id = ?;";
     private static final String SQL_DELETE_ANSWER_BY_ID = "DELETE FROM answers WHERE id = ?;";
     private static final String SQL_DELETE_REPLY_BY_ID = "DELETE FROM replies WHERE id = ?;";
-    private static final String SQL_UPDATE_UP_VOTES_ANSWERS = "UPDATE answers SET up_votes = up_votes + ?" +
-            "WHERE id = ?";
-    private static final String SQL_UPDATE_DOWN_VOTES_ANSWERS = "UPDATE answers SET down_votes = down_votes + ? " +
-            "WHERE id = ?";
-    private static final String SQL_UPDATE_UP_VOTES_QUESTIONS = "UPDATE questions SET up_votes = up_votes + ? " +
-            "WHERE id = ?";
-    private static final String SQL_UPDATE_DOWN_VOTES_QUESTIONS = "UPDATE questions SET down_votes = down_votes + ? " +
-            "WHERE id = ?";
-    private static final String SQL_VERIFY_ANSWER = "UPDATE questions SET validated_answer = ?" +
-            "WHERE id = ?";
+    private static final String SQL_UPDATE_UP_VOTES_ANSWERS = """
+                UPDATE answers
+                SET up_votes = up_votes + ?
+                WHERE id = ?;
+            """;
+    private static final String SQL_UPDATE_DOWN_VOTES_ANSWERS = """
+                UPDATE answers
+                SET down_votes = down_votes + ?
+                WHERE id = ?;
+            """;
+    private static final String SQL_UPDATE_UP_VOTES_QUESTIONS = """
+                UPDATE questions
+                SET up_votes = up_votes + ?
+                WHERE id = ?;
+            """;
+    private static final String SQL_UPDATE_DOWN_VOTES_QUESTIONS = """
+                UPDATE questions
+                SET down_votes = down_votes + ?
+                WHERE id = ?;
+            """;
+    private static final String SQL_VERIFY_ANSWER = """
+                UPDATE questions
+                SET validated_answer = ?
+                WHERE id = ?;
+            """;
     private static final String SQL_EDIT_POST = "UPDATE posts SET md_content = ? WHERE ID = ?;";
 
-    private static final String SQL_GET_QUESTIONS_BY_USERNAME = "SELECT * FROM questions q " +
-            "LEFT JOIN posts p on p.id = q.id WHERE p.op_name = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_ANSWERS_BY_USERNAME = "SELECT * FROM answers a " +
-            "LEFT JOIN posts p on p.id = a.id WHERE p.op_name = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_REPLIES_BY_USERNAME = "SELECT * FROM replies r " +
-            "LEFT JOIN posts p on p.id = r.id WHERE p.op_name = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_ANSWERS_FOR_QUESTION = "SELECT * FROM answers a " +
-            "LEFT JOIN posts p on p.id = a.id WHERE a.question_id = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_REPLIES_FOR_ANSWER = "SELECT * FROM replies r " +
-            "LEFT JOIN posts p on p.id = r.id WHERE r.answer_id = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_QUESTIONS_BY_COMMUNITY = "SELECT * FROM questions q " +
-            "LEFT JOIN posts p on p.id = q.id WHERE q.community_id = ? ORDER BY p.posted_on DESC " +
-            "LIMIT ? OFFSET ?;";
-    private static final String SQL_GET_QUESTION_BY_ID = "SELECT * FROM questions q " +
-            "LEFT JOIN posts p on p.id = q.id WHERE q.id = ?;";
-    private static final String SQL_GET_ANSWER_BY_ID = "SELECT * FROM answers a " +
-            "LEFT JOIN posts p on p.id = a.id WHERE a.id = ?;";
-    private static final String SQL_GET_REPLY_BY_ID = "SELECT * FROM replies r " +
-            "LEFT JOIN posts p on p.id = r.id WHERE r.id = ?;";
+    private static final String SQL_GET_QUESTIONS_BY_USERNAME = """
+                SELECT *
+                FROM questions q
+                JOIN posts p on p.id = q.id
+                WHERE p.op_name = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+    private static final String SQL_GET_ANSWERS_BY_USERNAME = """
+                SELECT *
+                FROM answers a
+                JOIN posts p on p.id = a.id
+                WHERE p.op_name = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+    private static final String SQL_GET_REPLIES_BY_USERNAME = """
+                SELECT *
+                FROM replies r
+                JOIN posts p on p.id = r.id
+                WHERE p.op_name = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+    private static final String SQL_GET_ANSWERS_FOR_QUESTION = """
+                SELECT *
+                FROM answers a
+                JOIN posts p on p.id = a.id
+                WHERE a.question_id = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ? OFFSET ?;
+            """;
+    private static final String SQL_GET_REPLIES_FOR_ANSWER = """
+                SELECT *
+                FROM replies r
+                JOIN posts p on p.id = r.id
+                WHERE r.answer_id = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+    private static final String SQL_GET_QUESTIONS_BY_COMMUNITY = """
+                SELECT *
+                FROM questions q
+                JOIN posts p on p.id = q.id
+                WHERE q.community_id = ?
+                ORDER BY p.posted_on DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+    private static final String SQL_GET_QUESTION_BY_ID = """
+                SELECT *
+                FROM questions q
+                JOIN posts p on p.id = q.id
+                WHERE q.id = ?;
+            """;
+    private static final String SQL_GET_ANSWER_BY_ID = """
+                SELECT *
+                FROM answers a
+                JOIN posts p on p.id = a.id
+                WHERE a.id = ?;
+            """;
+    private static final String SQL_GET_REPLY_BY_ID = """
+                SELECT *
+                FROM replies r
+                JOIN posts p on p.id = r.id
+                WHERE r.id = ?;
+            """;
     private static final String SQL_DELETE_ANSWERS_BY_QUESTION_ID = "DELETE FROM answers WHERE question_id = ?;";
     private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
