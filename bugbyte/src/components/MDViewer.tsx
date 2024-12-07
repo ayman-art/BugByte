@@ -8,22 +8,11 @@ import {
     imagePlugin,
     tablePlugin,
     markdownShortcutPlugin,
-    toolbarPlugin,
-    UndoRedo,
-    BoldItalicUnderlineToggles,
-    CodeToggle,
-    ListsToggle,
-    CreateLink,
     thematicBreakPlugin,
-    InsertImage,
-    InsertTable,
-    Separator,
     linkDialogPlugin,
     codeBlockPlugin,
     sandpackPlugin,
     codeMirrorPlugin,
-    InsertCodeBlock,
-    InsertThematicBreak,
   } from '@mdxeditor/editor';
 
 import '@mdxeditor/editor/style.css';
