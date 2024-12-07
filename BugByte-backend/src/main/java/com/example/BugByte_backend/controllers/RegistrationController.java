@@ -42,7 +42,7 @@ public class RegistrationController {
         Map<String, Object> userdata = Map.of("jwt", token);
         try {
             administrativeFacade.deleteUser(userdata);
-            return new ResponseEntity<>("User Deleted Successfully", HttpStatus.OK);
+            return new ResponseEntity<>(Map.of("message","User deleted successfully."), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
