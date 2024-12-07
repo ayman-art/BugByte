@@ -2,16 +2,14 @@ package com.example.BugByte_backend.models;
 
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name="users")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class User {
     @Id
@@ -35,30 +33,4 @@ public class User {
 
     @Column(nullable = false)
     private Boolean isAdmin;
-
-    public User(String userName, String email, String password) {
-        this(0L, userName, email, password, "", 0L, false);
-    }
-
-    public User(Long id, String userName, String email, String password) {
-        this(id, userName, email, password, "", 0L, false);
-    }
-
-    public User(Long id, String userName, String email, String password, String bio) {
-        this(id, userName, email, password, bio, 0L, false);
-    }
-
-    public User(Long id, String userName, String email, String password, Long reputation, Boolean isAdmin) {
-        this(id, userName, email, password, "", reputation, isAdmin);
-    }
-
-    public User(Long id, String userName, String email, String password, String bio, Long reputation, Boolean isAdmin) {
-        this.id = id;
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
-        this.bio = bio;
-        this.reputation = reputation;
-        this.isAdmin = isAdmin;
-    }
 }
