@@ -1,26 +1,17 @@
 package com.example.BugByte_backend.models;
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 
-@Entity
-@Table(name="replies")
 @Getter
 @Setter
-public class Reply {
-    @Id
-    @OneToOne
-    @JoinColumn(name = "id" ,nullable = false)
-    private Post post;
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class Reply extends Post{
 
-    @ManyToOne
-    @JoinColumn(name = "answer_id", nullable = false)
-    private Answer answer;
-
-    public Reply(Post post, Long answer) {
-        this.post = post;
-        this.answer = new Answer();
-        this.answer.getPost().setId(answer);
-    }
+    private Long answerId;
 }

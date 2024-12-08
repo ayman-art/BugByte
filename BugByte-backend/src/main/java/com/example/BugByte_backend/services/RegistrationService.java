@@ -34,6 +34,9 @@ public class RegistrationService {
                      .userName(userName)
                      .email(email)
                      .password(password)
+                     .reputation(0L)
+                     .bio("")
+                     .isAdmin(false)
                      .build();
         } catch (Exception e) {
             throw new Exception("Error registering user , user Already exists: " + e.getMessage());

@@ -1,7 +1,6 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.Follower;
-import com.example.BugByte_backend.models.FollowerId;
 import com.example.BugByte_backend.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -697,27 +696,6 @@ class UserProfileRepositoryTest {
 
 }
 
-class FollowerIdTest {
-
-    @Test
-    void equals_ShouldReturnTrue_WhenSameContent() {
-        FollowerId id1 = new FollowerId(1L, 2L);
-        FollowerId id2 = new FollowerId(1L, 2L);
-
-        assertEquals(id1, id2);
-        assertEquals(id1.hashCode(), id2.hashCode());
-    }
-
-    @Test
-    void equals_ShouldReturnFalse_WhenDifferentContent() {
-        FollowerId id1 = new FollowerId(1L, 2L);
-        FollowerId id2 = new FollowerId(2L, 1L);
-
-        assertNotEquals(id1, id2);
-        assertNotEquals(id1.hashCode(), id2.hashCode());
-    }
-}
-
 class FollowerTest {
 
     @Test
@@ -740,9 +718,9 @@ class FollowerTest {
                 .isAdmin(false)
                 .build();
 
-        Follower relationship = new Follower(null, follower, followed);
+        Follower relationship = new Follower(follower.getId(), followed.getId());
 
-        assertEquals(follower, relationship.getFollower());
-        assertEquals(followed, relationship.getFollowed());
+        assertEquals(follower.getId(), relationship.getFollowerId());
+        assertEquals(followed.getId(), relationship.getFollowedId());
     }
 }

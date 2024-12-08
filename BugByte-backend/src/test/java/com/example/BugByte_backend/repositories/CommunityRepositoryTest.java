@@ -144,10 +144,10 @@ public class CommunityRepositoryTest {
          comm2.setId(11L);
          comm3 = new Community("testComm3", 3L);
          comm3.setId(13L);
-         comMem1 = new CommunityMember(comm,admin);
-         comMem2= new CommunityMember(comm,member1);
-         comMem3 =new CommunityMember(comm,member2);
-         comMem4 =new CommunityMember(comm2,member1);
+         comMem1 = new CommunityMember(comm.getId(),admin.getId());
+         comMem2= new CommunityMember(comm.getId(),member1.getId());
+         comMem3 =new CommunityMember(comm.getId(),member2.getId());
+         comMem4 =new CommunityMember(comm2.getId(),member1.getId());
     }
 
     @Test

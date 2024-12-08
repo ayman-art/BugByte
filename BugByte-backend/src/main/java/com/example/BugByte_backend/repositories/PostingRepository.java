@@ -382,51 +382,41 @@ public class PostingRepository implements IPostingRepository{
         return jdbcTemplate.queryForObject(SQL_GET_REPLY_BY_ID, new Object[]{replyId}, replyRowMapper);
     }
 
-    private final RowMapper<Question> questionRowMapper = ((rs, rowNum) -> {
-        Post post = new Post(
-                rs.getLong("id"),
-                rs.getString("op_name"),
-                rs.getString("md_content"),
-                new Date(rs.getDate("posted_on").getTime())
-        );
-        Answer answer = new Answer();
-        answer.getPost().setId(rs.getLong("validated_answer"));
-        Question question = new Question(
-                post,
-                rs.getLong("community_id"),
-                rs.getLong("up_votes"),
-                rs.getLong("down_votes")
-        );
-        question.setValidatedAnswer(answer);
-        return question;
-    });
-    private final RowMapper<Answer> answerRowMapper = ((rs, rowNum) -> {
-        Post post = new Post(
-                rs.getLong("id"),
-                rs.getString("op_name"),
-                rs.getString("md_content"),
-                new Date(rs.getDate("posted_on").getTime())
-        );
-       return new Answer(
-                post,
-                rs.getLong("question_id"),
-                rs.getLong("up_votes"),
-                rs.getLong("down_votes")
+    private final RowMapper<Question> questionRowMapper = ((rs, rowNum) ->
+            Question.builder()
+                    .id(rs.getLong("id"))
+                    .creatorUserName(rs.getString("op_name"))
+                    .mdContent(rs.getString("md_content"))
+                    .postedOn(new Date(rs.getDate("posted_on").getTime()))
+                    .communityId(rs.getLong("community_id"))
+                    .upVotes(rs.getLong("up_votes"))
+                    .downVotes(rs.getLong("down_votes"))
+                    .validatedAnswerId(rs.getLong("validated_answer"))
+                    .build()
+    );
 
-        );
-    });
-    private final RowMapper<Reply> replyRowMapper = ((rs, rowNum) -> {
-        Post post = new Post(
-                rs.getLong("id"),
-                rs.getString("op_name"),
-                rs.getString("md_content"),
-                new Date(rs.getDate("posted_on").getTime())
-        );
-        return new Reply(
-                post,
-                rs.getLong("answer_id")
-        );
-    });
+    private final RowMapper<Answer> answerRowMapper = ((rs, rowNum) ->
+            Answer.builder()
+                    .id(rs.getLong("id"))
+                    .creatorUserName(rs.getString("op_name"))
+                    .mdContent(rs.getString("md_content"))
+                    .postedOn(new Date(rs.getDate("posted_on").getTime()))
+                    .questionId(rs.getLong("question_id"))
+                    .upVotes(rs.getLong("up_votes"))
+                    .downVotes(rs.getLong("down_votes"))
+                    .build()
+    );
+
+    private final RowMapper<Reply> replyRowMapper = ((rs, rowNum) ->
+            Reply.builder()
+                    .id(rs.getLong("id"))
+                    .creatorUserName(rs.getString("op_name"))
+                    .mdContent(rs.getString("md_content"))
+                    .postedOn(new Date(rs.getDate("posted_on").getTime()))
+                    .answerId(rs.getLong("answer_id"))
+                    .build()
+    );
+
     private final RowMapper<Post> postRowMapper = ((rs, rowNum) -> new Post(
             rs.getLong("id"),
             rs.getString("op_name"),

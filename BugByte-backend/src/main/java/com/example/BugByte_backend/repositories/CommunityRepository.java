@@ -147,16 +147,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 
     @Override
     public List<Community> findAllCommunities() {
-        return jdbcTemplate.query(SQL_FIND_ALL_COMMUNITIES, (rs, rowNum) -> {
-            Community community = new Community(
-                    rs.getString("name"),
-                    rs.getString("description"),
-                    rs.getLong("admin_id"),
-                    rs.getDate("creation_date")
-            );
-            community.setId(rs.getLong("id"));
-            return community;
-        });
+        return jdbcTemplate.query(SQL_FIND_ALL_COMMUNITIES,
+                (rs, rowNum) -> new Community(
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getLong("admin_id"),
+                        rs.getDate("creation_date")
+                ));
     }
 
     @Override
@@ -211,18 +209,16 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if (communityId == null)
             throw new NullPointerException("communityId is null");
 
-        List<User> users = jdbcTemplate.query(SQL_FIND_USERS_BY_COMMUNITY_ID, new Object[]{communityId}, (rs, rowNum) -> {
-            User user = new User(
-                    rs.getLong("id"),
-                    rs.getString("user_name"),
-                    rs.getString("email"),
-                    rs.getString("password"),
-                    rs.getString("bio"),
-                    rs.getLong("reputation"),
-                    rs.getBoolean("is_admin")
-            );
-            return user;
-        });
+        List<User> users = jdbcTemplate.query(SQL_FIND_USERS_BY_COMMUNITY_ID,
+                new Object[]{communityId}, (rs, rowNum) -> new User(
+                        rs.getLong("id"),
+                        rs.getString("user_name"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("bio"),
+                        rs.getLong("reputation"),
+                        rs.getBoolean("is_admin")
+                ));
 
         if (users.isEmpty())
             throw new RuntimeException("No users found in this community.");
@@ -235,16 +231,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if (userId == null)
             throw new NullPointerException("userId is null");
 
-        List<Community> communities = jdbcTemplate.query(SQL_FIND_COMMUNITIES_BY_USER_ID, new Object[]{userId}, (rs, rowNum) -> {
-            Community community = new Community(
-                    rs.getString("name"),
-                    rs.getString("description"),
-                    rs.getLong("admin_id"),
-                    rs.getDate("creation_date")
-            );
-            community.setId(rs.getLong("id"));
-            return community;
-        });
+        List<Community> communities = jdbcTemplate.query(SQL_FIND_COMMUNITIES_BY_USER_ID,
+                new Object[]{userId}, (rs, rowNum) -> new Community(
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getLong("admin_id"),
+                        rs.getDate("creation_date")
+                ));
 
         if (communities.isEmpty())
             throw new RuntimeException("User is not a member of any communities.");
