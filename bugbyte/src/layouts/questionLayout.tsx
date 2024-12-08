@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowUp, ArrowDown, Container } from 'lucide-react';
 import { button } from '@nextui-org/react';
+import {upvotePost, downvotePost} from '../API/QuestionAPI';
 
 interface CommunityPostProps {
   postId: string;
@@ -23,46 +24,13 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
   const [downvotes, setDownvotes] = useState(initialDownvotes);
 
   const handleVote = async (type: 'up' | 'down') => {
-    try {
-        if(type == 'up'){
-        const response = await fetch(`http://posts/upvote/${postId}`, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ voteType: postId }),
-        });
-
-            if (response.ok) {
-                if (type === 'up') {
-                    setUpvotes(prev => prev + 1);
-                }
-            }
-        }
-        } catch (error) {
-            console.error('Error updating vote:', error);
-        }
-
-        try{
-        if (type == 'down') {
-            const response = await fetch(`http://posts/downvote/${postId}`, {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ voteType: postId }),
-            });
-    
-                if (response.ok) {
-                    if (type === 'down') {
-                        setDownvotes(prev => prev + 1);
-                    }
-                }
-        }
-    } catch (error) {
-        console.error('Error updating vote:', error);
+    if (type === 'up') {
+      const success = await upvotePost(postId);
+      if (success) setUpvotes((prev) => prev + 1);
+    } else if (type === 'down') {
+      const success = await downvotePost(postId);
+      if (success) setDownvotes((prev) => prev + 1);
     }
-
   };
 
   const handleContentClick = (e: React.MouseEvent) => {
