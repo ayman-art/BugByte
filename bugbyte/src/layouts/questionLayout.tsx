@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ArrowUp, ArrowDown, Container } from 'lucide-react';
-import { button } from '@nextui-org/react';
 import {upvotePost, downvotePost} from '../API/QuestionAPI';
 
 interface CommunityPostProps {

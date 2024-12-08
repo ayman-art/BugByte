@@ -1,6 +1,8 @@
+import {API_URLS} from './ApiUrls';
+
 export const upvotePost = async (postId: string): Promise<boolean> => {
     try {
-      const response = await fetch(`http://posts/upvote/${postId}`, {
+      const response = await fetch(`${API_URLS.UPVOTE}?=${postId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -16,7 +18,7 @@ export const upvotePost = async (postId: string): Promise<boolean> => {
   
   export const downvotePost = async (postId: string): Promise<boolean> => {
     try {
-      const response = await fetch(`http://posts/downvote/${postId}`, {
+      const response = await fetch(`${API_URLS.DOWNVOTE}?=${postId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
