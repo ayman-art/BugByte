@@ -11,9 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Follower {
 
-    private FollowerId id;
+    private Long followerId;
 
-    private User follower;
-
-    private User followed;
+    private Long followedId;
 }

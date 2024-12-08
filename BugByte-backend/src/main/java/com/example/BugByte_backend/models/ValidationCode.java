@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ValidationCode {
 
-    private User user;
+    private Long userId;
 
     private String code;
 }

@@ -29,7 +29,15 @@ public class RegistrationService {
             System.out.println("userName " + userName + "email " + email);
              //insert user in the database
              long id  = userRepository.insertUser(userName , email , password);
-             return userRepository.findById(id);
+             return User.builder()
+                     .id(id)
+                     .userName(userName)
+                     .email(email)
+                     .password(password)
+                     .reputation(0L)
+                     .bio("")
+                     .isAdmin(false)
+                     .build();
         } catch (Exception e) {
             throw new Exception("Error registering user , user Already exists: " + e.getMessage());
         }
