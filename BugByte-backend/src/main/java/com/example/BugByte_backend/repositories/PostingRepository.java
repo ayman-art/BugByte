@@ -384,20 +384,30 @@ public class PostingRepository implements IPostingRepository{
 
     private final RowMapper<Question> questionRowMapper = ((rs, rowNum) -> new Question(
             rs.getLong("id"),
+            rs.getString("op_name"),
+            rs.getString("md_content"),
+            new Date(rs.getDate("posted_on").getTime()),
             rs.getLong("community_id"),
             rs.getLong("up_votes"),
             rs.getLong("down_votes"),
             rs.getLong("validated_answer"))
+
     );
 
     private final RowMapper<Answer> answerRowMapper = ((rs, rowNum) -> new Answer(
             rs.getLong("id"),
+            rs.getString("op_name"),
+            rs.getString("md_content"),
+            new Date(rs.getDate("posted_on").getTime()),
             rs.getLong("question_id"),
             rs.getLong("up_votes"),
             rs.getLong("down_votes")
     ));
     private final RowMapper<Reply> replyRowMapper = ((rs, rowNum) -> new Reply(
             rs.getLong("id"),
+            rs.getString("op_name"),
+            rs.getString("md_content"),
+            new Date(rs.getDate("posted_on").getTime()),
             rs.getLong("answer_id")
     ));
     private final RowMapper<Post> postRowMapper = ((rs, rowNum) -> new Post(

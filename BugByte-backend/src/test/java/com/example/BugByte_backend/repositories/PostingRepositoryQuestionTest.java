@@ -250,7 +250,7 @@ public class PostingRepositoryQuestionTest {
     public void testGetQuestionById_validInput() {
         Long questionId = 1L;
         Question expectedQuestion = new Question();
-        expectedQuestion.setPostId(questionId);
+        expectedQuestion.setId(questionId);
         when(jdbcTemplate.queryForObject(eq(SQL_GET_QUESTION_BY_ID), eq(new Object[]{questionId}), any(RowMapper.class)))
                 .thenReturn(expectedQuestion);
 

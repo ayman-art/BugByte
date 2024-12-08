@@ -156,7 +156,7 @@ public class PostingRepositoryReplyTest {
         Integer limit = 10;
         Integer offset = 0;
         Post post = new Post();
-        Reply reply = new Reply(post.getId() , answerId);
+        Reply reply = new Reply();
 
         List<Reply> expectedReplies = new ArrayList<>();
         expectedReplies.add(reply);
@@ -200,14 +200,14 @@ public class PostingRepositoryReplyTest {
         Long replyId = 1L;
         Post post = new Post();
         post.setId(1L);
-        Reply expectedReply = new Reply(post.getId(), 2L);
+        Reply expectedReply = new Reply();
         when(jdbcTemplate.queryForObject(eq(SQL_GET_REPLY_BY_ID), eq(new Object[]{replyId}), any(RowMapper.class)))
                 .thenReturn(expectedReply);
 
         Reply actualReply = postingRepository.getReplyById(replyId);
 
         assertNotNull(actualReply);
-        assertEquals(expectedReply.getPostId(), actualReply.getPostId());
+        assertEquals(expectedReply.getId(), actualReply.getId());
     }
 
     @Test
