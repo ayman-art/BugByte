@@ -1,18 +1,16 @@
 package com.example.BugByte_backend.models;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Reply {
-    private Post post;
+    private Long postId;
 
-    private Answer answer;
-
-    public Reply(Post post, Long answer) {
-        this.post = post;
-        this.answer = new Answer();
-        this.answer.getPost().setId(answer);
-    }
+    private Long answerId;
 }

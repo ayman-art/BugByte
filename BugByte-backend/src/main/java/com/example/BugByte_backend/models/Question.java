@@ -1,34 +1,22 @@
 package com.example.BugByte_backend.models;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Question {
-    private Post post;
+    private Long postId;
 
-    private Community community;
+    private Long communityId;
 
     private Long upVotes;
 
     private Long downVotes;
 
     private Answer validatedAnswer;
-
-    public Question(Post post, Long community_id, Long upVotes, Long downVotes) {
-        this.post = post;
-        this.community = new Community();
-        this.community.setId(community_id);
-        this.upVotes = upVotes;
-        this.downVotes = downVotes;
-    }
-
-    public Question() {
-        this.post = new Post();
-        this.community = new Community();
-        this.community.setId(1L);
-        this.upVotes = 0L;
-        this.downVotes = 0L;
-    }
 }

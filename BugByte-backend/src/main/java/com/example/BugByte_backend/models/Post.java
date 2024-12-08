@@ -1,5 +1,7 @@
 package com.example.BugByte_backend.models;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
@@ -7,27 +9,14 @@ import java.util.Date;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Post {
     private Long id;
 
-    private User creator;
+    private String creatorUserName;
 
     private String mdContent;
 
-    private Date postedOn;
-
-    public Post() {
-        this.id = 0L;
-        this.creator = new User();
-        this.mdContent = "";
-        this.postedOn = new Date();
-    }
-
-    public Post(Long id, String creator, String mdContent, Date postedOn) {
-        this.id = id;
-        this.creator = new User();
-        this.creator.setUserName(creator);
-        this.mdContent = mdContent;
-        this.postedOn = postedOn;
-    }
+    private Date postedOn = new Date();
 }

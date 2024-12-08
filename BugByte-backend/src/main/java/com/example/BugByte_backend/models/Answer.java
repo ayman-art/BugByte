@@ -1,31 +1,20 @@
 package com.example.BugByte_backend.models;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Answer {
-    private Post post;
+    private Long postId;
 
-    private Question question;
+    private Long questionId;
 
     private Long upVotes;
 
     private Long downVotes;
-
-    public Answer(){
-        this.post = new Post();
-        this.question = new Question();
-        this.upVotes = 0L;
-        this.downVotes = 0L;
-    }
-
-    public Answer(Post post, Long question, Long upVotes, Long downVotes) {
-        this.post = post;
-        this.question = new Question();
-        this.question.getPost().setId(question);
-        this.upVotes = upVotes;
-        this.downVotes = downVotes;
-    }
 }
