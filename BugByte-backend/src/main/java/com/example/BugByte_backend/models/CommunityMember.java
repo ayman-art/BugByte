@@ -1,12 +1,16 @@
 package com.example.BugByte_backend.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 
 @Entity
 @Table(name = "community_members")
+@Getter
+@Setter
 public class CommunityMember {
-
     @Id
     @ManyToOne
     @JoinColumn(name = "community_id", nullable = false)
@@ -31,29 +35,5 @@ public class CommunityMember {
         this.community = community;
         this.member = member;
         this.joinDate = new Date();
-    }
-
-    public Community getCommunity() {
-        return community;
-    }
-
-    public void setCommunity(Community community) {
-        this.community = community;
-    }
-
-    public User getMember() {
-        return member;
-    }
-
-    public void setMember(User member) {
-        this.member = member;
-    }
-
-    public Date getJoinDate() {
-        return joinDate;
-    }
-
-    public void setJoinDate(Date joinDate) {
-        this.joinDate = joinDate;
     }
 }

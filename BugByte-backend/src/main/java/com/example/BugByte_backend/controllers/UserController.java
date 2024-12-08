@@ -19,7 +19,6 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String token, @RequestParam("username") String username) {
-        System.out.println("HERE");
         token = token.replace("Bearer ", "");
 
         Map<String, Object> userData = new HashMap<>();
@@ -93,7 +92,7 @@ public class UserController {
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("jwt", token);
-        userData.put("user-name", username);
+        userData.put("userName", username);
 
         try {
             List<Map<String, Object>> res = administrativeFacade.getFollowings(userData);
@@ -109,7 +108,7 @@ public class UserController {
 
         Map<String, Object> userData = new HashMap<>();
         userData.put("jwt", token);
-        userData.put("user-name", username);
+        userData.put("userName", username);
 
         try {
             List<Map<String, Object>> res = administrativeFacade.getFollowers(userData);

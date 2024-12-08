@@ -106,10 +106,38 @@ public class CommunityRepositoryTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-         admin = new User(1L, "admin", "admin@test.com", "password", 100L, true);
-         member1 = new User(2L, "member1", "member1@test.com", "password", 100L, false);
-         member2 = new User(3L, "member2", "member2@test.com", "password", 100L, false);
-         member3=new User(4L, "member4", "member4@test.com", "password", 100L, false);
+         admin = User.builder()
+                 .id(1L)
+                 .userName("admin")
+                 .email("admin@test.com")
+                 .password("password")
+                 .reputation(100L)
+                 .isAdmin(true)
+                 .build();
+        member1 = User.builder()
+                .id(2L)
+                .userName("member1")
+                .email("member1@test.com")
+                .password("password")
+                .reputation(100L)
+                .isAdmin(false)
+                .build();
+        member2 = User.builder()
+                .id(3L)
+                .userName("member2")
+                .email("member2@test.com")
+                .password("password")
+                .reputation(100L)
+                .isAdmin(false)
+                .build();
+        member3 = User.builder()
+                .id(4L)
+                .userName("member3")
+                .email("member3@test.com")
+                .password("password")
+                .reputation(100L)
+                .isAdmin(false)
+                .build();
          comm = new Community("testComm", 1L);
          comm.setId(12L);
          comm2= new Community("test2Comm",2L);

@@ -15,12 +15,12 @@ public class GoogleAuthController {
 
     @PostMapping("/google")
     public ResponseEntity<?> verifyGoogleToken(@RequestBody Map<String, String> requestBody) {
-            try {
-                Map<String, Object> response = administrativeFacade.googleOAuthSignUp(requestBody);
-                return new ResponseEntity<>(response, HttpStatus.CREATED);
-            } catch (Exception e) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
+        try {
+            Map<String, Object> response = administrativeFacade.googleOAuthSignUp(requestBody);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }
 
