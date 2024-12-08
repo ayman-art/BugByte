@@ -147,6 +147,7 @@ public class PostingRepository implements IPostingRepository{
 
     @Autowired
     private JdbcTemplate jdbcTemplate ;
+
     @Override
     public Long insertPost(String mdContent, String op_name) {
         if (mdContent == null || op_name == null)
