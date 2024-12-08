@@ -1,29 +1,25 @@
 package com.example.BugByte_backend.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommunityMember {
-    private Community community;
+    private Long communityId;
 
-    private User member;
+    private Long memberId;
 
-    private Date joinDate;
+    private Date joinDate = new Date();
 
-    // Constructors
-    public CommunityMember(Community community, User member, Date joinDate) {
-        this.community = community;
-        this.member = member;
-        this.joinDate = joinDate;
-    }
-
-    public CommunityMember(Community community, User member) {
-        this.community = community;
-        this.member = member;
-        this.joinDate = new Date();
+    public CommunityMember(Long communityId, Long memberId) {
+        this.communityId = communityId;
+        this.memberId = memberId;
     }
 }

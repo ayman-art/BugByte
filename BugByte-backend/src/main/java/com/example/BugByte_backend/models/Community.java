@@ -1,6 +1,8 @@
 package com.example.BugByte_backend.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
@@ -9,6 +11,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Community {
     private Long id;
 
@@ -16,16 +20,14 @@ public class Community {
 
     private String description;
 
-    private User admin = new User();
+    private Long adminId;
 
-    private Date creationDate;
-
-    private List<CommunityMember> communityMembers;
+    private Date creationDate = new Date();
 
     public Community(String name, String description, Long adminId, Date creationDate) {
         this.name = name;
         this.description = description;
-        this.admin.setId(adminId);
+        this.adminId = adminId;
         this.creationDate = creationDate;
         this.id = 0L;
     }
@@ -33,23 +35,13 @@ public class Community {
     public Community(String name, String description, Long adminId) {
         this.name = name;
         this.description = description;
-        this.admin.setId(adminId);
-        this.creationDate = new Date();
+        this.adminId = adminId;
         this.id = 0L;
     }
 
     public Community(String name,Long adminId) {
         this.name = name;
         this.description = "";
-        this.admin.setId(adminId);
-        this.creationDate = new Date();
-    }
-
-    public Community(){
-        this.name = "";
-        this.description = "";
-        this.admin.setId(0L);
-        this.creationDate = new Date();
-        this.id = 0L;
+        this.adminId = adminId;
     }
 }
