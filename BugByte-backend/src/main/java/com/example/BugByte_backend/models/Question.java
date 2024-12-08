@@ -18,5 +18,5 @@ public class Question {
 
     private Long downVotes;
 
-    private Answer validatedAnswer;
+    private Long validatedAnswerId;
 }

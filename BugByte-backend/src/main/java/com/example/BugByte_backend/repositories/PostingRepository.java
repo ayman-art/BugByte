@@ -382,51 +382,24 @@ public class PostingRepository implements IPostingRepository{
         return jdbcTemplate.queryForObject(SQL_GET_REPLY_BY_ID, new Object[]{replyId}, replyRowMapper);
     }
 
-    private final RowMapper<Question> questionRowMapper = ((rs, rowNum) -> {
-        Post post = new Post(
-                rs.getLong("id"),
-                rs.getString("op_name"),
-                rs.getString("md_content"),
-                new Date(rs.getDate("posted_on").getTime())
-        );
-        Answer answer = new Answer();
-        answer.getPost().setId(rs.getLong("validated_answer"));
-        Question question = new Question(
-                post,
-                rs.getLong("community_id"),
-                rs.getLong("up_votes"),
-                rs.getLong("down_votes")
-        );
-        question.setValidatedAnswer(answer);
-        return question;
-    });
-    private final RowMapper<Answer> answerRowMapper = ((rs, rowNum) -> {
-        Post post = new Post(
-                rs.getLong("id"),
-                rs.getString("op_name"),
-                rs.getString("md_content"),
-                new Date(rs.getDate("posted_on").getTime())
-        );
-       return new Answer(
-                post,
-                rs.getLong("question_id"),
-                rs.getLong("up_votes"),
-                rs.getLong("down_votes")
+    private final RowMapper<Question> questionRowMapper = ((rs, rowNum) -> new Question(
+            rs.getLong("id"),
+            rs.getLong("community_id"),
+            rs.getLong("up_votes"),
+            rs.getLong("down_votes"),
+            rs.getLong("validated_answer"))
+    );
 
-        );
-    });
-    private final RowMapper<Reply> replyRowMapper = ((rs, rowNum) -> {
-        Post post = new Post(
-                rs.getLong("id"),
-                rs.getString("op_name"),
-                rs.getString("md_content"),
-                new Date(rs.getDate("posted_on").getTime())
-        );
-        return new Reply(
-                post,
-                rs.getLong("answer_id")
-        );
-    });
+    private final RowMapper<Answer> answerRowMapper = ((rs, rowNum) -> new Answer(
+            rs.getLong("id"),
+            rs.getLong("question_id"),
+            rs.getLong("up_votes"),
+            rs.getLong("down_votes")
+    ));
+    private final RowMapper<Reply> replyRowMapper = ((rs, rowNum) -> new Reply(
+            rs.getLong("id"),
+            rs.getLong("answer_id")
+    ));
     private final RowMapper<Post> postRowMapper = ((rs, rowNum) -> new Post(
             rs.getLong("id"),
             rs.getString("op_name"),
