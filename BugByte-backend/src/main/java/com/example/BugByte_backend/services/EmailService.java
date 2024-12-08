@@ -3,11 +3,13 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
+
 public class EmailService {
     private static final Dotenv dotenv = Dotenv.load();
     private static final String FROM_EMAIL = dotenv.get("FROM_EMAIL");
     private static final String EMAIL_PASSWORD = dotenv.get("EMAIL_PASSWORD");
-    public  boolean sendCodeByEmail(String email, String code) {
+
+    public boolean sendCodeByEmail(String email, String code) {
         Properties properties = new Properties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "587");
@@ -27,9 +29,10 @@ public class EmailService {
             message.setText("Welcome to BugByte , Your verification code is: " + code);
 
             Transport.send(message);
+            return true;
         } catch (MessagingException e) {
             e.printStackTrace();
+            return false;
         }
-        return true;
     }
 }

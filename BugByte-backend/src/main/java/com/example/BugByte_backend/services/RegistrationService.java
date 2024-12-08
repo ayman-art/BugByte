@@ -29,7 +29,12 @@ public class RegistrationService {
             System.out.println("userName " + userName + "email " + email);
              //insert user in the database
              long id  = userRepository.insertUser(userName , email , password);
-             return new User(id, userName, email, password);
+             return User.builder()
+                     .id(id)
+                     .userName(userName)
+                     .email(email)
+                     .password(password)
+                     .build();
         } catch (Exception e) {
             throw new Exception("Error registering user , user Already exists: " + e.getMessage());
         }
@@ -133,12 +138,16 @@ public class RegistrationService {
     }
     public User registerUsingGoogle(String name , String email) throws Exception{
         try{
-            User user = userRepository.findByIdentity(email);
-            return user;
+            return userRepository.findByIdentity(email);
         } catch (EmptyResultDataAccessException e){
             String password = registrationCOR.generateRandomPassword();
             long id = userRepository.insertUser(name , email , password);
-            return new User(id, name, email, password);
+            return User.builder()
+                    .id(id)
+                    .userName(name)
+                    .email(email)
+                    .password(password)
+                    .build();
         }
         catch (Exception e){
             throw new Exception("Failed to register user " + e.getMessage());

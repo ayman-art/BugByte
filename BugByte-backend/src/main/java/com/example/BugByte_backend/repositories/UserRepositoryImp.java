@@ -168,14 +168,14 @@ public class UserRepositoryImp implements UserRepository {
         return jdbcTemplate.queryForObject(SQL_FIND_VALIDATION_CODE_BY_ID, new Object[]{ id }, String.class);
     }
 
-
-    private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
-            rs.getLong("id"),
-            rs.getString("user_name"),
-            rs.getString("email"),
-            rs.getString("password"),
-            rs.getString("bio"),
-            rs.getLong("reputation"),
-            rs.getBoolean("is_admin")
-    ));
+    private final RowMapper<User> userRowMapper = ((rs, rowNum) -> User.builder()
+            .id(rs.getLong("id"))
+            .userName(rs.getString("user_name"))
+            .email(rs.getString("email"))
+            .password(rs.getString("password"))
+            .bio(rs.getString("bio"))
+            .reputation(rs.getLong("reputation"))
+            .isAdmin(rs.getBoolean("is_admin"))
+            .build()
+    );
 }

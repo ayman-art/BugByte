@@ -10,35 +10,16 @@ import java.util.List;
 
 @Repository
 public class userProfileRepository {
-
-
-    public int getFollowersCount(long userId){
-        Integer count = jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{ userId }, Integer.class);
-        if (count == null)
-            throw new RuntimeException("Invalid Input");
-
-        return count;
-    }
-    public int getFollowingsCount(long userId){
-        Integer count = jdbcTemplate.queryForObject(SQL_GET_FOLLOWINGS_COUNT, new Object[]{ userId }, Integer.class);
-        if (count == null)
-            throw new RuntimeException("Invalid Input");
-
-        return count;
-    }
-
     private static final String SQL_FOLLOW_USER = """
                 INSERT INTO followers
                     (follower_id, followed_id)
                 VALUES
                     (?, ?);
             """;
-
     private static final String SQL_IS_FOLLOWING = """
                 SELECT COUNT(*) FROM followers
                 WHERE follower_id = ? AND followed_id = ?;
             """;
-
     private static final String SQL_DELETE_FOLLOWER = "DELETE FROM followers WHERE follower_id = ? AND followed_id = ?;";
     private static final String SQL_GET_FOLLOWINGS_COUNT = """
                 SELECT COUNT(*)
@@ -53,22 +34,22 @@ public class userProfileRepository {
                 WHERE f.followed_id = ?;
             """;
     private static final String SQL_GET_FOLLOWERS = """
-                SELECT * 
+                SELECT *
                 FROM followers f
                 JOIN users u ON f.follower_id = u.id
                 WHERE f.followed_id = ?;
             """;
 
     private static final String SQL_GET_FOLLOWINGS = """
-                SELECT * 
+                SELECT *
                 FROM followers f
                 JOIN users u ON f.followed_id = u.id
                 WHERE f.follower_id = ?;
             """;
 
     private static final String SQL_UPDATE_BIO = """
-                UPDATE users 
-                SET bio = ? 
+                UPDATE users
+                SET bio = ?
                 WHERE id = ?;
             """;
 
@@ -120,7 +101,7 @@ public class userProfileRepository {
         return jdbcTemplate.query(SQL_GET_FOLLOWERS, userRowMapper, userId);
     }
 
-    public boolean updateBio(String newBio, Long userId) {
+    public Boolean updateBio(String newBio, Long userId) {
         if (userId == null)
             throw new NullPointerException("UserId is Null");
 
@@ -131,14 +112,30 @@ public class userProfileRepository {
         return row > 0;
     }
 
-    private final RowMapper<User> userRowMapper = ((rs, rowNum) -> new User(
-            rs.getLong("id"),
-            rs.getString("user_name"),
-            rs.getString("email"),
-            rs.getString("password"),
-            rs.getString("bio"),
-            rs.getLong("reputation"),
-            rs.getBoolean("is_admin")
-    ));
+    public Integer getFollowersCount(Long userId) {
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{ userId }, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
 
+        return count;
+    }
+
+    public Integer getFollowingsCount(Long userId) {
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_FOLLOWINGS_COUNT, new Object[]{ userId }, Integer.class);
+        if (count == null)
+            throw new RuntimeException("Invalid Input");
+
+        return count;
+    }
+
+    private final RowMapper<User> userRowMapper = ((rs, rowNum) -> User.builder()
+            .id(rs.getLong("id"))
+            .userName(rs.getString("user_name"))
+            .email(rs.getString("email"))
+            .password(rs.getString("password"))
+            .bio(rs.getString("bio"))
+            .reputation(rs.getLong("reputation"))
+            .isAdmin(rs.getBoolean("is_admin"))
+            .build()
+    );
 }

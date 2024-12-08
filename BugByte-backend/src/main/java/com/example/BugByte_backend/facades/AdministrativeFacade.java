@@ -50,7 +50,6 @@ public class AdministrativeFacade {
             "jwt", jwt,
             "isAdmin", isAdmin
         );
-
     }
 
     public  String loginUser(Map<String, Object> userdata) throws Exception{
@@ -71,7 +70,6 @@ public class AdministrativeFacade {
     public  String resetPassword(Map<String, Object> userdata) throws Exception {
         String email = (String) userdata.get("email");
         return registrationService.sendResetPasswordCode(email);
-
     }
 
     public String validateEmailedCode(Map<String, Object> userdata) throws Exception {
@@ -80,7 +78,6 @@ public class AdministrativeFacade {
         String email = (String) userdata.get("email");
         String code = (String) userdata.get("code");
         Map<String, Object> userMap = adapter.toMap(registrationService.validateCode(email, code));
-        Long id = (Long)userMap.get("id");
         return AuthenticationService.generateJWT((Long)userMap.get("id"),
                 (String)userMap.get("userName"), (boolean)userMap.get("isAdmin"));
     }
@@ -104,29 +101,29 @@ public class AdministrativeFacade {
 
         return profileData;
     }
+
     public void updateProfile(Map<String, Object> userdata) throws Exception {
         try {
-
-            Claims claim =AuthenticationService.parseToken((String) userdata.get("jwt"));
+            Claims claim = AuthenticationService.parseToken((String) userdata.get("jwt"));
             long id = Long.parseLong(claim.getId());
             userService.updateProfile(String.valueOf(userdata.get("bio")), id);
-        }catch (Exception e){
+        } catch (Exception e){
             throw new Exception("Unauthorized operation: "+ e.getMessage());
         }
-
     }
+
     public boolean followUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
-        return userService.followUser(id, (String)userdata.get("userName"));
+        return userService.followUser(id, (String) userdata.get("userName"));
     }
 
     public boolean unfollowUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
-        return userService.unfollowUser(id, (String)userdata.get("userName"));
+        return userService.unfollowUser(id, (String) userdata.get("userName"));
     }
 
     public List<Map<String, Object>> getFollowers(Map<String, Object> userdata) throws Exception {
@@ -140,7 +137,6 @@ public class AdministrativeFacade {
         }
         return followersMap;
     }
-
 
     public List<Map<String, Object>> getFollowings(Map<String, Object> userdata) throws Exception {
         List<User> followings = userService.getFollowings((String)userdata.get("userName"));
@@ -160,6 +156,7 @@ public class AdministrativeFacade {
         long id = Long.parseLong(claim.getId());
         return userService.makeAdmin(id, (String)userdata.get("userName"));
     }
+
     public Map<String, Object> googleOAuthSignUp(@RequestBody Map<String, String> requestBody) throws Exception {
         String tokenRequest = requestBody.get("token");
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
@@ -173,10 +170,10 @@ public class AdministrativeFacade {
             String email = payload.getEmail();
             String name = (String) payload.get("name");
             UserAdapter adapter = new UserAdapter();
-            Map<String, Object> userMap = adapter.toMap(registrationService.registerUsingGoogle(name , email));
-            String jwt = AuthenticationService.generateJWT((long)userMap.get("id"),
-                    (String)userMap.get("userName"), (boolean)userMap.get("isAdmin"));
-            boolean isAdmin = (boolean)userMap.get("isAdmin");
+            Map<String, Object> userMap = adapter.toMap(registrationService.registerUsingGoogle(name, email));
+            String jwt = AuthenticationService.generateJWT((long) userMap.get("id"),
+                    (String) userMap.get("userName"), (boolean) userMap.get("isAdmin"));
+            boolean isAdmin = (boolean) userMap.get("isAdmin");
             return Map.of(
                     "jwt", jwt,
                     "isAdmin", isAdmin
@@ -184,10 +181,5 @@ public class AdministrativeFacade {
         } else {
             throw new RuntimeException("Invalid token");
         }
-    }
-
-    public void authorizeToken(String token){
-        Claims claim = AuthenticationService.parseToken(token);
-
     }
 }
