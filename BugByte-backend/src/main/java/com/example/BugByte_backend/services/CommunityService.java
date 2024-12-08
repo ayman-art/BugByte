@@ -1,12 +1,14 @@
 package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.models.Community;
+import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.CommunityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -15,26 +17,10 @@ public class CommunityService {
 
     private final int poolCapacity = 100;
 
-    private static class CachedCommunity {
-        Community community;
-        boolean dirty;
-
-        CachedCommunity(Community community) {
-            this.community = community;
-            this.dirty = false;
-        }
-    }
-
-    private final LinkedHashMap<String, CachedCommunity> communityPool =
+    private final LinkedHashMap<String, Community> communityPool =
             new LinkedHashMap<>(poolCapacity, 0.75f, true) {
-                protected boolean removeEldestEntry(Map.Entry<String, CachedCommunity> eldest) {
-                    if (this.size() > poolCapacity) {
-                        if (eldest.getValue().dirty) {
-                            persistCommunity(eldest.getValue().community);
-                        }
-                        return true;
-                    }
-                    return false;
+                protected boolean removeEldestEntry(Map.Entry<String, Community> eldest) {
+                    return this.size() > CommunityService.this.poolCapacity;
                 }
             };
 
@@ -42,15 +28,15 @@ public class CommunityService {
     private CommunityRepository communityRepository;
 
     private void cacheCommunity(Community community) {
-        this.communityPool.put(community.getName(), new CachedCommunity(community));
+        this.communityPool.put(community.getName(), community);
     }
 
     private Community getCachedCommunity(String communityName) {
-        CachedCommunity cached = this.communityPool.get(communityName);
-        if (cached == null) {
+        Community community = this.communityPool.get(communityName);
+        if (community == null) {
             throw new IllegalArgumentException("Community not cached: " + communityName);
         }
-        return cached.community;
+        return community;
     }
 
     private boolean persistCommunity(Community community) {
@@ -112,8 +98,8 @@ public class CommunityService {
     }
 
     private String removeFromCache(Long communityId) {
-        for (Map.Entry<String, CachedCommunity> entry : communityPool.entrySet()) {
-            if (entry.getValue().community.getId().equals(communityId)) {
+        for (Map.Entry<String, Community> entry : communityPool.entrySet()) {
+            if (entry.getValue().getId().equals(communityId)) {
                 communityPool.remove(entry.getKey());
                 return entry.getKey();
             }
@@ -127,29 +113,59 @@ public class CommunityService {
         }
 
         try {
-            CachedCommunity cachedCommunity = communityPool.get(existingCommunity.getName());
-            if (cachedCommunity != null) {
-                updateCacheCommunity(cachedCommunity, updatedCommunity);
-            } else {
-                if (!persistCommunity(updatedCommunity)) {
-                    return false;
-                }
-            }
-            return persistCommunity(updatedCommunity);
+            cacheCommunity(updatedCommunity);
+            return true;
         } catch (Exception e) {
             System.out.println("Error updating community: " + e.getMessage());
             return false;
         }
     }
 
-    private void updateCacheCommunity(CachedCommunity cachedCommunity, Community updatedCommunity) {
-        cachedCommunity.community.setName(updatedCommunity.getName());
-        cachedCommunity.community.setDescription(updatedCommunity.getDescription());
-        cachedCommunity.dirty = true;
+    public List<Community> getUserCommunities(Long userId) {
+        try {
+            return communityRepository.getUserCommunities(userId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
-        if (!cachedCommunity.community.getName().equals(updatedCommunity.getName())) {
-            communityPool.remove(cachedCommunity.community.getName());
-            communityPool.put(updatedCommunity.getName(), cachedCommunity);
+    public List<User> getCommunityUsers(Long communityId) {
+        try {
+            return communityRepository.getCommunityMembers(communityId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public List<String> getCommunityMembersNames(Long communityId) {
+        try {
+            return communityRepository.getCommunityMembersNames(communityId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public List<String> getUserCommunitiesNames(Long userId) {
+        try {
+            return communityRepository.getUserCommunitiesNames(userId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public boolean setModerator(Long modratorId, String communityId) {
+        try {
+            return communityRepository.setModerator(modratorId, communityId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean removeModerator(Long modratorId, String communityId) {
+        try {
+            return communityRepository.removeModerator(modratorId, communityId);
+        } catch (Exception e) {
+            return false;
         }
     }
 }

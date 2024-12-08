@@ -78,6 +78,22 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     DELETE FROM community_members 
     WHERE community_id = ?;
 """;
+    private static final String SQL_SET_MODERATOR = """
+    INSERT INTO moderators 
+    (moderator_id , community_id)
+    VALUES 
+    (? ,?);
+""";
+    private static final String SQL_REMOVE_MODERATOR = """
+    DELETE FROM moderators 
+    WHERE moderator_id = ? AND community_id = ?;
+""";
+    private  static final String SQL_REMOVE_COMMUNITY_MODERATORS = """
+    DELETE FROM moderators 
+    WHERE community_id = ?;
+""";
+
+
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -210,6 +226,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if(communityId==null)
             throw new NullPointerException("communityId is null");
         boolean i = deleteCommunityMembers(communityId);
+        removeCommunityModerators(communityId);
         int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_BY_ID, communityId);
         return rows == 1;
     }
@@ -304,7 +321,28 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         int rows = jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION, community.getName(), community.getDescription(), community.getId());
         return rows == 1;
     }
-
-
+    @Override
+    public boolean setModerator(Long modratorId, String communityId)
+    {
+        if (modratorId == null || communityId == null)
+            throw new NullPointerException("ModeratorId or communityId is null");
+        int rows = jdbcTemplate.update(SQL_SET_MODERATOR, modratorId,communityId);
+        if (rows == 0)
+            throw new RuntimeException("Invalid input");
+        return rows==1;
+    }
+    @Override
+    public boolean removeModerator(Long modratorId, String communityId){
+        if (modratorId == null || communityId == null)
+            throw new NullPointerException("moderatorId or communityId is null");
+        int rows = jdbcTemplate.update(SQL_REMOVE_MODERATOR,modratorId, communityId);
+        return rows == 1;
+    }
+    private void  removeCommunityModerators(Long communityId)
+    {
+        if (communityId == null)
+            throw new NullPointerException("communityId is null");
+        int rows = jdbcTemplate.update(SQL_REMOVE_COMMUNITY_MODERATORS, communityId);
+    }
 }
 
