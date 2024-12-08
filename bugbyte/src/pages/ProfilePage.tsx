@@ -99,12 +99,6 @@ const Profile: React.FC = () => {
     try {
       const token = localStorage.getItem('authToken')
       await followUser(userName!, token!)
-      // Update state immutably
-      // setUserProfile((prevProfile) => {
-      //   const updatedProfile = { ...prevProfile!, is_following: true };
-      //   console.log('Updated Profile:', updatedProfile);
-      //   return updatedProfile;
-      // });
       setUserProfile((prevProfile) => 
         prevProfile ? { 
           ...prevProfile, 
@@ -120,12 +114,6 @@ const Profile: React.FC = () => {
     try {
       const token = localStorage.getItem('authToken')
       await unfollowUser(userName!, token!)
-        // Update state immutably
-      // setUserProfile((prevProfile) => {
-      //   const updatedProfile = { ...prevProfile!, is_following: false };
-      //   console.log('Updated Profile:', updatedProfile);
-      //   return updatedProfile;
-      // });
       setUserProfile((prevProfile) => 
         prevProfile ? { 
           ...prevProfile, 
@@ -141,12 +129,6 @@ const Profile: React.FC = () => {
     try {
       const token = localStorage.getItem('authToken')
       await makeAdmin(userName!, token!)
-      // Update state immutably
-      // setUserProfile((prevProfile) => {
-      //   const updatedProfile = { ...prevProfile!, is_following: true };
-      //   console.log('Updated Profile:', updatedProfile);
-      //   return updatedProfile;
-      // });
       setUserProfile((prevProfile) => 
         prevProfile ? { 
           ...prevProfile, 
@@ -158,23 +140,6 @@ const Profile: React.FC = () => {
       console.error('Error following user:', error);
     }
   }
-  // Fetch top posts data
-  // useEffect(() => {
-  //   async function fetchTopPosts(): Promise<void> {
-  //     try {
-  //       const response = await fetch('/api/top-posts');
-  //       if (!response.ok) throw new Error('Failed to fetch top posts');
-  //       const data: Post[] = await response.json();
-  //       setTopPosts(data);
-  //     } catch (error) {
-  //       console.error('Error fetching top posts:', error);
-  //     } finally {
-  //       setPostsLoading(false);
-  //     }
-  //   }
-
-  //   fetchTopPosts();
-  // }, []);
 
   if (profileLoading) {
     return <div style={{ textAlign: 'center', marginTop: '20px' }}>Loading profile...</div>;
@@ -283,11 +248,7 @@ const Profile: React.FC = () => {
         {/* Profile Header */}
         <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          {/*<img
-            src={userProfile.profilePicture}
-            alt="Profile"
-            style={styles.profilePicture}
-          />*/}
+          {}
           <img
             src={profilePath}
             alt="Profile"
