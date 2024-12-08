@@ -63,6 +63,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flex: 1,
     padding: '0 10%',
+    backgroundColor: '#f5f5f5', 
   },
   sidebar: {
     width: '200px',
