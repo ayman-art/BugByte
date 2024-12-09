@@ -1,10 +1,9 @@
 package com.example.BugByte_backend.ServicesTests;
 
-import com.example.BugByte_backend.models.Answer;
-import com.example.BugByte_backend.models.Post;
-import com.example.BugByte_backend.models.Question;
-import com.example.BugByte_backend.models.Reply;
+import com.example.BugByte_backend.models.*;
+import com.example.BugByte_backend.repositories.CommunityRepository;
 import com.example.BugByte_backend.repositories.PostingRepository;
+import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.PostingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,10 @@ public class PostingServiceTest {
     @Mock
     PostingRepository postingRepositoryMock;
 
+    @Mock
+    CommunityRepository communityRepositoryMock;
+    @Mock
+    UserRepositoryImp userRepositoryImpMock;
     @InjectMocks
     PostingService postingService;
     @BeforeEach
@@ -470,5 +475,184 @@ public class PostingServiceTest {
         boolean result = postingService.editPost(postId, mdContent);
 
         assertFalse(result);
+    }
+    @Test
+    void testGetCommunityQuestions_Success() throws Exception {
+        long communityId = 1L;
+        int limit = 5;
+        int offset = 0;
+        Community mockCommunity = new Community();
+        List<Question> mockQuestions = Arrays.asList(new Question(), new Question());
+
+        when(communityRepositoryMock.findCommunityById(communityId)).thenReturn(mockCommunity);
+        when(postingRepositoryMock.getQuestionsByCommunity(communityId, limit, offset)).thenReturn(mockQuestions);
+
+        List<Question> result = postingService.getCommunityQuestions(communityId, limit, offset);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetCommunityQuestions_CommunityNotFound() {
+        long communityId = 1L;
+        int limit = 5;
+        int offset = 0;
+        when(communityRepositoryMock.findCommunityById(communityId)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () ->
+                postingService.getCommunityQuestions(communityId, limit, offset));
+
+        assertEquals("Community is null", exception.getMessage());
+    }
+    @Test
+    void testGetUserQuestions_Success() throws Exception {
+        String userName = "user1";
+        int limit = 5;
+        int offset = 0;
+        User mockUser = new User();
+        List<Question> mockQuestions = Arrays.asList(new Question(), new Question());
+
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(mockUser);
+        when(postingRepositoryMock.getQuestionsByUserName(userName, limit, offset)).thenReturn(mockQuestions);
+
+        List<Question> result = postingService.getUserQuestions(userName, limit, offset);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetUserQuestions_UserNotFound() {
+        String userName = "user1";
+        int limit = 5;
+        int offset = 0;
+
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () ->
+                postingService.getUserQuestions(userName, limit, offset));
+
+        assertEquals("user is null", exception.getMessage());
+    }
+    @Test
+    void testGetUserAnswers_Success() throws Exception {
+        String userName = "user1";
+        int limit = 5;
+        int offset = 0;
+        User mockUser = new User();
+        List<Answer> mockAnswers = Arrays.asList(new Answer(), new Answer());
+
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(mockUser);
+        when(postingRepositoryMock.getAnswersByUserName(userName, limit, offset)).thenReturn(mockAnswers);
+
+        List<Answer> result = postingService.getUserAnswers(userName, limit, offset);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetUserAnswers_UserNotFound() {
+        String userName = "user1";
+        int limit = 5;
+        int offset = 0;
+
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () ->
+                postingService.getUserAnswers(userName, limit, offset));
+
+        assertEquals("user is null", exception.getMessage());
+    }
+    @Test
+    void testGetUserReplies_Success() throws Exception {
+        String userName = "user1";
+        int limit = 5;
+        int offset = 0;
+        User mockUser = new User();
+        List<Reply> mockReplies = Arrays.asList(new Reply(), new Reply());
+
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(mockUser);
+        when(postingRepositoryMock.getRepliesByUserName(userName, limit, offset)).thenReturn(mockReplies);
+
+        List<Reply> result = postingService.getUserReplies(userName, limit, offset);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetUserReplies_UserNotFound() {
+        String userName = "user1";
+        int limit = 5;
+        int offset = 0;
+
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () ->
+                postingService.getUserReplies(userName, limit, offset));
+
+        assertEquals("user is null", exception.getMessage());
+    }
+    @Test
+    void testGetAnswersForQuestion_Success() throws Exception {
+        long questionId = 1L;
+        int limit = 5;
+        int offset = 0;
+        Question mockQuestion = new Question();
+        List<Answer> mockAnswers = Arrays.asList(new Answer(), new Answer());
+
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(postingRepositoryMock.getAnswersForQuestion(questionId, limit, offset)).thenReturn(mockAnswers);
+
+        List<Answer> result = postingService.getAnswersForQuestion(questionId, limit, offset);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetAnswersForQuestion_QuestionNotFound() {
+        long questionId = 1L;
+        int limit = 5;
+        int offset = 0;
+
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () ->
+                postingService.getAnswersForQuestion(questionId, limit, offset));
+
+        assertEquals("question is null", exception.getMessage());
+    }
+    @Test
+    void testGetRepliesForAnswer_Success() throws Exception {
+        long answerId = 1L;
+        int limit = 5;
+        int offset = 0;
+        Answer mockAnswer = new Answer();
+        List<Reply> mockReplies = Arrays.asList(new Reply(), new Reply());
+
+        when(postingRepositoryMock.getAnswerById(answerId)).thenReturn(mockAnswer);
+        when(postingRepositoryMock.getRepliesForAnswer(answerId, limit, offset)).thenReturn(mockReplies);
+
+        List<Reply> result = postingService.getRepliesForAnswer(answerId, limit, offset);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetRepliesForAnswer_AnswerNotFound() {
+        long answerId = 1L;
+        int limit = 5;
+        int offset = 0;
+
+        when(postingRepositoryMock.getAnswerById(answerId)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () ->
+                postingService.getRepliesForAnswer(answerId, limit, offset));
+
+        assertEquals("answer is null", exception.getMessage());
     }
 }

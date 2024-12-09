@@ -1,15 +1,21 @@
 package com.example.BugByte_backend.services;
 
-import com.example.BugByte_backend.models.Answer;
-import com.example.BugByte_backend.models.Post;
-import com.example.BugByte_backend.models.Question;
-import com.example.BugByte_backend.models.Reply;
+import com.example.BugByte_backend.models.*;
+import com.example.BugByte_backend.repositories.CommunityRepository;
 import com.example.BugByte_backend.repositories.PostingRepository;
+import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 public class PostingService {
     @Autowired
     PostingRepository postingRepository;
+
+    @Autowired
+    CommunityRepository communityRepository;
+    @Autowired
+    UserRepositoryImp userRepositoryImp;
     public Post getPost(long postId) throws Exception{
         try {
             Post post = postingRepository.getPostByID(postId);
@@ -162,6 +168,102 @@ public class PostingService {
     public boolean editPost(long postId , String mdContent) throws Exception{
         try {
             return postingRepository.editPost(postId , mdContent);
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<Question> getCommunityQuestions(long communityId , int limit , int offset) throws Exception{
+        try {
+            Community community = communityRepository.findCommunityById(communityId);
+            if (community == null){
+                throw new Exception("Community is null");
+            }
+            List<Question> questions = postingRepository.getQuestionsByCommunity(communityId, limit , offset);
+            if (questions == null){
+                throw new Exception("there is no questions for this community");
+            }
+            return questions;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<Question> getUserQuestions(String userName , int limit , int offset) throws Exception{
+        try {
+           User user  = userRepositoryImp.findByIdentity(userName);
+            if (user == null){
+                throw new Exception("user is null");
+            }
+            List<Question> questions = postingRepository.getQuestionsByUserName(userName, limit , offset);
+            if (questions == null){
+                throw new Exception("there is no questions for this user");
+            }
+            return questions;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<Answer> getUserAnswers(String userName , int limit , int offset) throws Exception{
+        try {
+            User user  = userRepositoryImp.findByIdentity(userName);
+            if (user == null){
+                throw new Exception("user is null");
+            }
+            List<Answer> answers = postingRepository.getAnswersByUserName(userName, limit , offset);
+            if (answers == null){
+                throw new Exception("there is no answers for this user");
+            }
+            return answers;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<Reply> getUserReplies(String userName , int limit , int offset) throws Exception{
+        try {
+            User user  = userRepositoryImp.findByIdentity(userName);
+            if (user == null){
+                throw new Exception("user is null");
+            }
+            List<Reply> replies = postingRepository.getRepliesByUserName(userName, limit , offset);
+            if (replies == null){
+                throw new Exception("there is no replies for this user");
+            }
+            return replies;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<Answer> getAnswersForQuestion(long questionId , int limit , int offset) throws Exception{
+        try {
+            Question question = postingRepository.getQuestionById(questionId);
+            if (question == null){
+                throw new Exception("question is null");
+            }
+            List<Answer> answers = postingRepository.getAnswersForQuestion(questionId, limit , offset);
+            if (answers == null){
+                throw new Exception("there is no answers for this question");
+            }
+            return answers;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public List<Reply> getRepliesForAnswer(long answerId , int limit , int offset) throws Exception{
+        try {
+            Answer answer = postingRepository.getAnswerById(answerId);
+            if (answer == null){
+                throw new Exception("answer is null");
+            }
+            List<Reply> replies = postingRepository.getRepliesForAnswer(answerId, limit , offset);
+            if (replies == null){
+                throw new Exception("there is no replies for this answer");
+            }
+            return replies;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
