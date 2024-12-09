@@ -1,4 +1,4 @@
-package com.example.BugByte_backend.repositories.graphql;
+package com.example.BugByte_backend.repositories.graphql.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +14,6 @@ public class Image {
     private Long id;
     private String filename;
     private String url;
-    private Long size;
+    private int size;
     private String type;
 }

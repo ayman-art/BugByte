@@ -1,0 +1,16 @@
+
+type Image {
+    id: ID!
+    filename: String!
+    url: String!
+    size: Int!
+    type: String!
+}
+
+type Query {
+    images: [Image!]!
+}
+
+type Mutation {
+    uploadImage(filename: String!, url: String!, size: Int!, type: String!): Image!
+}
