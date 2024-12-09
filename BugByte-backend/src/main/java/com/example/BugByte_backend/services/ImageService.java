@@ -3,6 +3,8 @@ package com.example.BugByte_backend.services;
 import com.example.BugByte_backend.configurations.StorageConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,9 +17,10 @@ import java.util.UUID;
 @Service
 public class ImageService {
     private final Path fileStorageLocation;
-
+    @Autowired
+    StorageConfig storageConfig;
     @Value("${server.base-url}")
-    private String baseUrl;
+    public String baseUrl;
 
     @Autowired
     public ImageService(StorageConfig storageConfig) {
@@ -44,6 +47,20 @@ public class ImageService {
             return baseUrl + "/images/" + uniqueFileName;
         } catch (IOException ex) {
             throw new RuntimeException("Could not store file. Please try again!", ex);
+        }
+    }
+    public Resource loadFileAsResource(String filename) {
+        try {
+
+            Path filePath = storageConfig.getUploadPath().resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("File not found or not readable");
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Error loading file", ex);
         }
     }
 }

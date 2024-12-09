@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/images")
@@ -28,28 +27,21 @@ public class ImageController {
 
     @PostMapping("/upload")
     public String uploadImage(@RequestParam("file") MultipartFile file) {
-        System.out.println("recieved");
         return imageService.storeFile(file);
     }
 
-    @GetMapping("/download")
-    public ResponseEntity<Resource> serveFile(@RequestParam("name") String filename) {
-        System.out.println("reciever get");
+    @GetMapping("/download/{filename:.+}")
+    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         try {
-            Path filePath = this.fileStorageLocation.resolve(filename).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-
-            if(resource.exists()) {
-                return ResponseEntity.ok()
-                        .contentType(MediaType.IMAGE_JPEG)
-                        .header(HttpHeaders.CONTENT_DISPOSITION,
-                                "inline; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            Resource resource = imageService.loadFileAsResource(filename);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "inline; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
         } catch (Exception ex) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.notFound().build();
         }
     }
+
 }
