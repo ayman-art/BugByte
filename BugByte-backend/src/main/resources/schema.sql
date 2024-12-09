@@ -75,3 +75,12 @@ CREATE TABLE IF NOT EXISTS replies (
     FOREIGN KEY (id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (answer_id) REFERENCES answers(id) ON DELETE CASCADE
 );
+
+
+CREATE TABLE IF NOT EXISTS moderators (
+    id BIGINT NOT NULL,
+    community_id BIGINT NOT NULL,
+    PRIMARY KEY (id, community_id),
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE
+);
