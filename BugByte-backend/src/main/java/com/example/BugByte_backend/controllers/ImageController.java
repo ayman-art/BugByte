@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/images")
 public class ImageController {
     private final ImageService imageService;
     private final Path fileStorageLocation;
@@ -28,11 +28,13 @@ public class ImageController {
 
     @PostMapping("/upload")
     public String uploadImage(@RequestParam("file") MultipartFile file) {
+        System.out.println("recieved");
         return imageService.storeFile(file);
     }
 
-    @GetMapping("/images/{filename:.+}")
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+    @GetMapping("/download")
+    public ResponseEntity<Resource> serveFile(@RequestParam("name") String filename) {
+        System.out.println("reciever get");
         try {
             Path filePath = this.fileStorageLocation.resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
