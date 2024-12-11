@@ -83,13 +83,13 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 """;
     private static final String SQL_SET_MODERATOR = """
     INSERT INTO moderators 
-    (moderator_id , community_id)
+    (id , community_id)
     VALUES 
     (? ,?);
 """;
     private static final String SQL_REMOVE_MODERATOR = """
     DELETE FROM moderators 
-    WHERE moderator_id = ? AND community_id = ?;
+    WHERE id = ? AND community_id = ?;
 """;
     private  static final String SQL_REMOVE_COMMUNITY_MODERATORS = """
     DELETE FROM moderators 
