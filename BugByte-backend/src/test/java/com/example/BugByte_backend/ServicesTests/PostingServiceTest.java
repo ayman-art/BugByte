@@ -69,7 +69,7 @@ public class PostingServiceTest {
         when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getCommunityId()))
                 .thenReturn(true);
 
-        long result = postingService.PostQuestion(mockQuestion);
+        long result = postingService.postQuestion(mockQuestion);
 
         assertEquals(generatedPostId, result);
     }
@@ -85,7 +85,7 @@ public class PostingServiceTest {
                 .thenReturn(null);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            postingService.PostQuestion(mockQuestion);
+            postingService.postQuestion(mockQuestion);
         });
         assertEquals("post id is null", exception.getMessage());
     }
@@ -105,7 +105,7 @@ public class PostingServiceTest {
                 .thenReturn(false);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            postingService.PostQuestion(mockQuestion);
+            postingService.postQuestion(mockQuestion);
         });
         assertEquals("error inserting a question", exception.getMessage());
     }
@@ -123,7 +123,7 @@ public class PostingServiceTest {
         when(postingRepositoryMock.insertAnswer(generatedPostId, mockAnswer.getQuestionId()))
                 .thenReturn(true);
 
-        long result = postingService.PostAnswer(mockAnswer);
+        long result = postingService.postAnswer(mockAnswer);
 
         assertEquals(generatedPostId, result);
     }
@@ -139,7 +139,7 @@ public class PostingServiceTest {
                 .thenReturn(null);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            postingService.PostAnswer(mockAnswer);
+            postingService.postAnswer(mockAnswer);
         });
         assertEquals("post id is null", exception.getMessage());
     }
@@ -157,7 +157,7 @@ public class PostingServiceTest {
         when(postingRepositoryMock.insertReply(generatedPostId, mockReply.getAnswerId()))
                 .thenReturn(true);
 
-        long result = postingService.PostReply(mockReply);
+        long result = postingService.postReply(mockReply);
 
         assertEquals(generatedPostId, result);
     }
@@ -173,7 +173,7 @@ public class PostingServiceTest {
                 .thenReturn(null);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            postingService.PostReply(mockReply);
+            postingService.postReply(mockReply);
         });
         assertEquals("post id is null", exception.getMessage());
     }
@@ -193,7 +193,7 @@ public class PostingServiceTest {
                 .thenReturn(false);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            postingService.PostReply(mockReply);
+            postingService.postReply(mockReply);
         });
         assertEquals("error inserting a reply", exception.getMessage());
     }

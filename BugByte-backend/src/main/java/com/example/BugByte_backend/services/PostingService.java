@@ -27,7 +27,7 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public long PostQuestion(Question q) throws Exception{
+    public long postQuestion(Question q) throws Exception{
         try {
             Long postId = postingRepository.insertPost(q.getMdContent() , q.getCreatorUserName());
             if (postId == null)
@@ -41,7 +41,7 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public long PostAnswer(Answer a) throws Exception{
+    public long postAnswer(Answer a) throws Exception{
         try {
             Long postId = postingRepository.insertPost(a.getMdContent() , a.getCreatorUserName());
             if (postId == null)
@@ -55,7 +55,7 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public long PostReply(Reply r) throws Exception{
+    public long postReply(Reply r) throws Exception{
         try {
             Long postId = postingRepository.insertPost(r.getMdContent() , r.getCreatorUserName());
             if (postId == null)
