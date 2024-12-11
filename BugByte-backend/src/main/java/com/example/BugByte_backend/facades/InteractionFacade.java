@@ -226,7 +226,7 @@ public class InteractionFacade {
             throw new Exception(e.getMessage());
         }
     }
-    public List<Map<String , Object>> getAnswerForQuestion(Map<String, Object> questionData) throws Exception {
+    public List<Map<String , Object>> getAnswersForQuestion(Map<String, Object> questionData) throws Exception {
         try {
             AnswerAdapter answerAdapter = new AnswerAdapter();
             List<Answer> answers = postingService.getAnswersForQuestion((Long) questionData.get("questionId")
