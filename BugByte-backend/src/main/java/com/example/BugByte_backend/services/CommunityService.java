@@ -29,6 +29,7 @@ public class CommunityService {
 
     private void cacheCommunity(Community community) {
         this.communityPool.put(community.getName(), community);
+
     }
 
     private Community getCachedCommunity(String communityName) {
@@ -72,11 +73,10 @@ public class CommunityService {
         }
     }
 
-    public Long createCommunity(String name, Long adminId) {
+    public Long createCommunity(Community inCommunity) {
         try {
-            Long communityId = communityRepository.insertCommunity(name, adminId);
-            Community community = communityRepository.findCommunityByName(name);
-            cacheCommunity(community);
+            Long communityId = communityRepository.insertCommunity(inCommunity.getName(), inCommunity.getAdminId());
+            cacheCommunity(inCommunity);
             return communityId;
         } catch (Exception e) {
             System.out.println("Error creating community: " + e.getMessage());

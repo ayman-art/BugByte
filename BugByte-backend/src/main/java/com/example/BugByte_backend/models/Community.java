@@ -53,6 +53,10 @@ public class Community {
         this.id = 0L;
     }
 
+    public Community() {
+
+    }
+
     public Long getId() {
         return id;
     }

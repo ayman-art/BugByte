@@ -3,9 +3,12 @@ import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
 import java.util.Date;
 import java.util.List;
 
+@Repository
 public class CommunityRepository implements CommunityRepositoryInterface{
     private static final String SQL_INSERT_COMMUNITY = """
                 INSERT INTO communities
@@ -103,9 +106,12 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if (name == null || adminId == null)
             throw new NullPointerException("name or adminId is null");
         int rows = jdbcTemplate.update(SQL_INSERT_COMMUNITY, name, adminId, new Date());
-        if (rows != 0)
-            return findIdByName(name);
-        throw new RuntimeException("Invalid input");
+        if (rows != 0) {
+            Long n=findIdByName(name);
+            boolean k=insertMember(adminId,n);
+            return n;
+        }
+        throw new RuntimeException("Community with this name already exists.");
 
     }
 
@@ -315,34 +321,40 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
     @Override
     public boolean updateCommunityNameAndDescription(Community community) {
-        if (community ==null) {
-            throw new NullPointerException("communityId, newName, or newDescription is null");
+        if (community == null) {
+            throw new IllegalArgumentException("Community object is null");
         }
         int rows = jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION, community.getName(), community.getDescription(), community.getId());
         return rows == 1;
     }
+
     @Override
-    public boolean setModerator(Long modratorId, String communityId)
-    {
-        if (modratorId == null || communityId == null)
-            throw new NullPointerException("ModeratorId or communityId is null");
-        int rows = jdbcTemplate.update(SQL_SET_MODERATOR, modratorId,communityId);
-        if (rows == 0)
-            throw new RuntimeException("Invalid input");
-        return rows==1;
-    }
-    @Override
-    public boolean removeModerator(Long modratorId, String communityId){
-        if (modratorId == null || communityId == null)
-            throw new NullPointerException("moderatorId or communityId is null");
-        int rows = jdbcTemplate.update(SQL_REMOVE_MODERATOR,modratorId, communityId);
+    public boolean setModerator(Long moderatorId, String communityId) {
+        if (moderatorId == null || communityId == null) {
+            throw new IllegalArgumentException("ModeratorId or communityId is null");
+        }
+        int rows = jdbcTemplate.update(SQL_SET_MODERATOR, moderatorId, communityId);
+        if (rows == 0) {
+            throw new RuntimeException("Invalid input, no rows affected");
+        }
         return rows == 1;
     }
-    private void  removeCommunityModerators(Long communityId)
-    {
-        if (communityId == null)
-            throw new NullPointerException("communityId is null");
+
+    @Override
+    public boolean removeModerator(Long moderatorId, String communityId) {
+        if (moderatorId == null || communityId == null) {
+            throw new IllegalArgumentException("ModeratorId or communityId is null");
+        }
+        int rows = jdbcTemplate.update(SQL_REMOVE_MODERATOR, moderatorId, communityId);
+        return rows == 1;
+    }
+
+    private void removeCommunityModerators(Long communityId) {
+        if (communityId == null) {
+            throw new IllegalArgumentException("communityId is null");
+        }
         int rows = jdbcTemplate.update(SQL_REMOVE_COMMUNITY_MODERATORS, communityId);
     }
+
 }
 
