@@ -56,6 +56,9 @@ public class TagsRepository implements ITagsRepository {
         if (questionId == null || tags == null || tags.isEmpty())
             throw new NullPointerException("Question Id is null or tags are null or empty");
 
+        removeTagsFromQuestion(questionId);
+        insertTags(tags);
+
         List<Long> tagIds = getTagIdsByName(tags);
 
         String tagValues = tagIds.stream()

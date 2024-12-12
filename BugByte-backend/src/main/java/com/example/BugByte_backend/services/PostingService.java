@@ -3,6 +3,7 @@ package com.example.BugByte_backend.services;
 import com.example.BugByte_backend.models.*;
 import com.example.BugByte_backend.repositories.CommunityRepository;
 import com.example.BugByte_backend.repositories.PostingRepository;
+import com.example.BugByte_backend.repositories.TagsRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,6 +17,10 @@ public class PostingService {
     CommunityRepository communityRepository;
     @Autowired
     UserRepositoryImp userRepositoryImp;
+
+    @Autowired
+    TagsRepository tagsRepository;
+
     public Post getPost(long postId) throws Exception{
         try {
             Post post = postingRepository.getPostByID(postId);
@@ -27,12 +32,14 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public long postQuestion(Question q) throws Exception{
+    public long postQuestion(Question q) throws Exception {
         try {
             Long postId = postingRepository.insertPost(q.getMdContent() , q.getCreatorUserName());
             if (postId == null)
                 throw new Exception("post id is null");
-            if(postingRepository.insertQuestion(postId , q.getCommunityId())){
+            if (postingRepository.insertQuestion(postId , q.getCommunityId())) {
+                tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
+
                 return postId;
             }
             throw new Exception("error inserting a question");
@@ -173,32 +180,36 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public List<Question> getCommunityQuestions(long communityId , int limit , int offset) throws Exception{
+    public List<Question> getCommunityQuestions(long communityId, int limit, int offset) throws Exception {
         try {
             Community community = communityRepository.findCommunityById(communityId);
-            if (community == null){
+            if (community == null)
                 throw new Exception("Community is null");
-            }
+
             List<Question> questions = postingRepository.getQuestionsByCommunity(communityId, limit , offset);
-            if (questions == null){
+            if (questions == null)
                 throw new Exception("there is no questions for this community");
-            }
+
+            addTagsToQuestions(questions);
+
             return questions;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public List<Question> getUserQuestions(String userName , int limit , int offset) throws Exception{
+    public List<Question> getUserQuestions(String userName, int limit, int offset) throws Exception {
         try {
            User user  = userRepositoryImp.findByIdentity(userName);
-            if (user == null){
+            if (user == null)
                 throw new Exception("user is null");
-            }
-            List<Question> questions = postingRepository.getQuestionsByUserName(userName, limit , offset);
-            if (questions == null){
+
+            List<Question> questions = postingRepository.getQuestionsByUserName(userName, limit, offset);
+            if (questions == null)
                 throw new Exception("there is no questions for this user");
-            }
+
+            addTagsToQuestions(questions);
+
             return questions;
         }
         catch (Exception e){
@@ -221,7 +232,7 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public List<Reply> getUserReplies(String userName , int limit , int offset) throws Exception{
+    public List<Reply> getUserReplies(String userName, int limit, int offset) throws Exception{
         try {
             User user  = userRepositoryImp.findByIdentity(userName);
             if (user == null){
@@ -267,6 +278,13 @@ public class PostingService {
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
+        }
+    }
+
+    private void addTagsToQuestions(List<Question> questions) {
+        for (Question question : questions) {
+            List<String> questionTags = tagsRepository.findTagsByQuestion(question.getId());
+            question.setTags(questionTags);
         }
     }
 }
