@@ -1,9 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MDXEditor, 
+    headingsPlugin,
+    listsPlugin,
+    quotePlugin,
+    linkPlugin,
+    imagePlugin,
+    tablePlugin,
+    markdownShortcutPlugin,
+    thematicBreakPlugin,
+    linkDialogPlugin,
+    codeBlockPlugin,
+    sandpackPlugin,
+    codeMirrorPlugin,
+} from '@mdxeditor/editor';
+import '@mdxeditor/editor/style.css';
+import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 
 interface AnswerProps {
   id: string;
-  text: string;
+  postId: string;
+  text: string; // Markdown content
+
   upvotes: number;
   downvotes: number;
   opName: string;
@@ -31,11 +49,35 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
     <div className="answer-container">
       <div className="answer-content">
         <header className="answer-header">
-          <p className="op-name">Answered by: <span onClick={handleNavigateToProfile}  className="op-link">{opName}</span></p>
-          <section className="answer-body">
-            <p>{text}</p>
-          </section>
+          <p className="op-name">
+            Answered by:{" "}
+            <span onClick={handleNavigateToProfile} className="op-link">
+              {opName}
+            </span>
+          </p>
         </header>
+
+        {/* Use MDXEditor for markdown answer content */}
+        <section className="answer-body">
+          <MDXEditor
+            markdown={text}
+            readOnly
+            plugins={[
+              headingsPlugin(),
+              listsPlugin(),
+              quotePlugin(),
+              linkPlugin(),
+              imagePlugin({ imageUploadHandler }),
+              tablePlugin(),
+              codeBlockPlugin({ defaultCodeBlockLanguage: "js" }),
+              sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
+              codeMirrorPlugin(languages),
+              linkDialogPlugin(),
+              thematicBreakPlugin(),
+              markdownShortcutPlugin(),
+            ]}
+          />
+        </section>
 
         <p className="answer-date">on {date}</p>
 

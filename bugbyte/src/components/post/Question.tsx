@@ -1,6 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing the icons
+import { MDXEditor, 
+    headingsPlugin,
+    listsPlugin,
+    quotePlugin,
+    linkPlugin,
+    imagePlugin,
+    tablePlugin,
+    markdownShortcutPlugin,
+    thematicBreakPlugin,
+    linkDialogPlugin,
+    codeBlockPlugin,
+    sandpackPlugin,
+    codeMirrorPlugin,
+} from '@mdxeditor/editor';
+import '@mdxeditor/editor/style.css';
+import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 
 interface QuestionProps {
   postId: string;
@@ -58,8 +74,27 @@ const Question: React.FC<QuestionProps> = ({
               {opName}
             </span>
           </p>
+
+          {/* Use MDXEditor for markdown question text */}
           <section className="question-body">
-            <p>{questionText}</p>
+            <MDXEditor
+              markdown={questionText}
+              readOnly
+              plugins={[
+                headingsPlugin(),
+                listsPlugin(),
+                quotePlugin(),
+                linkPlugin(),
+                imagePlugin({ imageUploadHandler }),
+                tablePlugin(),
+                codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+                sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
+                codeMirrorPlugin(languages),
+                linkDialogPlugin(),
+                thematicBreakPlugin(),
+                markdownShortcutPlugin(),
+              ]}
+            />
           </section>
         </header>
 

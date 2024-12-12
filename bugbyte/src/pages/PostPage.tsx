@@ -19,6 +19,7 @@ interface QuestionProps {
 }
 
 interface AnswerProps {
+  id: string;
   postId: string;
   text: string;
   upvotes: number;
@@ -29,6 +30,7 @@ interface AnswerProps {
 
 interface ReplyProps {
   id: string;
+  answerId: string;  // Add answerId to map replies to answers
   text: string;
   upvotes: number;
   downvotes: number;
@@ -36,12 +38,24 @@ interface ReplyProps {
   date: string;
 }
 
+
 // Mock data for questions, answers, and replies
 const questions: QuestionProps[] = [
   {
     postId: '1',
     title: "TITLEEEE",
-    questionText: 'What is React and how does it work?',
+    questionText: `
+    # h1 Heading 8-)
+    ## h2 Heading
+    ### h3 Heading
+    #### h4 Heading
+    ##### h5 Heading
+    ###### h6 Heading
+
+
+    ## Horizontal Rules
+    ![Minion](https://octodex.github.com/images/minion.png)
+    `,
     tags: ['React', 'JavaScript', 'Frontend'],
     upvotes: 10,
     downvotes: 2,
@@ -68,6 +82,7 @@ const questions: QuestionProps[] = [
 // Mock data for answers and replies
 const answers: AnswerProps[] = [
   {
+    id: '1',
     postId: '1',
     text: 'React is a JavaScript library for building user interfaces, primarily for single-page applications.',
     upvotes: 5,
@@ -76,6 +91,7 @@ const answers: AnswerProps[] = [
     date: '2024-12-07',
   },
   {
+    id: '2',
     postId: '1',
     text: 'It uses a virtual DOM to efficiently update the user interface.',
     upvotes: 3,
@@ -89,7 +105,8 @@ const answers: AnswerProps[] = [
 const replies: ReplyProps[] = [
   {
     id: '1',
-    text: 'That makes sense! Thanks for the explanation.',
+    answerId: '1',  // Map to answerId
+    text: '# That makes sense! Thanks for the explanation.',
     upvotes: 2,
     downvotes: 0,
     opName: 'MikeSmith',
@@ -97,6 +114,7 @@ const replies: ReplyProps[] = [
   },
   {
     id: '2',
+    answerId: '2',  // Map to answerId
     text: 'Could you explain more about how the virtual DOM works?',
     upvotes: 1,
     downvotes: 0,
@@ -104,7 +122,6 @@ const replies: ReplyProps[] = [
     date: '2024-12-08',
   },
 ];
-
 const PostPage: React.FC = () => {
   // Retrieve the `postId` from the URL parameters
   const { postId } = useParams<{ postId: string }>();
@@ -117,9 +134,12 @@ const PostPage: React.FC = () => {
     return <p>Question not found.</p>;
   }
 
-  // Filter the answers and replies based on the `postId`
+  // Filter the answers based on the `postId`
   const postAnswers = answers.filter((answer) => answer.postId === postId);
-  const postReplies = replies.filter((reply) => reply.id === postId);
+
+  // Filter the replies based on the `answerId` (this was the issue)
+  const postReplies = (answerId: string) =>
+    replies.filter((reply) => reply.answerId === answerId);
 
   // Pass the `QuestionProps` data to the `Question` component
   return (
@@ -136,12 +156,12 @@ const PostPage: React.FC = () => {
         communityId={question.communityId}
         communityName={question.communityName}
       />
-
       <div className="answers-section">
         {postAnswers.length > 0 ? (
           postAnswers.map((answer, index) => (
             <div key={index} className="answer-container">
               <Answer
+                id={answer.id}
                 postId={answer.postId}
                 text={answer.text}
                 upvotes={answer.upvotes}
@@ -150,11 +170,13 @@ const PostPage: React.FC = () => {
                 date={answer.date}
               />
               <div className="replies-section">
-                {postReplies.length > 0 &&
-                  postReplies.map((reply, index) => (
+                {/* Use postReplies for each answer, filtered by answerId */}
+                {postReplies(answer.id).length > 0 &&
+                  postReplies(answer.id).map((reply, index) => (
                     <div key={index} className="reply-container">
                       <Reply
                         id={reply.id}
+                        answerId={reply.answerId} // Pass answerId to Reply component
                         text={reply.text}
                         upvotes={reply.upvotes}
                         downvotes={reply.downvotes}
@@ -173,5 +195,6 @@ const PostPage: React.FC = () => {
     </div>
   );
 };
+
 
 export default PostPage;

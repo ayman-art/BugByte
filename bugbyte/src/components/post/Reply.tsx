@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MDXEditor, 
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  linkPlugin,
+  imagePlugin,
+  tablePlugin,
+  markdownShortcutPlugin,
+  thematicBreakPlugin,
+  linkDialogPlugin,
+  codeBlockPlugin,
+  sandpackPlugin,
+  codeMirrorPlugin,
+} from '@mdxeditor/editor';
+import '@mdxeditor/editor/style.css';
+import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 
 interface ReplyProps {
   id: string;
-  text: string;
+  answerId: string;  // Add answerId to map replies to answers
+  text: string; // Markdown content
   upvotes: number;
   downvotes: number;
   opName: string;
@@ -34,10 +51,29 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
           <p className="op-name">
             Replied by: <span className="op-link" onClick={handleNavigateToProfile}>{opName}</span>
           </p>
-          <section className="reply-body">
-            <p>{text}</p>
-          </section>
         </header>
+
+        {/* Use MDXEditor for markdown reply content */}
+        <section className="reply-body">
+          <MDXEditor
+            markdown={text}
+            readOnly
+            plugins={[
+              headingsPlugin(),
+              listsPlugin(),
+              quotePlugin(),
+              linkPlugin(),
+              imagePlugin({ imageUploadHandler }),
+              tablePlugin(),
+              codeBlockPlugin({ defaultCodeBlockLanguage: "js" }),
+              sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
+              codeMirrorPlugin(languages),
+              linkDialogPlugin(),
+              thematicBreakPlugin(),
+              markdownShortcutPlugin(),
+            ]}
+          />
+        </section>
 
         <p className="reply-date">on {date}</p>
 

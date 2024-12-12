@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import MDEditor from './MDEditor';
 
 interface PostModalProps {
   isOpen: boolean;
@@ -11,8 +12,8 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onSave }) => {
   const [tagInput, setTagInput] = useState<string>('');
   const [selectedCommunity, setSelectedCommunity] = useState<string>('');
   const [postContent, setPostContent] = useState<string>('');
-  const [postTitle, setPostTitle] = useState<string>(''); // New state for title
-  
+  const [postTitle, setPostTitle] = useState<string>('');
+
   const communities = [
     'Tech Enthusiasts',
     'Bug Hunters',
@@ -32,7 +33,7 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onSave }) => {
 
   const handleSavePost = () => {
     onSave({
-      title: postTitle, // Include title in saved post
+      title: postTitle,
       content: postContent,
       community: selectedCommunity,
       tags: tags
@@ -45,62 +46,63 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onSave }) => {
   return (
     <div style={styles.modal}>
       <div style={styles.modalContent}>
-        <h3>Create Post</h3>
-        {/* New input for post title */}
-        <input
-          type="text"
-          style={styles.titleInput}
-          placeholder="Post Title"
-          value={postTitle}
-          onChange={(e) => setPostTitle(e.target.value)}
-        />
-        <textarea 
-          style={styles.textarea} 
-          placeholder="Write something..." 
-          value={postContent}
-          onChange={(e) => setPostContent(e.target.value)}
-        />
-        <div style={styles.communityDropdown}>
-          <label htmlFor="communitySelect">Select Community:</label>
-          <select
-            id="communitySelect"
-            value={selectedCommunity}
-            onChange={(e) => setSelectedCommunity(e.target.value)}
-            style={styles.dropdown}
-          >
-            <option value="" disabled>
-              Choose a community
-            </option>
-            {communities.map((community, index) => (
-              <option key={index} value={community}>
-                {community}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div style={styles.tagSection}>
+        <h3 style={styles.modalTitle}>Create Post</h3>
+        <div style={styles.scrollableContent}>
           <input
             type="text"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            style={styles.tagInput}
-            placeholder="Add tags..."
+            style={styles.titleInput}
+            placeholder="Post Title"
+            value={postTitle}
+            onChange={(e) => setPostTitle(e.target.value)}
           />
-          <button onClick={handleAddTag} style={styles.addTagButton}>
-            Add Tag
-          </button>
-          <div style={styles.tagList}>
-            {tags.map((tag, index) => (
-              <div key={index} style={styles.tagItem}>
-                <span>{tag}</span>
-                <button
-                  style={styles.removeTagButton}
-                  onClick={() => handleRemoveTag(tag)}
-                >
-                  X
-                </button>
-              </div>
-            ))}
+          <div style={styles.editorContainer}>
+            <MDEditor
+              markdown={postContent}
+              onChange={setPostContent}
+            />
+          </div>
+          <div style={styles.communityDropdown}>
+            <label htmlFor="communitySelect">Select Community:</label>
+            <select
+              id="communitySelect"
+              value={selectedCommunity}
+              onChange={(e) => setSelectedCommunity(e.target.value)}
+              style={styles.dropdown}
+            >
+              <option value="" disabled>
+                Choose a community
+              </option>
+              {communities.map((community, index) => (
+                <option key={index} value={community}>
+                  {community}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={styles.tagSection}>
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              style={styles.tagInput}
+              placeholder="Add tags..."
+            />
+            <button onClick={handleAddTag} style={styles.addTagButton}>
+              Add Tag
+            </button>
+            <div style={styles.tagList}>
+              {tags.map((tag, index) => (
+                <div key={index} style={styles.tagItem}>
+                  <span>{tag}</span>
+                  <button
+                    style={styles.removeTagButton}
+                    onClick={() => handleRemoveTag(tag)}
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div style={styles.modalButtons}>
@@ -127,24 +129,41 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 1000,
+    zIndex: 1,
   },
   modalContent: {
     backgroundColor: 'white',
-    padding: '20px',
     borderRadius: '10px',
-    width: '300px',
+    width: '500px',
+    maxHeight: '90vh',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    zIndex: 2,
   },
-  textarea: {
+  modalTitle: {
+    padding: '15px',
+    borderBottom: '1px solid #eee',
+    margin: 0,
+  },
+  scrollableContent: {
+    overflowY: 'auto',
+    padding: '15px',
+    flexGrow: 1,
+  },
+  editorContainer: {
+    marginBottom: '15px',
+  },
+  titleInput: {
     width: '100%',
-    height: '100px',
-    marginBottom: '10px',
+    marginBottom: '15px',
     padding: '10px',
     borderRadius: '5px',
     border: '1px solid #ccc',
+    boxSizing: 'border-box',
   },
   tagSection: {
-    marginBottom: '10px',
+    marginBottom: '15px',
   },
   tagInput: {
     width: '70%',
@@ -167,7 +186,8 @@ const styles = {
     marginTop: '10px',
   },
   tagItem: {
-    backgroundColor: '#f1f1f1',
+    backgroundColor: 'green', 
+    color: 'white',          
     padding: '5px 10px',
     margin: '5px',
     borderRadius: '5px',
@@ -184,6 +204,8 @@ const styles = {
   modalButtons: {
     display: 'flex',
     justifyContent: 'space-between',
+    padding: '15px',
+    borderTop: '1px solid #eee',
   },
   saveButton: {
     backgroundColor: '#099154',
@@ -202,7 +224,7 @@ const styles = {
     cursor: 'pointer',
   },
   communityDropdown: {
-    marginBottom: '10px',
+    marginBottom: '15px',
   },
   dropdown: {
     width: '100%',
