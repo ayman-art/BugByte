@@ -80,3 +80,11 @@ CREATE TABLE IF NOT EXISTS tag (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) UNIQUE NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS question_tag (
+    question_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    PRIMARY KEY (question_id, tag_id),
+    FOREIGN KEY (question_id) REFERENCES questions(id),
+    FOREIGN KEY (tag_id) REFERENCES tag(id)
+);
