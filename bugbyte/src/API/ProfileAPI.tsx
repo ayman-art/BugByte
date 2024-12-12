@@ -114,3 +114,18 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
       throw error;
     }
   };
+  export const updateProfilePicture = async (formData: FormData, token: string) => {
+    try {
+      const response = await fetch('/api/profile/picture', {
+        method:'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        },
+        body: formData
+      });
+      return await response.text();
+    } catch (error) {
+      throw error;
+    }
+  };

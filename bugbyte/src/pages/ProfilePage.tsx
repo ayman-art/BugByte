@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import profilePath from '../assets/user-profile.svg';
-import Layout from '../layouts/MainLayout';
 import TextPopUp from '../components/BioPopup'
-import { followUser, getProfile, makeAdmin, unfollowUser, updateBio } from '../API/ProfileAPI';
+import { followUser, getProfile, makeAdmin, unfollowUser, updateBio, updateProfilePicture } from '../API/ProfileAPI';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useNavbar } from '@nextui-org/navbar';
 interface UserProfile {
   username: string;
   reputation: number;
@@ -13,6 +11,7 @@ interface UserProfile {
   bio: string;
   is_following: boolean;
   is_admin: boolean; // Add this to match the fetched user profile structure
+  profile_picture?: string; // New optional field for profile picture
 }
 interface Post {
   id: number;
@@ -44,7 +43,9 @@ const Profile: React.FC = () => {
   const [profileLoading, setProfileLoading] = useState<boolean>(true);
   const [postsLoading, setPostsLoading] = useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isProfilePicPopupOpen, setIsProfilePicPopupOpen] = useState(false);
   const [error, setError] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
@@ -65,7 +66,38 @@ const Profile: React.FC = () => {
       setError("Failed to update bio");
     }
   };
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
+      setIsProfilePicPopupOpen(true);
+    }
+  };
+  
+  // Upload profile picture
+  const handleProfilePictureUpload = async () => {
+    if (!selectedFile) return;
 
+    try {
+      const token = localStorage.getItem('authToken');
+      const formData = new FormData();
+      formData.append('profile_picture', selectedFile);
+
+      const updatedProfilePic = await updateProfilePicture(formData, token!);
+      
+      setUserProfile((prevProfile) => 
+        prevProfile ? { 
+          ...prevProfile, 
+          profile_picture: updatedProfilePic 
+        } : null
+      );
+      
+      setIsProfilePicPopupOpen(false);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      setError("Failed to upload profile picture");
+    }
+  };
   const handlePopupClose = () => {
     setIsPopupOpen(false);
   };
@@ -149,111 +181,90 @@ const Profile: React.FC = () => {
     return <div style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}>Error loading profile. Please try again later.</div>;
   }
 
-  // Inline style definitions
-  const styles = {
-    errorMessge: {
-      color: 'red',
-      fontSize: '12px', 
-      marginTop: '10px', 
-      textAlign: 'center' as 'center', 
-    },
-    container: {
-      margin: '0 auto',
-      padding: '20px',
-      backgroundColor: '#f5f5f5',
-      borderRadius: '10px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      fontFamily: 'Arial, sans-serif',
-    },
-    header: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '20px',
-      marginBottom: '20px',
-      justifyContent: 'space-between', // Add space between the profile info and the buttons
-    },
-    profilePicture: {
-      width: '100px',
-      height: '100px',
-      borderRadius: '50%',
-      border: '2px solid #ddd',
-    },
-    profileInfo: {
-      margin: 0,
-    },
-    followStats: {
-      display: 'flex',
-      gap: '20px',
-      fontSize: '14px',
-      color: '#555',
-    },
-    bio: {
-      marginBottom: '20px',
-      padding: '10px',
-      backgroundColor: '#eaeaea',
-      borderRadius: '8px',
-    },
-    posts: {
-      marginTop: '20px',
-    },
-    post: {
-      backgroundColor: '#fff',
-      padding: '10px',
-      marginBottom: '10px',
-      border: '1px solid #ddd',
-      borderRadius: '8px',
-    },
-    openButton: {
-      padding: '8px 12px',
-      fontSize: '14px',
-      borderRadius: '5px',
-      border: 'none',
-      cursor: 'pointer',
-    },
-    editButton: {
-      backgroundColor: '#ADD8E6', // Light blue
-      color: '#333',
-      display: 'flex',
-      alignItems: 'center',
-      fontSize: '14px',
-      fontWeight: 'bold',
-    },
-    postTitle: {
-      margin: '0 0 5px 0',
-      fontSize: '16px',
-    },
-    postContent: {
-      margin: 0,
-      fontSize: '14px',
-      color: '#555',
-    },
-    button: {
-      padding: '8px 12px',
-      border: 'none',
-      borderRadius: '5px',
-      cursor: 'pointer',
-    },
-    followButton: {
-      backgroundColor: '#4caf50',
-      color: 'white',
-    },
-    adminButton: {
-      backgroundColor: '#f44336',
-      color: 'white',
-    },
-  };
+  
 
   return (
       <div style={styles.container}>
         {/* Profile Header */}
         <div style={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          {}
-          <img
-            src={profilePath}
-            alt="Profile"
-            style={styles.profilePicture}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }} >
+          {/* Profile Picture with Click to Upload */}
+          <div style={{ position: 'relative', cursor: 'pointer' }}>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleFileSelect}
+              style={{ display: 'none' }} 
+              id="profile-pic-upload"
+            />
+            <label htmlFor="profile-pic-upload">
+              <img
+                src={userProfile?.profile_picture || profilePath}
+                alt="Profile"
+                style={styles.profilePicture}
+              />
+              {loggedInUsername === userName && (
+                <div style={{
+                  position: 'absolute', 
+                  bottom: 0, 
+                  right: 0, 
+                  backgroundColor: 'rgba(0,0,0,0.5)', 
+                  color: 'white', 
+                  padding: '2px 5px', 
+                  borderRadius: '50%'
+                }}>
+                  📷
+                </div>
+              )}
+            </label>
+          </div>
+
+          {/* Profile Picture Upload Popup */}
+          {isProfilePicPopupOpen && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                backgroundColor: 'white',
+                padding: '20px',
+                borderRadius: '10px',
+                textAlign: 'center'
+              }}>
+                <h3>Upload Profile Picture</h3>
+                {selectedFile && (
+                  <img 
+                    src={URL.createObjectURL(selectedFile)} 
+                    alt="Selected" 
+                    style={{ 
+                      maxWidth: '200px', 
+                      maxHeight: '200px', 
+                      marginBottom: '10px' 
+                    }} 
+                  />
+                )}
+                <div>
+                  <button onClick={handleProfilePictureUpload}>
+                    Upload
+                  </button>
+                  <button onClick={() => {
+                    setIsProfilePicPopupOpen(false);
+                    setSelectedFile(null);
+                  }}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div>
             <h1>{userProfile.username}</h1>
             <p>Reputation: {userProfile.reputation}</p>
@@ -320,6 +331,97 @@ const Profile: React.FC = () => {
       </div>
   );
 };
-
+// Inline style definitions
+const styles = {
+  errorMessge: {
+    color: 'red',
+    fontSize: '12px', 
+    marginTop: '10px', 
+    textAlign: 'center' as 'center', 
+  },
+  container: {
+    margin: '0 auto',
+    padding: '20px',
+    backgroundColor: '#f5f5f5',
+    borderRadius: '10px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    fontFamily: 'Arial, sans-serif',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '20px',
+    marginBottom: '20px',
+    justifyContent: 'space-between', // Add space between the profile info and the buttons
+  },
+  profilePicture: {
+    width: '100px',
+    height: '100px',
+    borderRadius: '50%',
+    border: '2px solid #ddd',
+  },
+  profileInfo: {
+    margin: 0,
+  },
+  followStats: {
+    display: 'flex',
+    gap: '20px',
+    fontSize: '14px',
+    color: '#555',
+  },
+  bio: {
+    marginBottom: '20px',
+    padding: '10px',
+    backgroundColor: '#eaeaea',
+    borderRadius: '8px',
+  },
+  posts: {
+    marginTop: '20px',
+  },
+  post: {
+    backgroundColor: '#fff',
+    padding: '10px',
+    marginBottom: '10px',
+    border: '1px solid #ddd',
+    borderRadius: '8px',
+  },
+  openButton: {
+    padding: '8px 12px',
+    fontSize: '14px',
+    borderRadius: '5px',
+    border: 'none',
+    cursor: 'pointer',
+  },
+  editButton: {
+    backgroundColor: '#ADD8E6', // Light blue
+    color: '#333',
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '14px',
+    fontWeight: 'bold',
+  },
+  postTitle: {
+    margin: '0 0 5px 0',
+    fontSize: '16px',
+  },
+  postContent: {
+    margin: 0,
+    fontSize: '14px',
+    color: '#555',
+  },
+  button: {
+    padding: '8px 12px',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+  },
+  followButton: {
+    backgroundColor: '#4caf50',
+    color: 'white',
+  },
+  adminButton: {
+    backgroundColor: '#f44336',
+    color: 'white',
+  },
+};
 export default Profile;
-
