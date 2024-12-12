@@ -55,6 +55,9 @@ public class TagsRepository implements ITagsRepository {
 
     @Override
     public List<String> findTagsByQuestion(Long questionId) {
-        return null;
+        if (questionId == null)
+            throw new NullPointerException("Question Id is null");
+
+        return jdbcTemplate.queryForList(SQL_FIND_TAGS_BY_QUESTION, String.class, questionId);
     }
 }
