@@ -35,6 +35,9 @@ public class TagsRepository implements ITagsRepository {
 
     @Override
     public void insertTags(List<String> tags) {
+        if (tags == null || tags.isEmpty())
+            throw new NullPointerException("Tags are null or empty.");
+
         String tagValues = tags.stream()
             .map(tag -> "('" + tag.replace("'", "''") + "')")
             .collect(Collectors.joining(", "));
@@ -49,8 +52,10 @@ public class TagsRepository implements ITagsRepository {
     }
 
     @Override
-    public Boolean removeTagsFromQuestion(Long questionId) {
-        return null;
+    public void removeTagsFromQuestion(Long questionId) {
+        if (questionId == null)
+            throw new NullPointerException("Question Id is null");
+        jdbcTemplate.update(SQL_DELETE_TAGS_FROM_QUESTION, questionId);
     }
 
     @Override

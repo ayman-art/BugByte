@@ -8,7 +8,7 @@ public interface ITagsRepository {
 
     Long bulkAddTagsToQuestion(Long questionId, List<String> tags);
 
-    Boolean removeTagsFromQuestion(Long questionId);
+    void removeTagsFromQuestion(Long questionId);
 
     List<String> findTagsByQuestion(Long questionId);
 }
