@@ -138,12 +138,24 @@ public class CommunityRepositoryTest {
                 .reputation(100L)
                 .isAdmin(false)
                 .build();
-         comm = new Community("testComm", 1L);
-         comm.setId(12L);
-         comm2= new Community("test2Comm",2L);
-         comm2.setId(11L);
-         comm3 = new Community("testComm3", 3L);
-         comm3.setId(13L);
+        comm = Community.builder()
+                .name("testComm")
+                .id(12L)
+                .adminId(1L)
+                .build();
+
+        comm2 = Community.builder()
+                .name("test2Comm")
+                .id(11L)
+                .adminId(2L)
+                .build();
+
+        comm3 = Community.builder()
+                .name("testComm3")
+                .id(13L)
+                .adminId(3L)
+                .build();
+
          comMem1 = new CommunityMember(comm.getId(),admin.getId());
          comMem2= new CommunityMember(comm.getId(),member1.getId());
          comMem3 =new CommunityMember(comm.getId(),member2.getId());
