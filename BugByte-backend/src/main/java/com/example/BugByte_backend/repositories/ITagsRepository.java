@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ITagsRepository {
 
-    Long insertTag(String name);
+    Long insertTags(List<String> name);
 
     Long bulkAddTagsToQuestion(Long questionId, List<String> tags);
 
