@@ -88,3 +88,11 @@ CREATE TABLE IF NOT EXISTS question_tag (
     FOREIGN KEY (question_id) REFERENCES questions(id),
     FOREIGN KEY (tag_id) REFERENCES tag(id)
 );
+
+CREATE TABLE IF NOT EXISTS community_tag (
+    community_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    PRIMARY KEY (community_id, tag_id),
+    FOREIGN KEY (community_id) REFERENCES communities(id),
+    FOREIGN KEY (tag_id) REFERENCES tag(id)
+);
