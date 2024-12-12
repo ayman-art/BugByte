@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class Community {
     private Long adminId;
 
     private Date creationDate = new Date();
+
+    private List<String> tags = new ArrayList<>();
 
     public Community(String name, String description, Long adminId, Date creationDate) {
         this.name = name;
