@@ -8,6 +8,7 @@ import { authorizeToken, saveData } from './API/HomeAPI';
 import Layout from './layouts/MainLayout';
 import { useNavbar } from '@nextui-org/navbar';
 import PostPage from './pages/PostPage';
+import TestPage from './pages/TestPage';
 
 const isLoggedIn = false;
 
@@ -68,6 +69,7 @@ const App: React.FC = () => {
             <Route path="*" element={<Navigate to="/LogIn" />} />
           </>
         )}
+        <Route path="testPage" element={<Layout onLogout={handleLogout}><TestPage/></Layout>}/>
       </Routes>
     </BrowserRouter>
       );
