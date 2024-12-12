@@ -7,6 +7,7 @@ import ProfilePage from './pages/ProfilePage';
 import { authorizeToken, saveData } from './API/HomeAPI';
 import Layout from './layouts/MainLayout';
 import { useNavbar } from '@nextui-org/navbar';
+import PostPage from './pages/PostPage';
 
 const isLoggedIn = false;
 
@@ -54,15 +55,17 @@ const App: React.FC = () => {
           <>
             <Route path="/" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />
             <Route path="/Profile/:userName" element={<Layout onLogout={handleLogout}><ProfilePage /></Layout>} />
-            {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
+            <Route path="/Posts/:postId" element={<Layout onLogout={handleLogout}><PostPage /></Layout>} />
             <Route path="/SignUp" element={<Navigate to="/" />}/>
             <Route path="/LogIn" element={<Navigate to="/" />} />
           </>
         ) : (
           <>
-            <Route path="/" element={<Navigate to="/SignUp" />} />
+            <Route path="/Posts/:postId" element={<Layout onLogout={handleLogout}><PostPage /></Layout>} />
+            
             <Route path="/SignUp" element={<SignUpPage onLogin={handleLogin}/>} />
             <Route path="/LogIn" element={<Login onLogin={handleLogin}/>} />
+            <Route path="*" element={<Navigate to="/LogIn" />} />
           </>
         )}
       </Routes>
