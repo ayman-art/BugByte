@@ -39,7 +39,7 @@ public class TagsRepository implements ITagsRepository {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public void insertTags(List<String> tags) {
+    public Integer insertTags(List<String> tags) {
         if (tags == null || tags.isEmpty())
             throw new NullPointerException("Tags are null or empty.");
 
@@ -48,19 +48,28 @@ public class TagsRepository implements ITagsRepository {
                 .collect(Collectors.joining(", "));
 
         String formattedQuery = String.format(SQL_INSERT_TAGS, tagValues);
-        jdbcTemplate.update(formattedQuery);
+        return jdbcTemplate.update(formattedQuery);
     }
 
     @Override
-    public Long bulkAddTagsToQuestion(Long questionId, List<String> tags) {
-        return null;
+    public Integer bulkAddTagsToQuestion(Long questionId, List<String> tags) {
+        if (questionId == null || tags == null || tags.isEmpty())
+            throw new NullPointerException("Question Id is null or tags are null or empty");
+
+        List<Long> tagIds = getTagIdsByName(tags);
+
+        String tagValues = tagIds.stream()
+                .map(tagId -> "(" + questionId + ", " + tagId + ")")
+                .collect(Collectors.joining(", "));
+
+        return jdbcTemplate.update(String.format(SQL_ADD_TAGS_TO_QUESTION, tagValues));
     }
 
     @Override
-    public void removeTagsFromQuestion(Long questionId) {
+    public Integer removeTagsFromQuestion(Long questionId) {
         if (questionId == null)
             throw new NullPointerException("Question Id is null");
-        jdbcTemplate.update(SQL_DELETE_TAGS_FROM_QUESTION, questionId);
+        return jdbcTemplate.update(SQL_DELETE_TAGS_FROM_QUESTION, questionId);
     }
 
     @Override
@@ -73,6 +82,9 @@ public class TagsRepository implements ITagsRepository {
 
     @Override
     public List<Long> getTagIdsByName(List<String> tags) {
+        if (tags == null || tags.isEmpty())
+            throw new NullPointerException("Tags are null or empty");
+
         String tagValues = tags.stream()
                 .map(tag -> "'" + tag.replace("'", "''") + "'")
                 .collect(Collectors.joining(", "));
