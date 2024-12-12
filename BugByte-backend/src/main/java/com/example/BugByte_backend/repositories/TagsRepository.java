@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class TagsRepository implements ITagsRepository {
@@ -33,8 +34,13 @@ public class TagsRepository implements ITagsRepository {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Long insertTags(List<String> name) {
-        return null;
+    public void insertTags(List<String> tags) {
+        String tagValues = tags.stream()
+            .map(tag -> "('" + tag.replace("'", "''") + "')")
+            .collect(Collectors.joining(", "));
+
+        String formattedQuery = String.format(SQL_INSERT_TAGS, tagValues);
+        jdbcTemplate.update(formattedQuery);
     }
 
     @Override
