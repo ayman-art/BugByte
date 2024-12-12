@@ -59,7 +59,7 @@ const questions: QuestionProps[] = [
     tags: ['React', 'JavaScript', 'Frontend'],
     upvotes: 10,
     downvotes: 2,
-    opName: 'AymOsama',
+    opName: 'Ayman Algamal',
     date: '2024-12-07',
     communityId: '123',
     communityName: 'React Community',
@@ -96,7 +96,7 @@ const answers: AnswerProps[] = [
     text: 'It uses a virtual DOM to efficiently update the user interface.',
     upvotes: 3,
     downvotes: 0,
-    opName: 'JaneDoe',
+    opName: 'Ayman Algamal',
     date: '2024-12-07',
   },
 ];
@@ -118,7 +118,15 @@ const replies: ReplyProps[] = [
     text: 'Could you explain more about how the virtual DOM works?',
     upvotes: 1,
     downvotes: 0,
-    opName: 'ChrisBrown',
+    opName: 'Ayman Algamal',
+    date: '2024-12-08',
+  },{
+    id: '3',
+    answerId: '2',  // Map to answerId
+    text: '# ANOTHER REPLY?',
+    upvotes: 1,
+    downvotes: 0,
+    opName: 'Ayman Algamal',
     date: '2024-12-08',
   },
 ];

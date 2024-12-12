@@ -2,29 +2,29 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing the icons
 import { MDXEditor, 
-    headingsPlugin,
-    listsPlugin,
-    quotePlugin,
-    linkPlugin,
-    imagePlugin,
-    tablePlugin,
-    markdownShortcutPlugin,
-    thematicBreakPlugin,
-    linkDialogPlugin,
-    codeBlockPlugin,
-    sandpackPlugin,
-    codeMirrorPlugin,
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  linkPlugin,
+  imagePlugin,
+  tablePlugin,
+  markdownShortcutPlugin,
+  thematicBreakPlugin,
+  linkDialogPlugin,
+  codeBlockPlugin,
+  sandpackPlugin,
+  codeMirrorPlugin,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 
 interface QuestionProps {
   postId: string;
-  title: string;  // Added title prop
+  title: string;
   questionText: string;
   tags: string[];
-  upvotes: number; // Separate count for upvotes
-  downvotes: number; // Separate count for downvotes
+  upvotes: number;
+  downvotes: number;
   opName: string;
   date: string;
   communityId: string;
@@ -32,7 +32,7 @@ interface QuestionProps {
 }
 
 const Question: React.FC<QuestionProps> = ({
-  title,  // Destructure title from props
+  title,
   questionText,
   tags,
   upvotes,
@@ -45,6 +45,8 @@ const Question: React.FC<QuestionProps> = ({
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
   const navigate = useNavigate();
+  const loggedInUsername = localStorage.getItem('name') || '';
+  const isAdmin = localStorage.getItem('is_admin') === 'true';
 
   const handleUpvote = () => {
     setCurrentUpvotes(currentUpvotes + 1);
@@ -58,13 +60,15 @@ const Question: React.FC<QuestionProps> = ({
     navigate(`/Profile/${opName}`);
   };
 
+  // Check if the logged-in user is the post owner or an admin
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin;
+
   return (
     <div className="question-container">
       <div className="question-content">
         <header className="question-header">
-          {/* Display the title of the question */}
-          <h2 className="question-title">{title}</h2> {/* Added title here */}
-          
+          <h2 className="question-title">{title}</h2>
           <p className="community-tag">
             <span className="tag tag-community">c/{communityName}</span>
           </p>
@@ -75,7 +79,6 @@ const Question: React.FC<QuestionProps> = ({
             </span>
           </p>
 
-          {/* Use MDXEditor for markdown question text */}
           <section className="question-body">
             <MDXEditor
               markdown={questionText}
@@ -109,7 +112,6 @@ const Question: React.FC<QuestionProps> = ({
             ))}
           </div>
 
-          {/* Voting section */}
           <div className="question-votes">
             <span className="votes-count">{currentUpvotes} </span>
             <button onClick={handleUpvote} className="vote-button vote-button-up">
@@ -121,14 +123,18 @@ const Question: React.FC<QuestionProps> = ({
             </button>
           </div>
 
-          {/* Edit and Delete buttons with symbols */}
           <div className="question-actions">
-            <button className="action-button edit-button">
-              <FaEdit /> {/* Edit icon */}
-            </button>
-            <button className="action-button delete-button">
-              <FaTrash /> {/* Delete icon */}
-            </button>
+            {canEdit && (
+              <button className="action-button edit-button">
+                <FaEdit /> {/* Edit icon */}
+              </button>
+            )}
+
+            {canDelete && (
+              <button className="action-button delete-button">
+                <FaTrash /> {/* Delete icon */}
+              </button>
+            )}
           </div>
         </footer>
       </div>

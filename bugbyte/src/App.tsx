@@ -62,7 +62,6 @@ const App: React.FC = () => {
           </>
         ) : (
           <>
-            <Route path="/Posts/:postId" element={<Layout onLogout={handleLogout}><PostPage /></Layout>} />
             
             <Route path="/SignUp" element={<SignUpPage onLogin={handleLogin}/>} />
             <Route path="/LogIn" element={<Login onLogin={handleLogin}/>} />

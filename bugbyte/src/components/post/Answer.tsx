@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing the icons
 import { MDXEditor, 
     headingsPlugin,
     listsPlugin,
@@ -31,6 +32,9 @@ interface AnswerProps {
 const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
+  const navigate = useNavigate();
+  const loggedInUsername = localStorage.getItem('name') || '';
+  const isAdmin = localStorage.getItem('is_admin') === 'true';
 
   const handleUpvote = () => {
     setCurrentUpvotes(currentUpvotes + 1);
@@ -40,10 +44,13 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
     setCurrentDownvotes(currentDownvotes + 1);
   };
 
-  const navigate = useNavigate();
   const handleNavigateToProfile = () => {
     navigate(`/Profile/${opName}`);
   };
+
+  // Check if the logged-in user is the post owner
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin; // Allow admin to delete as well
 
   return (
     <div className="answer-container">
@@ -92,6 +99,21 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
             <button onClick={handleDownvote} className="vote-button vote-button-down">
               ↓
             </button>
+          </div>
+
+          {/* Action buttons */}
+          <div className="answer-actions">
+            {canEdit && (
+              <button className="action-button edit-button">
+                <FaEdit /> {/* Edit icon */}
+              </button>
+            )}
+
+            {canDelete && (
+              <button className="action-button delete-button">
+                <FaTrash /> {/* Delete icon */}
+              </button>
+            )}
           </div>
         </footer>
       </div>

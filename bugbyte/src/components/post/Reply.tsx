@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing icons for Edit and Delete buttons
 import { MDXEditor, 
   headingsPlugin,
   listsPlugin,
@@ -19,8 +20,8 @@ import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils
 
 interface ReplyProps {
   id: string;
-  answerId: string;  // Add answerId to map replies to answers
-  text: string; // Markdown content
+  answerId: string;
+  text: string;
   upvotes: number;
   downvotes: number;
   opName: string;
@@ -30,6 +31,11 @@ interface ReplyProps {
 const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
+  
+  const navigate = useNavigate();
+  const loggedInUsername = localStorage.getItem('name') || '';
+  const isAdmin = localStorage.getItem('is_admin') === 'true';
+
 
   const handleUpvote = () => {
     setCurrentUpvotes(currentUpvotes + 1);
@@ -39,10 +45,14 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
     setCurrentDownvotes(currentDownvotes + 1);
   };
 
-  const navigate = useNavigate();
+  // Navigate to the user's profile
   const handleNavigateToProfile = () => {
     navigate(`/Profile/${opName}`);
   };
+
+  // Check if the logged-in user is the post owner
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin; // Admin can delete as well
 
   return (
     <div className="reply-container">
@@ -88,6 +98,21 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
             <button onClick={handleDownvote} className="vote-button vote-button-down">
               ↓
             </button>
+          </div>
+
+          {/* Action buttons */}
+          <div className="reply-actions">
+            {canEdit && (
+              <button className="action-button edit-button">
+                <FaEdit /> {/* Edit icon */}
+              </button>
+            )}
+
+            {canDelete && (
+              <button className="action-button delete-button">
+                <FaTrash /> {/* Delete icon */}
+              </button>
+            )}
           </div>
         </footer>
       </div>
