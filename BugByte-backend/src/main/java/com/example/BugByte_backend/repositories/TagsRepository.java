@@ -58,6 +58,11 @@ public class TagsRepository implements ITagsRepository {
         if (tags == null || tags.isEmpty())
             throw new NullPointerException("Tags are null or empty.");
 
+        // This loops through the tags list ["python", "cpp", "vim"].
+        // and create a string with this format: ('python', 'cpp', 'vim')
+        // The sql requires the parentheses and the value should be surrounded by quotes
+        // If the tag has already a single quote, It should be written as two single quotes
+        // ex. it's --> it''s this is required to be valid in the query
         String tagValues = tags.stream()
                 .map(tag -> "('" + tag.replace("'", "''") + "')")
                 .collect(Collectors.joining(", "));
