@@ -75,3 +75,24 @@ CREATE TABLE IF NOT EXISTS replies (
     FOREIGN KEY (id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (answer_id) REFERENCES answers(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS tag (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS question_tag (
+    question_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    PRIMARY KEY (question_id, tag_id),
+    FOREIGN KEY (question_id) REFERENCES questions(id),
+    FOREIGN KEY (tag_id) REFERENCES tag(id)
+);
+
+CREATE TABLE IF NOT EXISTS community_tag (
+    community_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    PRIMARY KEY (community_id, tag_id),
+    FOREIGN KEY (community_id) REFERENCES communities(id),
+    FOREIGN KEY (tag_id) REFERENCES tag(id)
+);

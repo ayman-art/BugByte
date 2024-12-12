@@ -3,6 +3,7 @@ package com.example.BugByte_backend.ServicesTests;
 import com.example.BugByte_backend.models.*;
 import com.example.BugByte_backend.repositories.CommunityRepository;
 import com.example.BugByte_backend.repositories.PostingRepository;
+import com.example.BugByte_backend.repositories.TagsRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.PostingService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,11 +13,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -28,6 +31,8 @@ public class PostingServiceTest {
     CommunityRepository communityRepositoryMock;
     @Mock
     UserRepositoryImp userRepositoryImpMock;
+    @Mock
+    TagsRepository tagsRepositoryMock;
     @InjectMocks
     PostingService postingService;
     @BeforeEach
@@ -68,6 +73,7 @@ public class PostingServiceTest {
                 .thenReturn(generatedPostId);
         when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getCommunityId()))
                 .thenReturn(true);
+        when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
 
         long result = postingService.postQuestion(mockQuestion);
 
@@ -486,6 +492,7 @@ public class PostingServiceTest {
 
         when(communityRepositoryMock.findCommunityById(communityId)).thenReturn(mockCommunity);
         when(postingRepositoryMock.getQuestionsByCommunity(communityId, limit, offset)).thenReturn(mockQuestions);
+        when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
 
         List<Question> result = postingService.getCommunityQuestions(communityId, limit, offset);
 
@@ -515,6 +522,7 @@ public class PostingServiceTest {
 
         when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(mockUser);
         when(postingRepositoryMock.getQuestionsByUserName(userName, limit, offset)).thenReturn(mockQuestions);
+        when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
 
         List<Question> result = postingService.getUserQuestions(userName, limit, offset);
 

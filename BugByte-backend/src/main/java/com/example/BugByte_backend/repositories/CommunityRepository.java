@@ -148,13 +148,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     @Override
     public List<Community> findAllCommunities() {
         return jdbcTemplate.query(SQL_FIND_ALL_COMMUNITIES,
-                (rs, rowNum) -> new Community(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getLong("admin_id"),
-                        rs.getDate("creation_date")
-                ));
+                (rs, rowNum) -> Community.builder()
+                        .id(rs.getLong("id"))
+                        .name(rs.getString("name"))
+                        .description(rs.getString("description"))
+                        .adminId(rs.getLong("admin_id"))
+                        .creationDate(rs.getDate("creation_date"))
+                        .build()
+                );
     }
 
     @Override
@@ -232,13 +233,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new NullPointerException("userId is null");
 
         List<Community> communities = jdbcTemplate.query(SQL_FIND_COMMUNITIES_BY_USER_ID,
-                new Object[]{userId}, (rs, rowNum) -> new Community(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getLong("admin_id"),
-                        rs.getDate("creation_date")
-                ));
+                new Object[] {userId}, (rs, rowNum) -> Community.builder()
+                        .id(rs.getLong("id"))
+                        .name(rs.getString("name"))
+                        .description(rs.getString("description"))
+                        .adminId(rs.getLong("admin_id"))
+                        .creationDate(rs.getDate("creation_date"))
+                        .build()
+        );
 
         if (communities.isEmpty())
             throw new RuntimeException("User is not a member of any communities.");
