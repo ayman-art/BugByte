@@ -5,9 +5,11 @@ import com.example.BugByte_backend.repositories.CommunityRepository;
 import com.example.BugByte_backend.repositories.PostingRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class PostingService {
     @Autowired
     PostingRepository postingRepository;
@@ -22,6 +24,39 @@ public class PostingService {
             if (post == null)
                 throw new Exception("post is null");
             return post;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Question getQuestion(long questionId) throws Exception{
+        try {
+            Post post = postingRepository.getPostByID(questionId);
+            if (post == null)
+                throw new Exception("post is null");
+            return postingRepository.getQuestionById(questionId);
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Answer getAnswer(long answerId) throws Exception{
+        try {
+            Post post = postingRepository.getPostByID(answerId);
+            if (post == null)
+                throw new Exception("post is null");
+            return postingRepository.getAnswerById(answerId);
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Reply getReply(long replyId) throws Exception{
+        try {
+            Post post = postingRepository.getPostByID(replyId);
+            if (post == null)
+                throw new Exception("post is null");
+            return postingRepository.getReplyById(replyId);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

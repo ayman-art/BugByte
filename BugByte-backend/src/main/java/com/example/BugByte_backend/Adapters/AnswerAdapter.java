@@ -11,7 +11,7 @@ public class AnswerAdapter implements IAdapter<Answer> {
 
     @Override
     public Map<String, Object> toMap(Answer answer) {
-        Map<String, Object> answerMap = new HashMap<>();)
+        Map<String, Object> answerMap = new HashMap<>();
         answerMap.put("answerId", answer.getId());
         answerMap.put("opName", answer.getCreatorUserName());
         answerMap.put("mdContent", answer.getMdContent());

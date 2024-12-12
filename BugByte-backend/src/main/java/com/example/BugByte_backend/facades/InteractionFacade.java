@@ -248,4 +248,45 @@ public class InteractionFacade {
             throw new Exception(e.getMessage());
         }
     }
+    public Map<String , Object> getQuestion(Map<String, Object> questionData) throws Exception{
+        try {
+            QuestionAdapter questionAdapter = new QuestionAdapter();
+            Question question = postingService.getQuestion((Long) questionData.get("questionId"));
+            Map<String , Object> questionMap = questionAdapter.toMap(question);
+            if (question.getValidatedAnswerId() != null){
+                Answer answer = postingService.getAnswer(question.getValidatedAnswerId());
+                questionMap.put("answerMdContent" , answer.getMdContent());
+                questionMap.put("answerOp" , answer.getCreatorUserName());
+                questionMap.put("answerUpVotes" , answer.getUpVotes());
+                questionMap.put("answerDownVotes" , answer.getDownVotes());
+                questionMap.put("answerPostedOn" ,answer.getPostedOn());
+            }
+            return questionMap;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Map<String , Object> getAnswer(Map<String, Object> answerData) throws Exception{
+        try {
+            AnswerAdapter answerAdapter = new AnswerAdapter();
+            Answer answer = postingService.getAnswer((Long) answerData.get("answerId"));
+            Map<String , Object> answerMap = answerAdapter.toMap(answer);
+            return answerMap;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Map<String , Object> getReply(Map<String, Object> replyData) throws Exception{
+        try {
+            ReplyAdapter replyAdapter = new ReplyAdapter();
+            Reply reply = postingService.getReply((Long) replyData.get("replyId"));
+            Map<String , Object> replyMap = replyAdapter.toMap(reply);
+            return replyMap;
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
 }

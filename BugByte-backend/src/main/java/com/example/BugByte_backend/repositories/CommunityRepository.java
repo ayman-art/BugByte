@@ -3,9 +3,12 @@ import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
 import java.util.Date;
 import java.util.List;
 
+@Repository
 public class CommunityRepository implements CommunityRepositoryInterface{
     private static final String SQL_INSERT_COMMUNITY = """
                 INSERT INTO communities
