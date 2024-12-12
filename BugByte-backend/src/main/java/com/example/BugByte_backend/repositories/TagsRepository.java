@@ -14,6 +14,11 @@ public class TagsRepository implements ITagsRepository {
             VALUES %s
             ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id);
             """;
+    private static final String SQL_FIND_TAG_IDS_BY_NAME = """
+            SELECT id
+            FROM tag
+            WHERE name IN (%s);
+            """;
     private static final String SQL_ADD_TAGS_TO_QUESTION = """
             INSERT INTO question_tag (question_id, tag_id)
             VALUES %s
@@ -29,10 +34,20 @@ public class TagsRepository implements ITagsRepository {
             JOIN tag t ON qt.tag_id = t.id
             WHERE qt.question_id = ?;
             """;
-    private static final String SQL_FIND_TAG_IDS_BY_NAME = """
-            SELECT id
-            FROM tag
-            WHERE name IN (%s);
+    private static final String SQL_ADD_TAGS_TO_COMMUNITY = """
+            INSERT INTO community_tag (community_id, tag_id)
+            VALUES %s
+            ON DUPLICATE KEY UPDATE community_id = community_id;
+            """;
+    private static final String SQL_DELETE_TAGS_FROM_COMMUNITY = """
+            DELETE FROM community_tag
+            WHERE community_id = ?;
+            """;
+    private static final String SQL_FIND_TAGS_BY_COMMUNITY = """
+            SELECT name
+            FROM community_tag ct
+            JOIN tag t ON ct.tag_id = t.id
+            WHERE ct.community_id = ?;
             """;
 
     @Autowired
@@ -49,6 +64,20 @@ public class TagsRepository implements ITagsRepository {
 
         String formattedQuery = String.format(SQL_INSERT_TAGS, tagValues);
         return jdbcTemplate.update(formattedQuery);
+    }
+
+    @Override
+    public List<Long> getTagIdsByName(List<String> tags) {
+        if (tags == null || tags.isEmpty())
+            throw new NullPointerException("Tags are null or empty");
+
+        String tagValues = tags.stream()
+                .map(tag -> "'" + tag.replace("'", "''") + "'")
+                .collect(Collectors.joining(", "));
+
+        String formattedQuery = String.format(SQL_FIND_TAG_IDS_BY_NAME, tagValues);
+
+        return jdbcTemplate.queryForList(formattedQuery, Long.class);
     }
 
     @Override
@@ -84,16 +113,34 @@ public class TagsRepository implements ITagsRepository {
     }
 
     @Override
-    public List<Long> getTagIdsByName(List<String> tags) {
-        if (tags == null || tags.isEmpty())
-            throw new NullPointerException("Tags are null or empty");
+    public Integer bulkAddTagsToCommunity(Long communityId, List<String> tags) {
+        if (communityId == null || tags == null || tags.isEmpty())
+            throw new NullPointerException("Community Id is null or tags are null or empty");
 
-        String tagValues = tags.stream()
-                .map(tag -> "'" + tag.replace("'", "''") + "'")
+        removeTagsFromCommunity(communityId);
+        insertTags(tags);
+
+        List<Long> tagIds = getTagIdsByName(tags);
+
+        String tagValues = tagIds.stream()
+                .map(tagId -> "(" + communityId + ", " + tagId + ")")
                 .collect(Collectors.joining(", "));
 
-        String formattedQuery = String.format(SQL_FIND_TAG_IDS_BY_NAME, tagValues);
+        return jdbcTemplate.update(String.format(SQL_ADD_TAGS_TO_COMMUNITY, tagValues));
+    }
 
-        return jdbcTemplate.queryForList(formattedQuery, Long.class);
+    @Override
+    public Integer removeTagsFromCommunity(Long communityId) {
+        if (communityId == null)
+            throw new NullPointerException("Community Id is null");
+        return jdbcTemplate.update(SQL_DELETE_TAGS_FROM_COMMUNITY, communityId);
+    }
+
+    @Override
+    public List<String> findTagsByCommunity(Long communityId) {
+        if (communityId == null)
+            throw new NullPointerException("Community Id is null");
+
+        return jdbcTemplate.queryForList(SQL_FIND_TAGS_BY_COMMUNITY, String.class, communityId);
     }
 }
