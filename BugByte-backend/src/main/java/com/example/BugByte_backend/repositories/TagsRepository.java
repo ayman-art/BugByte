@@ -29,6 +29,11 @@ public class TagsRepository implements ITagsRepository {
             JOIN tag t ON qt.tag_id = t.id
             WHERE qt.question_id = ?;
             """;
+    private static final String SQL_FIND_TAG_IDS_BY_NAME = """
+            SELECT id
+            FROM tag
+            WHERE name IN (%s);
+            """;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -39,8 +44,8 @@ public class TagsRepository implements ITagsRepository {
             throw new NullPointerException("Tags are null or empty.");
 
         String tagValues = tags.stream()
-            .map(tag -> "('" + tag.replace("'", "''") + "')")
-            .collect(Collectors.joining(", "));
+                .map(tag -> "('" + tag.replace("'", "''") + "')")
+                .collect(Collectors.joining(", "));
 
         String formattedQuery = String.format(SQL_INSERT_TAGS, tagValues);
         jdbcTemplate.update(formattedQuery);
@@ -64,5 +69,16 @@ public class TagsRepository implements ITagsRepository {
             throw new NullPointerException("Question Id is null");
 
         return jdbcTemplate.queryForList(SQL_FIND_TAGS_BY_QUESTION, String.class, questionId);
+    }
+
+    @Override
+    public List<Long> getTagIdsByName(List<String> tags) {
+        String tagValues = tags.stream()
+                .map(tag -> "'" + tag.replace("'", "''") + "'")
+                .collect(Collectors.joining(", "));
+
+        String formattedQuery = String.format(SQL_FIND_TAG_IDS_BY_NAME, tagValues);
+
+        return jdbcTemplate.queryForList(formattedQuery, Long.class);
     }
 }

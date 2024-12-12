@@ -11,4 +11,6 @@ public interface ITagsRepository {
     void removeTagsFromQuestion(Long questionId);
 
     List<String> findTagsByQuestion(Long questionId);
+
+    List<Long> getTagIdsByName(List<String> tags);
 }
