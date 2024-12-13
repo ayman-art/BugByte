@@ -3,9 +3,12 @@ import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
 import java.util.Date;
 import java.util.List;
 
+@Repository
 public class CommunityRepository implements CommunityRepositoryInterface{
     private static final String SQL_INSERT_COMMUNITY = """
                 INSERT INTO communities
@@ -29,6 +32,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
                 FROM community_members
                 WHERE member_id = ?;
             """;
+
+    private static final String SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION = """
+    UPDATE communities
+    SET name = ?, description = ?
+    WHERE community_id = ?;
+""";
+
+
     private static final String SQL_FIND_BY_ID = "SELECT * FROM communities WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_NAME = "SELECT id FROM communities WHERE name = ?;";
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM communities WHERE name = ?;";
@@ -67,6 +78,22 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     DELETE FROM community_members
     WHERE community_id = ?;
 """;
+    private static final String SQL_SET_MODERATOR = """
+    INSERT INTO moderators 
+    (id , community_id)
+    VALUES 
+    (? ,?);
+""";
+    private static final String SQL_REMOVE_MODERATOR = """
+    DELETE FROM moderators 
+    WHERE id = ? AND community_id = ?;
+""";
+    private  static final String SQL_REMOVE_COMMUNITY_MODERATORS = """
+    DELETE FROM moderators 
+    WHERE community_id = ?;
+""";
+
+
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -76,9 +103,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if (name == null || adminId == null)
             throw new NullPointerException("name or adminId is null");
         int rows = jdbcTemplate.update(SQL_INSERT_COMMUNITY, name, adminId, new Date());
-        if (rows != 0)
-            return findIdByName(name);
-        throw new RuntimeException("Invalid input");
+        if (rows != 0) {
+            Long n=findIdByName(name);
+            boolean k=insertMember(adminId,n);
+            return n;
+        }
+        throw new RuntimeException("Community with this name already exists.");
+
+
     }
 
     @Override
@@ -148,13 +180,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     @Override
     public List<Community> findAllCommunities() {
         return jdbcTemplate.query(SQL_FIND_ALL_COMMUNITIES,
-                (rs, rowNum) -> new Community(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getLong("admin_id"),
-                        rs.getDate("creation_date")
-                ));
+                (rs, rowNum) -> Community.builder()
+                        .id(rs.getLong("id"))
+                        .name(rs.getString("name"))
+                        .description(rs.getString("description"))
+                        .adminId(rs.getLong("admin_id"))
+                        .creationDate(rs.getDate("creation_date"))
+                        .build()
+                );
     }
 
     @Override
@@ -192,6 +225,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if(communityId==null)
             throw new NullPointerException("communityId is null");
         boolean i = deleteCommunityMembers(communityId);
+        removeCommunityModerators(communityId);
         int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_BY_ID, communityId);
         return rows == 1;
     }
@@ -232,13 +266,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new NullPointerException("userId is null");
 
         List<Community> communities = jdbcTemplate.query(SQL_FIND_COMMUNITIES_BY_USER_ID,
-                new Object[]{userId}, (rs, rowNum) -> new Community(
-                        rs.getLong("id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getLong("admin_id"),
-                        rs.getDate("creation_date")
-                ));
+                new Object[] {userId}, (rs, rowNum) -> Community.builder()
+                        .id(rs.getLong("id"))
+                        .name(rs.getString("name"))
+                        .description(rs.getString("description"))
+                        .adminId(rs.getLong("admin_id"))
+                        .creationDate(rs.getDate("creation_date"))
+                        .build()
+        );
 
         if (communities.isEmpty())
             throw new RuntimeException("User is not a member of any communities.");
@@ -276,5 +311,43 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_MEMBERS, communityId);
         return rows == 1;
     }
+    @Override
+    public boolean updateCommunityNameAndDescription(Community community) {
+        if (community == null) {
+            throw new IllegalArgumentException("Community object is null");
+        }
+        int rows = jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION, community.getName(), community.getDescription(), community.getId());
+        return rows == 1;
+    }
+
+    @Override
+    public boolean setModerator(Long moderatorId, String communityId) {
+        if (moderatorId == null || communityId == null) {
+            throw new IllegalArgumentException("ModeratorId or communityId is null");
+        }
+        int rows = jdbcTemplate.update(SQL_SET_MODERATOR, moderatorId, communityId);
+        if (rows == 0) {
+            throw new RuntimeException("Invalid input, no rows affected");
+        }
+        return rows == 1;
+    }
+
+    @Override
+    public boolean removeModerator(Long moderatorId, String communityId) {
+        if (moderatorId == null || communityId == null) {
+            throw new IllegalArgumentException("ModeratorId or communityId is null");
+        }
+        int rows = jdbcTemplate.update(SQL_REMOVE_MODERATOR, moderatorId, communityId);
+        return rows == 1;
+    }
+
+    private void removeCommunityModerators(Long communityId) {
+        if (communityId == null) {
+            throw new IllegalArgumentException("communityId is null");
+        }
+        int rows = jdbcTemplate.update(SQL_REMOVE_COMMUNITY_MODERATORS, communityId);
+    }
+
+
 }
 

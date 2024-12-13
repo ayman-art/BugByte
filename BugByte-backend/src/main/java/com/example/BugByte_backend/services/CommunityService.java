@@ -1,4 +1,171 @@
 package com.example.BugByte_backend.services;
 
+import com.example.BugByte_backend.models.Community;
+import com.example.BugByte_backend.models.User;
+import com.example.BugByte_backend.repositories.CommunityRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+@Scope("singleton")
 public class CommunityService {
+
+    private final int poolCapacity = 100;
+
+    private final LinkedHashMap<String, Community> communityPool =
+            new LinkedHashMap<>(poolCapacity, 0.75f, true) {
+                protected boolean removeEldestEntry(Map.Entry<String, Community> eldest) {
+                    return this.size() > CommunityService.this.poolCapacity;
+                }
+            };
+
+    @Autowired
+    private CommunityRepository communityRepository;
+
+    private void cacheCommunity(Community community) {
+        this.communityPool.put(community.getName(), community);
+
+    }
+
+    private Community getCachedCommunity(String communityName) {
+        Community community = this.communityPool.get(communityName);
+        if (community == null) {
+            throw new IllegalArgumentException("Community not cached: " + communityName);
+        }
+        return community;
+    }
+
+    private boolean persistCommunity(Community community) {
+        try {
+            return communityRepository.updateCommunityNameAndDescription(community);
+        } catch (Exception e) {
+            System.out.println("Failed to persist community: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public Community getCommunity(String name) {
+        try {
+            return getCachedCommunity(name);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Cache miss for community: " + name);
+            return fetchCommunityFromDatabase(name);
+        }
+    }
+
+    private Community fetchCommunityFromDatabase(String name) {
+        try {
+            Community community = communityRepository.findCommunityByName(name);
+            if (community != null) {
+                cacheCommunity(community);
+                return community;
+            } else {
+                throw new IllegalArgumentException("Community not found in database: " + name);
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching community from database: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public Long createCommunity(Community inCommunity) {
+        try {
+            Long communityId = communityRepository.insertCommunity(inCommunity.getName(), inCommunity.getAdminId());
+            cacheCommunity(inCommunity);
+            return communityId;
+        } catch (Exception e) {
+            System.out.println("Error creating community: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public boolean deleteCommunity(Long communityId) {
+        try {
+            String communityNameToRemove = removeFromCache(communityId);
+            if (communityNameToRemove != null) {
+                System.out.println("Community removed from cache: " + communityNameToRemove);
+            }
+            return communityRepository.deleteCommunityById(communityId);
+        } catch (Exception e) {
+            System.out.println("Error deleting community: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private String removeFromCache(Long communityId) {
+        for (Map.Entry<String, Community> entry : communityPool.entrySet()) {
+            if (entry.getValue().getId().equals(communityId)) {
+                communityPool.remove(entry.getKey());
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    public boolean updateCommunity(Community existingCommunity, Community updatedCommunity) {
+        if (existingCommunity == null || updatedCommunity == null) {
+            throw new IllegalArgumentException("Community and updatedCommunity must not be null.");
+        }
+
+        try {
+            cacheCommunity(updatedCommunity);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Error updating community: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public List<Community> getUserCommunities(Long userId) {
+        try {
+            return communityRepository.getUserCommunities(userId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public List<User> getCommunityUsers(Long communityId) {
+        try {
+            return communityRepository.getCommunityMembers(communityId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public List<String> getCommunityMembersNames(Long communityId) {
+        try {
+            return communityRepository.getCommunityMembersNames(communityId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public List<String> getUserCommunitiesNames(Long userId) {
+        try {
+            return communityRepository.getUserCommunitiesNames(userId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public boolean setModerator(Long modratorId, String communityId) {
+        try {
+            return communityRepository.setModerator(modratorId, communityId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean removeModerator(Long modratorId, String communityId) {
+        try {
+            return communityRepository.removeModerator(modratorId, communityId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
