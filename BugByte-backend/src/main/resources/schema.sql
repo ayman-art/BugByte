@@ -77,6 +77,37 @@ CREATE TABLE IF NOT EXISTS replies (
 );
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 CREATE TABLE IF NOT EXISTS moderators (
     id BIGINT NOT NULL,
     community_id BIGINT NOT NULL,
