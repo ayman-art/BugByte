@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class SearchingFilteringQuestionServiceTest {
@@ -136,5 +136,30 @@ public class SearchingFilteringQuestionServiceTest {
     void testGetQuestionsByTags_ShouldThrowException_WhenTagsAreNullOrEmpty() {
         assertThrows(NullPointerException.class, () -> searchingFilteringQuestionService.getQuestionsByTags(null, 0, 10));
         assertThrows(NullPointerException.class, () -> searchingFilteringQuestionService.getQuestionsByTags(List.of(), 0, 10));
+    }
+
+    @Test
+    public void testDeleteQuestion_Success() {
+        List<String> tags = List.of("java", "python");
+        Question q1 = Question.builder()
+                .id(1L)
+                .title("title")
+                .mdContent("hello world")
+                .tags(tags)
+                .upVotes(0L)
+                .downVotes(0L)
+                .communityId(1L)
+                .validatedAnswerId(1L)
+                .creatorUserName("Ashraf")
+                .build();
+
+        searchingFilteringQuestionService.deleteQuestion(q1);
+
+        verify(questionRepository, times(1)).delete(q1);
+    }
+
+    @Test
+    public void testDeleteQuestion_ThrowsExceptionForNull() {
+        assertThrows(NullPointerException.class, () -> searchingFilteringQuestionService.deleteQuestion(null));
     }
 }
