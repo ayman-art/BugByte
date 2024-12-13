@@ -16,14 +16,19 @@ import java.util.List;
 @Document(indexName = "question")
 public class Question extends Post{
 
+    @Field(type = FieldType.Text, analyzer = "standard", searchAnalyzer = "standard")
     private String title;
 
+    @Field(type = FieldType.Long)
     private Long communityId;
 
+    @Field(type = FieldType.Long)
     private Long upVotes;
 
+    @Field(type = FieldType.Long)
     private Long downVotes;
 
+    @Field(type = FieldType.Long)
     private Long validatedAnswerId;
 
     @Field(type = FieldType.Keyword)
