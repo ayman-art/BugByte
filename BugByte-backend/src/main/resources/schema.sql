@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS posts (
 
 CREATE TABLE IF NOT EXISTS questions (
     id BIGINT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
     community_id BIGINT NOT NULL,
     up_votes BIGINT DEFAULT 0,
     down_votes BIGINT DEFAULT 0,

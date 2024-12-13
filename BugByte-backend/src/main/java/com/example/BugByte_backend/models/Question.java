@@ -16,6 +16,8 @@ import java.util.List;
 @Document(indexName = "question")
 public class Question extends Post{
 
+    private String title;
+
     private Long communityId;
 
     private Long upVotes;
