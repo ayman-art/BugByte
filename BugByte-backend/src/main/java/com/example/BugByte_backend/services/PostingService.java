@@ -21,6 +21,9 @@ public class PostingService {
     @Autowired
     TagsRepository tagsRepository;
 
+    @Autowired
+    SearchingFilteringQuestionService filteringQuestionService;
+
     public Post getPost(long postId) throws Exception{
         try {
             Post post = postingRepository.getPostByID(postId);
@@ -39,6 +42,9 @@ public class PostingService {
                 throw new Exception("post id is null");
             if (postingRepository.insertQuestion(postId, q.getTitle(), q.getCommunityId())) {
                 tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
+                q.setId(postId);
+
+                filteringQuestionService.saveQuestion(q);
 
                 return postId;
             }
@@ -174,7 +180,13 @@ public class PostingService {
     }
     public boolean editPost(long postId , String mdContent) throws Exception{
         try {
-            return postingRepository.editPost(postId , mdContent);
+            boolean res = postingRepository.editPost(postId , mdContent);
+            try {
+                Question question = postingRepository.getQuestionById(postId);
+                filteringQuestionService.saveQuestion(question);
+            } catch (Exception ignored) {}
+
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
