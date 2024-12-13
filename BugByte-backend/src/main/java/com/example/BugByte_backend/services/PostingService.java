@@ -37,7 +37,7 @@ public class PostingService {
             Long postId = postingRepository.insertPost(q.getMdContent() , q.getCreatorUserName());
             if (postId == null)
                 throw new Exception("post id is null");
-            if (postingRepository.insertQuestion(postId , q.getCommunityId())) {
+            if (postingRepository.insertQuestion(postId, q.getTitle(), q.getCommunityId())) {
                 tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
 
                 return postId;

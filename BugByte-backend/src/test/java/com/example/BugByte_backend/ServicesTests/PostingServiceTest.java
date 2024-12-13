@@ -71,7 +71,7 @@ public class PostingServiceTest {
 
         when(postingRepositoryMock.insertPost(mockQuestion.getMdContent(), mockQuestion.getCreatorUserName()))
                 .thenReturn(generatedPostId);
-        when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getCommunityId()))
+        when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getTitle(), mockQuestion.getCommunityId()))
                 .thenReturn(true);
         when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
 
@@ -107,7 +107,7 @@ public class PostingServiceTest {
 
         when(postingRepositoryMock.insertPost(mockQuestion.getMdContent(), mockQuestion.getCreatorUserName()))
                 .thenReturn(generatedPostId);
-        when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getCommunityId()))
+        when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getTitle(), mockQuestion.getCommunityId()))
                 .thenReturn(false);
 
         Exception exception = assertThrows(Exception.class, () -> {
