@@ -127,7 +127,7 @@ class UserControllerTest {
         String token = "Bearer validToken";
         String username = "john_doe";
         List<Map<String, Object>> followings = List.of(Map.of("username", "jane_doe"));
-        when(administrativeFacade.getFollowings(Map.of("jwt", "validToken", "user-name", username))).thenReturn(followings);
+        when(administrativeFacade.getFollowings(Map.of("jwt", "validToken", "userName", username))).thenReturn(followings);
 
         // Call the method
         ResponseEntity<?> result = userController.getFollowings(token, username);
@@ -142,7 +142,7 @@ class UserControllerTest {
         // Mock input and behavior
         String token = "Bearer invalidToken";
         String username = "john_doe";
-        when(administrativeFacade.getFollowings(Map.of("jwt", "invalidToken", "user-name", username))).thenThrow(new Exception("Unauthorized"));
+        when(administrativeFacade.getFollowings(Map.of("jwt", "invalidToken", "userName", username))).thenThrow(new Exception("Unauthorized"));
 
         // Call the method
         ResponseEntity<?> result = userController.getFollowings(token, username);

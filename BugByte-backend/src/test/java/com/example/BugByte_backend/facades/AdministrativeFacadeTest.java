@@ -80,8 +80,22 @@ public class AdministrativeFacadeTest {
         Map<String, Object> userdata = Map.of("userName", "test_user");
 
         List<User> mockedResult = List.of(
-                new User(1L, "test_user1", "password1", "email1", 100L, false),
-                new User(2L, "test_user2", "password2", "email2", 200L, true)
+                User.builder()
+                        .id(1L)
+                        .userName("test_user1")
+                        .email("email1")
+                        .password("password1")
+                        .reputation(100L)
+                        .isAdmin(false)
+                        .build(),
+                User.builder()
+                        .id(2L)
+                        .userName("test_user2")
+                        .email("email2")
+                        .password("password2")
+                        .reputation(200L)
+                        .isAdmin(true)
+                        .build()
         );
 
         when(userServiceMock.getFollowers("test_user")).thenReturn(mockedResult);
@@ -124,8 +138,22 @@ public class AdministrativeFacadeTest {
         Map<String, Object> userdata = Map.of("userName", "test_user");
 
         List<User> mockedResult = List.of(
-                new User(1L, "test_user1", "password1", "email1", 100L, false),
-                new User(2L, "test_user2", "password2", "email2", 200L, true)
+                User.builder()
+                        .id(1L)
+                        .userName("test_user1")
+                        .email("email1")
+                        .password("password1")
+                        .reputation(100L)
+                        .isAdmin(false)
+                        .build(),
+                User.builder()
+                        .id(2L)
+                        .userName("test_user2")
+                        .email("email2")
+                        .password("password2")
+                        .reputation(200L)
+                        .isAdmin(true)
+                        .build()
         );
 
         when(userServiceMock.getFollowings("test_user")).thenReturn(mockedResult);

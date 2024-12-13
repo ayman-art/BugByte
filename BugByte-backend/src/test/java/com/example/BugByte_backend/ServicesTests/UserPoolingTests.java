@@ -13,7 +13,12 @@ public class UserPoolingTests extends UserService {
     private static Long id = 0L;
     private User CreateDummyUser() {
         id++;
-        return new User(id,"name" + id, "example@provider.com", "password");
+        return User.builder()
+                .id(id)
+                .userName("name" + id)
+                .email("example@provider.com")
+                .password("password")
+                .build();
     }
 
     @Test
