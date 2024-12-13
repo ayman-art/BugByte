@@ -6,6 +6,7 @@ import com.example.BugByte_backend.repositories.PostingRepository;
 import com.example.BugByte_backend.repositories.TagsRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.PostingService;
+import com.example.BugByte_backend.services.SearchingFilteringQuestionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -33,6 +35,8 @@ public class PostingServiceTest {
     UserRepositoryImp userRepositoryImpMock;
     @Mock
     TagsRepository tagsRepositoryMock;
+    @Mock
+    SearchingFilteringQuestionService filteringQuestionService;
     @InjectMocks
     PostingService postingService;
     @BeforeEach
@@ -74,6 +78,7 @@ public class PostingServiceTest {
         when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getTitle(), mockQuestion.getCommunityId()))
                 .thenReturn(true);
         when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
+        when(filteringQuestionService.saveQuestion(eq(mockQuestion))).thenReturn(null);
 
         long result = postingService.postQuestion(mockQuestion);
 
