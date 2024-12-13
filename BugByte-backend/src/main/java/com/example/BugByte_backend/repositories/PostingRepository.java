@@ -19,9 +19,9 @@ public class PostingRepository implements IPostingRepository{
             """;
     private static final String SQL_INSERT_QUESTION = """
                 INSERT INTO questions
-                    (id, community_id, up_votes, down_votes)
+                    (id, title, community_id, up_votes, down_votes)
                 VALUES
-                    (?, ?, 0, 0);
+                    (?, ?, ?, 0, 0);
             """;
     private static final String SQL_INSERT_ANSWER = """
                 INSERT INTO answers
@@ -178,10 +178,10 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean insertQuestion(Long questionId, Long communityId) {
-        if(questionId == null || communityId == null)
-            throw new NullPointerException("question id or community id is null");
-        int rows = jdbcTemplate.update(SQL_INSERT_QUESTION, questionId, communityId);
+    public Boolean insertQuestion(Long questionId, String title, Long communityId) {
+        if(questionId == null || title == null || communityId == null)
+            throw new NullPointerException("question id or title or community id is null");
+        int rows = jdbcTemplate.update(SQL_INSERT_QUESTION, questionId, title, communityId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -388,6 +388,7 @@ public class PostingRepository implements IPostingRepository{
                     .creatorUserName(rs.getString("op_name"))
                     .mdContent(rs.getString("md_content"))
                     .postedOn(new Date(rs.getDate("posted_on").getTime()))
+                    .title(rs.getString("title"))
                     .communityId(rs.getLong("community_id"))
                     .upVotes(rs.getLong("up_votes"))
                     .downVotes(rs.getLong("down_votes"))
