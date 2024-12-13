@@ -39,7 +39,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     WHERE community_id = ?;
 """;
 
-
     private static final String SQL_FIND_BY_ID = "SELECT * FROM communities WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_NAME = "SELECT id FROM communities WHERE name = ?;";
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM communities WHERE name = ?;";
@@ -78,16 +77,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     DELETE FROM community_members
     WHERE community_id = ?;
 """;
-    private static final String SQL_SET_MODERATOR = """
-    INSERT INTO moderators 
-    (id , community_id)
-    VALUES 
-    (? ,?);
-""";
-    private static final String SQL_REMOVE_MODERATOR = """
-    DELETE FROM moderators 
-    WHERE id = ? AND community_id = ?;
-""";
+
     private  static final String SQL_REMOVE_COMMUNITY_MODERATORS = """
     DELETE FROM moderators 
     WHERE community_id = ?;
@@ -330,22 +320,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new RuntimeException("Invalid input, no rows affected");
         }
         return rows == 1;
-    }
-
-    @Override
-    public boolean removeModerator(Long moderatorId, String communityId) {
-        if (moderatorId == null || communityId == null) {
-            throw new IllegalArgumentException("ModeratorId or communityId is null");
-        }
-        int rows = jdbcTemplate.update(SQL_REMOVE_MODERATOR, moderatorId, communityId);
-        return rows == 1;
-    }
-
-    private void removeCommunityModerators(Long communityId) {
-        if (communityId == null) {
-            throw new IllegalArgumentException("communityId is null");
-        }
-        int rows = jdbcTemplate.update(SQL_REMOVE_COMMUNITY_MODERATORS, communityId);
     }
 
 
