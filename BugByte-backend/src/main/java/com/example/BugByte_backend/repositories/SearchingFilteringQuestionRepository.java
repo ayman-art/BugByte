@@ -24,5 +24,5 @@ public interface SearchingFilteringQuestionRepository extends  ElasticsearchRepo
             "\"sort\": [{" +
             "\"postedOn\": {\"order\": \"desc\"}" +
             "}]}}")
-    List<Question> findByTagsIn(List<String> tags);
+    Page<Question> findByTagsIn(List<String> tags, Pageable pageable);
 }

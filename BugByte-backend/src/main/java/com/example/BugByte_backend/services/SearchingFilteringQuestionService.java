@@ -29,10 +29,11 @@ public class SearchingFilteringQuestionService {
         return questionRepository.findByMdContentAndTags(query, pageable);
     }
 
-    public List<Question> getQuestionsByTags(List<String> tags) {
+    public Page<Question> getQuestionsByTags(List<String> tags, int page, int size) {
         if (tags == null || tags.isEmpty())
             throw new NullPointerException("tags can't be null or empty");
 
-        return questionRepository.findByTagsIn(tags);
+        Pageable pageable = PageRequest.of(page, size);
+        return questionRepository.findByTagsIn(tags, pageable);
     }
 }
