@@ -84,7 +84,10 @@ public class PostingService {
     }
     public boolean deleteQuestion(long questionId) throws Exception{
         try {
-             return postingRepository.deleteQuestion(questionId);
+            boolean res = postingRepository.deleteQuestion(questionId);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.deleteQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -108,7 +111,10 @@ public class PostingService {
     }
     public boolean upVoteQuestion(long questionId) throws Exception{
         try {
-            return postingRepository.upVoteQuestion(questionId , 1);
+            boolean res = postingRepository.upVoteQuestion(questionId , 1);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -116,7 +122,10 @@ public class PostingService {
     }
     public boolean removeUpVoteFromQuestion(long questionId) throws Exception{
         try {
-            return postingRepository.upVoteQuestion(questionId , -1);
+            boolean res = postingRepository.upVoteQuestion(questionId , -1);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -124,7 +133,10 @@ public class PostingService {
     }
     public boolean downVoteQuestion(long questionId) throws Exception{
         try {
-            return postingRepository.downVoteQuestion(questionId , 1);
+            boolean res = postingRepository.downVoteQuestion(questionId , 1);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -132,7 +144,10 @@ public class PostingService {
     }
     public boolean removeDownVoteFromQuestion(long questionId) throws Exception{
         try {
-            return postingRepository.downVoteQuestion(questionId , -1);
+            boolean res = postingRepository.downVoteQuestion(questionId , -1);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
