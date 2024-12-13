@@ -45,6 +45,12 @@ public class CommunityRepositoryTest {
                 WHERE member_id = ?;
             """;
 
+    private static final String SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION = """
+    UPDATE communities
+    SET name = ?, description = ?
+    WHERE community_id = ?;
+""";
+
     private static final String SQL_FIND_BY_ID = "SELECT * FROM communities WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_NAME = "SELECT id FROM communities WHERE name = ?;";
 
@@ -58,6 +64,7 @@ public class CommunityRepositoryTest {
 
     private static final String SQL_DELETE_COMMUNITY_BY_ID = "DELETE FROM communities WHERE id = ?;";
     private static final String SQL_DELETE_MEMBER_BY_ID = "DELETE FROM community_members WHERE member_id = ? AND community_id=?;";
+
     private static final String SQL_FIND_COMMUNITIES_BY_USER_ID = """
     SELECT *
     FROM communities c
@@ -86,6 +93,21 @@ public class CommunityRepositoryTest {
     DELETE FROM community_members 
     WHERE community_id = ?;
 """;
+    private static final String SQL_SET_MODERATOR = """
+    INSERT INTO moderators 
+    (moderator_id , community_id)
+    VALUES 
+    (? ,?);
+""";
+    private static final String SQL_REMOVE_MODERATOR = """
+    DELETE FROM moderators 
+    WHERE moderator_id = ? AND community_id = ?;
+""";
+    private  static final String SQL_REMOVE_COMMUNITY_MODERATORS = """
+    DELETE FROM moderators 
+    WHERE community_id = ?;
+""";
+
 
     private User admin;
     private User member1;
@@ -168,13 +190,16 @@ public class CommunityRepositoryTest {
         Long adminId = 1L;
         when(jdbcTemplate.update(eq(SQL_INSERT_COMMUNITY), eq(name), eq(adminId), any(Date.class)))
                 .thenReturn(1);
+        when(jdbcTemplate.update(eq(SQL_INSERT_MEMBER), eq(1L),eq(15L),any(Date.class)))
+                .thenReturn(1);
+
         when(jdbcTemplate.queryForObject(eq(SQL_FIND_ID_BY_NAME), any(Object[].class), eq(Long.class)))
                 .thenReturn(15L);
+
         Long result = communityRepository.insertCommunity(name, adminId);
+
         assertEquals(Long.valueOf(15L), result);
     }
-
-
 
     @Test
     public void testInsertCommunity_Failure_DuplicateName() {
@@ -553,5 +578,70 @@ public class CommunityRepositoryTest {
         assertEquals(mockUsers.size(), result.size());
         assertEquals(mockUsers, result);
     }
+
+    @Test
+    public void testUpdateCommunityNameAndDescription_success() {
+        Community community = new Community("New Name","New Description" ,1L );
+        when(jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION, community.getName(), community.getDescription(), community.getId())).thenReturn(1);
+        boolean result = communityRepository.updateCommunityNameAndDescription(community);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testUpdateCommunityNameAndDescription_failure() {
+        Community community = new Community("New Name","New Description" ,1L );
+        when(jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION, community.getName(), community.getDescription(), community.getId())).thenReturn(0);
+        boolean result = communityRepository.updateCommunityNameAndDescription(community);
+        assertFalse(result);
+    }
+
+    @Test
+    public void testSetModerator_success() {
+        Long moderatorId = 1L;
+        String communityId = "community123";
+        when(jdbcTemplate.update(SQL_SET_MODERATOR, moderatorId, communityId)).thenReturn(1);
+        boolean result = communityRepository.setModerator(moderatorId, communityId);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testSetModerator_failure_noRowsAffected() {
+        Long moderatorId = 1L;
+        String communityId = "community123";
+        when(jdbcTemplate.update(SQL_SET_MODERATOR, moderatorId, communityId)).thenReturn(0);
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> communityRepository.setModerator(moderatorId, communityId));
+        assertEquals("Invalid input, no rows affected", exception.getMessage());
+    }
+
+    @Test
+    public void testSetModerator_nullInput() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> communityRepository.setModerator(null, null));
+        assertEquals("ModeratorId or communityId is null", exception.getMessage());
+    }
+
+    @Test
+    public void testRemoveModerator_success() {
+        Long moderatorId = 1L;
+        String communityId = "community123";
+        when(jdbcTemplate.update(SQL_REMOVE_MODERATOR, moderatorId, communityId)).thenReturn(1);
+        boolean result = communityRepository.removeModerator(moderatorId, communityId);
+        assertTrue(result);
+    }
+
+    @Test
+    public void testRemoveModerator_failure() {
+        Long moderatorId = 1L;
+        String communityId = "community123";
+        when(jdbcTemplate.update(SQL_REMOVE_MODERATOR, moderatorId, communityId)).thenReturn(0);
+        boolean result = communityRepository.removeModerator(moderatorId, communityId);
+        assertFalse(result);
+    }
+
+    @Test
+    public void testRemoveModerator_nullInput() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> communityRepository.removeModerator(null, null));
+        assertEquals("ModeratorId or communityId is null", exception.getMessage());
+    }
+
 
 }
