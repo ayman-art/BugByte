@@ -18,11 +18,8 @@ public interface SearchingFilteringQuestionRepository extends  ElasticsearchRepo
             "]}}")
     Page<Question> findByMdContentAndTags(String query, Pageable pageable);
 
-    @Query("{\"bool\": {\"must\": [{" +
-            "\"terms\": {\"tags\": ?0}" +
-            "}]}, " +
-            "\"sort\": [{" +
-            "\"postedOn\": {\"order\": \"desc\"}" +
-            "}]}}")
+    @Query("{\"bool\": {\"must\": [" +
+            "{\"terms\": {\"tags\": ?0}}" +
+            "]}}")
     Page<Question> findByTagsIn(List<String> tags, Pageable pageable);
 }

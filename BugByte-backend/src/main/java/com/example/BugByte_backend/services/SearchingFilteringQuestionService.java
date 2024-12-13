@@ -36,4 +36,11 @@ public class SearchingFilteringQuestionService {
         Pageable pageable = PageRequest.of(page, size);
         return questionRepository.findByTagsIn(tags, pageable);
     }
+
+    public void deleteQuestion(Question question) {
+        if (question == null)
+            throw new NullPointerException("question is null");
+
+        questionRepository.delete(question);
+    }
 }
