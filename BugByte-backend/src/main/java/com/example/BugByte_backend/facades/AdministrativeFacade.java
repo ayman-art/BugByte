@@ -2,13 +2,16 @@ package com.example.BugByte_backend.facades;
 
 import com.example.BugByte_backend.Adapters.UserAdapter;
 import com.example.BugByte_backend.controllers.GoogleAuthController;
+import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.services.AuthenticationService;
+import com.example.BugByte_backend.services.CommunityService;
 import com.example.BugByte_backend.services.RegistrationService;
 import com.example.BugByte_backend.services.UserService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import io.jsonwebtoken.Claims;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +28,7 @@ public class AdministrativeFacade {
 
     @Autowired
     private RegistrationService registrationService;
+    CommunityService communityService =new CommunityService();
 
     /*
     Expected input format:
@@ -181,5 +185,55 @@ public class AdministrativeFacade {
         } else {
             throw new RuntimeException("Invalid token");
         }
+    }
+    public Map<String,Object> getCommunityInfo(Long CommunityId)
+    {
+        try {
+            Community community = communityService.getCommunityById(CommunityId);
+            return Map.of(
+                    "name",community.getName(),
+                    "admin_id", community.getAdminId(),
+                    "description",community.getDescription(),
+                    "creation_date",community.getCreationDate()
+            );
+        }catch (Exception e)
+        {
+            return null;
+        }
+
+    }
+    public boolean createCommunity(Map<String,Object> map){
+        try {
+            Long id =communityService.createCommunity(new Community((String) map.get("name")
+                                                         ,(Long) map.get("admin_id")));
+            if(map.containsKey("description"))
+            {
+                communityService.updateCommunityDescription(id,(String) map.get("description"));
+            }
+            return  true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+    public boolean deleteCommunity(Long communityId)
+    {
+        try {
+            return communityService.deleteCommunity(communityId);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+    public boolean editCommunity(Long communityId, Map<String,Object> map)
+    {
+        try {
+            Community comm = new Community(communityId ,(String)map.get("name"),(String) map.get("desription"));
+            return communityService.updateCommunity(comm);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+    public boolean setModerator(Map<String , Object>req)
+    {
+        return true;
     }
 }
