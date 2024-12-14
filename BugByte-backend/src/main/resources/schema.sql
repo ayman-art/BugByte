@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS replies (
 );
 
 CREATE TABLE IF NOT EXISTS upVotes (
-    userName TEXT NOT NULL,
+    userName VARCHAR(255) NOT NULL,
     post_id BIGINT NOT NULL,
     PRIMARY KEY (userName, post_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS upVotes (
 );
 
 CREATE TABLE IF NOT EXISTS downVotes (
-    userName TEXT NOT NULL,
+    userName VARCHAR(255) NOT NULL,
     post_id BIGINT NOT NULL,
     PRIMARY KEY (userName, post_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,

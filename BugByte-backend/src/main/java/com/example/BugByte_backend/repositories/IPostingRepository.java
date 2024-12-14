@@ -27,13 +27,13 @@ public interface IPostingRepository {
 
      Boolean deleteReply(Long replyId);
 
-     Boolean upVoteQuestion(Long questionId, Integer value);
+     Boolean upVoteQuestion(Long questionId, Integer value, String userName) throws Exception;
 
-     Boolean downVoteQuestion(Long questionId, Integer value);
+     Boolean downVoteQuestion(Long questionId, Integer valu , String userNamee) throws Exception;
 
-     Boolean upVoteAnswer(Long AnswerId, Integer value);
+     Boolean upVoteAnswer(Long AnswerId, Integer value , String userName) throws Exception;
 
-     Boolean downVoteAnswer(Long AnswerId, Integer value);
+     Boolean downVoteAnswer(Long AnswerId, Integer value , String userName) throws Exception;
 
      Boolean verifyAnswer(Long answerId);
 

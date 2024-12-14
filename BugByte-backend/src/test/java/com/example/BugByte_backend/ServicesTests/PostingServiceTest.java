@@ -265,9 +265,9 @@ public class PostingServiceTest {
     void testUpVoteQuestion_Success() throws Exception {
         long questionId = 404L;
 
-        when(postingRepositoryMock.upVoteQuestion(questionId, 1)).thenReturn(true);
+        when(postingRepositoryMock.upVoteQuestion(questionId, 1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.upVoteQuestion(questionId);
+        boolean result = postingService.upVoteQuestion(questionId , "user1");
 
         assertTrue(result);
     }
@@ -276,9 +276,9 @@ public class PostingServiceTest {
     void testUpVoteQuestion_Failure() throws Exception {
         long questionId = 404L;
 
-        when(postingRepositoryMock.upVoteQuestion(questionId, 1)).thenReturn(false);
+        when(postingRepositoryMock.upVoteQuestion(questionId, 1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.upVoteQuestion(questionId);
+        boolean result = postingService.upVoteQuestion(questionId , "user1");
 
         assertFalse(result);
     }
@@ -286,9 +286,9 @@ public class PostingServiceTest {
     void testRemoveUpVoteFromQuestion_Success() throws Exception {
         long questionId = 505L;
 
-        when(postingRepositoryMock.upVoteQuestion(questionId, -1)).thenReturn(true);
+        when(postingRepositoryMock.upVoteQuestion(questionId, -1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.removeUpVoteFromQuestion(questionId);
+        boolean result = postingService.removeUpVoteFromQuestion(questionId , "user1");
 
         assertTrue(result);
     }
@@ -297,9 +297,9 @@ public class PostingServiceTest {
     void testRemoveUpVoteFromQuestion_Failure() throws Exception {
         long questionId = 505L;
 
-        when(postingRepositoryMock.upVoteQuestion(questionId, -1)).thenReturn(false);
+        when(postingRepositoryMock.upVoteQuestion(questionId, -1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.removeUpVoteFromQuestion(questionId);
+        boolean result = postingService.removeUpVoteFromQuestion(questionId , "user1");
 
         assertFalse(result);
     }
@@ -307,9 +307,9 @@ public class PostingServiceTest {
     void testDownVoteQuestion_Success() throws Exception {
         long questionId = 606L;
 
-        when(postingRepositoryMock.downVoteQuestion(questionId, 1)).thenReturn(true);
+        when(postingRepositoryMock.downVoteQuestion(questionId, 1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.downVoteQuestion(questionId);
+        boolean result = postingService.downVoteQuestion(questionId , "user1");
 
         assertTrue(result);
     }
@@ -318,9 +318,9 @@ public class PostingServiceTest {
     void testDownVoteQuestion_Failure() throws Exception {
         long questionId = 606L;
 
-        when(postingRepositoryMock.downVoteQuestion(questionId, 1)).thenReturn(false);
+        when(postingRepositoryMock.downVoteQuestion(questionId, 1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.downVoteQuestion(questionId);
+        boolean result = postingService.downVoteQuestion(questionId , "user1");
 
         assertFalse(result);
     }
@@ -328,9 +328,9 @@ public class PostingServiceTest {
     void testRemoveDownVoteFromQuestion_Success() throws Exception {
         long questionId = 707L;
 
-        when(postingRepositoryMock.downVoteQuestion(questionId, -1)).thenReturn(true);
+        when(postingRepositoryMock.downVoteQuestion(questionId, -1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.removeDownVoteFromQuestion(questionId);
+        boolean result = postingService.removeDownVoteFromQuestion(questionId , "user1");
 
         assertTrue(result);
     }
@@ -339,9 +339,9 @@ public class PostingServiceTest {
     void testRemoveDownVoteFromQuestion_Failure() throws Exception {
         long questionId = 707L;
 
-        when(postingRepositoryMock.downVoteQuestion(questionId, -1)).thenReturn(false);
+        when(postingRepositoryMock.downVoteQuestion(questionId, -1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.removeDownVoteFromQuestion(questionId);
+        boolean result = postingService.removeDownVoteFromQuestion(questionId , "user1");
 
         assertFalse(result);
     }
@@ -349,9 +349,9 @@ public class PostingServiceTest {
     void testUpVoteAnswer_Success() throws Exception {
         long answerId = 808L;
 
-        when(postingRepositoryMock.upVoteAnswer(answerId, 1)).thenReturn(true);
+        when(postingRepositoryMock.upVoteAnswer(answerId, 1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.upVoteAnswer(answerId);
+        boolean result = postingService.upVoteAnswer(answerId , "user1");
 
         assertTrue(result);
     }
@@ -360,9 +360,9 @@ public class PostingServiceTest {
     void testUpVoteAnswer_Failure() throws Exception {
         long answerId = 808L;
 
-        when(postingRepositoryMock.upVoteAnswer(answerId, 1)).thenReturn(false);
+        when(postingRepositoryMock.upVoteAnswer(answerId, 1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.upVoteAnswer(answerId);
+        boolean result = postingService.upVoteAnswer(answerId , "user1");
 
         assertFalse(result);
     }
@@ -370,9 +370,9 @@ public class PostingServiceTest {
     void testRemoveUpFromVoteAnswer_Success() throws Exception {
         long answerId = 909L;
 
-        when(postingRepositoryMock.upVoteAnswer(answerId, -1)).thenReturn(true);
+        when(postingRepositoryMock.upVoteAnswer(answerId, -1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.removeUpFromVoteAnswer(answerId);
+        boolean result = postingService.removeUpFromVoteAnswer(answerId , "user1");
 
         assertTrue(result);
     }
@@ -381,9 +381,9 @@ public class PostingServiceTest {
     void testRemoveUpFromVoteAnswer_Failure() throws Exception {
         long answerId = 909L;
 
-        when(postingRepositoryMock.upVoteAnswer(answerId, -1)).thenReturn(false);
+        when(postingRepositoryMock.upVoteAnswer(answerId, -1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.removeUpFromVoteAnswer(answerId);
+        boolean result = postingService.removeUpFromVoteAnswer(answerId , "user1");
 
         assertFalse(result);
     }
@@ -392,9 +392,9 @@ public class PostingServiceTest {
     void testDownVoteAnswer_Success() throws Exception {
         long answerId = 1010L;
 
-        when(postingRepositoryMock.downVoteAnswer(answerId, 1)).thenReturn(true);
+        when(postingRepositoryMock.downVoteAnswer(answerId, 1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.downVoteAnswer(answerId);
+        boolean result = postingService.downVoteAnswer(answerId , "user1");
 
         assertTrue(result);
     }
@@ -403,9 +403,9 @@ public class PostingServiceTest {
     void testDownVoteAnswer_Failure() throws Exception {
         long answerId = 1010L;
 
-        when(postingRepositoryMock.downVoteAnswer(answerId, 1)).thenReturn(false);
+        when(postingRepositoryMock.downVoteAnswer(answerId, 1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.downVoteAnswer(answerId);
+        boolean result = postingService.downVoteAnswer(answerId , "user1");
 
         assertFalse(result);
     }
@@ -414,9 +414,9 @@ public class PostingServiceTest {
     void testRemoveDownVoteAnswer_Success() throws Exception {
         long answerId = 1111L;
 
-        when(postingRepositoryMock.downVoteAnswer(answerId, -1)).thenReturn(true);
+        when(postingRepositoryMock.downVoteAnswer(answerId, -1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.removeDownVoteAnswer(answerId);
+        boolean result = postingService.removeDownVoteAnswer(answerId , "user1");
 
         assertTrue(result);
     }
@@ -425,9 +425,9 @@ public class PostingServiceTest {
     void testRemoveDownVoteAnswer_Failure() throws Exception {
         long answerId = 1111L;
 
-        when(postingRepositoryMock.downVoteAnswer(answerId, -1)).thenReturn(false);
+        when(postingRepositoryMock.downVoteAnswer(answerId, -1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.removeDownVoteAnswer(answerId);
+        boolean result = postingService.removeDownVoteAnswer(answerId , "user1");
 
         assertFalse(result);
     }

@@ -128,65 +128,65 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public boolean upVoteQuestion(long questionId) throws Exception{
+    public boolean upVoteQuestion(long questionId , String userName) throws Exception{
         try {
-            return postingRepository.upVoteQuestion(questionId , 1);
+            return postingRepository.upVoteQuestion(questionId , 1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeUpVoteFromQuestion(long questionId) throws Exception{
+    public boolean removeUpVoteFromQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.upVoteQuestion(questionId , -1);
+            return postingRepository.upVoteQuestion(questionId , -1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean downVoteQuestion(long questionId) throws Exception{
+    public boolean downVoteQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteQuestion(questionId , 1);
+            return postingRepository.downVoteQuestion(questionId , 1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeDownVoteFromQuestion(long questionId) throws Exception{
+    public boolean removeDownVoteFromQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteQuestion(questionId , -1);
+            return postingRepository.downVoteQuestion(questionId , -1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean upVoteAnswer(long answerId) throws Exception{
+    public boolean upVoteAnswer(long answerId ,  String userName) throws Exception{
         try {
-            return postingRepository.upVoteAnswer(answerId , 1);
+            return postingRepository.upVoteAnswer(answerId , 1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeUpFromVoteAnswer(long answerId) throws Exception{
+    public boolean removeUpFromVoteAnswer(long answerId ,  String userName) throws Exception{
         try {
-            return postingRepository.upVoteAnswer(answerId , -1);
+            return postingRepository.upVoteAnswer(answerId , -1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean downVoteAnswer(long answerId) throws Exception{
+    public boolean downVoteAnswer(long answerId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteAnswer(answerId , 1);
+            return postingRepository.downVoteAnswer(answerId , 1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeDownVoteAnswer(long answerId) throws Exception{
+    public boolean removeDownVoteAnswer(long answerId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteAnswer(answerId , -1);
+            return postingRepository.downVoteAnswer(answerId , -1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

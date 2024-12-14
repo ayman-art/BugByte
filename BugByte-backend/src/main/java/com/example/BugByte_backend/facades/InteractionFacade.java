@@ -104,8 +104,11 @@ public class InteractionFacade {
     }
     public boolean upVoteQuestion(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             long questionId = (long) postData.get("questionId");
-            return postingService.upVoteQuestion(questionId);
+            return postingService.upVoteQuestion(questionId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -113,8 +116,11 @@ public class InteractionFacade {
     }
     public boolean removeUpVoteQuestion(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             long questionId = (long) postData.get("questionId");
-            return postingService.removeUpVoteFromQuestion(questionId);
+            return postingService.removeUpVoteFromQuestion(questionId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -122,8 +128,11 @@ public class InteractionFacade {
     }
     public boolean downVoteQuestion(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             long questionId = (long) postData.get("questionId");
-            return postingService.downVoteQuestion(questionId);
+            return postingService.downVoteQuestion(questionId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -131,8 +140,11 @@ public class InteractionFacade {
     }
     public boolean removeDownVoteQuestion(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             long questionId = (long) postData.get("questionId");
-            return postingService.removeDownVoteFromQuestion(questionId);
+            return postingService.removeDownVoteFromQuestion(questionId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -140,8 +152,11 @@ public class InteractionFacade {
     }
     public boolean upVoteAnswer(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             long answerId = (long) postData.get("answerId");
-            return postingService.upVoteAnswer(answerId);
+            return postingService.upVoteAnswer(answerId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -149,8 +164,11 @@ public class InteractionFacade {
     }
     public boolean removeUpVoteAnswer(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             long answerId = (long) postData.get("answerId");
-            return postingService.removeUpFromVoteAnswer(answerId);
+            return postingService.removeUpFromVoteAnswer(answerId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -158,8 +176,11 @@ public class InteractionFacade {
     }
     public boolean downVoteAnswer(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             long answerId = (long) postData.get("answerId");
-            return postingService.downVoteAnswer(answerId);
+            return postingService.downVoteAnswer(answerId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -167,8 +188,11 @@ public class InteractionFacade {
     }
     public boolean removeDownVoteAnswer(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             long answerId = (long) postData.get("answerId");
-            return postingService.removeDownVoteAnswer(answerId);
+            return postingService.removeDownVoteAnswer(answerId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
