@@ -31,6 +31,17 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onSave }) => {
     setTags(tags.filter((t) => t !== tag));
   };
 
+  const handleClose = () => {
+    clearPost();
+    onClose();
+  }
+  const clearPost = () => {
+    setTagInput('');
+    setTags([]);
+    setSelectedCommunity('');
+    setPostContent('');
+    setPostTitle('');
+    }
   const handleSavePost = () => {
     onSave({
       title: postTitle,
@@ -109,7 +120,7 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onSave }) => {
           <button style={styles.saveButton} onClick={handleSavePost}>
             Save Post
           </button>
-          <button style={styles.closeButton} onClick={onClose}>
+          <button style={styles.closeButton} onClick={handleClose}>
             Close
           </button>
         </div>
