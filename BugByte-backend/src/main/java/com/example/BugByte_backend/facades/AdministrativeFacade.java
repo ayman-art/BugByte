@@ -1,13 +1,11 @@
 package com.example.BugByte_backend.facades;
 
+import com.example.BugByte_backend.Adapters.CommunityAdapter;
 import com.example.BugByte_backend.Adapters.UserAdapter;
 import com.example.BugByte_backend.controllers.GoogleAuthController;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.services.AuthenticationService;
-import com.example.BugByte_backend.services.CommunityService;
-import com.example.BugByte_backend.services.RegistrationService;
-import com.example.BugByte_backend.services.UserService;
+import com.example.BugByte_backend.services.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import io.jsonwebtoken.Claims;
@@ -29,6 +27,7 @@ public class AdministrativeFacade {
     @Autowired
     private RegistrationService registrationService;
     CommunityService communityService =new CommunityService();
+    ModeratorService moderatorService = new ModeratorService();
 
     /*
     Expected input format:
@@ -190,12 +189,8 @@ public class AdministrativeFacade {
     {
         try {
             Community community = communityService.getCommunityById(CommunityId);
-            return Map.of(
-                    "name",community.getName(),
-                    "admin_id", community.getAdminId(),
-                    "description",community.getDescription(),
-                    "creation_date",community.getCreationDate()
-            );
+            CommunityAdapter communityAdapter = new CommunityAdapter();
+            return communityAdapter.toMap(community);
         }catch (Exception e)
         {
             return null;
@@ -204,12 +199,8 @@ public class AdministrativeFacade {
     }
     public boolean createCommunity(Map<String,Object> map){
         try {
-            Long id =communityService.createCommunity(new Community((String) map.get("name")
-                                                         ,(Long) map.get("admin_id")));
-            if(map.containsKey("description"))
-            {
-                communityService.updateCommunityDescription(id,(String) map.get("description"));
-            }
+            CommunityAdapter communityAdapter = new CommunityAdapter();
+            Long id =communityService.createCommunity(communityAdapter.fromMap(map));
             return  true;
         }catch (Exception e){
             return false;
@@ -232,8 +223,54 @@ public class AdministrativeFacade {
             return false;
         }
     }
-    public boolean setModerator(Map<String , Object>req)
+    public boolean setModerator(Map<String , Object>req) {
+        try {
+        return moderatorService.setModerator((Long) req.get("moderator_id"), (Long) req.get("community_id"));
+        } catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+    public boolean removeModerator(Map<String , Object>req)
     {
-        return true;
+        try {
+
+            return moderatorService.removeModerator((Long) req.get("moderator_id"), (Long) req.get("community_id"));
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+    public boolean removeMember(Map<String,Object>req)
+    {
+        try {
+            return communityService.deleteMember((Long)req.get("community_id"),(String)req.get("user_name"));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public List<Map<String, Object>> getAdmins(Long communityId)
+    {
+       List<User> admins = communityService.getCommunityAdmins(communityId);
+        UserAdapter adapter = new UserAdapter();
+        List <Map<String, Object>> adminsMap = admins.stream().map(adapter::toMap).toList();
+        for (Map<String, Object> admin : adminsMap) {
+            admin.remove("password");
+            admin.remove("email");
+            admin.remove("id");
+        }
+        return adminsMap;
+    }
+
+    public boolean joinCommunity(Map<String,Object>req)
+    {
+        try {
+            return communityService.joinCommunity((Long)req.get("community_id"),(Long)req.get("id"));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }
