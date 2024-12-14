@@ -172,4 +172,42 @@ public class PostingController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @PostMapping("verify-answer")
+    public ResponseEntity<?> verifyAnswer(@RequestHeader("Authorization") String token, @RequestParam("answerId") Long answerId) {
+        token = token.replace("Bearer ", "");
+        Map<String, Object> answerData = Map.of("jwt", token, "answerId", answerId);
+        try {
+//            return new ResponseEntity<>(interactionFacade.verifyAnswer(answerData), HttpStatus.OK);
+            return new ResponseEntity<>(Map.of("message", "Answer verified successfully"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("answers/{answerId}")
+    public ResponseEntity<?> getAnswer(@RequestHeader("Authorization") String token, @PathVariable("answerId") Long answerId) {
+        token = token.replace("Bearer ", "");
+        Map<String, Object> answerData = Map.of("jwt", token, "answerId", answerId);
+        try {
+//            return new ResponseEntity<>(interactionFacade.getAnswer(answerData), HttpStatus.OK);
+            return new ResponseEntity<>(Map.of("message", "Answer fetched successfully"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("replies/{replyId}")
+    public ResponseEntity<?> getReply(@RequestHeader("Authorization") String token, @PathVariable("replyId") Long replyId) {
+        token = token.replace("Bearer ", "");
+        Map<String, Object> replyData = Map.of("jwt", token, "replyId", replyId);
+        try {
+//            return new ResponseEntity<>(interactionFacade.getReply(replyData), HttpStatus.OK);
+            return new ResponseEntity<>(Map.of("message", "Reply fetched successfully"), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+
 }
