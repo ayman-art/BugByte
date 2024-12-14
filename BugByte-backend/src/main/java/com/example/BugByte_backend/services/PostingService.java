@@ -104,24 +104,33 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public boolean deleteQuestion(long questionId) throws Exception{
+    public boolean deleteQuestion(long questionId , String userName) throws Exception{
         try {
+            Post post = postingRepository.getPostByID(questionId);
+            if (! post.getCreatorUserName().equals(userName))
+                throw new Exception("this user can't delete this post");
              return postingRepository.deleteQuestion(questionId);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean deleteAnswer(long answerId) throws Exception{
+    public boolean deleteAnswer(long answerId , String userName) throws Exception{
         try {
+            Post post = postingRepository.getPostByID(answerId);
+            if (! post.getCreatorUserName().equals(userName))
+                throw new Exception("this user can't delete this post");
             return postingRepository.deleteAnswer(answerId);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean deleteReply(long replyId) throws Exception{
+    public boolean deleteReply(long replyId , String userName) throws Exception{
         try {
+            Post post = postingRepository.getPostByID(replyId);
+            if (! post.getCreatorUserName().equals(userName))
+                throw new Exception("this user can't delete this post");
             return postingRepository.deleteReply(replyId);
         }
         catch (Exception e){
@@ -192,8 +201,12 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public boolean verifyAnswer(long answerId) throws Exception{
+    public boolean verifyAnswer(long answerId , String userName) throws Exception{
         try {
+            Answer answer = postingRepository.getAnswerById(answerId);
+            Post post = postingRepository.getPostByID(answer.getQuestionId());
+            if (! post.getCreatorUserName().equals(userName))
+                throw new Exception("this user can't delete this post");
             return postingRepository.verifyAnswer(answerId);
         }
         catch (Exception e){

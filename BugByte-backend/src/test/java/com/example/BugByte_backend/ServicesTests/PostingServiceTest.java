@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -200,10 +201,13 @@ public class PostingServiceTest {
     @Test
     void testDeleteQuestion_Success() throws Exception {
         long questionId = 101L;
+        Post post = new Post();
+        post.setCreatorUserName("user1");
 
         when(postingRepositoryMock.deleteQuestion(questionId)).thenReturn(true);
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(post);
 
-        boolean result = postingService.deleteQuestion(questionId);
+        boolean result = postingService.deleteQuestion(questionId , "user1");
 
         assertTrue(result);
     }
@@ -211,10 +215,13 @@ public class PostingServiceTest {
     @Test
     void testDeleteQuestion_Failure() throws Exception {
         long questionId = 101L;
+        Post post = new Post();
+        post.setCreatorUserName("user1");
 
         when(postingRepositoryMock.deleteQuestion(questionId)).thenReturn(false);
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(post);
 
-        boolean result = postingService.deleteQuestion(questionId);
+        boolean result = postingService.deleteQuestion(questionId , "user1");
 
         assertFalse(result);
     }
@@ -222,10 +229,13 @@ public class PostingServiceTest {
     @Test
     void testDeleteAnswer_Success() throws Exception {
         long answerId = 202L;
+        Post post = new Post();
+        post.setCreatorUserName("user1");
 
         when(postingRepositoryMock.deleteAnswer(answerId)).thenReturn(true);
+        when(postingRepositoryMock.getPostByID(answerId)).thenReturn(post);
 
-        boolean result = postingService.deleteAnswer(answerId);
+        boolean result = postingService.deleteAnswer(answerId , "user1");
 
         assertTrue(result);
     }
@@ -233,20 +243,25 @@ public class PostingServiceTest {
     @Test
     void testDeleteAnswer_Failure() throws Exception {
         long answerId = 202L;
-
+        Post post = new Post();
+        post.setCreatorUserName("user1");
         when(postingRepositoryMock.deleteAnswer(answerId)).thenReturn(false);
+        when(postingRepositoryMock.getPostByID(answerId)).thenReturn(post);
 
-        boolean result = postingService.deleteAnswer(answerId);
+        boolean result = postingService.deleteAnswer(answerId , "user1");
 
         assertFalse(result);
     }
     @Test
     void testDeleteReply_Success() throws Exception {
         long replyId = 303L;
+        Post post = new Post();
+        post.setCreatorUserName("user1");
 
         when(postingRepositoryMock.deleteReply(replyId)).thenReturn(true);
+        when(postingRepositoryMock.getPostByID(replyId)).thenReturn(post);
 
-        boolean result = postingService.deleteReply(replyId);
+        boolean result = postingService.deleteReply(replyId , "user1");
 
         assertTrue(result);
     }
@@ -254,10 +269,12 @@ public class PostingServiceTest {
     @Test
     void testDeleteReply_Failure() throws Exception {
         long replyId = 303L;
-
+        Post post = new Post();
+        post.setCreatorUserName("user1");
         when(postingRepositoryMock.deleteReply(replyId)).thenReturn(false);
+        when(postingRepositoryMock.getPostByID(replyId)).thenReturn(post);
 
-        boolean result = postingService.deleteReply(replyId);
+        boolean result = postingService.deleteReply(replyId , "user1");
 
         assertFalse(result);
     }
@@ -435,10 +452,16 @@ public class PostingServiceTest {
     @Test
     void testVerifyAnswer_Success() throws Exception {
         long answerId = 1212L;
+        Answer answer = new Answer();
+        answer.setQuestionId(1L);
+        Post post = new Post();
+        post.setCreatorUserName("user1");
 
         when(postingRepositoryMock.verifyAnswer(answerId)).thenReturn(true);
+        when(postingRepositoryMock.getAnswerById(answerId)).thenReturn(answer);
+        when(postingRepositoryMock.getPostByID(answer.getQuestionId())).thenReturn(post);
 
-        boolean result = postingService.verifyAnswer(answerId);
+        boolean result = postingService.verifyAnswer(answerId , "user1");
 
         assertTrue(result);
     }
@@ -446,10 +469,17 @@ public class PostingServiceTest {
     @Test
     void testVerifyAnswer_Failure() throws Exception {
         long answerId = 1212L;
+        Answer answer = new Answer();
+        answer.setQuestionId(1L);
+        Post post = new Post();
+        post.setCreatorUserName("user1");
 
         when(postingRepositoryMock.verifyAnswer(answerId)).thenReturn(false);
 
-        boolean result = postingService.verifyAnswer(answerId);
+        when(postingRepositoryMock.getAnswerById(answerId)).thenReturn(answer);
+        when(postingRepositoryMock.getPostByID(answer.getQuestionId())).thenReturn(post);
+
+        boolean result = postingService.verifyAnswer(answerId , "user1");
 
         assertFalse(result);
     }

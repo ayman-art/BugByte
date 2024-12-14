@@ -77,8 +77,11 @@ public class InteractionFacade {
     }
     public boolean deleteQuestion(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String opName = claim.getSubject();
             long questionId = (long) postData.get("questionId");
-            return postingService.deleteQuestion(questionId);
+            return postingService.deleteQuestion(questionId , opName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -86,8 +89,11 @@ public class InteractionFacade {
     }
     public boolean deleteAnswer(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String opName = claim.getSubject();
             long answerId = (long) postData.get("answerId");
-            return postingService.deleteAnswer(answerId);
+            return postingService.deleteAnswer(answerId , opName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -95,8 +101,11 @@ public class InteractionFacade {
     }
     public boolean deleteReply(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String opName = claim.getSubject();
             long replyId = (long) postData.get("replyId");
-            return postingService.deleteReply(replyId);
+            return postingService.deleteReply(replyId , opName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -200,8 +209,11 @@ public class InteractionFacade {
     }
     public boolean verifyAnswer(Map<String , Object> postData) throws Exception {
         try {
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String opName = claim.getSubject();
             long answerId = (long) postData.get("answerId");
-            return postingService.verifyAnswer(answerId);
+            return postingService.verifyAnswer(answerId , opName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
