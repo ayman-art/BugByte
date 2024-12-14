@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a1dba11b-1d6f-4279-8131-9e5b9725cf86" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BugByte-backend/src/main/java/com/example/BugByte_backend/models/Community.java" beforeDir="false" afterPath="$PROJECT_DIR$/BugByte-backend/src/main/java/com/example/BugByte_backend/models/Community.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BugByte-backend/src/main/java/com/example/BugByte_backend/repositories/CommunityRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/BugByte-backend/src/main/java/com/example/BugByte_backend/repositories/CommunityRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BugByte-backend/src/main/java/com/example/BugByte_backend/services/CommunityService.java" beforeDir="false" afterPath="$PROJECT_DIR$/BugByte-backend/src/main/java/com/example/BugByte_backend/services/CommunityService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BugByte-backend/src/test/java/com/example/BugByte_backend/ServicesTests/CommunityServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/BugByte-backend/src/test/java/com/example/BugByte_backend/ServicesTests/CommunityServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BugByte-backend/src/test/java/com/example/BugByte_backend/repositories/CommunityRepositoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/BugByte-backend/src/test/java/com/example/BugByte_backend/repositories/CommunityRepositoryTest.java" afterDir="false" />
-    </list>
+
+    <list default="true" id="a1dba11b-1d6f-4279-8131-9e5b9725cf86" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -59,23 +53,22 @@
     "Application.BugByteBackendApplication.executor": "Run",
     "Application.Unnamed.executor": "Run",
     "JUnit.BugByteBackendApplicationTests.executor": "Run",
-    "JUnit.CommunityRepositoryTest.executor": "Run",
-    "JUnit.CommunityRepositoryTest.testInsertCommunity_Success.executor": "Run",
-    "JUnit.CommunityRepositoryTest.testSetModerator_failure_noRowsAffected.executor": "Run",
-    "JUnit.CommunityServiceTest.executor": "Run",
-    "JUnit.CommunityServiceTest.testCreateCommunity.executor": "Run",
-    "JUnit.CommunityServiceTest.testCreateCommunityAlreadyExists.executor": "Run",
-    "JUnit.CommunityServiceTest.testCreateCommunity_UserDoesNotExist.executor": "Run",
-    "JUnit.CommunityServiceTest.testDeleteCommunity.executor": "Run",
-    "JUnit.CommunityServiceTest.testDeleteCommunityNotFound.executor": "Run",
-    "JUnit.CommunityServiceTest.testGetCommunity_CacheHit.executor": "Debug",
+
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "BUGBYTE-90-Community-Service",
+    "Spring Boot.BugByteBackendApplication.executor": "Run",
+    "git-widget-placeholder": "BUGBYTE-103-Home-Page-FE",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/matrix/Documents/GitHub/BugByte/BugByte-backend",
-    "project.structure.last.edited": "SDKs",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2"
+    "project.structure.side.proportion": "0.2",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -222,22 +215,26 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <method v="2" />
     </configuration>
-    <list>
-      <item itemvalue="JUnit.CommunityRepositoryTest.testSetModerator_failure_noRowsAffected" />
-      <item itemvalue="JUnit.CommunityRepositoryTest" />
-      <item itemvalue="JUnit.CommunityRepositoryTest.testInsertCommunity_Success" />
-      <item itemvalue="JUnit.CommunityServiceTest" />
-      <item itemvalue="JUnit.CommunityServiceTest.testCreateCommunity" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="JUnit.CommunityRepositoryTest.testInsertCommunity_Success" />
-        <item itemvalue="JUnit.CommunityRepositoryTest" />
-        <item itemvalue="JUnit.CommunityRepositoryTest.testSetModerator_failure_noRowsAffected" />
-        <item itemvalue="JUnit.CommunityServiceTest" />
-        <item itemvalue="JUnit.CommunityServiceTest.testCreateCommunity" />
-      </list>
-    </recent_temporary>
+
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BugByteBackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="BugByte-backend" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.BugByte_backend.BugByteBackendApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -247,6 +244,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1732705203159</updated>
+      <workItem from="1733682518206" duration="671000" />
     </task>
     <servers />
   </component>

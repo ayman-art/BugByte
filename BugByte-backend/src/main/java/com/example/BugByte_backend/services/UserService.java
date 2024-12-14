@@ -71,9 +71,9 @@ public class UserService {
     public Map<String,Object> getProfile(String userName) throws Exception{
         try {
             User user = this.getUser(userName);
-            if(user == null){
+            if(user == null)
                 throw new Exception("User doesn't Exist");
-            }
+
             UserAdapter userAdapter = new UserAdapter();
             Map<String,Object> userData =  userAdapter.toMap(user);
             // removing sensitive and unnecessary data
@@ -86,10 +86,11 @@ public class UserService {
             userData.put("followingsCount" , followingsCount);
 
             return userData;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new Exception("Couldn't get the user's profile:  " + e.getMessage());
         }
     }
+
     public boolean isFollowing(long id1, long id2){
         return userProfileRepository.isFollowing(id1,id2);
     }
@@ -99,13 +100,12 @@ public class UserService {
             User follower = userRepository.findById(userId);
             User following = this.getUser(followingName);
 
-            if (follower == null) {
+            if (follower == null)
                 throw new Exception("follower doesn't Exist");
-            } else if (following == null) {
+            else if (following == null)
                 throw new Exception("following doesn't Exist");
-            } else if (userProfileRepository.isFollowing(userId , following.getId())){
+            else if (userProfileRepository.isFollowing(userId , following.getId()))
                 throw new Exception("User is Already following this user");
-            }
 
             return userProfileRepository.followUser(userId, following.getId());
         } catch (Exception e) {
@@ -118,30 +118,31 @@ public class UserService {
             User follower = userRepository.findById(userId);
             User following = this.getUser(followingName);
 
-            if(follower == null) {
+            if(follower == null)
                 throw new Exception("follower doesn't Exist");
-            } else if (following == null) {
+            else if (following == null)
                 throw new Exception("following doesn't Exist");
-            } else if (!userProfileRepository.isFollowing(userId , following.getId())) {
+            else if (!userProfileRepository.isFollowing(userId , following.getId()))
                 throw new Exception("User isn't following this user");
-            }
 
             return userProfileRepository.unfollowUser(userId , following.getId());
         } catch (Exception e) {
             throw new Exception("Error occurred while unfollowing user:  " + e.getMessage());
         }
     }
-    public boolean updateProfile(String newBio, long userId) throws Exception{
+
+    public boolean updateProfile(String newBio, long userId) throws Exception {
         try {
             User user = userRepository.findById(userId);
-            if(user == null) {
+            if(user == null)
                 throw new Exception("user doesn't Exist");
-            }
-            boolean success = userProfileRepository.updateBio(newBio , userId) ;
+
+            boolean success = userProfileRepository.updateBio(newBio, userId);
             if (success) {
                 user.setBio(newBio);
                 cacheUser(user);
             }
+
             return success;
         } catch (Exception e) {
             throw new Exception("Error occurred while updating bio:  " + e.getMessage());

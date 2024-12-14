@@ -128,20 +128,60 @@ public class CommunityRepositoryTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-         admin = new User(1L, "admin", "admin@test.com", "password", 100L, true);
-         member1 = new User(2L, "member1", "member1@test.com", "password", 100L, false);
-         member2 = new User(3L, "member2", "member2@test.com", "password", 100L, false);
-         member3=new User(4L, "member4", "member4@test.com", "password", 100L, false);
-         comm = new Community("testComm", 1L);
-         comm.setId(12L);
-         comm2= new Community("test2Comm",2L);
-         comm2.setId(11L);
-         comm3 = new Community("testComm3", 3L);
-         comm3.setId(13L);
-         comMem1 = new CommunityMember(comm,admin);
-         comMem2= new CommunityMember(comm,member1);
-         comMem3 =new CommunityMember(comm,member2);
-         comMem4 =new CommunityMember(comm2,member1);
+         admin = User.builder()
+                 .id(1L)
+                 .userName("admin")
+                 .email("admin@test.com")
+                 .password("password")
+                 .reputation(100L)
+                 .isAdmin(true)
+                 .build();
+        member1 = User.builder()
+                .id(2L)
+                .userName("member1")
+                .email("member1@test.com")
+                .password("password")
+                .reputation(100L)
+                .isAdmin(false)
+                .build();
+        member2 = User.builder()
+                .id(3L)
+                .userName("member2")
+                .email("member2@test.com")
+                .password("password")
+                .reputation(100L)
+                .isAdmin(false)
+                .build();
+        member3 = User.builder()
+                .id(4L)
+                .userName("member3")
+                .email("member3@test.com")
+                .password("password")
+                .reputation(100L)
+                .isAdmin(false)
+                .build();
+        comm = Community.builder()
+                .name("testComm")
+                .id(12L)
+                .adminId(1L)
+                .build();
+
+        comm2 = Community.builder()
+                .name("test2Comm")
+                .id(11L)
+                .adminId(2L)
+                .build();
+
+        comm3 = Community.builder()
+                .name("testComm3")
+                .id(13L)
+                .adminId(3L)
+                .build();
+
+         comMem1 = new CommunityMember(comm.getId(),admin.getId());
+         comMem2= new CommunityMember(comm.getId(),member1.getId());
+         comMem3 =new CommunityMember(comm.getId(),member2.getId());
+         comMem4 =new CommunityMember(comm2.getId(),member1.getId());
     }
 
     @Test

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
     static Dotenv dotenv = Dotenv.configure().load();
 
-
     public static String generateJWT(long id, String username, Boolean admin){
         long now = System.currentTimeMillis();
         Date today = new Date(now);
@@ -33,9 +32,7 @@ public class AuthenticationService {
         return builder.compact();
     }
 
-
     public static Claims parseToken(String jwt){
-
         String envKey = dotenv.get("JWT_Key");
         byte[] apiKeySecretBytes = Base64.getDecoder().decode(envKey);
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.getJcaName());
@@ -44,6 +41,7 @@ public class AuthenticationService {
                 .parseClaimsJws(jwt)
                 .getBody();
     }
+
     public static String refreshToken(String oldJwt) {
         try {
             Claims claims = parseToken(oldJwt);
@@ -55,6 +53,4 @@ public class AuthenticationService {
             throw new IllegalStateException("Unable to refresh token: " + e.getMessage());
         }
     }
-
-
 }
