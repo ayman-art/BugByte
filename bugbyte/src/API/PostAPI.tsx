@@ -181,6 +181,125 @@ export const editQuestion = async (questionId: string, title: string, mdContent:
     }
 }
 
+export const editAnswer = async (answerId: string, mdContent: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.ANSWER}?answerId=${answerId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ mdContent }),
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to edit answer');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error editing answer:', error);
+        throw error;
+    }
+}
+
+export const editReply = async (replyId: string, mdContent: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.REPLY}?replyId=${replyId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ mdContent }),
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to edit reply');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error editing reply:', error);
+        throw error;
+    }
+}
+
+export const deleteQuestion = async (questionId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.QUESTION}?questionId=${questionId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete question');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error deleting question:', error);
+        throw error;
+    }
+}
+
+export const deleteAnswer = async (answerId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.ANSWER}?answerId=${answerId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete answer');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error deleting answer:', error);
+        throw error;
+    }
+}
+
+export const deleteReply = async (replyId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.REPLY}?replyId=${replyId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete reply');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error deleting reply:', error);
+        throw error;
+    }
+}
+
+
+
 
 export const verifyAnswer = async (answerId: string, token: string): Promise<any> => {
     try {
