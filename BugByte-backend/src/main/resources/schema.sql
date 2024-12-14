@@ -75,3 +75,19 @@ CREATE TABLE IF NOT EXISTS replies (
     FOREIGN KEY (id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (answer_id) REFERENCES answers(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS upVotes (
+    userName TEXT NOT NULL,
+    post_id BIGINT NOT NULL,
+    PRIMARY KEY (userName, post_id),
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (userName) REFERENCES users(user_name) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS downVotes (
+    userName TEXT NOT NULL,
+    post_id BIGINT NOT NULL,
+    PRIMARY KEY (userName, post_id),
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (userName) REFERENCES users(user_name) ON DELETE CASCADE
+);

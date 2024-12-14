@@ -7,7 +7,9 @@ import com.example.BugByte_backend.Adapters.ReplyAdapter;
 import com.example.BugByte_backend.models.Answer;
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.models.Reply;
+import com.example.BugByte_backend.services.AuthenticationService;
 import com.example.BugByte_backend.services.PostingService;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +24,10 @@ public class InteractionFacade {
     public Map<String , Object> postQuestion(Map<String , Object> postData) throws Exception {
         try {
             Question question = new Question();
-            question.setCreatorUserName((String) postData.get("opName"));
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String opName = claim.getSubject();
+            question.setCreatorUserName(opName);
             question.setCommunityId((Long) postData.get("communityId"));
             question.setMdContent((String) postData.get("mdContent"));
             long questionId = postingService.postQuestion(question);
@@ -37,7 +42,10 @@ public class InteractionFacade {
     public Map<String , Object> postAnswer(Map<String , Object> postData) throws Exception {
         try {
             Answer answer = new Answer();
-            answer.setCreatorUserName((String) postData.get("opName"));
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String opName = claim.getSubject();
+            answer.setCreatorUserName(opName);
             answer.setQuestionId((Long) postData.get("questionId"));
             answer.setMdContent((String) postData.get("mdContent"));
             long answerId = postingService.postAnswer(answer);
@@ -52,7 +60,10 @@ public class InteractionFacade {
     public Map<String , Object> postReply(Map<String , Object> postData) throws Exception {
         try {
             Reply reply = new Reply();
-            reply.setCreatorUserName((String) postData.get("opName"));
+            String token = (String) postData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String opName = claim.getSubject();
+            reply.setCreatorUserName(opName);
             reply.setAnswerId((Long) postData.get("answerId"));
             reply.setMdContent((String) postData.get("mdContent"));
             long replyId = postingService.postReply(reply);
