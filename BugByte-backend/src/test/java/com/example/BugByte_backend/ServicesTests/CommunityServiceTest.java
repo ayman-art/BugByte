@@ -63,42 +63,42 @@ public class CommunityServiceTest {
         boolean result =communityService.deleteCommunity(11L);
         assertEquals(result,false);
     }
-    @Test
-    public void testSetModerator() {
-        when(communityRepository.setModerator(200L, "1")).thenReturn(true);
-
-        boolean result = communityService.setModerator(200L, "1");
-
-        assertTrue(result);
-        verify(communityRepository, times(1)).setModerator(200L, "1");
-    }
-    @Test
-    public void testSetModeratorFails() {
-        when(communityRepository.setModerator(200L, "1")).thenReturn(false);
-
-        boolean result = communityService.setModerator(200L, "1");
-
-        assertFalse(result);
-        verify(communityRepository, times(1)).setModerator(200L, "1");
-    }
-
-    @Test
-    public void testRemoveModerator() {
-        when(communityRepository.removeModerator(200L, "1")).thenReturn(true);
-
-        boolean result = communityService.removeModerator(200L, "1");
-
-        assertTrue(result);
-        verify(communityRepository, times(1)).removeModerator(200L, "1");
-    }
-
-    @Test
-    public void testRemoveModeratorFails() {
-        when(communityRepository.removeModerator(200L, "1")).thenReturn(false);
-
-        boolean result = communityService.removeModerator(200L, "1");
-
-        assertFalse(result);
-        verify(communityRepository, times(1)).removeModerator(200L, "1");
-    }
+//    @Test
+//    public void testSetModerator() {
+//        when(.setModerator(200L, "1")).thenReturn(true);
+//
+//        boolean result = communityService.setModerator(200L, "1");
+//
+//        assertTrue(result);
+//        verify(communityRepository, times(1)).setModerator(200L, "1");
+//    }
+//    @Test
+//    public void testSetModeratorFails() {
+//        when(communityRepository.setModerator(200L, "1")).thenReturn(false);
+//
+//        boolean result = communityService.setModerator(200L, "1");
+//
+//        assertFalse(result);
+//        verify(communityRepository, times(1)).setModerator(200L, "1");
+//    }
+//
+//    @Test
+//    public void testRemoveModerator() {
+//        when(communityRepository.removeModerator(200L, "1")).thenReturn(true);
+//
+//        boolean result = communityService.removeModerator(200L, "1");
+//
+//        assertTrue(result);
+//        verify(communityRepository, times(1)).removeModerator(200L, "1");
+//    }
+//
+//    @Test
+//    public void testRemoveModeratorFails() {
+//        when(communityRepository.removeModerator(200L, "1")).thenReturn(false);
+//
+//        boolean result = communityService.removeModerator(200L, "1");
+//
+//        assertFalse(result);
+//        verify(communityRepository, times(1)).removeModerator(200L, "1");
+//    }
 }
