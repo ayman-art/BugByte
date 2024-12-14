@@ -389,7 +389,7 @@ public class PostingServiceTest {
 
         when(postingRepositoryMock.upVoteAnswer(answerId, -1 , "user1")).thenReturn(true);
 
-        boolean result = postingService.removeUpFromVoteAnswer(answerId , "user1");
+        boolean result = postingService.removeUpVoteFromAnswer(answerId , "user1");
 
         assertTrue(result);
     }
@@ -400,7 +400,7 @@ public class PostingServiceTest {
 
         when(postingRepositoryMock.upVoteAnswer(answerId, -1 , "user1")).thenReturn(false);
 
-        boolean result = postingService.removeUpFromVoteAnswer(answerId , "user1");
+        boolean result = postingService.removeUpVoteFromAnswer(answerId , "user1");
 
         assertFalse(result);
     }

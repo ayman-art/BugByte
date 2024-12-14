@@ -177,7 +177,7 @@ public class InteractionFacade {
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
             long answerId = (long) postData.get("answerId");
-            return postingService.removeUpFromVoteAnswer(answerId , userName);
+            return postingService.removeUpVoteFromAnswer(answerId , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

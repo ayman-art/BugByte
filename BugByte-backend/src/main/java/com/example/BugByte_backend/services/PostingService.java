@@ -177,7 +177,7 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeUpFromVoteAnswer(long answerId ,  String userName) throws Exception{
+    public boolean removeUpVoteFromAnswer(long answerId ,  String userName) throws Exception{
         try {
             return postingRepository.upVoteAnswer(answerId , -1 , userName);
         }
