@@ -29,7 +29,7 @@ public interface IPostingRepository {
 
      Boolean upVoteQuestion(Long questionId, Integer value, String userName) throws Exception;
 
-     Boolean downVoteQuestion(Long questionId, Integer valu , String userNamee) throws Exception;
+     Boolean downVoteQuestion(Long questionId, Integer value , String userName) throws Exception;
 
      Boolean upVoteAnswer(Long AnswerId, Integer value , String userName) throws Exception;
 
