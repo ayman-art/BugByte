@@ -326,5 +326,11 @@ public class PostingService {
         }
         return postingRepository.is_DownVoted(userName , postId);
     }
+    public String getQuestionCommunity(long communityId) throws Exception {
+        Community community = communityRepository.findCommunityById(communityId);
+        if (community == null)
+            throw new Exception("community is null");
+        return community.getName();
+    }
 
 }

@@ -228,6 +228,7 @@ public class InteractionFacade {
             return questions.stream().map(question -> {
                 Map<String, Object> questionMap = questionAdapter.toMap(question);
                 try {
+                    questionMap.put("communityName" , postingService.getQuestionCommunity(question.getCommunityId()));
                     questionMap.put("isUpVoted", postingService.isUpVoted(userName , question.getId()));
                     questionMap.put("isDownVoted", postingService.isDownVoted(userName , question.getId()));
                 } catch (Exception e) {
@@ -251,6 +252,7 @@ public class InteractionFacade {
             return questions.stream().map(question -> {
                 Map<String, Object> questionMap = questionAdapter.toMap(question);
                 try {
+                    questionMap.put("communityName" , postingService.getQuestionCommunity(question.getCommunityId()));
                     questionMap.put("isUpVoted", postingService.isUpVoted(userName , question.getId()));
                     questionMap.put("isDownVoted", postingService.isDownVoted(userName , question.getId()));
                 } catch (Exception e) {
@@ -351,6 +353,7 @@ public class InteractionFacade {
                 questionMap.put("answerPostedOn" ,answer.getPostedOn());
             }
             try {
+                questionMap.put("communityName" , postingService.getQuestionCommunity(question.getCommunityId()));
                 questionMap.put("isUpVoted", postingService.isUpVoted(userName , question.getId()));
                 questionMap.put("isDownVoted", postingService.isDownVoted(userName , question.getId()));
             } catch (Exception e) {
