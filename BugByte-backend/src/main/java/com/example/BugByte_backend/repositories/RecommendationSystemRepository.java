@@ -73,7 +73,7 @@ public class RecommendationSystemRepository {
                     .communityId(rs.getLong("community_id"))
                     .upVotes(rs.getLong("up_votes"))
                     .downVotes(rs.getLong("down_votes"))
-                    .validatedAnswerId(rs.getLong("validated_answer"))
+                    .validatedAnswerId(rs.getLong("validated_answer_id"))
                     .build()
     );
 }
