@@ -153,21 +153,6 @@ public class CommunityService {
         }
     }
 
-    public boolean setModerator(Long modratorId, String communityId) {
-        try {
-            return communityRepository.setModerator(modratorId, communityId);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean removeModerator(Long modratorId, String communityId) {
-        try {
-            return communityRepository.removeModerator(modratorId, communityId);
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     public Community getCommunityById(Long communityId) {
         try {

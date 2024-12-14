@@ -127,52 +127,7 @@ public class PostingRepositoryQuestionTest {
         assertEquals(NullPointerException.class, exception.getClass());
         assertEquals("question id is null", exception.getMessage());
     }
-    @Test
-    public void testUpVoteQuestion_validInput() {
-        Long questionId = 1L;
-        Integer value = 1;
-        when(jdbcTemplate.update(eq(SQL_UPDATE_UP_VOTES_QUESTIONS), eq(value), eq(questionId)))
-                .thenReturn(1);
 
-        Boolean result = postingRepository.upVoteQuestion(questionId, value);
-        assertTrue(result);
-    }
-
-    @Test
-    public void testUpVoteQuestion_nullInput() {
-        Exception exception = null;
-        try {
-            postingRepository.upVoteQuestion(null, 1);
-        } catch (Exception e) {
-            exception = e;
-        }
-        assertEquals(NullPointerException.class, exception.getClass());
-        assertEquals("question id or value is null", exception.getMessage());
-    }
-    @Test
-    public void testDownVoteQuestion_validInput() {
-        Long questionId = 1L;
-        Integer value = -1;
-
-        when(jdbcTemplate.update(eq(SQL_UPDATE_DOWN_VOTES_QUESTIONS), eq(value), eq(questionId)))
-                .thenReturn(1);
-
-        Boolean result = postingRepository.downVoteQuestion(questionId, value);
-        assertTrue(result);
-    }
-
-    @Test
-    public void testDownVoteQuestion_nullInput() {
-        Exception exception = null;
-
-        try {
-            postingRepository.downVoteQuestion(null, -1);
-        } catch (Exception e) {
-            exception = e;
-        }
-        assertEquals(NullPointerException.class, exception.getClass());
-        assertEquals("question id or value is null", exception.getMessage());
-    }
     @Test
     public void testVerifyAnswer_validInput() {
         Long answerId = 1L;

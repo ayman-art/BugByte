@@ -9,7 +9,8 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
+//
+//@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Community {
@@ -79,13 +80,13 @@ public class Community {
         this.description = description;
     }
 
-    public Long getAdminId() {
-        return admin.getId();
-    }
-
-    public void setAdminId(Long adminId) {
-        this.admin.setId(adminId);
-    }
+//    public Long getAdminId() {
+//        return admin.getId();
+//    }
+//
+//    public void setAdminId(Long adminId) {
+//        this.admin.setId(adminId);
+//    }
 
     public Date getCreationDate() {
         return creationDate;
