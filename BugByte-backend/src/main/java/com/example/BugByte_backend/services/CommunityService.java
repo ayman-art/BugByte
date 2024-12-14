@@ -107,13 +107,13 @@ public class CommunityService {
         return null;
     }
 
-    public boolean updateCommunity(Community existingCommunity, Community updatedCommunity) {
-        if (existingCommunity == null || updatedCommunity == null) {
-            throw new IllegalArgumentException("Community and updatedCommunity must not be null.");
+    public boolean updateCommunity(Community updatedCommunity) {
+        if (updatedCommunity == null) {
+            throw new IllegalArgumentException("updatedCommunity must not be null.");
         }
-
         try {
             cacheCommunity(updatedCommunity);
+            persistCommunity(updatedCommunity);
             return true;
         } catch (Exception e) {
             System.out.println("Error updating community: " + e.getMessage());
@@ -153,4 +153,20 @@ public class CommunityService {
         }
     }
 
+
+    public Community getCommunityById(Long communityId) {
+        try {
+              return communityRepository.findCommunityById(communityId);
+        } catch (IllegalArgumentException e) {
+            throw  e;
+        }
+    }
+
+    public boolean updateCommunityDescription(Long id, String description) {
+        try {
+            return communityRepository.updateCommunityDescription(id,description);
+        } catch (IllegalArgumentException e) {
+            throw  e;
+        }
+    }
 }

@@ -33,6 +33,11 @@ public class Community {
         this.creationDate = creationDate;
         this.id = 0L;
     }
+    public Community(Long id,String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.id =id;
+    }
 
     public Community(String name, String description, Long adminId) {
         this.name = name;
@@ -49,9 +54,7 @@ public class Community {
         this.id = 0L;
     }
 
-    public Community() {
 
-    }
 
     public Long getId() {
         return id;
