@@ -173,7 +173,7 @@ public class PostingController {
         }
     }
 
-    @PostMapping("verify-answer")
+    @PostMapping("answers/verify")
     public ResponseEntity<?> verifyAnswer(@RequestHeader("Authorization") String token, @RequestParam("answerId") Long answerId) {
         token = token.replace("Bearer ", "");
         Map<String, Object> answerData = Map.of("jwt", token, "answerId", answerId);
