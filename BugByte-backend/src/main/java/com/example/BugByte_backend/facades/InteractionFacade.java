@@ -220,9 +220,21 @@ public class InteractionFacade {
     public List<Map<String , Object>> getUserQuestions(Map<String, Object> userdata) throws Exception {
         try {
             QuestionAdapter questionAdapter = new QuestionAdapter();
+            String token = (String) userdata.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             List<Question> questions = postingService.getUserQuestions((String) userdata.get("userName")
             , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
-            return questions.stream().map(questionAdapter::toMap).toList();
+            return questions.stream().map(question -> {
+                Map<String, Object> questionMap = questionAdapter.toMap(question);
+                try {
+                    questionMap.put("isUpVoted", postingService.isUpVoted(userName , question.getId()));
+                    questionMap.put("isDownVoted", postingService.isDownVoted(userName , question.getId()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                return questionMap;
+            }).toList();
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -231,9 +243,21 @@ public class InteractionFacade {
     public List<Map<String , Object>> getCommunityQuestions(Map<String, Object> communityData) throws Exception {
         try {
             QuestionAdapter questionAdapter = new QuestionAdapter();
+            String token = (String) communityData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             List<Question> questions = postingService.getCommunityQuestions((Long) communityData.get("communityId")
                     , (Integer) communityData.get("limit"), (Integer) communityData.get("offset"));
-            return questions.stream().map(questionAdapter::toMap).toList();
+            return questions.stream().map(question -> {
+                Map<String, Object> questionMap = questionAdapter.toMap(question);
+                try {
+                    questionMap.put("isUpVoted", postingService.isUpVoted(userName , question.getId()));
+                    questionMap.put("isDownVoted", postingService.isDownVoted(userName , question.getId()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                return questionMap;
+            }).toList();
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -242,9 +266,21 @@ public class InteractionFacade {
     public List<Map<String , Object>> getUserAnswers(Map<String, Object> userdata) throws Exception {
         try {
             AnswerAdapter answerAdapter = new AnswerAdapter();
+            String token = (String) userdata.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             List<Answer> answers = postingService.getUserAnswers((String) userdata.get("userName")
                     , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
-            return answers.stream().map(answerAdapter::toMap).toList();
+            return answers.stream().map(answer -> {
+                Map<String, Object> answerMap = answerAdapter.toMap(answer);
+                try {
+                    answerMap.put("isUpVoted", postingService.isUpVoted(userName , answer.getId()));
+                    answerMap.put("isDownVoted", postingService.isDownVoted(userName , answer.getId()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                return answerMap;
+            }).toList();
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -252,6 +288,9 @@ public class InteractionFacade {
     }
     public List<Map<String , Object>> getUserReplies(Map<String, Object> userdata) throws Exception {
         try {
+            String token = (String) userdata.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             ReplyAdapter replyAdapter = new ReplyAdapter();
             List<Reply> replies = postingService.getUserReplies((String) userdata.get("userName")
                     , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
@@ -263,10 +302,22 @@ public class InteractionFacade {
     }
     public List<Map<String , Object>> getAnswersForQuestion(Map<String, Object> questionData) throws Exception {
         try {
+            String token = (String) questionData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             AnswerAdapter answerAdapter = new AnswerAdapter();
             List<Answer> answers = postingService.getAnswersForQuestion((Long) questionData.get("questionId")
                     , (Integer) questionData.get("limit"), (Integer) questionData.get("offset"));
-            return answers.stream().map(answerAdapter::toMap).toList();
+            return answers.stream().map(answer -> {
+                Map<String, Object> answerMap = answerAdapter.toMap(answer);
+                try {
+                    answerMap.put("isUpVoted", postingService.isUpVoted(userName , answer.getId()));
+                    answerMap.put("isDownVoted", postingService.isDownVoted(userName , answer.getId()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                return answerMap;
+            }).toList();
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -286,6 +337,9 @@ public class InteractionFacade {
     public Map<String , Object> getQuestion(Map<String, Object> questionData) throws Exception{
         try {
             QuestionAdapter questionAdapter = new QuestionAdapter();
+            String token = (String) questionData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             Question question = postingService.getQuestion((Long) questionData.get("questionId"));
             Map<String , Object> questionMap = questionAdapter.toMap(question);
             if (question.getValidatedAnswerId() != null){
@@ -296,6 +350,12 @@ public class InteractionFacade {
                 questionMap.put("answerDownVotes" , answer.getDownVotes());
                 questionMap.put("answerPostedOn" ,answer.getPostedOn());
             }
+            try {
+                questionMap.put("isUpVoted", postingService.isUpVoted(userName , question.getId()));
+                questionMap.put("isDownVoted", postingService.isDownVoted(userName , question.getId()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             return questionMap;
         }
         catch (Exception e){
@@ -305,8 +365,17 @@ public class InteractionFacade {
     public Map<String , Object> getAnswer(Map<String, Object> answerData) throws Exception{
         try {
             AnswerAdapter answerAdapter = new AnswerAdapter();
+            String token = (String) answerData.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
             Answer answer = postingService.getAnswer((Long) answerData.get("answerId"));
             Map<String , Object> answerMap = answerAdapter.toMap(answer);
+            try {
+                answerMap.put("isUpVoted", postingService.isUpVoted(userName , answer.getId()));
+                answerMap.put("isDownVoted", postingService.isDownVoted(userName , answer.getId()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             return answerMap;
         }
         catch (Exception e){

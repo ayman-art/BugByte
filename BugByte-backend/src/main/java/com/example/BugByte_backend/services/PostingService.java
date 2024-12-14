@@ -304,5 +304,27 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
+    public boolean isUpVoted(String userName , long postId) throws Exception {
+        User user  = userRepositoryImp.findByIdentity(userName);
+        if (user == null){
+            throw new Exception("user is null");
+        }
+        Post post = postingRepository.getPostByID(postId);
+        if (post == null){
+            throw new Exception("post is null");
+        }
+       return postingRepository.is_UpVoted(userName , postId);
+    }
+    public boolean isDownVoted(String userName , long postId) throws Exception {
+        User user  = userRepositoryImp.findByIdentity(userName);
+        if (user == null){
+            throw new Exception("user is null");
+        }
+        Post post = postingRepository.getPostByID(postId);
+        if (post == null){
+            throw new Exception("post is null");
+        }
+        return postingRepository.is_DownVoted(userName , postId);
+    }
 
 }

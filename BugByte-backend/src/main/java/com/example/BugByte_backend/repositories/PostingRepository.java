@@ -153,9 +153,9 @@ public class PostingRepository implements IPostingRepository{
                 JOIN posts p on p.id = r.id
                 WHERE r.id = ?;
             """;
-    private static final String SQL_GET_UP_VOTE = "SELECT * FROM upVotes WHERE userName = ?;";
+    private static final String SQL_GET_UP_VOTE = "SELECT * FROM upVotes WHERE userName = ? AND post_id = ?;";
 
-    private static final String SQL_GET_DOWN_VOTE = "SELECT * FROM downVotes WHERE userName = ?;";
+    private static final String SQL_GET_DOWN_VOTE = "SELECT * FROM downVotes WHERE userName = ? AND post_id = ?;";
 
     private static final String SQL_DELETE_UP_VOTE = "DELETE FROM upVotes WHERE userName = ? AND post_id = ?;";
     private static final String SQL_DELETE_DOWN_VOTE = "DELETE FROM downVotes WHERE userName = ? AND post_id = ?;";
@@ -276,6 +276,7 @@ public class PostingRepository implements IPostingRepository{
             if (count == 1)
                 throw new Exception("user already up voted this question");
 
+            jdbcTemplate.update(SQL_DELETE_DOWN_VOTE ,userName , questionId);
             jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, questionId);
         }else{
             if (count == 0)
@@ -301,6 +302,7 @@ public class PostingRepository implements IPostingRepository{
             if (count == 1)
                 throw new Exception("user already down voted this question");
 
+            jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, questionId);
             jdbcTemplate.update(SQL_INSERT_DOWNVOTE, userName, questionId);
         }else{
             if (count == 0)
@@ -325,6 +327,7 @@ public class PostingRepository implements IPostingRepository{
             if (count == 1)
                 throw new Exception("user already up voted this answer");
 
+            jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
             jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, answerId);
         }else{
             if (count == 0)
@@ -350,12 +353,13 @@ public class PostingRepository implements IPostingRepository{
             if (count == 1)
                 throw new Exception("user already up voted this answer");
 
-            jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, answerId);
+            jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
+            jdbcTemplate.update(SQL_INSERT_DOWNVOTE, userName, answerId);
         }else{
             if (count == 0)
                 throw new Exception("user didn't up vote this answer before");
 
-            jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
+            jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
         }
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,answerId);
 
@@ -448,6 +452,16 @@ public class PostingRepository implements IPostingRepository{
         if (replyId == null)
             throw new NullPointerException("questionId is null");
         return jdbcTemplate.queryForObject(SQL_GET_REPLY_BY_ID, new Object[]{replyId}, replyRowMapper);
+    }
+    public boolean is_UpVoted(String userName , long questionId){
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
+                new Object[]{ userName, questionId }, Integer.class);
+        return (count == 1);
+    }
+    public boolean is_DownVoted(String userName , long questionId){
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE,
+                new Object[]{ userName, questionId }, Integer.class);
+        return (count == 1);
     }
 
     private final RowMapper<Question> questionRowMapper = ((rs, rowNum) ->
