@@ -4,7 +4,7 @@ import Layout from '../layouts/MainLayout';
 import TextPopUp from '../components/BioPopup'
 import { followUser, getProfile, makeAdmin, unfollowUser, updateBio } from '../API/ProfileAPI';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useNavbar } from '@nextui-org/navbar';
+// import { useNavbar } from '@nextui-org/navbar';
 interface UserProfile {
   username: string;
   reputation: number;
@@ -23,6 +23,16 @@ interface Post {
 const Profile: React.FC = () => {
   const navigate = useNavigate()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const visitFollowers = () => {
+    const username = localStorage.getItem("name");
+    navigate(`/Profile/${username}/Followers`)
+  }
+  const visitFollowings = () => {
+    const username = localStorage.getItem("name");
+    navigate(`/Profile/${username}/Followings`)
+  }
+  
   const {userName} = useParams<{ userName: string }>();
   const [topPosts, setTopPosts] = useState<Post[]>([
     {
@@ -186,6 +196,7 @@ const Profile: React.FC = () => {
       gap: '20px',
       fontSize: '14px',
       color: '#555',
+      cursor:'pointer'
     },
     bio: {
       marginBottom: '20px',
@@ -258,8 +269,8 @@ const Profile: React.FC = () => {
             <h1>{userProfile.username}</h1>
             <p>Reputation: {userProfile.reputation}</p>
             <div style={styles.followStats}>
-              <p>Followers: {userProfile.followers}</p>
-              <p>Following: {userProfile.following}</p>
+              <li onClick={visitFollowers}>Followers: {userProfile.followers}</li>
+              <li onClick={visitFollowings}>Following: {userProfile.following}</li>
             </div>
           </div>
         </div>
