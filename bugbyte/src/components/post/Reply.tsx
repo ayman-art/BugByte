@@ -17,6 +17,7 @@ import { MDXEditor,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
+import PostModal from '../PostModal';
 
 interface ReplyProps {
   id: string;
@@ -31,6 +32,7 @@ interface ReplyProps {
 const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   const navigate = useNavigate();
   const loggedInUsername = localStorage.getItem('name') || '';
@@ -44,6 +46,11 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
   const handleDownvote = () => {
     setCurrentDownvotes(currentDownvotes + 1);
   };
+
+  const handleEditSave = (postDetails: { content: string }) => {
+    console.log(postDetails);
+    setIsEditModalOpen(false);
+  }
 
   // Navigate to the user's profile
   const handleNavigateToProfile = () => {
@@ -90,8 +97,9 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
         <footer className="reply-footer"> 
           {/* Action buttons */}
           <div className="reply-actions">
-            {canEdit && (
-              <button className="action-button edit-button">
+            { (
+              <button className="action-button edit-button"
+                onClick={() => setIsEditModalOpen(true)}>
                 <FaEdit /> {/* Edit icon */}
               </button>
             )}
@@ -104,6 +112,14 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
           </div>
         </footer>
       </div>
+      {/* Edit Modal */}
+      <PostModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleEditSave}
+        initialData={{ content: text }}
+        type="md-only"
+      />
     </div>
   );
 };
