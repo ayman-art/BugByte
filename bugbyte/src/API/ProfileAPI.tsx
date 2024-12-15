@@ -116,15 +116,35 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
   };
   export const updateProfilePicture = async (formData: FormData, token: string) => {
     try {
-      const response = await fetch('/api/profile/picture', {
+      const response = await fetch(API_URLS.UPLOAD_IMAGE, {
         method:'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        },
+        
         body: formData
       });
-      return await response.text();
+      if(!response.ok){
+        throw new Error(`Uploading Image Failed`)
+      }
+      const url = await response.text();
+      console.log(url)
+      const response2 = await fetch(`${API_URLS.UPDATE_PROFILE_PICTURE}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body:JSON.stringify({
+          'url': url
+        })
+      });
+      if(!response2.ok){
+        throw new Error(`Updating Profile Picture failed`)
+      }
+      return url
+    //   const response3 = await fetch(url)
+    //   if(!response3.ok){
+    //     throw new Error(`Downloading Image Failed`)
+    //   }
+    //   return response
     } catch (error) {
       throw error;
     }

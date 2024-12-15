@@ -16,5 +16,6 @@ export const API_URLS = {
   ADMIN: `${API_BASE_URL}/users/make-admin`,
   UPVOTE:`${API_BASE_URL}/upvote`,
   DOWNVOTE:`${API_BASE_URL}/downvote`,
-  UPLOAD_IMAGE: `${API_BASE_URL}/images/upload`
+  UPLOAD_IMAGE: `${API_BASE_URL}/images/upload`,
+  UPDATE_PROFILE_PICTURE: `${API_BASE_URL}/users/update-picture`
 };

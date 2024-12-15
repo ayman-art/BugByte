@@ -80,7 +80,7 @@ const Profile: React.FC = () => {
     try {
       const token = localStorage.getItem('authToken');
       const formData = new FormData();
-      formData.append('profile_picture', selectedFile);
+      formData.append('file', selectedFile);
 
       const updatedProfilePic = await updateProfilePicture(formData, token!);
       
@@ -115,7 +115,8 @@ const Profile: React.FC = () => {
           following: data['followingsCount'],
           bio: data['bio'],
           is_admin: data['isAdmin'],
-          is_following: data['is_following']
+          is_following: data['is_following'],
+          profile_picture: data['picture']
         });
         
       } catch (error) {
@@ -190,13 +191,14 @@ const Profile: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }} >
           {/* Profile Picture with Click to Upload */}
           <div style={{ position: 'relative', cursor: 'pointer' }}>
+          {loggedInUsername === userName && (
             <input 
               type="file" 
               accept="image/*" 
               onChange={handleFileSelect}
               style={{ display: 'none' }} 
               id="profile-pic-upload"
-            />
+            />)}
             <label htmlFor="profile-pic-upload">
               <img
                 src={userProfile?.profile_picture || profilePath}
