@@ -1,18 +1,24 @@
 import { SandpackConfig } from "@mdxeditor/editor"
+import { API_URLS } from "../API/ApiUrls";
 
 
 export default async function imageUploadHandler(image: File) {
     // THIS IS DUMMY CODE FROM THE DOCS
     const formData = new FormData()
-    formData.append('image', image)
+    formData.append('file', image)
     // send the file to your server and return
     // the URL of the uploaded image in the response
-    const response = await fetch('/uploads/new', {
+    const response = await fetch(API_URLS.UPLOAD_IMAGE, {
         method: 'POST',
         body: formData
     })
-    const json = (await response.json()) as { url: string }
-    return json.url
+    if (response.ok){
+      const url = await response.text();
+      return url;
+    }else{
+      throw new Error("File Not Found");
+    }
+    
 }
 export const languages = { codeBlockLanguages: {
     js: 'JavaScript',
