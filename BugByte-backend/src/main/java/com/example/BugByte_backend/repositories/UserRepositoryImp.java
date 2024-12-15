@@ -20,6 +20,7 @@ public class UserRepositoryImp implements UserRepository {
             """;
     private static final String SQL_FIND_BY_ID = "SELECT * FROM users WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_EMAIL = "SELECT id FROM users WHERE email = ?;";
+    private static final String SQL_FIND_ID_BY_USERNAME = "SELECT id FROM users WHERE user_name = ?;";
     private static final String SQL_FIND_BY_IDENTITY = "SELECT * FROM users WHERE email = ? OR user_name = ?;";
     private static final String SQL_CHANGE_PASSWORD = "UPDATE users SET password = ? WHERE id = ?";
     private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
@@ -36,6 +37,7 @@ public class UserRepositoryImp implements UserRepository {
     private static final String SQL_COUNT_USER_IN_VALIDATION_CODE = "SELECT COUNT(*) AS count FROM validation_code WHERE id = ?";
     private static final String SQL_FIND_VALIDATION_CODE_BY_ID = "SELECT code FROM validation_code WHERE id = ?;";
     private static final String SQL_UPDATE_VALIDATION_CODE = "UPDATE validation_code SET code = ? WHERE id = ?;";
+
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -167,6 +169,13 @@ public class UserRepositoryImp implements UserRepository {
             throw new NullPointerException("UserId is Null");
 
         return jdbcTemplate.queryForObject(SQL_FIND_VALIDATION_CODE_BY_ID, new Object[]{ id }, String.class);
+    }
+    public Long getIdByUserName(String userName)
+    {
+        if (userName == null)
+            throw new NullPointerException("userName is Null");
+
+        return jdbcTemplate.queryForObject(SQL_FIND_ID_BY_USERNAME, new Object[]{ userName }, Long.class);
     }
 
     @Override

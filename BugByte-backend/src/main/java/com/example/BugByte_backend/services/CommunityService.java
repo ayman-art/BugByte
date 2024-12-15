@@ -76,6 +76,8 @@ public class CommunityService {
     public Long createCommunity(Community inCommunity) {
         try {
             Long communityId = communityRepository.insertCommunity(inCommunity.getName(), inCommunity.getAdminId());
+            if(!(inCommunity.getDescription().equals("") || inCommunity.getDescription()==null))
+                this.updateCommunityDescription(communityId,inCommunity.getDescription());
             cacheCommunity(inCommunity);
             return communityId;
         } catch (Exception e) {
@@ -167,6 +169,24 @@ public class CommunityService {
             return communityRepository.updateCommunityDescription(id,description);
         } catch (IllegalArgumentException e) {
             throw  e;
+        }
+    }
+    public boolean deleteMember(Long communityId , String Username)
+    {
+        return  communityRepository.deleteMemberByUsername(communityId,Username);
+    }
+    public boolean joinCommunity(Long communityId , Long userId)
+    {
+        return communityRepository.insertMember(userId,communityId);
+    }
+    public List<User> getCommunityAdmins(Long communityId)
+    {
+        try {
+        return communityRepository.findModeratorsByCommunityId(communityId);
+        }
+        catch (Exception e)
+        {
+           throw (e);
         }
     }
 }
