@@ -34,7 +34,7 @@ public class RecommendationSystemControllerTest {
     @Test
     void testGetFeed_Success() throws Exception {
         String token = "valid-token";
-
+        int size = 10;
         List<String> tags = List.of("java", "python");
         Question q1 = Question.builder()
                 .id(1L)
@@ -59,11 +59,11 @@ public class RecommendationSystemControllerTest {
                 .creatorUserName("Ashraf")
                 .build();
         List<Question> mockFeed = List.of(q1, q2);
-        when(recommendationSystemService.generateFeedForUser(token)).thenReturn(mockFeed);
+        when(recommendationSystemService.generateFeedForUser(token, size)).thenReturn(mockFeed);
 
-        ResponseEntity<?> response = recommendationSystemController.getFeed(token);
+        ResponseEntity<?> response = recommendationSystemController.getFeed(token, size);
 
-        verify(recommendationSystemService, times(1)).generateFeedForUser(token);
+        verify(recommendationSystemService, times(1)).generateFeedForUser(token, size);
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() instanceof Map;
         Map<?, ?> body = (Map<?, ?>) response.getBody();
@@ -73,12 +73,13 @@ public class RecommendationSystemControllerTest {
     @Test
     void testGetFeed_Unauthorized() throws Exception {
         String token = "invalid-token";
-        when(recommendationSystemService.generateFeedForUser(token))
+        int size = 5;
+        when(recommendationSystemService.generateFeedForUser(token, size))
                 .thenThrow(new RuntimeException("Unauthorized"));
 
-        ResponseEntity<?> response = recommendationSystemController.getFeed(token);
+        ResponseEntity<?> response = recommendationSystemController.getFeed(token, size);
 
-        verify(recommendationSystemService, times(1)).generateFeedForUser(token);
+        verify(recommendationSystemService, times(1)).generateFeedForUser(token, size);
         assert response.getStatusCode() == HttpStatus.UNAUTHORIZED;
         assert Objects.equals(response.getBody(), "Unauthorized");
     }

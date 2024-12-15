@@ -5,10 +5,7 @@ import com.example.BugByte_backend.services.RecommendationSystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -21,9 +18,10 @@ public class RecommendationSystemController {
     private RecommendationSystemService recommendationSystemService;
 
     @GetMapping("/feed")
-    public ResponseEntity<?> getFeed(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getFeed(@RequestHeader("Authorization") String token,
+                                     @RequestParam(defaultValue = "10") int size) {
         try {
-            List<Question> feed = recommendationSystemService.generateFeedForUser(token);
+            List<Question> feed = recommendationSystemService.generateFeedForUser(token, size);
             return new ResponseEntity<>(Map.of("feed", feed), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
