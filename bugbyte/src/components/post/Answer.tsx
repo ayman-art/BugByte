@@ -33,7 +33,8 @@ interface AnswerProps {
 const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
-  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false); // State for modal
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
@@ -53,6 +54,11 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
   const handleReplySave = (postDetails: { content: string }) => {
     console.log(postDetails);
     setIsReplyModalOpen(false);
+  }
+
+  const handleEditSave = (postDetails: { content: string }) => {
+    console.log(postDetails);
+    setIsEditModalOpen(false);
   }
 
   // Check if the logged-in user is the post owner
@@ -111,7 +117,8 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
           {/* Action buttons */}
           <div className="answer-actions">
             {canEdit && (
-              <button className="action-button edit-button">
+              <button className="action-button edit-button"
+                onClick={() => setIsEditModalOpen(true)}>
                 <FaEdit /> {/* Edit icon */}
               </button>
             )}
@@ -136,6 +143,14 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
         isOpen={isReplyModalOpen}
         onClose={() => setIsReplyModalOpen(false)}
         onSave={handleReplySave}
+        type="md-only"
+      />
+      {/* Edit Modal */}
+      <PostModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleEditSave}
+        initialData={{ content: text }}
         type="md-only"
       />
       
