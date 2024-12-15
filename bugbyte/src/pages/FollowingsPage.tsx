@@ -28,7 +28,7 @@ const followings: React.FC = () => {
             {loading ? "Loading..." : (
                 followings.length > 0 ? (
                     <div>
-                        <h3>followings of {username}:</h3>
+                        <h3>Followings of {username}:</h3>
                         <ul>
                             {followings.map((following, index) => (
                                 <div
@@ -44,7 +44,7 @@ const followings: React.FC = () => {
                         </ul>
                     </div>
                 ) : (
-                    <p>No followings found.</p>
+                    <p>No Followings found.</p>
                 )
             )}
         </div>
