@@ -26,8 +26,11 @@ public class AdministrativeFacade {
 
     @Autowired
     private RegistrationService registrationService;
-    CommunityService communityService =new CommunityService();
-    ModeratorService moderatorService = new ModeratorService();
+
+    @Autowired
+    CommunityService communityService;
+    @Autowired
+    ModeratorService moderatorService;
 
     /*
     Expected input format:
@@ -185,42 +188,67 @@ public class AdministrativeFacade {
             throw new RuntimeException("Invalid token");
         }
     }
-    public Map<String,Object> getCommunityInfo(Long CommunityId)
+    public Map<String,Object> getCommunityInfo(Map<String,Object> map)
     {
         try {
-            Community community = communityService.getCommunityById(CommunityId);
+            String token = (String) map.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            String userName = claim.getSubject();
+            if (userName == null) throw new Exception("userName is null");
+            Community community = communityService.getCommunityById(Long.parseLong((String) map.get("communityId")));
+            System.out.println(map.get("communityId"));
             CommunityAdapter communityAdapter = new CommunityAdapter();
             return communityAdapter.toMap(community);
         }catch (Exception e)
         {
+            System.out.println(e.getMessage());
             return null;
         }
 
     }
     public boolean createCommunity(Map<String,Object> map){
         try {
+            String token = (String) map.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            boolean isAdmin = (boolean) claim.get("is_admin");
+            System.out.println(isAdmin);
+            if (!isAdmin) throw new Exception("user is not an admin");
             CommunityAdapter communityAdapter = new CommunityAdapter();
-            Long id =communityService.createCommunity(communityAdapter.fromMap(map));
+            map.remove("jwt");
+            map.put("admin_id" , Long.parseLong(claim.getId()));
+            Long id = communityService.createCommunity(communityAdapter.fromMap(map));
             return  true;
         }catch (Exception e){
             return false;
         }
     }
-//    public boolean deleteCommunity(Long communityId)
-//    {
-//        try {
-//            return communityService.deleteCommunity(communityId);
-//        } catch (IllegalArgumentException e) {
-//            return false;
-//        }
-//    }
-    public boolean editCommunity(Long communityId, Map<String,Object> map)
+    public boolean deleteCommunity(Map<String,Object> map)
     {
         try {
-            Community comm = new Community(communityId ,(String)map.get("name"),(String) map.get("desription"));
+            String token = (String) map.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            boolean isAdmin = (boolean) claim.get("is_admin");
+            if (!isAdmin) throw new Exception("user is not an admin");
+            return communityService.deleteCommunity(Long.parseLong((String) map.get("communityId")));
+        } catch (IllegalArgumentException e) {
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public boolean editCommunity(Map<String,Object> map)
+    {
+        try {
+            String token = (String) map.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            boolean isAdmin = (boolean) claim.get("is_admin");
+            if (!isAdmin) throw new Exception("user is not an admin");
+            Community comm = new Community(Long.parseLong((String) map.get("communityId")),(String)map.get("name"),(String) map.get("desription"));
             return communityService.updateCommunity(comm);
         } catch (IllegalArgumentException e) {
             return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -235,7 +263,12 @@ public class AdministrativeFacade {
 
     public boolean setModerator(Map<String , Object>req) {
         try {
-        return moderatorService.setModerator((Long) req.get("moderator_id"), (Long) req.get("community_id"));
+            String token = (String) req.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            boolean isAdmin = (boolean) claim.get("is_admin");
+            if (!isAdmin) throw new Exception("user is not an admin");
+        return moderatorService.setModerator((String) req.get("moderatorName"),
+                Long.parseLong((String) req.get("communityId")));
         } catch (Exception e)
         {
             return false;
@@ -245,8 +278,12 @@ public class AdministrativeFacade {
     public boolean removeModerator(Map<String , Object>req)
     {
         try {
-
-            return moderatorService.removeModerator((Long) req.get("moderator_id"), (Long) req.get("community_id"));
+            String token = (String) req.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            boolean isAdmin = (boolean) claim.get("is_admin");
+            if (!isAdmin) throw new Exception("user is not an admin");
+            return moderatorService.removeModerator((String) req.get("moderatorName"),
+                    Long.parseLong((String) req.get("communityId")));
         }
         catch (Exception e)
         {
@@ -256,15 +293,25 @@ public class AdministrativeFacade {
     public boolean removeMember(Map<String,Object>req)
     {
         try {
-            return communityService.deleteMember((Long)req.get("community_id"),(String)req.get("user_name"));
+            String token = (String) req.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            boolean isAdmin = (boolean) claim.get("is_admin");
+            if (!isAdmin) throw new Exception("user is not an admin");
+            return communityService.deleteMember(Long.parseLong((String) req.get("communityId"))
+                    ,(String)req.get("user_name"));
         } catch (IllegalArgumentException e) {
             return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public List<Map<String, Object>> getAdmins(Long communityId)
-    {
-       List<User> admins = communityService.getCommunityAdmins(communityId);
+    public List<Map<String, Object>> getAdmins(Map<String , Object>req) throws Exception {
+        String token = (String) req.get("jwt");
+        Claims claim = AuthenticationService.parseToken(token);
+        boolean isAdmin = (boolean) claim.get("is_admin");
+        if (!isAdmin) throw new Exception("user is not an admin");
+        List<User> admins = communityService.getCommunityAdmins(Long.parseLong((String) req.get("communityId")));
         UserAdapter adapter = new UserAdapter();
         List <Map<String, Object>> adminsMap = admins.stream().map(adapter::toMap).toList();
         for (Map<String, Object> admin : adminsMap) {
@@ -278,7 +325,11 @@ public class AdministrativeFacade {
     public boolean joinCommunity(Map<String,Object>req)
     {
         try {
-            return communityService.joinCommunity((Long)req.get("community_id"),(Long)req.get("id"));
+            String token = (String) req.get("jwt");
+            Claims claim = AuthenticationService.parseToken(token);
+            long userId = Long.parseLong(claim.getId());
+            return communityService.joinCommunity(Long.parseLong((String) req.get("communityId"))
+                    ,userId);
         } catch (IllegalArgumentException e) {
             return false;
         }

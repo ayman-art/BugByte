@@ -158,6 +158,7 @@ public class CommunityService {
 
     public Community getCommunityById(Long communityId) {
         try {
+            System.out.println(communityId);
               return communityRepository.findCommunityById(communityId);
         } catch (IllegalArgumentException e) {
             throw  e;
