@@ -199,4 +199,11 @@ public class UserService {
             throw new Exception("Error happened while making this user an admin:  " + e.getMessage());
         }
     }
+
+    public void updatePicture(long id, String pictureURL) throws Exception {
+        this.userRepository.updateProfilePicture(id, pictureURL);
+        User user = userRepository.findById(id);
+        cacheUser(user);
+
+    }
 }

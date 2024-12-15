@@ -9,6 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -32,6 +33,11 @@ public class Community {
         this.creationDate = creationDate;
         this.id = 0L;
     }
+    public Community(Long id,String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.id =id;
+    }
 
     public Community(String name, String description, Long adminId) {
         this.name = name;
@@ -44,5 +50,8 @@ public class Community {
         this.name = name;
         this.description = "";
         this.adminId = adminId;
+        this.creationDate = new Date();
+        this.id = 0L;
     }
+
 }

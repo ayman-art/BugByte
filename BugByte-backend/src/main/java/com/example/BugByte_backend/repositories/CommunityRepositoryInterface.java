@@ -31,7 +31,7 @@ public interface CommunityRepositoryInterface {
 
     boolean updateCommunityName(Long communityId, String newName);
 
-    boolean deleteCommunityById(Long communityId);
+    //boolean deleteCommunityById(Long communityId);
 
     boolean deleteMemberById(Long memberId, Long communityId);
 
@@ -44,4 +44,7 @@ public interface CommunityRepositoryInterface {
     List<String> getUserCommunitiesNames(Long userId);
 
     boolean deleteCommunityMembers(Long communityId);
+
+    boolean updateCommunityNameAndDescription(Community community);
+
 }

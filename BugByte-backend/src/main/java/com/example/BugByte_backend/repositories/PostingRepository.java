@@ -17,6 +17,18 @@ public class PostingRepository implements IPostingRepository{
                 VALUES
                     (?, ?, ?);
             """;
+    private static final String SQL_INSERT_UPVOTE = """
+                INSERT INTO upVotes
+                    (userName, post_id)
+                VALUES
+                    (?, ?);
+            """;
+    private static final String SQL_INSERT_DOWNVOTE = """
+                INSERT INTO downVotes
+                    (userName, post_id)
+                VALUES
+                    (?, ?);
+            """;
     private static final String SQL_INSERT_QUESTION = """
                 INSERT INTO questions
                     (id, title, community_id, up_votes, down_votes)
@@ -141,6 +153,12 @@ public class PostingRepository implements IPostingRepository{
                 JOIN posts p on p.id = r.id
                 WHERE r.id = ?;
             """;
+    private static final String SQL_GET_UP_VOTE = "SELECT * FROM upVotes WHERE userName = ? AND post_id = ?;";
+
+    private static final String SQL_GET_DOWN_VOTE = "SELECT * FROM downVotes WHERE userName = ? AND post_id = ?;";
+
+    private static final String SQL_DELETE_UP_VOTE = "DELETE FROM upVotes WHERE userName = ? AND post_id = ?;";
+    private static final String SQL_DELETE_DOWN_VOTE = "DELETE FROM downVotes WHERE userName = ? AND post_id = ?;";
     private static final String SQL_DELETE_ANSWERS_BY_QUESTION_ID = "DELETE FROM answers WHERE question_id = ?;";
     private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
@@ -249,10 +267,23 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean upVoteQuestion(Long questionId, Integer value) {
-        if (questionId == null || value == null)
+    public Boolean upVoteQuestion(Long questionId,Integer value , String userName) throws Exception {
+        if (questionId == null || value == null || userName == null)
             throw new NullPointerException("question id or value is null");
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
+                new Object[]{ userName, questionId }, Integer.class);
+        if(value == 1) {
+            if (count == 1)
+                throw new Exception("user already up voted this question");
 
+            jdbcTemplate.update(SQL_DELETE_DOWN_VOTE ,userName , questionId);
+            jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, questionId);
+        }else{
+            if (count == 0)
+                throw new Exception("user didn't up vote this question before");
+
+            jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, questionId);
+        }
         int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_QUESTIONS ,value, questionId);
 
         if (rows == 0)
@@ -261,10 +292,24 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean downVoteQuestion(Long questionId, Integer value) {
+    public Boolean downVoteQuestion(Long questionId, Integer value , String userName) throws Exception {
         if(questionId == null || value == null)
             throw new NullPointerException("question id or value is null");
 
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE,
+                new Object[]{ userName, questionId }, Integer.class);
+        if(value == 1) {
+            if (count == 1)
+                throw new Exception("user already down voted this question");
+
+            jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, questionId);
+            jdbcTemplate.update(SQL_INSERT_DOWNVOTE, userName, questionId);
+        }else{
+            if (count == 0)
+                throw new Exception("user didn't down vote this question before");
+
+            jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, questionId);
+        }
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_QUESTIONS ,value ,questionId);
 
         if (rows == 0)
@@ -273,9 +318,23 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean upVoteAnswer(Long answerId, Integer value) {
+    public Boolean upVoteAnswer(Long answerId, Integer value , String userName) throws Exception {
         if (answerId == null)
             throw new NullPointerException("answer id or value is null");
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
+                new Object[]{ userName, answerId}, Integer.class);
+        if(value == 1) {
+            if (count == 1)
+                throw new Exception("user already up voted this answer");
+
+            jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
+            jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, answerId);
+        }else{
+            if (count == 0)
+                throw new Exception("user didn't up vote this answer before");
+
+            jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
+        }
 
         int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_ANSWERS ,value ,answerId);
 
@@ -285,10 +344,23 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean downVoteAnswer(Long answerId, Integer value) {
+    public Boolean downVoteAnswer(Long answerId, Integer value , String userName) throws Exception {
         if (answerId == null)
             throw new NullPointerException("answer id or value is null");
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
+                new Object[]{ userName, answerId }, Integer.class);
+        if(value == 1) {
+            if (count == 1)
+                throw new Exception("user already up voted this answer");
 
+            jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
+            jdbcTemplate.update(SQL_INSERT_DOWNVOTE, userName, answerId);
+        }else{
+            if (count == 0)
+                throw new Exception("user didn't up vote this answer before");
+
+            jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
+        }
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,answerId);
 
         if (rows == 0)
@@ -380,6 +452,16 @@ public class PostingRepository implements IPostingRepository{
         if (replyId == null)
             throw new NullPointerException("questionId is null");
         return jdbcTemplate.queryForObject(SQL_GET_REPLY_BY_ID, new Object[]{replyId}, replyRowMapper);
+    }
+    public boolean is_UpVoted(String userName , long questionId){
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
+                new Object[]{ userName, questionId }, Integer.class);
+        return (count == 1);
+    }
+    public boolean is_DownVoted(String userName , long questionId){
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE,
+                new Object[]{ userName, questionId }, Integer.class);
+        return (count == 1);
     }
 
     private final RowMapper<Question> questionRowMapper = ((rs, rowNum) ->
