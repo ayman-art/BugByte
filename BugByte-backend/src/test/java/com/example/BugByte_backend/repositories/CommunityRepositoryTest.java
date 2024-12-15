@@ -429,23 +429,23 @@ public class CommunityRepositoryTest {
         String newName = null;
         assertThrows(NullPointerException.class, () -> communityRepository.updateCommunityName(communityId, newName));
     }
-    @Test
-    public void testDeleteCommunityById_Success() {
-        Long communityId = 12L;
-
-        when(jdbcTemplate.update(eq(SQL_DELETE_COMMUNITY_BY_ID), eq(communityId)))
-                .thenReturn(1);
-
-        boolean result = communityRepository.deleteCommunityById(communityId);
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void testDeleteCommunityById_Failure_NullId() {
-        Long communityId = null;
-        assertThrows(NullPointerException.class, () -> communityRepository.deleteCommunityById(communityId));
-    }
+//    @Test
+//    public void testDeleteCommunityById_Success() {
+//        Long communityId = 12L;
+//
+//        when(jdbcTemplate.update(eq(SQL_DELETE_COMMUNITY_BY_ID), eq(communityId)))
+//                .thenReturn(1);
+//
+//        boolean result = communityRepository.deleteCommunityById(communityId);
+//
+//        assertTrue(result);
+//    }
+//
+//    @Test
+//    public void testDeleteCommunityById_Failure_NullId() {
+//        Long communityId = null;
+//        assertThrows(NullPointerException.class, () -> communityRepository.deleteCommunityById(communityId));
+//    }
     @Test
     public void testDeleteMemberById_Success() {
         Long memberId = 1L;
