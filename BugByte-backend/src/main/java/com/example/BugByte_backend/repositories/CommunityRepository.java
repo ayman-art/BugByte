@@ -220,15 +220,15 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         return rows == 1;
     }
 //
-//    @Override
-//    public  boolean deleteCommunityById(Long communityId) {
-//        if(communityId==null)
-//            throw new NullPointerException("communityId is null");
-//        boolean i = deleteCommunityMembers(communityId);
-//        removeCommunityModerators(communityId);
-//        int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_BY_ID, communityId);
-//        return rows == 1;
-//    }
+    @Override
+    public  boolean deleteCommunityById(Long communityId) {
+        if(communityId==null)
+            throw new NullPointerException("communityId is null");
+        boolean i = deleteCommunityMembers(communityId);
+        removeCommunityModerators(communityId);
+        int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_BY_ID, communityId);
+        return rows == 1;
+    }
 
     private void removeCommunityModerators(Long communityId) {
         if (communityId == null) {

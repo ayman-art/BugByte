@@ -21,9 +21,9 @@ import static org.mockito.Mockito.when;
 public class PostingRepositoryQuestionTest {
     private static final String SQL_INSERT_QUESTION = """
                 INSERT INTO questions
-                    (id, community_id, up_votes, down_votes)
+                    (id, title, community_id, up_votes, down_votes)
                 VALUES
-                    (?, ?, 0, 0);
+                    (?, ?, ?, 0, 0);
             """;
     private static final String SQL_DELETE_QUESTION_BY_ID = "DELETE FROM questions WHERE id = ?;";
     private static final String SQL_UPDATE_UP_VOTES_QUESTIONS = """
@@ -82,11 +82,12 @@ public class PostingRepositoryQuestionTest {
     @Test
     public void testInsertQuestion_validInput() {
         Long questionId = 1L;
+        String title = "title";
         Long communityId = 1L;
-        when(jdbcTemplate.update(eq(SQL_INSERT_QUESTION), eq(questionId), eq(communityId)))
+        when(jdbcTemplate.update(eq(SQL_INSERT_QUESTION), eq(questionId), eq(title), eq(communityId)))
                 .thenReturn(1);
 
-        Boolean result = postingRepository.insertQuestion(questionId, communityId);
+        Boolean result = postingRepository.insertQuestion(questionId, title, communityId);
         assertTrue(result);
     }
 
@@ -95,12 +96,12 @@ public class PostingRepositoryQuestionTest {
         Exception exception = null;
 
         try {
-            postingRepository.insertQuestion(null, 1L);
+            postingRepository.insertQuestion(null, "title", 1L);
         } catch (Exception e) {
             exception = e;
         }
         assertEquals(NullPointerException.class, exception.getClass());
-        assertEquals("question id or community id is null", exception.getMessage());
+        assertEquals("question id or title or community id is null", exception.getMessage());
     }
     @Test
     public void testDeleteQuestion_validInput() {

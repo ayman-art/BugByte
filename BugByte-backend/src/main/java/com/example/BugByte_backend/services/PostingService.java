@@ -23,6 +23,9 @@ public class PostingService {
     @Autowired
     TagsRepository tagsRepository;
 
+    @Autowired
+    SearchingFilteringQuestionService filteringQuestionService;
+
     public Post getPost(long postId) throws Exception{
         try {
             Post post = postingRepository.getPostByID(postId);
@@ -72,8 +75,11 @@ public class PostingService {
             Long postId = postingRepository.insertPost(q.getMdContent() , q.getCreatorUserName());
             if (postId == null)
                 throw new Exception("post id is null");
-            if (postingRepository.insertQuestion(postId , q.getCommunityId())) {
+            if (postingRepository.insertQuestion(postId, q.getTitle(), q.getCommunityId())) {
                 tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
+                q.setId(postId);
+
+                filteringQuestionService.saveQuestion(q);
 
                 return postId;
             }
@@ -116,7 +122,10 @@ public class PostingService {
             Post post = postingRepository.getPostByID(questionId);
             if (! post.getCreatorUserName().equals(userName))
                 throw new Exception("this user can't delete this post");
-             return postingRepository.deleteQuestion(questionId);
+            boolean res = postingRepository.deleteQuestion(questionId);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.deleteQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -146,7 +155,10 @@ public class PostingService {
     }
     public boolean upVoteQuestion(long questionId , String userName) throws Exception{
         try {
-            return postingRepository.upVoteQuestion(questionId , 1 , userName);
+            boolean res = postingRepository.upVoteQuestion(questionId , 1 , userName);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -154,7 +166,10 @@ public class PostingService {
     }
     public boolean removeUpVoteFromQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.upVoteQuestion(questionId , -1 , userName);
+            boolean res = postingRepository.upVoteQuestion(questionId , -1 , userName);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -162,7 +177,10 @@ public class PostingService {
     }
     public boolean downVoteQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteQuestion(questionId , 1 , userName);
+            boolean res = postingRepository.downVoteQuestion(questionId , 1 , userName);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -170,7 +188,10 @@ public class PostingService {
     }
     public boolean removeDownVoteFromQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteQuestion(questionId , -1 , userName);
+            boolean res = postingRepository.downVoteQuestion(questionId , -1 , userName);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -222,7 +243,13 @@ public class PostingService {
     }
     public boolean editPost(long postId , String mdContent) throws Exception{
         try {
-            return postingRepository.editPost(postId , mdContent);
+            boolean res = postingRepository.editPost(postId , mdContent);
+            try {
+                Question question = postingRepository.getQuestionById(postId);
+                filteringQuestionService.saveQuestion(question);
+            } catch (Exception ignored) {}
+
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

@@ -15,7 +15,7 @@ public interface IPostingRepository {
 
      Post getPostByID(Long postId);
 
-     Boolean insertQuestion(Long questionId, Long communityId);
+     Boolean insertQuestion(Long questionId, String title, Long communityId);
 
      Boolean insertAnswer(Long answerId, Long questionId);
 
