@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     bio TEXT,
     reputation BIGINT DEFAULT 0,
-    is_admin BOOLEAN DEFAULT FALSE
+    is_admin BOOLEAN DEFAULT FALSE,
+    picture TEXT
 );
 
 CREATE TABLE IF NOT EXISTS validation_codes (

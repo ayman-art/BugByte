@@ -21,4 +21,6 @@ public class User {
     private Long reputation;
 
     private Boolean isAdmin;
+
+    private String picture;
 }

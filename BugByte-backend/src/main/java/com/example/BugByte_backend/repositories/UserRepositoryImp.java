@@ -14,9 +14,9 @@ import java.util.List;
 public class UserRepositoryImp implements UserRepository {
     private static final String SQL_INSERT_USER = """
                 INSERT INTO users
-                    (user_name, email, password, bio, reputation, is_admin)
+                    (user_name, email, password, bio, reputation, is_admin, picture)
                 VALUES
-                    (?, ?, ?, "", 0, false);
+                    (?, ?, ?, "", 0, false, "");
             """;
     private static final String SQL_FIND_BY_ID = "SELECT * FROM users WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_EMAIL = "SELECT id FROM users WHERE email = ?;";
@@ -25,6 +25,7 @@ public class UserRepositoryImp implements UserRepository {
     private static final String SQL_CHANGE_PASSWORD = "UPDATE users SET password = ? WHERE id = ?";
     private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
     private static final String SQL_MAKE_USER_ADMIN = "UPDATE users SET is_admin = true WHERE id = ?";
+    private static final String SQL_UPDATE_PICTURE = "UPDATE users SET picture = ? WHERE id = ?";
     private static final String SQL_INSERT_VALIDATION_CODE = """
                 INSERT INTO validation_code
                     (id, code)
@@ -177,6 +178,14 @@ public class UserRepositoryImp implements UserRepository {
         return jdbcTemplate.queryForObject(SQL_FIND_ID_BY_USERNAME, new Object[]{ userName }, Long.class);
     }
 
+    @Override
+    public void updateProfilePicture(Long userId, String URL) throws Exception {
+        if (userId == null)
+            throw new NullPointerException("UserId is Null");
+        int rows = jdbcTemplate.update(SQL_UPDATE_PICTURE, URL, userId);
+        if (rows != 1) throw new Exception("Picture update failed");
+    }
+
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> User.builder()
             .id(rs.getLong("id"))
             .userName(rs.getString("user_name"))
@@ -185,6 +194,7 @@ public class UserRepositoryImp implements UserRepository {
             .bio(rs.getString("bio"))
             .reputation(rs.getLong("reputation"))
             .isAdmin(rs.getBoolean("is_admin"))
+            .picture(rs.getString("picture"))
             .build()
     );
 }

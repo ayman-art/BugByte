@@ -219,16 +219,16 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         int rows = jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME, newName, communityId);
         return rows == 1;
     }
-
-    @Override
-    public  boolean deleteCommunityById(Long communityId) {
-        if(communityId==null)
-            throw new NullPointerException("communityId is null");
-        boolean i = deleteCommunityMembers(communityId);
-        removeCommunityModerators(communityId);
-        int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_BY_ID, communityId);
-        return rows == 1;
-    }
+//
+//    @Override
+//    public  boolean deleteCommunityById(Long communityId) {
+//        if(communityId==null)
+//            throw new NullPointerException("communityId is null");
+//        boolean i = deleteCommunityMembers(communityId);
+//        removeCommunityModerators(communityId);
+//        int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_BY_ID, communityId);
+//        return rows == 1;
+//    }
 
     private void removeCommunityModerators(Long communityId) {
         if (communityId == null) {
@@ -258,7 +258,8 @@ public class CommunityRepository implements CommunityRepositoryInterface{
                         rs.getString("password"),
                         rs.getString("bio"),
                         rs.getLong("reputation"),
-                        rs.getBoolean("is_admin")
+                        rs.getBoolean("is_admin"),
+                        rs.getString("picture")
                 ));
 
         if (users.isEmpty())

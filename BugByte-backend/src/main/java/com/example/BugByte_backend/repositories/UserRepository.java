@@ -28,4 +28,6 @@ public interface UserRepository {
     Boolean userExists(Long userId);
 
     String getCodeById(Long id);
+
+    void updateProfilePicture(Long userId, String URL) throws Exception;
 }
