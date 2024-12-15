@@ -8,6 +8,12 @@ interface NavbarProps {
   onLogout: () => void;
 }
 
+interface PostDetails {
+  title?: string; 
+  content: string; 
+  community?: string; 
+  tags?: string[] 
+}
 const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
@@ -17,9 +23,13 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     navigate(`/Profile/${username}`);
   };
 
-  const handleSavePost = (postDetails: { content: string; community: string; tags: string[] }) => {
+  const handleSavePost = (postDetails: PostDetails) => {
     console.log('Post saved:', postDetails);
-    // Add your post saving logic here
+ 
+    const id = 1
+    navigate(`/Posts/${id}`);
+
+
   };
 
   return (
@@ -51,6 +61,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={handleSavePost}
+        initialData={{ content: 'sasa', community: 'Bug Hunters', tags: ['react', 'javascript'], title: 'sasa' }}
       />
     </nav>
   );

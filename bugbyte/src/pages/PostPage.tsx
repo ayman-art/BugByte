@@ -41,69 +41,142 @@ interface ReplyProps {
 const PostPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
 
-  const [question, setQuestion] = useState<QuestionProps | null>(questionsEx[0]);
-  const [answers, setAnswers] = useState<AnswerProps[]>(answersEx);
-  const [replies, setReplies] = useState<ReplyProps[]>(repliesEx);
+  const [question, setQuestion] = useState<QuestionProps | null>(null);
+  const [answers, setAnswers] = useState<AnswerProps[]>([]);
+  const [replies, setReplies] = useState<Map<string, ReplyProps[]>>(new Map());
+  const [hasNextAnswers, setHasNextAnswers] = useState(true);
+  const [hasNextReplies, setHasNextReplies] = useState<Map<string, boolean>>(new Map());
+  const pageSize = 2;
 
-  // Fetch question, answers, and replies based on postId
   useEffect(() => {
-    // mocking
-    const fetchedQuestion = questionsEx.find((q) => q.postId === postId);
-    const fetchedAnswers = answersEx.filter((answer) => answer.postId === postId);
-    const fetchedReplies = repliesEx.filter((reply) => reply.answerId === '1');
+    const fetchQuestion = async () => {
+      const fetchedQuestion = questionsEx.find((q) => q.postId === postId);
+      const fetchedAnswers = answersEx.filter((answer) => answer.postId === postId).slice(0, pageSize);
+      const hasNext = answersEx.filter((answer) => answer.postId === postId).length > pageSize;
 
-    if (fetchedQuestion) {
-      setQuestion(fetchedQuestion);
+      setQuestion(fetchedQuestion || null);
       setAnswers(fetchedAnswers);
-      setReplies(fetchedReplies);
-    }
+      setHasNextAnswers(hasNext);
+
+      // Initialize `hasNextReplies` for all fetched answers
+      const nextReplies = new Map<string, boolean>();
+      fetchedAnswers.forEach((answer) => {
+        const hasMoreReplies = (repliesEx[answer.id]?.length || 0) > pageSize;
+        nextReplies.set(answer.id, hasMoreReplies);
+        setReplies((prev) => {
+          const newReplies = new Map(prev);
+          newReplies.set(answer.id, (repliesEx[answer.id]?.slice(0, pageSize)) || []);
+          return newReplies;
+        });
+      });
+      setHasNextReplies(nextReplies);
+    };
+
+    fetchQuestion();
   }, [postId]);
 
+  const fetchMoreAnswers = () => {
+    const newAnswers = answersEx.slice(answers.length, answers.length + pageSize + 1);
+    const addedAnswers = newAnswers.slice(0, pageSize);
+    const hasNext = newAnswers.length > pageSize;
+  
+    // Initialize replies and hasNextReplies for the newly added answers
+    const nextReplies = new Map<string, boolean>();
+    addedAnswers.forEach((answer) => {
+      const hasMoreReplies = (repliesEx[answer.id]?.length || 0) > pageSize;
+      nextReplies.set(answer.id, hasMoreReplies);
+  
+      setReplies((prev) => {
+        const newReplies = new Map(prev);
+        newReplies.set(answer.id, (repliesEx[answer.id]?.slice(0, pageSize)) || []);
+        return newReplies;
+      });
+    });
+  
+    setHasNextReplies((prev) => {
+      const newHasNextReplies = new Map(prev);
+      nextReplies.forEach((value, key) => {
+        newHasNextReplies.set(key, value);
+      });
+      return newHasNextReplies;
+    });
+  
+    setAnswers((prev) => [...prev, ...addedAnswers]);
+    setHasNextAnswers(hasNext);
+  };
+  
+
+  const fetchMoreReplies = (answerId: string) => {
+    const currentReplies = replies.get(answerId) || [];
+    const newReplies = repliesEx[answerId]?.slice(currentReplies.length, currentReplies.length + pageSize + 1) || [];
+    const addedReplies = newReplies.slice(0, pageSize);
+    const hasNext = newReplies.length > pageSize;
+
+    setReplies((prev) => {
+      const newRepliesMap = new Map(prev);
+      newRepliesMap.set(answerId, [...(prev.get(answerId) || []), ...addedReplies]);
+      return newRepliesMap;
+    });
+
+    setHasNextReplies((prev) => {
+      const newHasNextReplies = new Map(prev);
+      newHasNextReplies.set(answerId, hasNext);
+      return newHasNextReplies;
+    });
+  };
+
   const onDeleteAnswer = (answerId: string) => {
-    const updatedAnswers = answers.filter((answer) => answer.id !== answerId);
-    setAnswers(updatedAnswers);
+    setAnswers((prev) => prev.filter((answer) => answer.id !== answerId));
+
+    setReplies((prev) => {
+      const newReplies = new Map(prev);
+      newReplies.delete(answerId);
+      return newReplies;
+    });
+
+    setHasNextReplies((prev) => {
+      const newHasNextReplies = new Map(prev);
+      newHasNextReplies.delete(answerId);
+      return newHasNextReplies;
+    });
   };
 
   if (!question) {
     return <p>Question not found.</p>;
   }
 
-  const repliesMap = replies.reduce((map, reply) => {
-    if (!map[reply.answerId]) {
-      map[reply.answerId] = [];
-    }
-    map[reply.answerId].push(reply);
-    return map;
-  }, {} as { [key: string]: ReplyProps[] });
-
   return (
     <div className="post-page">
       <Question {...question} />
       <div className="answers-section">
-        {answers.length > 0 ? (
-          answers.map((answer) => (
-            <div key={answer.id} className="answer-container">
-              <Answer
-                {...answer}
-                onDelete={onDeleteAnswer}
-              />
-              <div className="replies-section">
-                {repliesMap[answer.id]?.map((reply) => (
-                  <div key={reply.id} className="reply-container">
-                    <Reply {...reply} />
-                  </div>
-                ))}
-              </div>
+        {answers.map((answer) => (
+          <div key={answer.id} className="answer-container">
+            <Answer {...answer} onDelete={onDeleteAnswer} />
+            <div className="replies-section">
+              {(replies.get(answer.id) || []).map((reply) => (
+                <div key={reply.id} className="reply-container">
+                  <Reply {...reply} />
+                </div>
+              ))}
+              {hasNextReplies.get(answer.id) && (
+                <button className="show-more-replies" onClick={() => fetchMoreReplies(answer.id)}>
+                  Show More Replies
+                </button>
+              )}
             </div>
-          ))
-        ) : (
-          <p>No answers yet.</p>
+          </div>
+        ))}
+        {hasNextAnswers && (
+          <button className="show-more-answers" onClick={fetchMoreAnswers}>
+            Show More Answers
+          </button>
         )}
       </div>
     </div>
   );
 };
 
+// Mock Data (unchanged)
 const questionsEx: QuestionProps[] = [
   {
     postId: '1',
@@ -160,36 +233,97 @@ const answersEx: AnswerProps[] = [
     opName: 'Ayman Algamal',
     date: '2024-12-07',
   },
-];
-
-const repliesEx: ReplyProps[] = [
-  {
-    id: '1',
-    answerId: '1',
-    text: '# That makes sense! Thanks for the explanation.',
-    upvotes: 2,
-    downvotes: 0,
-    opName: 'MikeSmith',
-    date: '2024-12-08',
-  },
-  {
-    id: '2',
-    answerId: '1',
-    text: 'Could you explain more about how the virtual DOM works?',
-    upvotes: 1,
-    downvotes: 0,
-    opName: 'Ayman Algamal',
-    date: '2024-12-08',
-  },
   {
     id: '3',
-    answerId: '1',
-    text: '# ANOTHER REPLY?',
-    upvotes: 1,
+    postId: '1',
+    text: 'It usesss a virtual DOM to efficiently update the UI.',
+    upvotes: 3,
     downvotes: 0,
     opName: 'Ayman Algamal',
-    date: '2024-12-08',
+    date: '2024-12-07',
+  },
+  {
+    id: '4',
+    postId: '1',
+    text: 'It usesssssss a virtual DOM to efficiently update the UI.',
+    upvotes: 3,
+    downvotes: 0,
+    opName: 'Ayman Algamal',
+    date: '2024-12-07',
   },
 ];
 
+const repliesEx: { [key: string]: ReplyProps[] } =
+  {
+    "1": [
+      {
+        id: '1',
+        answerId: '1',
+        text: 'React is a JavaScript library for building user interfaces.',
+        upvotes: 5,
+        downvotes: 1,
+        opName: 'JohnDoe',
+        date: '2024-12-07',
+      },
+      {
+        id: '2',
+        answerId: '1',
+        text: 'It uses a virtual DOM to efficiently update the UI.',
+        upvotes: 3,
+        downvotes: 0,
+        opName: 'Ayman Algamal',
+        date: '2024-12-07',
+      },
+     
+    ],
+    "2": [
+      {
+        id: '5',
+        answerId: '2',
+        text: 'It usesss a virtual DOM to efficiently update the UI to ans2.',
+        upvotes: 3,
+        downvotes: 0,
+        opName: 'Ayman Algamal',
+        date: '2024-12-07',
+      },
+      {
+        id: '6',
+        answerId: '2',
+        text: 'It usesssssss a virtual DOM to efficiently update the UI to ans2.',
+        upvotes: 3,
+        downvotes: 0,
+        opName: 'Ayman Algamal',
+        date: '2024-12-07',
+      },
+      {
+        id: '8',
+        answerId: '2',
+        text: 'It usesssssss a virtual DOM to efficiently update the UI to ans4.',
+        upvotes: 3,
+        downvotes: 0,
+        opName: 'Ayman Algamal',
+        date: '2024-12-07',
+      },
+    ],
+    "4": [
+      {
+        id: '7',
+        answerId: '4',
+        text: 'It usesss a virtual DOM to efficiently update the UI to ans4.',
+        upvotes: 3,
+        downvotes: 0,
+        opName: 'Ayman Algamal',
+        date: '2024-12-07',
+      },
+      {
+        id: '8',
+        answerId: '4',
+        text: 'It usesssssss a virtual DOM to efficiently update the UI to ans4.',
+        upvotes: 3,
+        downvotes: 0,
+        opName: 'Ayman Algamal',
+        date: '2024-12-07',
+      },
+    ]
+  };
 export default PostPage;
