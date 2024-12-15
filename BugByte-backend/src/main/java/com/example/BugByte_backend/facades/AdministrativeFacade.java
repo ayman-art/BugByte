@@ -236,6 +236,7 @@ public class AdministrativeFacade {
     public void updateUserProfilePicture(Map<String, Object> map) throws Exception {
         String jwt = (String) map.get("jwt");
         Claims claim = AuthenticationService.parseToken(jwt);
+        if(claim.getId()==null) throw new Exception("User Unauthorized ");
         Long id = Long.valueOf(claim.getId());
         String url = (String) map.get("url");
         userService.updatePicture(id, url);

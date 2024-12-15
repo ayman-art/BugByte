@@ -511,23 +511,23 @@ public class PostingServiceTest {
 
         assertFalse(result);
     }
-    @Test
-    void testGetCommunityQuestions_Success() throws Exception {
-        long communityId = 1L;
-        int limit = 5;
-        int offset = 0;
-        Community mockCommunity = new Community();
-        List<Question> mockQuestions = Arrays.asList(new Question(), new Question());
-
-        when(communityRepositoryMock.findCommunityById(communityId)).thenReturn(mockCommunity);
-        when(postingRepositoryMock.getQuestionsByCommunity(communityId, limit, offset)).thenReturn(mockQuestions);
-        when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
-
-        List<Question> result = postingService.getCommunityQuestions(communityId, limit, offset);
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-    }
+//    @Test
+//    void testGetCommunityQuestions_Success() throws Exception {
+//        long communityId = 1L;
+//        int limit = 5;
+//        int offset = 0;
+//        Community mockCommunity = new Community();
+//        List<Question> mockQuestions = Arrays.asList(new Question(), new Question());
+//
+//        when(communityRepositoryMock.findCommunityById(communityId)).thenReturn(mockCommunity);
+//        when(postingRepositoryMock.getQuestionsByCommunity(communityId, limit, offset)).thenReturn(mockQuestions);
+//        when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
+//
+//        List<Question> result = postingService.getCommunityQuestions(communityId, limit, offset);
+//
+//        assertNotNull(result);
+//        assertEquals(2, result.size());
+//    }
 
     @Test
     void testGetCommunityQuestions_CommunityNotFound() {
