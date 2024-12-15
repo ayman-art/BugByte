@@ -26,6 +26,8 @@ interface AnswerProps {
   downvotes: number;
   opName: string;
   date: string;
+  verified?: boolean;
+  enabledVerify?: boolean;
 }
 
 interface ReplyProps {
@@ -79,7 +81,15 @@ const PostPage: React.FC = () => {
     const newAnswers = answersEx.slice(answers.length, answers.length + pageSize + 1);
     const addedAnswers = newAnswers.slice(0, pageSize);
     const hasNext = newAnswers.length > pageSize;
-  
+    
+
+    const hasVerifiedAnswer = answers.some((answer) => answer.verified);
+    const enableVerify = !hasVerifiedAnswer;
+
+    addedAnswers.forEach((answer) => {
+      answer.enabledVerify = enableVerify;
+    });
+
     // Initialize replies and hasNextReplies for the newly added answers
     const nextReplies = new Map<string, boolean>();
     addedAnswers.forEach((answer) => {
@@ -145,13 +155,27 @@ const PostPage: React.FC = () => {
     return <p>Question not found.</p>;
   }
 
+  const onVerify = (answerId: string) => {
+    // Update the verified answer in the state
+    setAnswers((prev) =>
+      prev.map((answer) => {
+        if (answer.id === answerId) {
+          return { ...answer, verified: true, enabledVerify: false };
+        } else {
+          return { ...answer, verified: false, enabledVerify: false };
+        }
+        return answer;
+      })
+    );
+  };
+
   return (
     <div className="post-page">
       <Question {...question} />
       <div className="answers-section">
         {answers.map((answer) => (
           <div key={answer.id} className="answer-container">
-            <Answer {...answer} onDelete={onDeleteAnswer} />
+            <Answer {...answer} onDelete={onDeleteAnswer} onVerify={onVerify} />
             <div className="replies-section">
               {(replies.get(answer.id) || []).map((reply) => (
                 <div key={reply.id} className="reply-container">
@@ -251,6 +275,42 @@ const answersEx: AnswerProps[] = [
     opName: 'Ayman Algamal',
     date: '2024-12-07',
   },
+  {
+    id: '5',
+    postId: '2',
+    text: 'It usesss a virtual DOM to efficiently update the UI to ans2.',
+    upvotes: 3,
+    downvotes: 0,
+    opName: 'Ayman Algamal',
+    date: '2024-12-07',
+  },
+  {
+    id: '6',
+    postId: '2',
+    text: 'It usesssssss a virtual DOM to efficiently update the UI to ans2.',
+    upvotes: 3,
+    downvotes: 0,
+    opName: 'Ayman Algamal',
+    date: '2024-12-07',
+  },
+  {
+    id: '7',
+    postId: '2',
+    text: 'It usesss a virtual DOM to efficiently update the UI to ans4.',
+    upvotes: 3,
+    downvotes: 0,
+    opName: 'Ayman Algamal',
+    date: '2024-12-07',
+  },
+  {
+    id: '8',
+    postId: '2',
+    text: 'It usesssssss a virtual DOM to efficiently update the UI to ans4.',
+    upvotes: 3,
+    downvotes: 0,
+    opName: 'Ayman Algamal',
+    date: '2024-12-07',
+  },
 ];
 
 const repliesEx: { [key: string]: ReplyProps[] } =
@@ -310,6 +370,15 @@ const repliesEx: { [key: string]: ReplyProps[] } =
         id: '7',
         answerId: '4',
         text: 'It usesss a virtual DOM to efficiently update the UI to ans4.',
+        upvotes: 3,
+        downvotes: 0,
+        opName: 'Ayman Algamal',
+        date: '2024-12-07',
+      },
+      {
+        id: '8',
+        answerId: '4',
+        text: 'It usesssssss a virtual DOM to efficiently update the UI to ans4.',
         upvotes: 3,
         downvotes: 0,
         opName: 'Ayman Algamal',
