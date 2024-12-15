@@ -67,7 +67,7 @@ body {
   font-size: 14px;
   font-weight: bold;
   transition: background-color 0.3s ease;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 
 .tag:hover {

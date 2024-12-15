@@ -23,14 +23,14 @@ interface AnswerProps {
   id: string;
   postId: string;
   text: string; // Markdown content
-
   upvotes: number;
   downvotes: number;
   opName: string;
   date: string;
+  onDelete: (answerId: string) => void;
 }
 
-const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date }) => {
+const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date, onDelete, id }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
@@ -123,8 +123,11 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
               </button>
             )}
 
-            {canDelete && (
-              <button className="action-button delete-button">
+            {(
+              <button
+                className="action-button delete-button"
+                onClick={() => onDelete(id)}
+              >
                 <FaTrash /> {/* Delete icon */}
               </button>
             )}
@@ -134,7 +137,6 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
             >
               <FaReply /> {/* Reply icon */}
             </button>
-            
           </div>
         </footer>
       </div>
@@ -153,8 +155,6 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
         initialData={{ content: text }}
         type="md-only"
       />
-      
-
     </div>
   );
 };
