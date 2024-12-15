@@ -1,6 +1,6 @@
 import React from 'react';
 
-import CommunityPost from '../layouts/questionLayout';
+import CommunityPost from '../components/QuestionPreview';
 import { Container } from 'lucide-react';
 
 const HomePage: React.FC = () => {
