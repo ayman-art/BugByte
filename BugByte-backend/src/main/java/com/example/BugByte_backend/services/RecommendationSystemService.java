@@ -1,22 +1,15 @@
 package com.example.BugByte_backend.services;
 
 import com.example.BugByte_backend.models.Question;
+import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.RecommendationSystemRepository;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.springframework.util.SerializationUtils.serialize;
 
 @Service
 public class RecommendationSystemService {
@@ -34,15 +27,24 @@ public class RecommendationSystemService {
 
         Long size = redisTemplate.opsForList().size(cacheKey);
         if (size == null || size == 0) {
-            System.out.println("Not Cached");
             List<Question> newFeed = recommendationSystemRepository.generateFeedForUser(id);
-            for (Question question : newFeed) {
-                System.out.println(question.getTitle());
+            for (Question question : newFeed)
                 redisTemplate.opsForList().rightPush(cacheKey, question);
-            }
         }
 
         return getPaginatedFeed(id, pageSize);
+    }
+
+    public void updateUsersFeed(List<User> users, Question question) {
+        for (User user : users)
+            updateFeedForUser(user.getId(), question);
+    }
+
+    private void updateFeedForUser(Long userId, Question question) {
+        String cacheKey = "feed:" + userId;
+
+        redisTemplate.opsForList().leftPush(cacheKey, question);
+        redisTemplate.opsForList().trim(cacheKey, 0, 99);
     }
 
     private List<Question> getPaginatedFeed(Long userId, int pageSize) {
