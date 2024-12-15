@@ -161,7 +161,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if( id == null)
             throw new NullPointerException("id is Null");
 
-        Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, new Object[]{id},Community.class);
+        Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, communityRowMapper,id);
         if(com == null)
             throw new RuntimeException("No community with this id: " + id);
         return com;
@@ -336,7 +336,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if (communityId == null) {
             throw new NullPointerException("communityId is null");
         }
-
+        System.out.println(communityId);
         List<User> moderators = jdbcTemplate.query(SQL_FIND_MODERATORS_BY_COMMUNITY, new Long[]{communityId},new UserRowMapper());
         return moderators;
     }
@@ -355,7 +355,14 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         }
     }
 
-
+    private final RowMapper<Community> communityRowMapper = ((rs, rowNum) -> Community.builder()
+            .id(rs.getLong("id"))
+            .name(rs.getString("name"))
+            .description(rs.getString("description"))
+            .adminId(rs.getLong("admin_id"))
+            .creationDate(rs.getDate("creation_date"))
+            .build()
+    );
 
 
 }
