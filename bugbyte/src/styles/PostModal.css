@@ -1,0 +1,132 @@
+/* PostModal.css */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  
+  .modalContent {
+    background-color: white;
+    border-radius: 10px;
+    width: 500px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 2;
+  }
+  
+  .modalTitle {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    margin: 0;
+  }
+  
+  .scrollableContent {
+    overflow-y: auto;
+    padding: 15px;
+    flex-grow: 1;
+  }
+  
+  .editorContainer {
+    margin-bottom: 15px;
+  }
+  
+  .titleInput {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  
+  .tagSection {
+    margin-bottom: 15px;
+  }
+  
+  .tagInput {
+    width: 70%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+  }
+  
+  .addTagButton {
+    background-color: #099154;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  
+  .tagList {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  
+  .tagItem {
+    background-color: green;
+    color: white;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .removeTagButton {
+    background-color: transparent;
+    color: #ff4757;
+    border: none;
+    margin-left: 5px;
+    cursor: pointer;
+  }
+  
+  .modalButtons {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    border-top: 1px solid #eee;
+  }
+  
+  .saveButton {
+    background-color: #099154;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  
+  .closeButton {
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  
+  .communityDropdown {
+    margin-bottom: 15px;
+  }
+  
+  .dropdown {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+  }
+  
