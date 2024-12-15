@@ -2,17 +2,20 @@ import React, { useState } from 'react';
 import MDEditor from './MDEditor';
 import '../styles/PostModal.css';
 
+interface PostDetails {
+  title?: string; 
+  content: string; 
+  community?: string; 
+  tags?: string[] 
+}
+
 interface PostModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (postDetails: { 
-    title?: string; 
-    content: string; 
-    community?: string; 
-    tags?: string[] 
-  }) => void;
+  onSave: (postDetails: PostDetails) => void;
   type?: 'full' | 'md-only' | 'no-community';
   communities?: string[];
+  initialData?: PostDetails;
 }
 
 const PostModal: React.FC<PostModalProps> = ({ 
@@ -20,13 +23,14 @@ const PostModal: React.FC<PostModalProps> = ({
   onClose, 
   onSave, 
   type = 'full',
-  communities = ['Tech Enthusiasts', 'Bug Hunters', 'Developers Hub']
+  communities = ['Tech Enthusiasts', 'Bug Hunters', 'Developers Hub'],
+  initialData
 }) => {
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState<string>('');
-  const [selectedCommunity, setSelectedCommunity] = useState<string>('');
-  const [postContent, setPostContent] = useState<string>('');
-  const [postTitle, setPostTitle] = useState<string>('');
+  const [selectedCommunity, setSelectedCommunity] = useState<string>(initialData?.community || '');
+  const [postContent, setPostContent] = useState<string>(initialData?.content || '');
+  const [postTitle, setPostTitle] = useState<string>(initialData?.title || '');
 
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -46,19 +50,14 @@ const PostModal: React.FC<PostModalProps> = ({
 
   const clearPost = () => {
     setTagInput('');
-    setTags([]);
-    setSelectedCommunity('');
-    setPostContent('');
-    setPostTitle('');
+    setTags(initialData?.tags || []);
+    setSelectedCommunity(initialData?.community || '');
+    setPostContent(initialData?.content || '');
+    setPostTitle(initialData?.title || '');
   }
 
   const handleSavePost = () => {
-    const postDetails: { 
-      title?: string; 
-      content: string; 
-      community?: string; 
-      tags?: string[] 
-    } = { content: postContent };
+    const postDetails: PostDetails = { content: postContent };
 
     if (type !== 'md-only') {
       postDetails.title = postTitle;
@@ -79,7 +78,9 @@ const PostModal: React.FC<PostModalProps> = ({
   return (
     <div className="modal">
       <div className="modalContent">
-        <h3 className="modalTitle">Create Post</h3>
+        <h3 className="modalTitle">
+          {initialData ? 'Edit' : 'Create'}
+        </h3>
         <div className="scrollableContent">
           {type !== 'md-only' && (
             <input
@@ -149,7 +150,7 @@ const PostModal: React.FC<PostModalProps> = ({
         </div>
         <div className="modalButtons">
           <button className="saveButton" onClick={handleSavePost}>
-            Post Question
+            {initialData ? 'Update' : 'Post'}
           </button>
           <button className="closeButton" onClick={handleClose}>
             Close
