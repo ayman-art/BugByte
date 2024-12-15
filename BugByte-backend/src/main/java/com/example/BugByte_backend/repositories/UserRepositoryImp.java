@@ -24,6 +24,7 @@ public class UserRepositoryImp implements UserRepository {
     private static final String SQL_CHANGE_PASSWORD = "UPDATE users SET password = ? WHERE id = ?";
     private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
     private static final String SQL_MAKE_USER_ADMIN = "UPDATE users SET is_admin = true WHERE id = ?";
+    private static final String SQL_UPDATE_PICTURE = "UPDATE users SET picture = ? WHERE id = ?";
     private static final String SQL_INSERT_VALIDATION_CODE = """
                 INSERT INTO validation_code
                     (id, code)
@@ -166,6 +167,14 @@ public class UserRepositoryImp implements UserRepository {
             throw new NullPointerException("UserId is Null");
 
         return jdbcTemplate.queryForObject(SQL_FIND_VALIDATION_CODE_BY_ID, new Object[]{ id }, String.class);
+    }
+
+    @Override
+    public void updateProfilePicture(Long userId, String URL) throws Exception {
+        if (userId == null)
+            throw new NullPointerException("UserId is Null");
+        int rows = jdbcTemplate.update(SQL_UPDATE_PICTURE, URL, userId);
+        if (rows != 1) throw new Exception("Picture update failed");
     }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> User.builder()

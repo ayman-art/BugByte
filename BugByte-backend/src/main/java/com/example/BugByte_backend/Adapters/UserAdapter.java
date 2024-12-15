@@ -18,6 +18,7 @@ public class UserAdapter implements IAdapter<User> {
         userMap.put("isAdmin", user.getIsAdmin());
         userMap.put("reputation", user.getReputation());
         userMap.put("id", user.getId());
+        userMap.put("picture", user.getPicture());
         return userMap;
     }
 
@@ -27,10 +28,11 @@ public class UserAdapter implements IAdapter<User> {
         String email = (String) map.get("email");
         String password = (String) map.get("password");
         String bio = (String) map.get("bio");
+        String picture = (String) map.get("picture");
         long id = (long) map.get("id");
         boolean is_admin = (boolean) map.get("isAdmin");
         long reputation = (long) map.get("reputation");
-        return new User(id, username, email, password, bio, reputation, is_admin);
+        return new User(id, username, email, password, bio, reputation, is_admin, picture);
     }
 
     @Override
