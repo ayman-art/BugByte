@@ -1,14 +1,15 @@
 package com.example.BugByte_backend.facades;
 
+import com.example.BugByte_backend.Adapters.CommunityAdapter;
 import com.example.BugByte_backend.Adapters.UserAdapter;
 import com.example.BugByte_backend.controllers.GoogleAuthController;
+import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.services.AuthenticationService;
-import com.example.BugByte_backend.services.RegistrationService;
-import com.example.BugByte_backend.services.UserService;
+import com.example.BugByte_backend.services.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import io.jsonwebtoken.Claims;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,8 @@ public class AdministrativeFacade {
 
     @Autowired
     private RegistrationService registrationService;
+    CommunityService communityService =new CommunityService();
+    ModeratorService moderatorService = new ModeratorService();
 
     /*
     Expected input format:
@@ -180,6 +183,104 @@ public class AdministrativeFacade {
             );
         } else {
             throw new RuntimeException("Invalid token");
+        }
+    }
+    public Map<String,Object> getCommunityInfo(Long CommunityId)
+    {
+        try {
+            Community community = communityService.getCommunityById(CommunityId);
+            CommunityAdapter communityAdapter = new CommunityAdapter();
+            return communityAdapter.toMap(community);
+        }catch (Exception e)
+        {
+            return null;
+        }
+
+    }
+    public boolean createCommunity(Map<String,Object> map){
+        try {
+            CommunityAdapter communityAdapter = new CommunityAdapter();
+            Long id =communityService.createCommunity(communityAdapter.fromMap(map));
+            return  true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+//    public boolean deleteCommunity(Long communityId)
+//    {
+//        try {
+//            return communityService.deleteCommunity(communityId);
+//        } catch (IllegalArgumentException e) {
+//            return false;
+//        }
+//    }
+    public boolean editCommunity(Long communityId, Map<String,Object> map)
+    {
+        try {
+            Community comm = new Community(communityId ,(String)map.get("name"),(String) map.get("desription"));
+            return communityService.updateCommunity(comm);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public void updateUserProfilePicture(Map<String, Object> map) throws Exception {
+        String jwt = (String) map.get("jwt");
+        Claims claim = AuthenticationService.parseToken(jwt);
+        if(claim.getId()==null) throw new Exception("User Unauthorized ");
+        Long id = Long.valueOf(claim.getId());
+        String url = (String) map.get("url");
+        userService.updatePicture(id, url);
+    }
+
+    public boolean setModerator(Map<String , Object>req) {
+        try {
+        return moderatorService.setModerator((Long) req.get("moderator_id"), (Long) req.get("community_id"));
+        } catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+    public boolean removeModerator(Map<String , Object>req)
+    {
+        try {
+
+            return moderatorService.removeModerator((Long) req.get("moderator_id"), (Long) req.get("community_id"));
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+    public boolean removeMember(Map<String,Object>req)
+    {
+        try {
+            return communityService.deleteMember((Long)req.get("community_id"),(String)req.get("user_name"));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public List<Map<String, Object>> getAdmins(Long communityId)
+    {
+       List<User> admins = communityService.getCommunityAdmins(communityId);
+        UserAdapter adapter = new UserAdapter();
+        List <Map<String, Object>> adminsMap = admins.stream().map(adapter::toMap).toList();
+        for (Map<String, Object> admin : adminsMap) {
+            admin.remove("password");
+            admin.remove("email");
+            admin.remove("id");
+        }
+        return adminsMap;
+    }
+
+    public boolean joinCommunity(Map<String,Object>req)
+    {
+        try {
+            return communityService.joinCommunity((Long)req.get("community_id"),(Long)req.get("id"));
+        } catch (IllegalArgumentException e) {
+            return false;
         }
     }
 }
