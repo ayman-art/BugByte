@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing the icons
+import { FaEdit, FaTrash, FaReply } from 'react-icons/fa';
 import { MDXEditor, 
   headingsPlugin,
   listsPlugin,
@@ -16,6 +16,7 @@ import { MDXEditor,
   codeMirrorPlugin,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
+import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 
 interface QuestionProps {
@@ -44,6 +45,8 @@ const Question: React.FC<QuestionProps> = ({
 }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
@@ -60,7 +63,16 @@ const Question: React.FC<QuestionProps> = ({
     navigate(`/Profile/${opName}`);
   };
 
-  // Check if the logged-in user is the post owner or an admin
+  const handleReplySave = (postDetails: { content: string }) => {
+    console.log('Reply posted:', postDetails);
+    // Add functionality to save reply here
+  };
+
+  const handleEditSave = (postDetails: { content: string }) => {
+    console.log('Post edited:', postDetails);
+    setIsEditModalOpen(false);
+  }
+
   const canEdit = loggedInUsername === opName;
   const canDelete = loggedInUsername === opName || isAdmin;
 
@@ -78,7 +90,6 @@ const Question: React.FC<QuestionProps> = ({
               {opName}
             </span>
           </p>
-
           <section className="question-body">
             <MDXEditor
               markdown={questionText}
@@ -124,20 +135,45 @@ const Question: React.FC<QuestionProps> = ({
           </div>
 
           <div className="question-actions">
-            {canEdit && (
-              <button className="action-button edit-button">
-                <FaEdit /> {/* Edit icon */}
+            { (
+              <button className="action-button edit-button"
+                onClick={() => setIsEditModalOpen(true)}>
+                <FaEdit />
               </button>
             )}
 
             {canDelete && (
               <button className="action-button delete-button">
-                <FaTrash /> {/* Delete icon */}
+                <FaTrash />
               </button>
             )}
+
+            <button
+              className="action-button reply-button"
+              onClick={() => setIsReplyModalOpen(true)}
+            >
+              <FaReply /> {/* Reply icon */}
+            </button>
           </div>
         </footer>
       </div>
+
+      {/* Reply Modal */}
+      <PostModal
+        isOpen={isReplyModalOpen}
+        onClose={() => setIsReplyModalOpen(false)}
+        onSave={handleReplySave}
+        type="md-only"
+      />
+      
+      {/* Edit Modal */}
+      <PostModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleEditSave}
+        initialData={{ content: questionText }}
+        type="no-community"
+      />
     </div>
   );
 };
