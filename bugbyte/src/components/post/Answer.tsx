@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing the icons
+import { FaEdit, FaTrash, FaReply } from 'react-icons/fa'; // Importing the icons
 import { MDXEditor, 
     headingsPlugin,
     listsPlugin,
@@ -17,6 +17,7 @@ import { MDXEditor,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
+import PostModal from '../PostModal';
 
 interface AnswerProps {
   id: string;
@@ -32,6 +33,7 @@ interface AnswerProps {
 const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
+  const [isReplyModalOpen, setIsReplyModalOpen] = useState(false); // State for modal
   const navigate = useNavigate();
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
@@ -47,6 +49,11 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
   const handleNavigateToProfile = () => {
     navigate(`/Profile/${opName}`);
   };
+
+  const handleReplySave = (postDetails: { content: string }) => {
+    console.log(postDetails);
+    setIsReplyModalOpen(false);
+  }
 
   // Check if the logged-in user is the post owner
   const canEdit = loggedInUsername === opName;
@@ -114,9 +121,25 @@ const Answer: React.FC<AnswerProps> = ({ text, upvotes, downvotes, opName, date 
                 <FaTrash /> {/* Delete icon */}
               </button>
             )}
+            <button
+              className="action-button reply-button"
+              onClick={() => setIsReplyModalOpen(true)}
+            >
+              <FaReply /> {/* Reply icon */}
+            </button>
+            
           </div>
         </footer>
       </div>
+      {/* Reply Modal */}
+      <PostModal
+        isOpen={isReplyModalOpen}
+        onClose={() => setIsReplyModalOpen(false)}
+        onSave={handleReplySave}
+        type="md-only"
+      />
+      
+
     </div>
   );
 };
