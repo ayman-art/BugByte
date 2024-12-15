@@ -185,7 +185,7 @@ public class UserRepositoryImp implements UserRepository {
             .bio(rs.getString("bio"))
             .reputation(rs.getLong("reputation"))
             .isAdmin(rs.getBoolean("is_admin"))
-            .picture("picture")
+            .picture(rs.getString("picture"))
             .build()
     );
 }

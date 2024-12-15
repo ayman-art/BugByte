@@ -84,18 +84,18 @@ public class CommunityService {
         }
     }
 
-    public boolean deleteCommunity(Long communityId) {
-        try {
-            String communityNameToRemove = removeFromCache(communityId);
-            if (communityNameToRemove != null) {
-                System.out.println("Community removed from cache: " + communityNameToRemove);
-            }
-            return communityRepository.deleteCommunityById(communityId);
-        } catch (Exception e) {
-            System.out.println("Error deleting community: " + e.getMessage());
-            return false;
-        }
-    }
+//    public boolean deleteCommunity(Long communityId) {
+//        try {
+//            String communityNameToRemove = removeFromCache(communityId);
+//            if (communityNameToRemove != null) {
+//                System.out.println("Community removed from cache: " + communityNameToRemove);
+//            }
+//            return communityRepository.deleteCommunityById(communityId);
+//        } catch (Exception e) {
+//            System.out.println("Error deleting community: " + e.getMessage());
+//            return false;
+//        }
+//    }
 
     private String removeFromCache(Long communityId) {
         for (Map.Entry<String, Community> entry : communityPool.entrySet()) {

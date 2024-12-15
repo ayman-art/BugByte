@@ -204,6 +204,6 @@ public class UserService {
         this.userRepository.updateProfilePicture(id, pictureURL);
         User user = userRepository.findById(id);
         cacheUser(user);
-        
+
     }
 }

@@ -215,14 +215,14 @@ public class AdministrativeFacade {
             return false;
         }
     }
-    public boolean deleteCommunity(Long communityId)
-    {
-        try {
-            return communityService.deleteCommunity(communityId);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
+//    public boolean deleteCommunity(Long communityId)
+//    {
+//        try {
+//            return communityService.deleteCommunity(communityId);
+//        } catch (IllegalArgumentException e) {
+//            return false;
+//        }
+//    }
     public boolean editCommunity(Long communityId, Map<String,Object> map)
     {
         try {
@@ -232,6 +232,15 @@ public class AdministrativeFacade {
             return false;
         }
     }
+
+    public void updateUserProfilePicture(Map<String, Object> map) throws Exception {
+        String jwt = (String) map.get("jwt");
+        Claims claim = AuthenticationService.parseToken(jwt);
+        Long id = Long.valueOf(claim.getId());
+        String url = (String) map.get("url");
+        userService.updatePicture(id, url);
+    }
+
     public boolean setModerator(Map<String , Object>req)
     {
         return true;

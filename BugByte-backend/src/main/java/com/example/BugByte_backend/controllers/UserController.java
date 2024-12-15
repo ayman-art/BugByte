@@ -137,4 +137,17 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @PostMapping("/update-picture")
+    public ResponseEntity<?> updateProfilePicture(@RequestHeader("Authorization") String token,
+                                                  @RequestBody Map<String, Object> data){
+        token = token.replace("Bearer ", "");
+        data.put("jwt", token);
+        try{
+            administrativeFacade.updateUserProfilePicture(data);
+            return new ResponseEntity<>("Profile picture updated successfully", HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
 }
