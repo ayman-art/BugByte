@@ -87,19 +87,7 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
 
         <p className="reply-date">on {date}</p>
 
-        <footer className="reply-footer">
-          {/* Voting section */}
-          <div className="reply-votes">
-            <span className="votes-count">{currentUpvotes} </span>
-            <button onClick={handleUpvote} className="vote-button vote-button-up">
-              ↑
-            </button>
-            <span className="votes-count">{currentDownvotes} </span>
-            <button onClick={handleDownvote} className="vote-button vote-button-down">
-              ↓
-            </button>
-          </div>
-
+        <footer className="reply-footer"> 
           {/* Action buttons */}
           <div className="reply-actions">
             {canEdit && (
