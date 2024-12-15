@@ -30,6 +30,7 @@ interface QuestionProps {
   date: string;
   communityId: string;
   communityName: string;
+  initialVoteStatus: 'upvoted' | 'downvoted' | 'neutral'; // New prop for the initial vote status
 }
 
 const Question: React.FC<QuestionProps> = ({
@@ -42,21 +43,57 @@ const Question: React.FC<QuestionProps> = ({
   date,
   communityId,
   communityName,
+  initialVoteStatus, // Access the new prop
 }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
+  const [voteStatus, setVoteStatus] = useState(initialVoteStatus || 'neutral'); // Track vote status
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
 
-  const handleUpvote = () => {
-    setCurrentUpvotes(currentUpvotes + 1);
+ 
+
+  const handleUpvoteQuestion = () => {
+    if (voteStatus === 'upvoted') {
+      // todo: call api(remove upvote)
+      setCurrentUpvotes(currentUpvotes - 1);
+      setVoteStatus('neutral');
+      console.log('FROM upvoted to neutral');
+    } else if (voteStatus === 'downvoted') {
+      // call api(remove downvote, add upvote)
+      setCurrentDownvotes(currentDownvotes - 1);
+      setCurrentUpvotes(currentUpvotes + 1);
+      setVoteStatus('upvoted');
+      console.log('FROM downvoted to upvoted');
+    } else {
+      // call api(add upvote)
+      setCurrentUpvotes(currentUpvotes + 1);
+      setVoteStatus('upvoted');
+      console.log('FROM neutral to upvoted');
+    }
   };
 
-  const handleDownvote = () => {
-    setCurrentDownvotes(currentDownvotes + 1);
+  const handleDownvoteQuestion = () => {
+    if (voteStatus === 'downvoted') {
+      // todo: call api(remove downvote)
+      setCurrentDownvotes(currentDownvotes - 1);
+      setVoteStatus('neutral');
+      console.log('FROM downvoted to neutral');
+    } else if (voteStatus === 'upvoted') {
+      // call api(remove upvote, add downvote)
+      setCurrentUpvotes(currentUpvotes - 1);
+      setCurrentDownvotes(currentDownvotes + 1);
+      setVoteStatus('downvoted');
+      console.log('FROM upvoted to downvoted');
+    } else {
+      // call api(add downvote)
+      setCurrentDownvotes(currentDownvotes + 1);
+      setVoteStatus('downvoted');
+      console.log('FROM neutral to downvoted');
+    }
   };
 
   const handleNavigateToProfile = () => {
@@ -71,7 +108,7 @@ const Question: React.FC<QuestionProps> = ({
   const handleEditSave = (postDetails: { content: string }) => {
     console.log('Post edited:', postDetails);
     setIsEditModalOpen(false);
-  }
+  };
 
   const canEdit = loggedInUsername === opName;
   const canDelete = loggedInUsername === opName || isAdmin;
@@ -125,19 +162,24 @@ const Question: React.FC<QuestionProps> = ({
 
           <div className="question-votes">
             <span className="votes-count">{currentUpvotes} </span>
-            <button onClick={handleUpvote} className="vote-button vote-button-up">
+            <button
+              onClick={handleUpvoteQuestion}
+              className={`vote-button ${voteStatus === 'upvoted' ? 'active' : ''} vote-button-up`}
+            >
               ↑
             </button>
             <span className="votes-count">{currentDownvotes} </span>
-            <button onClick={handleDownvote} className="vote-button vote-button-down">
+            <button
+              onClick={handleDownvoteQuestion}
+              className={`vote-button ${voteStatus === 'downvoted' ? 'active' : ''} vote-button-down`}
+            >
               ↓
             </button>
           </div>
 
           <div className="question-actions">
-            { (
-              <button className="action-button edit-button"
-                onClick={() => setIsEditModalOpen(true)}>
+            {canEdit && (
+              <button className="action-button edit-button" onClick={() => setIsEditModalOpen(true)}>
                 <FaEdit />
               </button>
             )}
@@ -148,10 +190,7 @@ const Question: React.FC<QuestionProps> = ({
               </button>
             )}
 
-            <button
-              className="action-button reply-button"
-              onClick={() => setIsReplyModalOpen(true)}
-            >
+            <button className="action-button reply-button" onClick={() => setIsReplyModalOpen(true)}>
               <FaReply /> {/* Reply icon */}
             </button>
           </div>
