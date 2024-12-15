@@ -14,7 +14,7 @@ import java.util.List;
 public class UserRepositoryImp implements UserRepository {
     private static final String SQL_INSERT_USER = """
                 INSERT INTO users
-                    (user_name, email, password, bio, reputation, is_admin)
+                    (user_name, email, password, bio, reputation, is_admin, )
                 VALUES
                     (?, ?, ?, "", 0, false);
             """;
