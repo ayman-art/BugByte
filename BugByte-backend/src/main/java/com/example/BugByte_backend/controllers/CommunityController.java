@@ -33,7 +33,7 @@ public class CommunityController {
             if(administrativeFacade.createCommunity(communityData))
             return new ResponseEntity<>("Community Created Successfully" , HttpStatus.OK);
             else {
-                return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("error creating community", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -42,8 +42,12 @@ public class CommunityController {
     @PostMapping("/deleteCommunity")
     public ResponseEntity<?> deleteCommunity(@RequestBody Map<String, Object> communityData) {
         try {
-            administrativeFacade.deleteCommunity(communityData);
-            return new ResponseEntity<>("Community deleted Successfully" , HttpStatus.OK);
+            if (administrativeFacade.deleteCommunity(communityData)) {
+                return new ResponseEntity<>("Community deleted Successfully", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>("error deleting community", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -51,8 +55,12 @@ public class CommunityController {
     @PostMapping("/editCommunity")
     public ResponseEntity<?> editCommunity(@RequestBody Map<String, Object> communityData) {
         try {
-            administrativeFacade.editCommunity(communityData);
-            return new ResponseEntity<>("Community edited Successfully" , HttpStatus.OK);
+            if(administrativeFacade.editCommunity(communityData)) {
+                return new ResponseEntity<>("Community edited Successfully", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>("error editing community", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -60,8 +68,12 @@ public class CommunityController {
     @PostMapping("/setModerator")
     public ResponseEntity<?> setModerator(@RequestBody Map<String, Object> moderatorData) {
         try {
-            administrativeFacade.setModerator(moderatorData);
-            return new ResponseEntity<>("User is Moderator now" , HttpStatus.OK);
+            if(administrativeFacade.setModerator(moderatorData)) {
+                return new ResponseEntity<>("User is Moderator now", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>("error adding moderator", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -69,8 +81,12 @@ public class CommunityController {
     @PostMapping("/removeModerator")
     public ResponseEntity<?> removeModerator(@RequestBody Map<String, Object> moderatorData) {
         try {
-            administrativeFacade.removeModerator(moderatorData);
-            return new ResponseEntity<>("moderator removed Successfully" , HttpStatus.OK);
+            if(administrativeFacade.removeModerator(moderatorData)) {
+                return new ResponseEntity<>("moderator removed Successfully", HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<>("error removing moderator", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -78,8 +94,12 @@ public class CommunityController {
     @PostMapping("/removeMember")
     public ResponseEntity<?> removeMember(@RequestBody Map<String, Object> memberData) {
         try {
-            administrativeFacade.removeMember(memberData);
-            return new ResponseEntity<>("member removed Successfully" , HttpStatus.OK);
+            if(administrativeFacade.removeMember(memberData)) {
+                return new ResponseEntity<>("member removed Successfully", HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<>("error removing member", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -98,8 +118,12 @@ public class CommunityController {
     @PostMapping("/joinCommunity")
     public ResponseEntity<?> joinCommunity(@RequestBody Map<String, Object> communityData) {
         try {
-            administrativeFacade.joinCommunity(communityData);
-            return new ResponseEntity<>("user joined  Successfully" , HttpStatus.OK);
+            if(administrativeFacade.joinCommunity(communityData)) {
+                return new ResponseEntity<>("user joined  Successfully", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>("error joining community", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
