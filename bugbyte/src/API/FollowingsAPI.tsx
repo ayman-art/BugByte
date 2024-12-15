@@ -1,11 +1,12 @@
 import { API_URLS } from './ApiUrls';
 
-export const getFollowings = async (username: string): Promise<any[]> => {
+export const getFollowings = async (username: string, token: string): Promise<any[]> => {
   try {
     const response = await fetch(`${API_URLS.GET_FOLLOWINGS}?username=${encodeURIComponent(username)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
     });
 
