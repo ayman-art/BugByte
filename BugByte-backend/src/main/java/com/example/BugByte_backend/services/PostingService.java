@@ -26,6 +26,12 @@ public class PostingService {
     @Autowired
     SearchingFilteringQuestionService filteringQuestionService;
 
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    RecommendationSystemService recommendationSystemService;
+
     public Post getPost(long postId) throws Exception{
         try {
             Post post = postingRepository.getPostByID(postId);
@@ -70,9 +76,10 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public long postQuestion(Question q) throws Exception{
+
+    public long postQuestion(Question q) throws Exception {
         try {
-            Long postId = postingRepository.insertPost(q.getMdContent() , q.getCreatorUserName());
+            Long postId = postingRepository.insertPost(q.getMdContent(), q.getCreatorUserName());
             if (postId == null)
                 throw new Exception("post id is null");
             if (postingRepository.insertQuestion(postId, q.getTitle(), q.getCommunityId())) {
@@ -80,6 +87,11 @@ public class PostingService {
                 q.setId(postId);
 
                 filteringQuestionService.saveQuestion(q);
+                List<User> followers = userService.getFollowers(q.getCreatorUserName());
+                List<User> joinedMembers = communityRepository.getCommunityMembers(q.getCommunityId());
+
+                recommendationSystemService.updateUsersFeed(followers, q);
+                recommendationSystemService.updateUsersFeed(joinedMembers, q);
 
                 return postId;
             }
