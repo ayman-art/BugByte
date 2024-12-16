@@ -61,7 +61,6 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSave={handleSavePost}
-        initialData={{ content: 'sasa', community: 'Bug Hunters', tags: ['react', 'javascript'], title: 'sasa' }}
       />
     </nav>
   );
