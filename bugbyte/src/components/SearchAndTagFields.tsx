@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/SearchAndTagFields.css'; // Import the CSS file
+import '../styles/SearchAndTagFields.css';
 import {searchCommunities , searchQuestions} from '../API/Search.tsx';
 import {searchFilteredCommunities , searchFilteredQuestions} from '../API/Filter.tsx';
 
@@ -19,15 +19,17 @@ interface SearchAndTagFieldsProps {
     onSearchClick: () => void;
 }
 export const sendRequest = (searchValue: string, tagValue: string, source: string) => {
-//     if(source=="home" && tagValue=="");
-     //let c=  searchQuestions(searchValue,0,3);
-//     else if (source=="home" && tagValue!="");
-//        let c=  searchFilteredQuestions(tagValue,0,2);
-//     else if (source=="community" && tagValue=="");
-//         let c = searchCommunities(searchValue,0,3);
- //   else if (source=="community" && tagValue!="");
-        let c = searchFilteredCommunities(tagValue,0,2);
+    if (source === "home" && tagValue === "") {
+        return searchQuestions(searchValue, 0, 3);
+    } else if (source === "home" && tagValue !== "") {
+        return searchFilteredQuestions(tagValue, 0, 2);
+    } else if (source === "community" && tagValue === "") {
+        return searchCommunities(searchValue, 0, 3);
+    } else if (source === "community" && tagValue !== "") {
+        return searchFilteredCommunities(tagValue, 0, 2);
+    }
 };
+
 
 const SearchAndTagFields: React.FC<SearchAndTagFieldsProps> = ({
     searchValue,

@@ -18,6 +18,6 @@ export const API_URLS = {
   DOWNVOTE:`${API_BASE_URL}/downvote`,
   SEARCH_COMMUNITIES:`${API_BASE_URL}/search/community`,
   SEARCH_QUESTIONS:`${API_BASE_URL}/search/question`,
-  SEARCH_FILTERED_COMMUNITIES:`${API_BASE_URL}/search/filterCommunity`,
-  SEARCH_FILTERED_QUESTIONS:`${API_BASE_URL}/search/filterQuestion`
+  SEARCH_FILTERED_QUESTIONS: 'http://localhost:8080/search/filterQuestion',
+  SEARCH_FILTERED_COMMUNITIES: 'http://localhost:8080/search/filterCommunity',
 };

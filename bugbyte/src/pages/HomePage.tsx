@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchAndTagFields from '../components/SearchAndTagFields';
 import CommunityPost from '../layouts/questionLayout';
-import {sendRequest} from '../components/SearchAndTagFields';
+import { sendRequest } from '../components/SearchAndTagFields';
+import { Question } from '../Models/Question';
 import { Container } from 'lucide-react';
+
 const HomePage: React.FC = () => {
     const [searchValue, setSearchValue] = useState('');
     const [tagValue, setTagValue] = useState('');
+    const [questions, setQuestions] = useState<Question[]>([]);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);
@@ -15,27 +18,33 @@ const HomePage: React.FC = () => {
         setTagValue(event.target.value);
     };
 
-    const handleSearchClick = () => {
-           sendRequest(searchValue,tagValue,"home");
-           setTagValue("");
-           setSearchValue("");
-        };
-
+    const handleSearchClick = async () => {
+        try {
+            if(!(searchValue==="" && tagValue==="")){
+            const fetchedQuestions = await sendRequest(searchValue, tagValue, "home");
+            setQuestions(fetchedQuestions);
+            //setTagValue("");
+            //setSearchValue("");
+            }
+        } catch (error) {
+            console.error("Error fetching questions:", error);
+        }
+    };
 
     return (
         <div style={styles.container}>
-            {/* Add the SearchAndTagFields component here */}
+            {/* Search and Tag Fields */}
             <div style={styles.searchSection}>
                 <SearchAndTagFields
                     searchValue={searchValue}
                     tagValue={tagValue}
                     onSearchChange={handleSearchChange}
                     onTagChange={handleTagChange}
-                    onSearchClick={handleSearchClick}  // Pass the search handler
+                    onSearchClick={handleSearchClick}
                 />
             </div>
 
-            {/* Display Community Posts */}
+            {/* Community Posts */}
             <div>
                 <CommunityPost
                     postId="123"
@@ -68,6 +77,32 @@ const HomePage: React.FC = () => {
                     downvotes={0}
                 />
             </div>
+
+            {/* Render the list of questions */}
+            <div>
+                <h2>Questions</h2>
+                {questions.length > 0 ? (
+                    questions.map((question) => (
+                        <div key={question.id} style={styles.questionCard}>
+                            <h3>{question.title}</h3>
+                            <p>{question.mdContent}</p>
+                            <div>
+                                <strong>Tags:</strong>
+                                <ul>
+                                    {question.tags.map((tag, index) => (
+                                        <li key={index}>{tag}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <p>Posted by: {question.creatorUserName}</p>
+                            <p>Posted on: {new Date(question.postedOn).toLocaleDateString()}</p>
+                            <p>Upvotes: {question.upVotes} | Downvotes: {question.downVotes}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p>No questions found.</p>
+                )}
+            </div>
         </div>
     );
 };
@@ -85,6 +120,14 @@ const styles: { [key: string]: React.CSSProperties } = {
         display: 'flex',
         justifyContent: 'center',
         width: '100%',
+    },
+    questionCard: {
+        border: '1px solid #ccc',
+        padding: '10px',
+        margin: '10px',
+        borderRadius: '5px',
+        width: '80%',
+        boxSizing: 'border-box',
     },
 };
 
