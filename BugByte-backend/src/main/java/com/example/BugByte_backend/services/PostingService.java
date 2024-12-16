@@ -121,10 +121,11 @@ public class PostingService {
     public boolean deleteQuestion(long questionId , String userName) throws Exception{
         try {
             Post post = postingRepository.getPostByID(questionId);
-            if (! post.getCreatorUserName().equals(userName))
+            if (! post.getCreatorUserName().equals(userName)) {
                 throw new Exception("this user can't delete this post");
-            boolean res = postingRepository.deleteQuestion(questionId);
+            }
             Question question = postingRepository.getQuestionById(questionId);
+            boolean res = postingRepository.deleteQuestion(questionId);
             filteringQuestionService.deleteQuestion(question);
             return res;
         }
@@ -236,7 +237,7 @@ public class PostingService {
             Post post = postingRepository.getPostByID(answer.getQuestionId());
             if (! post.getCreatorUserName().equals(userName))
                 throw new Exception("this user can't delete this post");
-            return postingRepository.verifyAnswer(answerId);
+            return postingRepository.verifyAnswer(answerId, answer.getQuestionId());
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

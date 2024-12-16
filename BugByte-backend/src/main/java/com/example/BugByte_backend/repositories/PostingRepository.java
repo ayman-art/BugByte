@@ -1,13 +1,11 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.*;
-import org.elasticsearch.script.TimeSeries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -81,10 +79,10 @@ public class PostingRepository implements IPostingRepository{
             """;
     private static final String SQL_VERIFY_ANSWER = """
                 UPDATE questions
-                SET validated_answer = ?
+                SET validated_answer_id = ?
                 WHERE id = ?;
             """;
-    private static final String SQL_EDIT_POST = "UPDATE posts SET md_content = ? WHERE ID = ?;";
+    private static final String SQL_EDIT_POST = "UPDATE posts SET md_content = ? WHERE id = ?;";
 
     private static final String SQL_GET_QUESTIONS_BY_USERNAME = """
                 SELECT *
@@ -157,9 +155,9 @@ public class PostingRepository implements IPostingRepository{
                 JOIN posts p on p.id = r.id
                 WHERE r.id = ?;
             """;
-    private static final String SQL_GET_UP_VOTE = "SELECT * FROM upVotes WHERE userName = ? AND post_id = ?;";
+    private static final String SQL_GET_UP_VOTE = "SELECT COUNT(*) FROM upVotes WHERE userName = ? AND post_id = ?;";
 
-    private static final String SQL_GET_DOWN_VOTE = "SELECT * FROM downVotes WHERE userName = ? AND post_id = ?;";
+    private static final String SQL_GET_DOWN_VOTE = "SELECT COUNT(*) FROM downVotes WHERE userName = ? AND post_id = ?;";
 
     private static final String SQL_DELETE_UP_VOTE = "DELETE FROM upVotes WHERE userName = ? AND post_id = ?;";
     private static final String SQL_DELETE_DOWN_VOTE = "DELETE FROM downVotes WHERE userName = ? AND post_id = ?;";
@@ -242,12 +240,16 @@ public class PostingRepository implements IPostingRepository{
     public Boolean deleteQuestion(Long questionId) {
         if(questionId == null)
             throw new NullPointerException("question id is null");
+        System.out.println("errr");
         jdbcTemplate.update(SQL_DELETE_ANSWERS_BY_QUESTION_ID, questionId);
+        System.out.println("errr2");
         int rows = jdbcTemplate.update( SQL_DELETE_QUESTION_BY_ID , questionId);
+        System.out.println("errr3");
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
         jdbcTemplate.update(SQL_DELETE_POST_BY_ID, questionId);
+        System.out.println("errr4");
         return true;
     }
 
@@ -379,11 +381,11 @@ public class PostingRepository implements IPostingRepository{
     }
 
     @Override
-    public Boolean verifyAnswer(Long answerId) {
+    public Boolean verifyAnswer(Long answerId, Long questionId) {
         if(answerId == null)
             throw new NullPointerException("answer id is null");
 
-        int rows = jdbcTemplate.update( SQL_VERIFY_ANSWER, answerId);
+        int rows = jdbcTemplate.update( SQL_VERIFY_ANSWER, answerId, questionId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -394,7 +396,7 @@ public class PostingRepository implements IPostingRepository{
     public Boolean editPost(Long postId, String mdContent) {
         if (postId == null || mdContent == null)
             throw new NullPointerException("post id or md content is null");
-        int rows = jdbcTemplate.update( SQL_EDIT_POST, postId);
+        int rows = jdbcTemplate.update( SQL_EDIT_POST, mdContent, postId);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");

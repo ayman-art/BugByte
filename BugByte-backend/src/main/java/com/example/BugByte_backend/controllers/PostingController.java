@@ -1,5 +1,6 @@
 package com.example.BugByte_backend.controllers;
 import com.example.BugByte_backend.facades.InteractionFacade;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ public class PostingController {
     public ResponseEntity<?> postQuestion(@RequestHeader("Authorization") String token, @RequestParam("communityId") Long communityId, @RequestBody Map<String, Object> question) {
         token = token.replace("Bearer ", "");
         question.put("jwt", token);
-        question.put("communityId", communityId);
+        question.put("communityId", Integer.valueOf(communityId.toString()));
         System.out.println(question);
         try {
             return new ResponseEntity<>(interactionFacade.postQuestion(question), HttpStatus.OK);
@@ -28,7 +29,7 @@ public class PostingController {
     public ResponseEntity<?> postAnswer(@RequestHeader("Authorization") String token, @RequestParam("questionId") Long questionId, @RequestBody Map<String, Object> answer) {
         token = token.replace("Bearer ", "");
         answer.put("jwt", token);
-        answer.put("questionId", questionId);
+        answer.put("questionId", Integer.valueOf(questionId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.postAnswer(answer), HttpStatus.OK);
         } catch (Exception e) {
@@ -39,7 +40,7 @@ public class PostingController {
     public ResponseEntity<?> postReply(@RequestHeader("Authorization") String token, @RequestParam("answerId") Long answerId, @RequestBody Map<String, Object> reply) {
         token = token.replace("Bearer ", "");
         reply.put("jwt", token);
-        reply.put("answerId", answerId);
+        reply.put("answerId", Integer.valueOf(answerId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.postReply(reply), HttpStatus.OK);
         } catch (Exception e) {
@@ -49,7 +50,7 @@ public class PostingController {
     @GetMapping("questions")
     public ResponseEntity<?> getQuestion(@RequestHeader("Authorization") String token, @RequestParam("questionId") Long questionId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> questionData = Map.of("jwt", token, "questionId", questionId);
+        Map<String, Object> questionData = Map.of("jwt", token, "questionId", Integer.valueOf(questionId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.getQuestion(questionData), HttpStatus.OK);
         } catch (Exception e) {
@@ -60,7 +61,7 @@ public class PostingController {
     public ResponseEntity<?> getAnswers(@RequestHeader("Authorization") String token, @RequestParam("questionId") Long questionId,
                                         @RequestParam(value = "offset", defaultValue = "0") int offset, @RequestParam(value = "limit", defaultValue = "10") int limit) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> answerData = Map.of("jwt", token, "questionId", questionId, "offset", offset, "limit", limit);
+        Map<String, Object> answerData = Map.of("jwt", token, "questionId", Integer.valueOf(questionId.toString()), "offset", offset, "limit", limit);
         try {
             return new ResponseEntity<>(interactionFacade.getAnswersForQuestion(answerData), HttpStatus.OK);
         } catch (Exception e) {
@@ -71,7 +72,7 @@ public class PostingController {
     public ResponseEntity<?> getReplies(@RequestHeader("Authorization") String token, @RequestParam("answerId") Long answerId,
                                         @RequestParam(value = "offset", defaultValue = "0") int offset, @RequestParam(value = "limit", defaultValue = "10") int limit) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> replyData = Map.of("jwt", token, "answerId", answerId, "offset", offset, "limit", limit);
+        Map<String, Object> replyData = Map.of("jwt", token, "answerId", Integer.valueOf(answerId.toString()), "offset", offset, "limit", limit);
         try {
             return new ResponseEntity<>(interactionFacade.getRepliesForAnswer(replyData), HttpStatus.OK);
         } catch (Exception e) {
@@ -82,7 +83,7 @@ public class PostingController {
     public ResponseEntity<?> updateQuestion(@RequestHeader("Authorization") String token, @RequestParam("questionId") Long questionId, @RequestBody Map<String, Object> question) {
         token = token.replace("Bearer ", "");
         question.put("jwt", token);
-        question.put("questionId", questionId);
+        question.put("questionId", Integer.valueOf(questionId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.editPost(question), HttpStatus.OK);
         } catch (Exception e) {
@@ -93,7 +94,7 @@ public class PostingController {
     public ResponseEntity<?> updateAnswer(@RequestHeader("Authorization") String token, @RequestParam("answerId") Long answerId, @RequestBody Map<String, Object> answer) {
         token = token.replace("Bearer ", "");
         answer.put("jwt", token);
-        answer.put("answerId", answerId);
+        answer.put("postId", Integer.valueOf(answerId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.editPost(answer), HttpStatus.OK);
         } catch (Exception e) {
@@ -104,7 +105,7 @@ public class PostingController {
     public ResponseEntity<?> updateReply(@RequestHeader("Authorization") String token, @RequestParam("replyId") Long replyId, @RequestBody Map<String, Object> reply) {
         token = token.replace("Bearer ", "");
         reply.put("jwt", token);
-        reply.put("replyId", replyId);
+        reply.put("postId", Integer.valueOf(replyId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.editPost(reply), HttpStatus.OK);
         } catch (Exception e) {
@@ -114,9 +115,11 @@ public class PostingController {
     @DeleteMapping("questions")
     public ResponseEntity<?> deleteQuestion(@RequestHeader("Authorization") String token, @RequestParam("questionId") Long questionId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> questionData = Map.of("jwt", token, "questionId", questionId);
+        Map<String, Object> questionData = Map.of("jwt", token, "questionId", Integer.valueOf(questionId.toString()));
         try {
-            return new ResponseEntity<>(interactionFacade.deleteQuestion(questionData), HttpStatus.OK);
+
+            interactionFacade.deleteQuestion(questionData);
+            return new ResponseEntity<>(Map.of("message", "Question deleted successfully"), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
@@ -124,7 +127,7 @@ public class PostingController {
     @DeleteMapping("answers")
     public ResponseEntity<?> deleteAnswer(@RequestHeader("Authorization") String token, @RequestParam("answerId") Long answerId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> answerData = Map.of("jwt", token, "answerId", answerId);
+        Map<String, Object> answerData = Map.of("jwt", token, "answerId", Integer.valueOf(answerId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.deleteAnswer(answerData), HttpStatus.OK);
         } catch (Exception e) {
@@ -134,7 +137,7 @@ public class PostingController {
     @DeleteMapping("replies")
     public ResponseEntity<?> deleteReply(@RequestHeader("Authorization") String token, @RequestParam("replyId") Long replyId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> replyData = Map.of("jwt", token, "replyId", replyId);
+        Map<String, Object> replyData = Map.of("jwt", token, "replyId", Integer.valueOf(replyId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.deleteReply(replyData), HttpStatus.OK);
         } catch (Exception e) {
@@ -144,7 +147,7 @@ public class PostingController {
     @PutMapping("upvoteQuestion")
     public ResponseEntity<?> upvoteQuestion(@RequestHeader("Authorization") String token, @RequestParam("postId") Long postId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> postData = Map.of("jwt", token, "questionId", postId);
+        Map<String, Object> postData = Map.of("jwt", token, "questionId", Integer.valueOf(postId.toString()));
 
         try {
             interactionFacade.upVoteQuestion(postData);
@@ -157,7 +160,7 @@ public class PostingController {
     @PutMapping("removeUpvoteQuestion")
     public ResponseEntity<?> removeUpvoteQuestion(@RequestHeader("Authorization") String token, @RequestParam("postId") Long postId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> postData = Map.of("jwt", token, "questionId", postId);
+        Map<String, Object> postData = Map.of("jwt", token, "questionId", Integer.valueOf(postId.toString()));
 
         try {
             interactionFacade.removeUpVoteQuestion(postData);
@@ -170,7 +173,7 @@ public class PostingController {
     @PutMapping("downvoteQuestion")
     public ResponseEntity<?> downvoteQuestion(@RequestHeader("Authorization") String token, @RequestParam("postId") Long postId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> postData = Map.of("jwt", token, "questionId", postId);
+        Map<String, Object> postData = Map.of("jwt", token, "questionId", Integer.valueOf(postId.toString()));
 
         try {
             interactionFacade.downVoteQuestion(postData);
@@ -183,7 +186,7 @@ public class PostingController {
     @PutMapping("removeDownvoteQuestion")
     public ResponseEntity<?> removeDownvoteQuestion(@RequestHeader("Authorization") String token, @RequestParam("postId") Long postId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> postData = Map.of("jwt", token, "questionId", postId);
+        Map<String, Object> postData = Map.of("jwt", token, "questionId", Integer.valueOf(postId.toString()));
 
         try {
             interactionFacade.removeDownVoteQuestion(postData);
@@ -196,7 +199,7 @@ public class PostingController {
     @PutMapping("upvoteAnswer")
     public ResponseEntity<?> upvoteAnswer(@RequestHeader("Authorization") String token, @RequestParam("postId") Long postId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> postData = Map.of("jwt", token, "answerId", postId);
+        Map<String, Object> postData = Map.of("jwt", token, "answerId", Integer.valueOf(postId.toString()));
 
         try {
             interactionFacade.upVoteAnswer(postData);
@@ -209,7 +212,7 @@ public class PostingController {
     @PutMapping("removeUpvoteAnswer")
     public ResponseEntity<?> removeUpvoteAnswer(@RequestHeader("Authorization") String token, @RequestParam("postId") Long postId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> postData = Map.of("jwt", token, "answerId", postId);
+        Map<String, Object> postData = Map.of("jwt", token, "answerId", Integer.valueOf(postId.toString()));
 
         try {
             interactionFacade.removeUpVoteAnswer(postData);
@@ -222,7 +225,7 @@ public class PostingController {
     @PutMapping("downvoteAnswer")
     public ResponseEntity<?> downvoteAnswer(@RequestHeader("Authorization") String token, @RequestParam("postId") Long postId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> postData = Map.of("jwt", token, "answerId", postId);
+        Map<String, Object> postData = Map.of("jwt", token, "answerId", Integer.valueOf(postId.toString()));
 
         try {
             interactionFacade.downVoteAnswer(postData);
@@ -235,7 +238,7 @@ public class PostingController {
     @PutMapping("removeDownvoteAnswer")
     public ResponseEntity<?> removeDownvoteAnswer(@RequestHeader("Authorization") String token, @RequestParam("postId") Long postId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> postData = Map.of("jwt", token, "answerId", postId);
+        Map<String, Object> postData = Map.of("jwt", token, "answerId", Integer.valueOf(postId.toString()));
 
         try {
             interactionFacade.removeDownVoteAnswer(postData);
@@ -250,7 +253,7 @@ public class PostingController {
     @PostMapping("answers/verify")
     public ResponseEntity<?> verifyAnswer(@RequestHeader("Authorization") String token, @RequestParam("answerId") Long answerId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> answerData = Map.of("jwt", token, "answerId", answerId);
+        Map<String, Object> answerData = Map.of("jwt", token, "answerId", Integer.valueOf(answerId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.verifyAnswer(answerData), HttpStatus.OK);
         } catch (Exception e) {
@@ -261,7 +264,7 @@ public class PostingController {
     @GetMapping("answers/{answerId}")
     public ResponseEntity<?> getAnswer(@RequestHeader("Authorization") String token, @PathVariable("answerId") Long answerId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> answerData = Map.of("jwt", token, "answerId", answerId);
+        Map<String, Object> answerData = Map.of("jwt", token, "answerId", Integer.valueOf(answerId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.getAnswer(answerData), HttpStatus.OK);
         } catch (Exception e) {
@@ -272,7 +275,7 @@ public class PostingController {
     @GetMapping("replies/{replyId}")
     public ResponseEntity<?> getReply(@RequestHeader("Authorization") String token, @PathVariable("replyId") Long replyId) {
         token = token.replace("Bearer ", "");
-        Map<String, Object> replyData = Map.of("jwt", token, "replyId", replyId);
+        Map<String, Object> replyData = Map.of("jwt", token, "replyId", Integer.valueOf(replyId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.getReply(replyData), HttpStatus.OK);
         } catch (Exception e) {
@@ -280,7 +283,7 @@ public class PostingController {
         }
     }
 
-    @GetMapping("userQuestions")
+    @GetMapping("questions/userQuestions")
     public ResponseEntity<?> getUserQuestions(@RequestHeader("Authorization") String token,
                                               @RequestParam("limit") int limit,
                                               @RequestParam("offset") int offset) {
@@ -291,24 +294,24 @@ public class PostingController {
             List<Map<String, Object>> questions = interactionFacade.getUserQuestions(userData);
             return new ResponseEntity<>(questions, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("message", "Error fetching user questions"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("communityQuestions")
+    @GetMapping("questions/communityQuestions")
     public ResponseEntity<?> getCommunityQuestions(@RequestHeader("Authorization") String token,
                                                    @RequestParam("communityId") Long communityId,
                                                    @RequestParam("limit") int limit,
                                                    @RequestParam("offset") int offset) {
         Map<String, Object> communityData = Map.of("jwt", token.replace("Bearer ", ""),
-                "communityId", communityId,
+                "communityId", Integer.valueOf(communityId.toString()),
                 "limit", limit,
                 "offset", offset);
         try {
             List<Map<String, Object>> questions = interactionFacade.getCommunityQuestions(communityData);
             return new ResponseEntity<>(questions, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(Map.of("message", "Error fetching community questions"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
