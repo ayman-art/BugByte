@@ -9,7 +9,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
   const navigate = useNavigate()
-  const visitProfile = ()=>{
+  const visitProfile = () => {
     const username = localStorage.getItem("name");
     navigate(`/Profile/${username}`)
   }
