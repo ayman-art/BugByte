@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SearchAndTagFields from '../components/SearchAndTagFields';
-import CommunityPost from '../layouts/questionLayout';
+import CommunityPost from '../components/QuestionPreview.tsx';
 import { sendRequest } from '../components/SearchAndTagFields';
 import { Question } from '../Models/Question';
-import CommunityPost from '../components/QuestionPreview';
 import { Container } from 'lucide-react';
 
 const HomePage: React.FC = () => {
@@ -26,6 +25,7 @@ const HomePage: React.FC = () => {
             if(!(searchValue==="" && tagValue==="")){
             const fetchedQuestions = await sendRequest(searchValue, tagValue, "home",page,size);
             setQuestions(fetchedQuestions);
+            console.log(fetchedQuestions);
             //setTagValue("");
             //setSearchValue("");
             }
