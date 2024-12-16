@@ -33,9 +33,12 @@ public class SearchingFilteringController {
             token = token.replace("Bearer ", "");
             Claims claim = AuthenticationService.parseToken(token);
 
+            System.out.println("Before");
             Page<Question> questionPage = questionService.searchQuestions(content, page, size);
+            System.out.println("after");
             List<Question> list = questionPage.getContent();
-
+            System.out.println(list);
+            System.out.println("Hello");
             Map<String, Object> data = Map.of("questions", list);
             return new ResponseEntity<>(data, HttpStatus.OK);
         } catch (Exception e) {

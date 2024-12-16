@@ -2,8 +2,6 @@ import React from 'react';
 import '../styles/SearchAndTagFields.css';
 import {searchCommunities , searchQuestions} from '../API/Search.tsx';
 import {searchFilteredCommunities , searchFilteredQuestions} from '../API/Filter.tsx';
-import { Question } from '../Models/Question';
-import { Community } from '../Models/Community';
 
 interface SearchAndTagFieldsProps {
     searchValue: string;
@@ -14,7 +12,8 @@ interface SearchAndTagFieldsProps {
 }
 export const sendRequest = (searchValue: string, tagValue: string, source: string,page:number,size:number) => {
     if (source === "home" && tagValue === "") {
-        return searchQuestions(searchValue, page,size);
+        const token = localStorage.getItem('authToken')
+        return searchQuestions(searchValue, page,size, token!);
     } else if (source === "home" && tagValue !== "") {
         return searchFilteredQuestions(tagValue, page, size);
     } else if (source === "community" && tagValue === "") {

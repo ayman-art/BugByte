@@ -1,4 +1,4 @@
-interface Question {
+export interface Question {
   id: number;
   creatorUserName: string;
   mdContent: string;

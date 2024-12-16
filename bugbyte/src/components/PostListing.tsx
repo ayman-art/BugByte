@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CommunityPost from "./QuestionPreview";
 
 interface Post {
   id: string;
   communityId: number;
   title: string;
-  creatoruserName: string;
+  creatorUserName: string;
   mdContent: string;
   upVotes: number;
   downVotes: number;
@@ -18,15 +18,23 @@ interface PostListingProps {
   hasMore: boolean;
 }
 
-const PostListing: React.FC<PostListingProps> = ({ posts, fetchPosts, loading, hasMore }) => {
+const PostListing: React.FC<PostListingProps> = ({
+  posts,
+  fetchPosts,
+  loading,
+  hasMore,
+}) => {
+  const [lock, setLock] = useState<boolean>(false)
   const loader = useRef<HTMLDivElement>(null);
 
   // Observe when the loader div comes into view
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchPosts(); // Fetch posts when loader is visible
+       async (entries) => {
+        if (entries[0].isIntersecting && hasMore && !lock ) {
+          setLock(true)
+          await fetchPosts(); // Fetch posts when loader is visible
+          setLock(false)
         }
       },
       { threshold: 1.0 }
@@ -43,12 +51,12 @@ const PostListing: React.FC<PostListingProps> = ({ posts, fetchPosts, loading, h
 
   return (
     <div>
-      {posts.map((post) => (
+      {posts.map((post, index) => (
         <CommunityPost
-          key={post.id}
+          key={`${post.id}+${index}`}
           postId={post.id}
           communityName={`${post.communityId}`}
-          authorName={post.creatoruserName}
+          authorName={post.creatorUserName}
           content={post.mdContent}
           upvotes={post.upVotes}
           downvotes={post.downVotes}

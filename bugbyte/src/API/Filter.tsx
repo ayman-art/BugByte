@@ -1,6 +1,6 @@
 import { API_URLS } from './ApiUrls';
 import { Question } from '../Models/Question';
-import { Community } from '../Models/Community';
+import { Community } from '../Models/Community.tsx';
 
 const getAuthToken = (): string => {
   const authToken = localStorage.getItem('authToken');
