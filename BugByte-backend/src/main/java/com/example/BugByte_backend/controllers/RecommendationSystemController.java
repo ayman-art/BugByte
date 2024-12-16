@@ -19,6 +19,7 @@ public class RecommendationSystemController {
 
     @GetMapping("/feed")
     public ResponseEntity<?> getFeed(@RequestHeader("Authorization") String token,
+                                     @RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int size) {
         try {
             List<Question> feed = recommendationSystemService.generateFeedForUser(token, size);
