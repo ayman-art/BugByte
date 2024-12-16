@@ -22,6 +22,16 @@ interface Post {
 const Profile: React.FC = () => {
   const navigate = useNavigate()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const visitFollowers = () => {
+    const username = localStorage.getItem("name");
+    navigate(`/Profile/${username}/Followers`)
+  }
+  const visitFollowings = () => {
+    const username = localStorage.getItem("name");
+    navigate(`/Profile/${username}/Followings`)
+  }
+  
   const {userName} = useParams<{ userName: string }>();
   const [topPosts, setTopPosts] = useState<Post[]>([
     {
@@ -182,7 +192,99 @@ const Profile: React.FC = () => {
     return <div style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}>Error loading profile. Please try again later.</div>;
   }
 
-  
+  const styles = {
+    errorMessge: {
+      color: 'red',
+      fontSize: '12px', 
+      marginTop: '10px', 
+      textAlign: 'center' as 'center', 
+    },
+    container: {
+      margin: '0 auto',
+      padding: '20px',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '10px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      fontFamily: 'Arial, sans-serif',
+    },
+    header: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '20px',
+      marginBottom: '20px',
+      justifyContent: 'space-between', // Add space between the profile info and the buttons
+    },
+    profilePicture: {
+      width: '100px',
+      height: '100px',
+      borderRadius: '50%',
+      border: '2px solid #ddd',
+    },
+    profileInfo: {
+      margin: 0,
+    },
+    followStats: {
+      display: 'flex',
+      gap: '20px',
+      fontSize: '14px',
+      color: '#555',
+      cursor:'pointer'
+    },
+    bio: {
+      marginBottom: '20px',
+      padding: '10px',
+      backgroundColor: '#eaeaea',
+      borderRadius: '8px',
+    },
+    posts: {
+      marginTop: '20px',
+    },
+    post: {
+      backgroundColor: '#fff',
+      padding: '10px',
+      marginBottom: '10px',
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+    },
+    openButton: {
+      padding: '8px 12px',
+      fontSize: '14px',
+      borderRadius: '5px',
+      border: 'none',
+      cursor: 'pointer',
+    },
+    editButton: {
+      backgroundColor: '#ADD8E6', // Light blue
+      color: '#333',
+      display: 'flex',
+      alignItems: 'center',
+      fontSize: '14px',
+      fontWeight: 'bold',
+    },
+    postTitle: {
+      margin: '0 0 5px 0',
+      fontSize: '16px',
+    },
+    postContent: {
+      margin: 0,
+      fontSize: '14px',
+      color: '#555',
+    },
+    button: {
+      padding: '8px 12px',
+      border: 'none',
+      borderRadius: '5px',
+      cursor: 'pointer',
+    },
+    followButton: {
+      backgroundColor: '#4caf50',
+      color: 'white',
+    },
+    adminButton: {
+      backgroundColor: '#f44336',
+      color: 'white',
+    },
+  };
 
   return (
       <div style={styles.container}>
@@ -271,8 +373,8 @@ const Profile: React.FC = () => {
             <h1>{userProfile.username}</h1>
             <p>Reputation: {userProfile.reputation}</p>
             <div style={styles.followStats}>
-              <p>Followers: {userProfile.followers}</p>
-              <p>Following: {userProfile.following}</p>
+              <li onClick={visitFollowers}>Followers: {userProfile.followers}</li>
+              <li onClick={visitFollowings}>Following: {userProfile.following}</li>
             </div>
           </div>
         </div>
