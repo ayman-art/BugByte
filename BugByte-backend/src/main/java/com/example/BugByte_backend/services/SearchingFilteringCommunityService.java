@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class SearchingFilteringCommunityService {
+public class SearchingFilteringCommunityService  {
     @Autowired
     private SearchingFilteringCommunityRepository communityRepository;
 
