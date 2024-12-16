@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import PostListing from "../components/PostListing";
-import { fetchJoinedCommunities } from "../API/HomeAPI";
 import SearchAndTagFields, {
   sendRequest,
 } from "../components/SearchAndTagFields";
@@ -19,7 +18,7 @@ const QuestionSearchPage: React.FC = () => {
   const [posts, setPosts] = useState<Question[]>([]); // List of posts
   const [page, setPage] = useState(1); // Current page
   const [loading, setLoading] = useState(false); // Loading state
-  const [hasMore, setHasMore] = useState(true); // If more posts are available
+  const [hasMore, setHasMore] = useState(false); // If more posts are available
   const [searchValue, setSearchValue] = useState("");
   const [tagValue, setTagValue] = useState("");
   //   const [questions, setQuestions] = useState<Question[]>([]);
@@ -35,7 +34,21 @@ const QuestionSearchPage: React.FC = () => {
 
   const handleSearchClick = async () => {
     try {
+      console.log("CLICKED");
+      setPosts([]);
+      setLoading(false);
       setHasMore(true);
+      setPage(0);
+
+      await fetchPosts();
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    }
+  };
+  // Fetch posts from the API
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
       if (!(searchValue === "" && tagValue === "")) {
         const fetchedQuestions = await sendRequest(
           searchValue,
@@ -52,28 +65,7 @@ const QuestionSearchPage: React.FC = () => {
           console.log(page);
         }
         console.log(fetchedQuestions);
-        //   setPage((prevPage) => prevPage + 1); // Increment page
-        //setTagValue("");
-        //setSearchValue("");
       }
-    } catch (error) {
-      console.error("Error fetching questions:", error);
-    }
-  };
-  // Fetch posts from the API
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      await handleSearchClick();
-      // const feed = posts;
-
-      // if (feed.length === 0) {
-      //   setHasMore(false); // No more posts
-      // } else {
-      //   setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
-      //   setPage((prevPage) => prevPage + 1); // Increment page
-      //   console.log(page);
-      // }
     } catch (error) {
       console.error("Failed to fetch posts:", error);
     } finally {
@@ -86,7 +78,7 @@ const QuestionSearchPage: React.FC = () => {
       try {
         setPage(0);
         setHasMore(false);
-        await fetchJoinedCommunities();
+        await handleSearchClick();
         // await fetchPosts(); // Initial post fetch
       } catch (error) {
         console.error("Error during initialization:", error);

@@ -16,6 +16,8 @@ import { authorizeToken, saveData } from "./API/HomeAPI";
 import Layout from "./layouts/MainLayout";
 import TestPage from "./pages/TestPage";
 import CommunityPage from "./pages/CommunityPage";
+import { Home } from "lucide-react";
+import HomePage from "./pages/HomePage";
 
 const isLoggedIn = false;
 
@@ -65,7 +67,7 @@ const App: React.FC = () => {
               path="/"
               element={
                 <Layout onLogout={handleLogout}>
-                  <QuestionSearchPage />
+                  <HomePage />
                 </Layout>
               }
             />

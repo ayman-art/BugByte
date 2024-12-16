@@ -24,17 +24,18 @@ const PostListing: React.FC<PostListingProps> = ({
   loading,
   hasMore,
 }) => {
-  const [lock, setLock] = useState<boolean>(false)
+  const [lock, setLock] = useState<boolean>(false);
   const loader = useRef<HTMLDivElement>(null);
 
   // Observe when the loader div comes into view
   useEffect(() => {
     const observer = new IntersectionObserver(
-       async (entries) => {
-        if (entries[0].isIntersecting && hasMore && !lock ) {
-          setLock(true)
+      async (entries) => {
+        if (entries[0].isIntersecting && hasMore && !lock) {
+          console.log(hasMore);
+          setLock(true);
           await fetchPosts(); // Fetch posts when loader is visible
-          setLock(false)
+          setLock(false);
         }
       },
       { threshold: 1.0 }
