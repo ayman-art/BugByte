@@ -19,5 +19,6 @@ export const API_URLS = {
   UPVOTE:`${API_BASE_URL}/upvote`,
   DOWNVOTE:`${API_BASE_URL}/downvote`,
   UPLOAD_IMAGE: `${API_BASE_URL}/images/upload`,
-  UPDATE_PROFILE_PICTURE: `${API_BASE_URL}/users/update-picture`
+  UPDATE_PROFILE_PICTURE: `${API_BASE_URL}/users/update-picture`,
+  CREATE_COMMUNITY: `${API_BASE_URL}/communities/createCommunity`
 };

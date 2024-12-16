@@ -4,10 +4,7 @@ import com.example.BugByte_backend.facades.AdministrativeFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,10 +25,12 @@ public class CommunityController {
         }
     }
     @PostMapping("/createCommunity")
-    public ResponseEntity<?> createCommunity(@RequestBody Map<String, Object> communityData) {
+    public ResponseEntity<?> createCommunity(@RequestBody Map<String, Object> communityData ,@RequestHeader("Authorization") String token) {
         try {
-            if(administrativeFacade.createCommunity(communityData))
-            return new ResponseEntity<>("Community Created Successfully" , HttpStatus.OK);
+            token = token.replace("Bearer ", "");
+            communityData.put("jwt", token);
+            if (administrativeFacade.createCommunity(communityData))
+                return new ResponseEntity<>("Community Created Successfully" , HttpStatus.OK);
             else {
                 return new ResponseEntity<>("error creating community", HttpStatus.BAD_REQUEST);
             }
