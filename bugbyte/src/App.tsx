@@ -16,6 +16,7 @@ import { authorizeToken, saveData } from "./API/HomeAPI";
 import Layout from "./layouts/MainLayout";
 import TestPage from "./pages/TestPage";
 import CommunityPage from "./pages/CommunityPage";
+import PostPage from "./pages/PostPage";
 
 const isLoggedIn = false;
 
@@ -96,6 +97,13 @@ const App: React.FC = () => {
             {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
             <Route path="/SignUp" element={<Navigate to="/" />} />
             <Route path="/LogIn" element={<Navigate to="/" />} />
+            <Route path="/Posts/:postId" 
+              element={
+                <Layout onLogout={handleLogout}>
+                  <PostPage />
+                </Layout>
+              }
+            />
             <Route
               path="/Search"
               element={

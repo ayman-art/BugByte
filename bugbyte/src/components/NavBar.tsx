@@ -6,16 +6,38 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Cursor } from 'react-simple-typewriter';
 import { updateProfilePicture } from '../API/ProfileAPI';
 import { API_URLS } from '../API/ApiUrls';
+import PostModal from './PostModal';
 interface NavbarProps {
   onLogout: () => void;
 }
-const Navbar: React.FC<NavbarProps> = ({onLogout}) => {
+
+interface PostDetails {
+  title?: string; 
+  content: string; 
+  community?: string; 
+  tags?: string[] 
+}
+const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+
+  
+
+  
   const [profilePicFetched, setProfilePic] = useState<string | null>(null)
   const visitProfile = ()=>{
     const username = localStorage.getItem("name");
     navigate(`/Profile/${username}`)
   }
-  const navigate = useNavigate()
+
+
+  const handleSavePost = (postDetails: PostDetails) => {
+    console.log('Post saved:', postDetails);
+ 
+    const id = 1
+    navigate(`/Posts/${id}`);
+  };
+
   // useEffect(()=>{
   //   async function fetchPicture(): Promise<void>{
       
@@ -45,7 +67,11 @@ const Navbar: React.FC<NavbarProps> = ({onLogout}) => {
       </div>
 
       {/* Profile and Logout */}
+      
       <div style={styles.rightContainer}>
+      <button style={styles.plusButton} onClick={() => setShowModal(true)}>
+          +
+      </button>
       <img 
         src={profilePicFetched || profilePath} alt="Profile" 
         style={styles.profileIcon}
