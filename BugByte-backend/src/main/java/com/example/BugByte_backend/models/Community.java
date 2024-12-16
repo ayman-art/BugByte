@@ -1,6 +1,10 @@
 package com.example.BugByte_backend.models;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,17 +17,25 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Document(indexName = "community")
 public class Community {
+    @Id
+    @Field(type = FieldType.Long)
     private Long id;
 
+    @Field(type = FieldType.Text, analyzer = "standard", searchAnalyzer = "standard")
     private String name;
 
+    @Field(type = FieldType.Text, analyzer = "standard", searchAnalyzer = "standard")
     private String description;
 
+    @Field(type = FieldType.Long)
     private Long adminId;
 
+    @Field(type = FieldType.Date)
     private Date creationDate = new Date();
 
+    @Field(type = FieldType.Keyword)
     private List<String> tags = new ArrayList<>();
 
     public Community(String name, String description, Long adminId, Date creationDate) {
