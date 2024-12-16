@@ -9,16 +9,11 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
-  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [communityName, setCommunityName] = useState('');
   const [description, setDescription] = useState('');
   const [error, setError] = useState(''); // State for error handling
 
-  const visitProfile = () => {
-    const username = localStorage.getItem('name');
-    navigate(`/Profile/${username}`);
-  };
 
   const navigate = useNavigate()
   const visitProfile = () => {

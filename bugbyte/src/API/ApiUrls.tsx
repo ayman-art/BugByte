@@ -20,5 +20,6 @@ export const API_URLS = {
   DOWNVOTE:`${API_BASE_URL}/downvote`,
   UPLOAD_IMAGE: `${API_BASE_URL}/images/upload`,
   UPDATE_PROFILE_PICTURE: `${API_BASE_URL}/users/update-picture`,
-  CREATE_COMMUNITY: `${API_BASE_URL}/communities/createCommunity`
+  CREATE_COMMUNITY: `${API_BASE_URL}/communities/createCommunity`,
+  GET_FEED: `${API_BASE_URL}/recommendation/feed`,
 };
