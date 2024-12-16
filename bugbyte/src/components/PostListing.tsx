@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CommunityPost from "./QuestionPreview";
 
 interface Post {
@@ -24,14 +24,17 @@ const PostListing: React.FC<PostListingProps> = ({
   loading,
   hasMore,
 }) => {
+  const [lock, setLock] = useState<boolean>(false)
   const loader = useRef<HTMLDivElement>(null);
 
   // Observe when the loader div comes into view
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          fetchPosts(); // Fetch posts when loader is visible
+       async (entries) => {
+        if (entries[0].isIntersecting && hasMore && !lock ) {
+          setLock(true)
+          await fetchPosts(); // Fetch posts when loader is visible
+          setLock(false)
         }
       },
       { threshold: 1.0 }
