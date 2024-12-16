@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import PostListing from "../components/PostListing";
-import { getFeed } from "../API/FeedApi";
 import { fetchJoinedCommunities } from "../API/HomeAPI";
 import SearchAndTagFields, {
   sendRequest,
@@ -16,15 +15,15 @@ interface Question {
   downVotes: number;
 }
 
-const HomePage: React.FC = () => {
+const QuestionSearchPage: React.FC = () => {
   const [posts, setPosts] = useState<Question[]>([]); // List of posts
   const [page, setPage] = useState(1); // Current page
   const [loading, setLoading] = useState(false); // Loading state
   const [hasMore, setHasMore] = useState(true); // If more posts are available
   const [searchValue, setSearchValue] = useState("");
   const [tagValue, setTagValue] = useState("");
-  const [questions, setQuestions] = useState<Question[]>([]);
-  let size = 10;
+  //   const [questions, setQuestions] = useState<Question[]>([]);
+  let size = 1;
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
@@ -36,6 +35,7 @@ const HomePage: React.FC = () => {
 
   const handleSearchClick = async () => {
     try {
+      setHasMore(true);
       if (!(searchValue === "" && tagValue === "")) {
         const fetchedQuestions = await sendRequest(
           searchValue,
@@ -44,8 +44,15 @@ const HomePage: React.FC = () => {
           page,
           size
         );
-        setQuestions(fetchedQuestions);
+        if (fetchedQuestions.length === 0) {
+          setHasMore(false); // No more posts
+        } else {
+          setPosts((prevPosts) => [...prevPosts, ...fetchedQuestions]); // Append new posts
+          setPage((prevPage) => prevPage + 1); // Increment page
+          console.log(page);
+        }
         console.log(fetchedQuestions);
+        //   setPage((prevPage) => prevPage + 1); // Increment page
         //setTagValue("");
         //setSearchValue("");
       }
@@ -57,15 +64,16 @@ const HomePage: React.FC = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("authToken");
-      const feed = await getFeed(token!);
+      await handleSearchClick();
+      // const feed = posts;
 
-      if (feed.length === 0) {
-        setHasMore(false); // No more posts
-      } else {
-        setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
-        setPage((prevPage) => prevPage + 1); // Increment page
-      }
+      // if (feed.length === 0) {
+      //   setHasMore(false); // No more posts
+      // } else {
+      //   setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
+      //   setPage((prevPage) => prevPage + 1); // Increment page
+      //   console.log(page);
+      // }
     } catch (error) {
       console.error("Failed to fetch posts:", error);
     } finally {
@@ -76,8 +84,10 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const initialize = async () => {
       try {
+        setPage(0);
+        setHasMore(false);
         await fetchJoinedCommunities();
-        await fetchPosts(); // Initial post fetch
+        // await fetchPosts(); // Initial post fetch
       } catch (error) {
         console.error("Error during initialization:", error);
       }
@@ -88,7 +98,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
-      <h1>Home</h1>
       <div style={styles.searchSection}>
         <SearchAndTagFields
           searchValue={searchValue}
@@ -108,7 +117,7 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default QuestionSearchPage;
 
 // Styles for the page
 const styles: { [key: string]: React.CSSProperties } = {

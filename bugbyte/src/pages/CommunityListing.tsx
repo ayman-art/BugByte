@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import MDEditor from '../components/MDEditor';
 import MDViewer from '../components/MDViewer';
-import { Community } from '../Models/Community';
+import { Community } from '../Models/Community.tsx';
 
 const CommunityListing: React.FC = () => {
         const [searchValue, setSearchValue] = useState('');
