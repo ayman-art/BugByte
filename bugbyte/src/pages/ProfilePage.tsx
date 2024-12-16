@@ -3,7 +3,6 @@ import profilePath from '../assets/user-profile.svg';
 import TextPopUp from '../components/BioPopup'
 import { followUser, getProfile, makeAdmin, unfollowUser, updateBio, updateProfilePicture } from '../API/ProfileAPI';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useNavbar } from '@nextui-org/navba
 interface UserProfile {
   username: string;
   reputation: number;
