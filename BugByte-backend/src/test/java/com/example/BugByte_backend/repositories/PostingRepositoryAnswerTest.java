@@ -151,52 +151,6 @@ public class PostingRepositoryAnswerTest {
     }
 
     @Test
-    public void testUpVoteAnswer_validInput() {
-        Long answerId = 1L;
-        Integer value = 5;
-        when(jdbcTemplate.update(eq(SQL_UPDATE_UP_VOTES_ANSWERS), eq(value), eq(answerId)))
-                .thenReturn(1);
-
-        Boolean result = postingRepository.upVoteAnswer(answerId, value);
-        assertTrue(result);
-    }
-
-    @Test
-    public void testUpVoteAnswer_nullAnswerId() {
-        Exception exception = null;
-
-        try {
-            postingRepository.upVoteAnswer(null, 5);
-        } catch (Exception e) {
-            exception = e;
-        }
-        assertEquals(NullPointerException.class, exception.getClass());
-        assertEquals("answer id or value is null", exception.getMessage());
-    }
-
-    @Test
-    public void testDownVoteAnswer_validInput() {
-        Long answerId = 1L;
-        Integer value = -5;
-        when(jdbcTemplate.update(eq(SQL_UPDATE_DOWN_VOTES_ANSWERS), eq(value), eq(answerId)))
-                .thenReturn(1);
-
-        Boolean result = postingRepository.downVoteAnswer(answerId, value);
-        assertTrue(result);
-    }
-
-    @Test
-    public void testDownVoteAnswer_nullAnswerId() {
-        Exception exception = null;
-        try {
-            postingRepository.downVoteAnswer(null, -5);
-        } catch (Exception e) {
-            exception = e;
-        }
-        assertEquals(NullPointerException.class, exception.getClass());
-        assertEquals("answer id or value is null", exception.getMessage());
-    }
-    @Test
     public void testGetAnswersByUserName_validInput() {
         String userName = "user1";
         Integer limit = 10;

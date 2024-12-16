@@ -33,6 +33,46 @@ public class UserServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
+    @Test
+    void testUpdatePicture_Success() throws Exception {
+        // Arrange
+        long userId = 1L;
+        String pictureURL = "https://example.com/picture.jpg";
+        User mockUser = new User();
+        mockUser.setId(userId);
+        mockUser.setPicture(pictureURL);
+
+        when(userRepositoryMock.findById(userId)).thenReturn(mockUser);
+
+        // Act
+        userService.updatePicture(userId, pictureURL);
+
+        // Assert
+        verify(userRepositoryMock).updateProfilePicture(userId, pictureURL);
+        verify(userRepositoryMock).findById(userId);
+        // Assuming cacheUser is a private method, verify its behavior indirectly
+    }
+
+
+    @Test
+    void testUpdatePicture_RepositoryThrowsException() throws Exception {
+        // Arrange
+        long userId = 1L;
+        String pictureURL = "https://example.com/picture.jpg";
+
+        doThrow(new RuntimeException("Database error"))
+                .when(userRepositoryMock).updateProfilePicture(userId, pictureURL);
+
+        // Act & Assert
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            userService.updatePicture(userId, pictureURL);
+        });
+
+        assertEquals("Database error", exception.getMessage());
+        verify(userRepositoryMock).updateProfilePicture(userId, pictureURL);
+        verify(userRepositoryMock, never()).findById(userId);
+    }
     //test getProfile user exists
     @Test
     public void testGetProfile_UserExists() throws Exception {

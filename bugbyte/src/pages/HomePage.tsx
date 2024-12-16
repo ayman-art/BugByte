@@ -3,6 +3,7 @@ import SearchAndTagFields from '../components/SearchAndTagFields';
 import CommunityPost from '../layouts/questionLayout';
 import { sendRequest } from '../components/SearchAndTagFields';
 import { Question } from '../Models/Question';
+import CommunityPost from '../components/QuestionPreview';
 import { Container } from 'lucide-react';
 
 const HomePage: React.FC = () => {

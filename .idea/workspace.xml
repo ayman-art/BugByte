@@ -4,11 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+
     <list default="true" id="a1dba11b-1d6f-4279-8131-9e5b9725cf86" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -33,6 +41,9 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2pQjTZaRMWwbrv8Ai0tyEUJSmim" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -42,6 +53,7 @@
     "Application.BugByteBackendApplication.executor": "Run",
     "Application.Unnamed.executor": "Run",
     "JUnit.BugByteBackendApplicationTests.executor": "Run",
+
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "Spring Boot.BugByteBackendApplication.executor": "Run",
@@ -68,6 +80,108 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration name="CommunityRepositoryTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="BugByte-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.BugByte_backend.repositories.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.BugByte_backend.repositories" />
+      <option name="MAIN_CLASS_NAME" value="com.example.BugByte_backend.repositories.CommunityRepositoryTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CommunityRepositoryTest.testInsertCommunity_Success" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="BugByte-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.BugByte_backend.repositories.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="23" />
+      <option name="PACKAGE_NAME" value="com.example.BugByte_backend.repositories" />
+      <option name="MAIN_CLASS_NAME" value="com.example.BugByte_backend.repositories.CommunityRepositoryTest" />
+      <option name="METHOD_NAME" value="testInsertCommunity_Success" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/BugByte-backend" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CommunityRepositoryTest.testSetModerator_failure_noRowsAffected" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="BugByte-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.BugByte_backend.repositories.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.BugByte_backend.repositories" />
+      <option name="MAIN_CLASS_NAME" value="com.example.BugByte_backend.repositories.CommunityRepositoryTest" />
+      <option name="METHOD_NAME" value="testSetModerator_failure_noRowsAffected" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CommunityServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="BugByte-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.BugByte_backend.ServicesTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.BugByte_backend.ServicesTests" />
+      <option name="MAIN_CLASS_NAME" value="com.example.BugByte_backend.ServicesTests.CommunityServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CommunityServiceTest.testCreateCommunity" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="BugByte-backend" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.BugByte_backend.ServicesTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.BugByte_backend.ServicesTests" />
+      <option name="MAIN_CLASS_NAME" value="com.example.BugByte_backend.ServicesTests.CommunityServiceTest" />
+      <option name="METHOD_NAME" value="testCreateCommunity" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -101,6 +215,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <method v="2" />
     </configuration>
+
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
         <option name="Make" enabled="true" />
@@ -119,6 +234,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -134,5 +250,32 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/BugByte-backend/src/main/java/com/example/BugByte_backend/repositories/CommunityRepository.java</url>
+          <line>155</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="JUnit">
+        <watch expression="memberId" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
