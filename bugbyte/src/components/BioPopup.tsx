@@ -18,7 +18,7 @@ const TextPopup: React.FC<PopupProps> = ({ initialText, onSubmit, onClose }) => 
   return (
     <div style={styles.overlay}>
       <div style={styles.popup}>
-        <h2>Edit Text</h2>
+        <h2>Edit Bio</h2>
         <input
           type="text"
           value={text}
@@ -27,7 +27,7 @@ const TextPopup: React.FC<PopupProps> = ({ initialText, onSubmit, onClose }) => 
         />
         <div style={styles.buttons}>
           <button onClick={handleSubmit} style={styles.submitButton}>
-            Submit
+            Change
           </button>
           <button onClick={onClose} style={styles.cancelButton}>
             Cancel

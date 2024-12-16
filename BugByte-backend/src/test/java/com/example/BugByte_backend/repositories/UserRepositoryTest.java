@@ -100,7 +100,12 @@ public class UserRepositoryTest {
         String email = "username@example.com";
         String password = "password";
         String hashedPassword = "hashedPassword";
-        User user = new User(id, username, email, hashedPassword);
+        User user = User.builder()
+                .id(id)
+                .userName(username)
+                .email(email)
+                .password(hashedPassword)
+                .build();
 
         when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(email), eq(email))).thenReturn(user);
         when(passwordEncoder.matches(eq(password), eq(hashedPassword))).thenReturn(true);
@@ -133,7 +138,12 @@ public class UserRepositoryTest {
     @Test
     public void testFindByIdentity_withUsername() {
         String identity = "username";
-        User expectedUser = new User(1L, identity, "email@example.com", "password");
+        User expectedUser = User.builder()
+                .id(1L)
+                .userName(identity)
+                .email("email@example.com")
+                .password("password")
+                .build();
 
         when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(identity), eq(identity)))
                 .thenReturn(expectedUser);
@@ -147,7 +157,12 @@ public class UserRepositoryTest {
     @Test
     public void testFindByIdentity_withEmail() {
         String identity = "email@example.com";
-        User expectedUser = new User(1L, "username", identity, "password");
+        User expectedUser = User.builder()
+                .id(1L)
+                .userName("username")
+                .email(identity)
+                .password("password")
+                .build();
 
         when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_IDENTITY), any(RowMapper.class), eq(identity), eq(identity)))
                 .thenReturn(expectedUser);
@@ -176,7 +191,12 @@ public class UserRepositoryTest {
         String email = "username@example.com";
         String password = "password";
 
-        User user = new User(id, username, email, password);
+        User user = User.builder()
+                .id(id)
+                .userName(username)
+                .email(email)
+                .password(password)
+                .build();
 
         when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_ID), any(RowMapper.class), eq(id))).thenReturn(user);
 

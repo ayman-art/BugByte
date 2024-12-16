@@ -1,7 +1,6 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.Follower;
-import com.example.BugByte_backend.models.FollowerId;
 import com.example.BugByte_backend.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,12 +85,59 @@ class UserProfileRepositoryTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        testUser1 = new User(1L, "user1", "user1@test.com", "password", 100L, false);
-        testUser2 = new User(2L, "user2", "user2@test.com", "password", 200L, false);
-        testUser3 = new User(3L, "user3", "user3@test.com", "password", 300L, false);
-        testUser4 = new User(4L, "user4", "user4@test.com", "password", 400L, false);
-        testUser5 = new User(5L, "user5", "user5@test.com", "password", 500L, false);
-        testUser6 = new User(6L, "user6", "user6@test.com", "password", 600L, false);
+        testUser1 = User.builder()
+                .id(1L)
+                .userName("user1")
+                .email("user1@test.com")
+                .password("password")
+                .reputation(100L)
+                .isAdmin(false)
+                .build();
+
+        testUser2 = User.builder()
+                .id(2L)
+                .userName("user2")
+                .email("user2@test.com")
+                .password("password")
+                .reputation(200L)
+                .isAdmin(false)
+                .build();
+
+        testUser3 = User.builder()
+                .id(3L)
+                .userName("user3")
+                .email("user3@test.com")
+                .password("password")
+                .reputation(300L)
+                .isAdmin(false)
+                .build();
+
+        testUser4 = User.builder()
+                .id(4L)
+                .userName("user4")
+                .email("user4@test.com")
+                .password("password")
+                .reputation(400L)
+                .isAdmin(false)
+                .build();
+
+        testUser5 = User.builder()
+                .id(5L)
+                .userName("user5")
+                .email("user5@test.com")
+                .password("password")
+                .reputation(500L)
+                .isAdmin(false)
+                .build();
+
+        testUser6 = User.builder()
+                .id(6L)
+                .userName("user6")
+                .email("user6@test.com")
+                .password("password")
+                .reputation(600L)
+                .isAdmin(false)
+                .build();
     }
 
     @Test
@@ -650,37 +696,31 @@ class UserProfileRepositoryTest {
 
 }
 
-class FollowerIdTest {
-
-    @Test
-    void equals_ShouldReturnTrue_WhenSameContent() {
-        FollowerId id1 = new FollowerId(1L, 2L);
-        FollowerId id2 = new FollowerId(1L, 2L);
-
-        assertEquals(id1, id2);
-        assertEquals(id1.hashCode(), id2.hashCode());
-    }
-
-    @Test
-    void equals_ShouldReturnFalse_WhenDifferentContent() {
-        FollowerId id1 = new FollowerId(1L, 2L);
-        FollowerId id2 = new FollowerId(2L, 1L);
-
-        assertNotEquals(id1, id2);
-        assertNotEquals(id1.hashCode(), id2.hashCode());
-    }
-}
-
 class FollowerTest {
 
     @Test
     void constructor_ShouldSetFields() {
-        User follower = new User(1L, "follower", "follower@test.com", "password", 100L, false);
-        User followed = new User(2L, "followed", "followed@test.com", "password", 200L, false);
+        User follower = User.builder()
+                .id(1L)
+                .userName("follower")
+                .email("follower@test.com")
+                .password("password")
+                .reputation(100L)
+                .isAdmin(false)
+                .build();
 
-        Follower relationship = new Follower(follower, followed);
+        User followed = User.builder()
+                .id(2L)
+                .userName("followed")
+                .email("followed@test.com")
+                .password("password")
+                .reputation(200L)
+                .isAdmin(false)
+                .build();
 
-        assertEquals(follower, relationship.getFollower());
-        assertEquals(followed, relationship.getFollowed());
+        Follower relationship = new Follower(follower.getId(), followed.getId());
+
+        assertEquals(follower.getId(), relationship.getFollowerId());
+        assertEquals(followed.getId(), relationship.getFollowedId());
     }
 }
