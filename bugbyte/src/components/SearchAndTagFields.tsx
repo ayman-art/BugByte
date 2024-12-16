@@ -2,15 +2,9 @@ import React from 'react';
 import '../styles/SearchAndTagFields.css';
 import {searchCommunities , searchQuestions} from '../API/Search.tsx';
 import {searchFilteredCommunities , searchFilteredQuestions} from '../API/Filter.tsx';
+import { Question } from '../Models/Question';
+import { Community } from '../Models/Community';
 
-interface Community {
-  id: number;
-  name: string;
-  description: string;
-  adminId: number;
-  creationDate: string;
-  tags: string[];
-}
 interface SearchAndTagFieldsProps {
     searchValue: string;
     tagValue: string;

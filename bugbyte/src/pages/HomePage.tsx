@@ -132,6 +132,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         width: '80%',
         boxSizing: 'border-box',
     },
+
 };
 
 export default HomePage;
