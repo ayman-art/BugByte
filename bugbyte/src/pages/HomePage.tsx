@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import CommunityPost from '../components/QuestionPreview';
 import { Container } from 'lucide-react';
+import { fetchJoinedCommunities } from '../API/HomeAPI';
 
 const HomePage: React.FC = () => {
+    useEffect(()=>{
+    const prep = async()=>{
+        fetchJoinedCommunities()
+    };
+    prep();
+},[]);
     return (
             
             <div style={styles.container}>

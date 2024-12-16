@@ -188,23 +188,16 @@ public class AdministrativeFacade {
             throw new RuntimeException("Invalid token");
         }
     }
-    public Map<String,Object> getCommunityInfo(Map<String,Object> map)
-    {
-        try {
-            String token = (String) map.get("jwt");
-            Claims claim = AuthenticationService.parseToken(token);
-            String userName = claim.getSubject();
-            if (userName == null) throw new Exception("userName is null");
-            Community community = communityService.getCommunityById(Long.parseLong((String) map.get("communityId")));
-            System.out.println(map.get("communityId"));
-            CommunityAdapter communityAdapter = new CommunityAdapter();
-            return communityAdapter.toMap(community);
-        }catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-            return null;
-        }
-
+    public Map<String,Object> getCommunityInfo(Map<String,Object> map) throws Exception {
+        String token = (String) map.get("jwt");
+        Claims claim = AuthenticationService.parseToken(token);
+        String userName = claim.getSubject();
+        if (userName == null) throw new Exception("userName is null");
+        System.out.println("test");
+        Community community = communityService.getCommunityById((Long)map.get("communityId"));
+        System.out.println(map.get("communityId"));
+        CommunityAdapter communityAdapter = new CommunityAdapter();
+        return communityAdapter.toMap(community);
     }
     public boolean createCommunity(Map<String,Object> map){
         try {
@@ -333,5 +326,17 @@ public class AdministrativeFacade {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+    public Map<String, Object> getUserJoinedCommunities(String jwt) throws Exception {
+        Claims claim = AuthenticationService.parseToken(jwt);
+        Long id = Long.parseLong(claim.getId());
+        System.out.println(id);
+        //if (id == null )throw new Exception("UnAuthorized");
+        List<Community> comms = communityService.getUserCommunities(id);
+        System.out.println("here");
+        Map<String, Object> response = Map.of(
+                "joined-communities", comms
+        );
+        return response;
     }
 }

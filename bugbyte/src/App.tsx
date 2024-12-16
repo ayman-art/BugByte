@@ -66,7 +66,7 @@ const App: React.FC = () => {
             <Route path="/LogIn" element={<Login onLogin={handleLogin}/>} />
           </>
         )}
-        <Route path="testPage" element={<Layout onLogout={handleLogout}><CommunityPage/></Layout>}/>
+        <Route path="testPage/:communityId" element={<Layout onLogout={handleLogout}><CommunityPage/></Layout>}/>
       </Routes>
     </BrowserRouter>
       );

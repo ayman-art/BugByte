@@ -4,10 +4,7 @@ import com.example.BugByte_backend.facades.AdministrativeFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,13 +15,19 @@ import java.util.Map;
 public class CommunityController {
     @Autowired
     AdministrativeFacade administrativeFacade;
-    @PostMapping("/getCommunity")
-    public ResponseEntity<?> getCommunity(@RequestBody Map<String, Object> communityData) {
+    @GetMapping("/getCommunity")
+    public ResponseEntity<?> getCommunity(@RequestHeader("Authorization") String token, @RequestParam("id") String id) {
+        token = token.replace("Bearer ", "");
+        Long CommunityId = Long.parseLong(id);
+        Map<String, Object> userdata = Map.of(
+                "jwt", token,
+                "communityId", CommunityId
+        );
         try {
-            Map<String, Object> response = administrativeFacade.getCommunityInfo(communityData);
+            Map<String, Object> response = administrativeFacade.getCommunityInfo(userdata);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
     @PostMapping("/createCommunity")
@@ -126,6 +129,15 @@ public class CommunityController {
             }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/joinedCommunities")
+    public ResponseEntity<?> joinedCommunities(@RequestHeader("Authorization") String token){
+        token = token.replace("Bearer ", "");
+        try{
+            return new ResponseEntity<>(administrativeFacade.getUserJoinedCommunities(token), HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(Map.of("message", "unauthorized"), HttpStatus.UNAUTHORIZED);
         }
     }
 }

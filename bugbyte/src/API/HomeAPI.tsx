@@ -46,4 +46,19 @@ function base64urlDecode(base64url: string) {
     // Decode the Base64 string
     let decodedData = atob(base64);
     return decodedData;
-  }
+}
+
+export const fetchJoinedCommunities = async()=>{
+  const token = localStorage.getItem("authToken");
+  const response = await fetch(API_URLS.JOINED_COMMUNITITES,{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  const data = await response.json()
+  if (!response.ok) throw new Error(data["message"])
+  console.log(data)
+
+}
