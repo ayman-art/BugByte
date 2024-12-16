@@ -18,15 +18,15 @@ interface SearchAndTagFieldsProps {
     onTagChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onSearchClick: () => void;
 }
-export const sendRequest = (searchValue: string, tagValue: string, source: string) => {
+export const sendRequest = (searchValue: string, tagValue: string, source: string,page:number,size:number) => {
     if (source === "home" && tagValue === "") {
-        return searchQuestions(searchValue, 0, 3);
+        return searchQuestions(searchValue, page,size);
     } else if (source === "home" && tagValue !== "") {
-        return searchFilteredQuestions(tagValue, 0, 2);
+        return searchFilteredQuestions(tagValue, page, size);
     } else if (source === "community" && tagValue === "") {
-        return searchCommunities(searchValue, 0, 3);
+        return searchCommunities(searchValue, page, size);
     } else if (source === "community" && tagValue !== "") {
-        return searchFilteredCommunities(tagValue, 0, 2);
+        return searchFilteredCommunities(tagValue, page, size);
     }
 };
 

@@ -9,6 +9,8 @@ const HomePage: React.FC = () => {
     const [searchValue, setSearchValue] = useState('');
     const [tagValue, setTagValue] = useState('');
     const [questions, setQuestions] = useState<Question[]>([]);
+    const page=0;
+    const size =10;
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchValue(event.target.value);
@@ -21,7 +23,7 @@ const HomePage: React.FC = () => {
     const handleSearchClick = async () => {
         try {
             if(!(searchValue==="" && tagValue==="")){
-            const fetchedQuestions = await sendRequest(searchValue, tagValue, "home");
+            const fetchedQuestions = await sendRequest(searchValue, tagValue, "home",page,size);
             setQuestions(fetchedQuestions);
             //setTagValue("");
             //setSearchValue("");
