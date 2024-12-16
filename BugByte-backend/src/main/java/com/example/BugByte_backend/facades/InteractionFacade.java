@@ -13,6 +13,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +29,11 @@ public class InteractionFacade {
             Claims claim = AuthenticationService.parseToken(token);
             String opName = claim.getSubject();
             question.setCreatorUserName(opName);
-            question.setCommunityId((Long) postData.get("communityId"));
+            Integer communityId = (Integer) postData.get("communityId");
+            question.setCommunityId(Long.valueOf(communityId));
             question.setMdContent((String) postData.get("mdContent"));
+            question.setTitle((String) postData.get("title"));
+            question.setTags((List<String>) postData.get("tags"));
             long questionId = postingService.postQuestion(question);
             Map<String , Object> questionData = new HashMap<>();
             questionData.put("questionId" , questionId);
@@ -46,7 +50,7 @@ public class InteractionFacade {
             Claims claim = AuthenticationService.parseToken(token);
             String opName = claim.getSubject();
             answer.setCreatorUserName(opName);
-            answer.setQuestionId((Long) postData.get("questionId"));
+            answer.setQuestionId(Long.valueOf((Integer) postData.get("questionId")));
             answer.setMdContent((String) postData.get("mdContent"));
             long answerId = postingService.postAnswer(answer);
             Map<String , Object> answerData = new HashMap<>();
@@ -64,7 +68,7 @@ public class InteractionFacade {
             Claims claim = AuthenticationService.parseToken(token);
             String opName = claim.getSubject();
             reply.setCreatorUserName(opName);
-            reply.setAnswerId((Long) postData.get("answerId"));
+            reply.setAnswerId(Long.valueOf((Integer) postData.get("answerId")));
             reply.setMdContent((String) postData.get("mdContent"));
             long replyId = postingService.postReply(reply);
             Map<String , Object> replyData = new HashMap<>();
@@ -80,7 +84,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String opName = claim.getSubject();
-            long questionId = (long) postData.get("questionId");
+            Long questionId = Long.valueOf((Integer) postData.get("questionId"));
             return postingService.deleteQuestion(questionId , opName);
         }
         catch (Exception e){
@@ -92,7 +96,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String opName = claim.getSubject();
-            long answerId = (long) postData.get("answerId");
+            Long answerId = Long.valueOf((Integer) postData.get("answerId"));
             return postingService.deleteAnswer(answerId , opName);
         }
         catch (Exception e){
@@ -104,7 +108,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String opName = claim.getSubject();
-            long replyId = (long) postData.get("replyId");
+            Long replyId = Long.valueOf((Integer) postData.get("replyId"));
             return postingService.deleteReply(replyId , opName);
         }
         catch (Exception e){
@@ -116,7 +120,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            long questionId = (long) postData.get("questionId");
+            Long questionId = Long.valueOf((Integer) postData.get("questionId"));
             return postingService.upVoteQuestion(questionId , userName);
         }
         catch (Exception e){
@@ -128,7 +132,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            long questionId = (long) postData.get("questionId");
+            Long questionId = Long.valueOf((Integer) postData.get("questionId"));
             return postingService.removeUpVoteFromQuestion(questionId , userName);
         }
         catch (Exception e){
@@ -140,7 +144,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            long questionId = (long) postData.get("questionId");
+            Long questionId = Long.valueOf((Integer) postData.get("questionId"));
             return postingService.downVoteQuestion(questionId , userName);
         }
         catch (Exception e){
@@ -152,7 +156,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            long questionId = (long) postData.get("questionId");
+            Long questionId = Long.valueOf((Integer) postData.get("questionId"));
             return postingService.removeDownVoteFromQuestion(questionId , userName);
         }
         catch (Exception e){
@@ -164,7 +168,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            long answerId = (long) postData.get("answerId");
+            Long answerId = Long.valueOf((Integer) postData.get("answerId"));
             return postingService.upVoteAnswer(answerId , userName);
         }
         catch (Exception e){
@@ -176,7 +180,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            long answerId = (long) postData.get("answerId");
+            Long answerId = Long.valueOf((Integer) postData.get("answerId"));
             return postingService.removeUpVoteFromAnswer(answerId , userName);
         }
         catch (Exception e){
@@ -188,7 +192,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            long answerId = (long) postData.get("answerId");
+            Long answerId = Long.valueOf((Integer) postData.get("answerId"));
             return postingService.downVoteAnswer(answerId , userName);
         }
         catch (Exception e){
@@ -200,7 +204,7 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            long answerId = (long) postData.get("answerId");
+            Long answerId = Long.valueOf((Integer) postData.get("answerId"));
             return postingService.removeDownVoteAnswer(answerId , userName);
         }
         catch (Exception e){
@@ -212,7 +216,8 @@ public class InteractionFacade {
             String token = (String) postData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String opName = claim.getSubject();
-            long answerId = (long) postData.get("answerId");
+            Long answerId = Long.valueOf((Integer) postData.get("answerId"));
+            System.out.println("answerId: " + answerId);
             return postingService.verifyAnswer(answerId , opName);
         }
         catch (Exception e){
@@ -221,7 +226,7 @@ public class InteractionFacade {
     }
     public boolean editPost(Map<String , Object> postData) throws Exception {
         try {
-            long postId = (long) postData.get("postId");
+            Long postId = Long.valueOf((Integer) postData.get("postId"));
             String content = (String) postData.get("mdContent");
             return postingService.editPost(postId , content);
         }
@@ -235,7 +240,7 @@ public class InteractionFacade {
             String token = (String) userdata.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            List<Question> questions = postingService.getUserQuestions((String) userdata.get("userName")
+            List<Question> questions = postingService.getUserQuestions(userName
             , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
             return questions.stream().map(question -> {
                 Map<String, Object> questionMap = questionAdapter.toMap(question);
@@ -259,7 +264,7 @@ public class InteractionFacade {
             String token = (String) communityData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            List<Question> questions = postingService.getCommunityQuestions((Long) communityData.get("communityId")
+            List<Question> questions = postingService.getCommunityQuestions(Long.valueOf((Integer) communityData.get("communityId"))
                     , (Integer) communityData.get("limit"), (Integer) communityData.get("offset"));
             return questions.stream().map(question -> {
                 Map<String, Object> questionMap = questionAdapter.toMap(question);
@@ -320,7 +325,7 @@ public class InteractionFacade {
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
             AnswerAdapter answerAdapter = new AnswerAdapter();
-            List<Answer> answers = postingService.getAnswersForQuestion((Long) questionData.get("questionId")
+            List<Answer> answers = postingService.getAnswersForQuestion(Long.valueOf((Integer) questionData.get("questionId"))
                     , (Integer) questionData.get("limit"), (Integer) questionData.get("offset"));
             return answers.stream().map(answer -> {
                 Map<String, Object> answerMap = answerAdapter.toMap(answer);
@@ -340,7 +345,7 @@ public class InteractionFacade {
     public List<Map<String , Object>> getRepliesForAnswer(Map<String, Object> answerData) throws Exception {
         try {
             ReplyAdapter replyAdapter = new ReplyAdapter();
-            List<Reply> replies = postingService.getRepliesForAnswer((Long) answerData.get("answerId")
+            List<Reply> replies = postingService.getRepliesForAnswer(Long.valueOf((Integer) answerData.get("answerId"))
                     , (Integer) answerData.get("limit"), (Integer) answerData.get("offset"));
             return replies.stream().map(replyAdapter::toMap).toList();
         }
@@ -354,7 +359,7 @@ public class InteractionFacade {
             String token = (String) questionData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            Question question = postingService.getQuestion((Long) questionData.get("questionId"));
+            Question question = postingService.getQuestion(Long.valueOf((Integer) questionData.get("questionId")));
             Map<String , Object> questionMap = questionAdapter.toMap(question);
             if (question.getValidatedAnswerId() != null){
                 Answer answer = postingService.getAnswer(question.getValidatedAnswerId());
@@ -383,12 +388,14 @@ public class InteractionFacade {
             String token = (String) answerData.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             String userName = claim.getSubject();
-            Answer answer = postingService.getAnswer((Long) answerData.get("answerId"));
+            Answer answer = postingService.getAnswer(Long.valueOf((Integer) answerData.get("answerId")));
             Map<String , Object> answerMap = answerAdapter.toMap(answer);
+            System.out.println(answerMap);
             try {
                 answerMap.put("isUpVoted", postingService.isUpVoted(userName , answer.getId()));
                 answerMap.put("isDownVoted", postingService.isDownVoted(userName , answer.getId()));
             } catch (Exception e) {
+                System.out.println("where");
                 throw new RuntimeException(e);
             }
             return answerMap;
@@ -400,7 +407,7 @@ public class InteractionFacade {
     public Map<String , Object> getReply(Map<String, Object> replyData) throws Exception{
         try {
             ReplyAdapter replyAdapter = new ReplyAdapter();
-            Reply reply = postingService.getReply((Long) replyData.get("replyId"));
+            Reply reply = postingService.getReply(Long.valueOf((Integer) replyData.get("replyId")));
             Map<String , Object> replyMap = replyAdapter.toMap(reply);
             return replyMap;
         }
