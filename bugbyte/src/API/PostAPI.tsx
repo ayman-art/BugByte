@@ -303,7 +303,7 @@ export const deleteReply = async (replyId: string, token: string): Promise<any> 
 
 export const verifyAnswer = async (answerId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.VERIFY_ANSWER}?answerId=${answerId}`, {
+        const response = await fetch(`${API_URLS.ANSWER}/verify?answerId=${answerId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
