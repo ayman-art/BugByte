@@ -3,6 +3,7 @@ package com.example.BugByte_backend.services;
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.RecommendationSystemRepository;
+import com.example.BugByte_backend.repositories.TagsRepository;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +19,9 @@ public class RecommendationSystemService {
     private RecommendationSystemRepository recommendationSystemRepository;
 
     @Autowired
+    private TagsRepository tagsRepository;
+
+    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
     public List<Question> generateFeedForUser(String token, int pageSize) {
@@ -28,8 +32,10 @@ public class RecommendationSystemService {
         Long size = redisTemplate.opsForList().size(cacheKey);
         if (size == null || size == 0) {
             List<Question> newFeed = recommendationSystemRepository.generateFeedForUser(id);
-            for (Question question : newFeed)
+            for (Question question : newFeed) {
+                question.setTags(tagsRepository.findTagsByQuestion(question.getId()));
                 redisTemplate.opsForList().rightPush(cacheKey, question);
+            }
         }
 
         return getPaginatedFeed(id, pageSize);

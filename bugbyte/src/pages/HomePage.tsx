@@ -14,6 +14,7 @@ interface Question {
   mdContent: string;
   upVotes: number;
   downVotes: number;
+  tags?: string[];
 }
 
 const HomePage: React.FC = () => {

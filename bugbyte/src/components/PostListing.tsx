@@ -9,6 +9,7 @@ interface Post {
   mdContent: string;
   upVotes: number;
   downVotes: number;
+  tags?: string[];
 }
 
 interface PostListingProps {
@@ -61,6 +62,7 @@ const PostListing: React.FC<PostListingProps> = ({
           content={post.mdContent}
           upvotes={post.upVotes}
           downvotes={post.downVotes}
+          tags={post.tags}
         />
       ))}
 
