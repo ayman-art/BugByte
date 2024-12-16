@@ -76,6 +76,8 @@ public class CommunityService {
     public Long createCommunity(Community inCommunity) {
         try {
             Long communityId = communityRepository.insertCommunity(inCommunity.getName(), inCommunity.getAdminId());
+            if(!(inCommunity.getDescription().equals("") || inCommunity.getDescription()==null))
+                this.updateCommunityDescription(communityId,inCommunity.getDescription());
             cacheCommunity(inCommunity);
             return communityId;
         } catch (Exception e) {
@@ -107,13 +109,13 @@ public class CommunityService {
         return null;
     }
 
-    public boolean updateCommunity(Community existingCommunity, Community updatedCommunity) {
-        if (existingCommunity == null || updatedCommunity == null) {
-            throw new IllegalArgumentException("Community and updatedCommunity must not be null.");
+    public boolean updateCommunity(Community updatedCommunity) {
+        if (updatedCommunity == null) {
+            throw new IllegalArgumentException("updatedCommunity must not be null.");
         }
-
         try {
             cacheCommunity(updatedCommunity);
+            persistCommunity(updatedCommunity);
             return true;
         } catch (Exception e) {
             System.out.println("Error updating community: " + e.getMessage());
@@ -153,19 +155,39 @@ public class CommunityService {
         }
     }
 
-    public boolean setModerator(Long modratorId, String communityId) {
+
+    public Community getCommunityById(Long communityId) {
         try {
-            return communityRepository.setModerator(modratorId, communityId);
-        } catch (Exception e) {
-            return false;
+            System.out.println(communityId);
+              return communityRepository.findCommunityById(communityId);
+        } catch (IllegalArgumentException e) {
+            throw  e;
         }
     }
 
-    public boolean removeModerator(Long modratorId, String communityId) {
+    public boolean updateCommunityDescription(Long id, String description) {
         try {
-            return communityRepository.removeModerator(modratorId, communityId);
-        } catch (Exception e) {
-            return false;
+            return communityRepository.updateCommunityDescription(id,description);
+        } catch (IllegalArgumentException e) {
+            throw  e;
+        }
+    }
+    public boolean deleteMember(Long communityId , String Username)
+    {
+        return  communityRepository.deleteMemberByUsername(communityId,Username);
+    }
+    public boolean joinCommunity(Long communityId , Long userId)
+    {
+        return communityRepository.insertMember(userId,communityId);
+    }
+    public List<User> getCommunityAdmins(Long communityId)
+    {
+        try {
+        return communityRepository.findModeratorsByCommunityId(communityId);
+        }
+        catch (Exception e)
+        {
+           throw (e);
         }
     }
 }

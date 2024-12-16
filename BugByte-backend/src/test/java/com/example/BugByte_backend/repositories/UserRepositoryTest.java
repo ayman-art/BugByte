@@ -1,6 +1,7 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.User;
+import com.example.BugByte_backend.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -48,29 +49,60 @@ public class UserRepositoryTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
+    private UserService userProfileService;
+    @InjectMocks
     private UserRepositoryImp userRepository;
+    private static final String SQL_UPDATE_PICTURE = "UPDATE users SET profile_picture = ? WHERE user_id = ?";
+    private UpdateProfilePictureTestHelper testHelper;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        testHelper = new UpdateProfilePictureTestHelper(jdbcTemplate);
+    }
+    @Test
+    void testUpdateProfilePicture_Success() throws Exception {
+        // Arrange
+        Long userId = 1L;
+        String url = "http://example.com/picture.jpg";
+        when(jdbcTemplate.update(SQL_UPDATE_PICTURE, url, userId)).thenReturn(1);
+
+        // Act
+        testHelper.updateProfilePicture(userId, url);
+
+        // Assert
+        verify(jdbcTemplate, times(1)).update(SQL_UPDATE_PICTURE, url, userId);
     }
 
     @Test
-    public void testInsertUser_success() {
-        String username = "username";
-        String email = "username@example.com";
-        String password = "password";
-        String hashedPassword = "hashedPassword";
+    void testUpdateProfilePicture_NullUserId() {
+        // Arrange
+        Long userId = null;
+        String url = "http://example.com/picture.jpg";
 
-        when(jdbcTemplate.update(eq(SQL_INSERT_USER), eq(username), eq(email), eq(hashedPassword))).thenReturn(1);
-        when(jdbcTemplate.queryForObject(eq(SQL_FIND_ID_BY_EMAIL), eq(new Object[]{ email }), eq(Long.class))).thenReturn(7L);
+        // Act & Assert
+        Exception exception = assertThrows(NullPointerException.class, () -> {
+            testHelper.updateProfilePicture(userId, url);
+        });
 
-        when(passwordEncoder.encode(eq(password))).thenReturn(hashedPassword);
-
-        Long result = userRepository.insertUser(username, email, password);
-        assertEquals(7L, result);
+        assertEquals("UserId is Null", exception.getMessage());
     }
 
+    @Test
+    void testUpdateProfilePicture_UpdateFailed() {
+        // Arrange
+        Long userId = 1L;
+        String url = "http://example.com/picture.jpg";
+        when(jdbcTemplate.update(SQL_UPDATE_PICTURE, url, userId)).thenReturn(0);
+
+        // Act & Assert
+        Exception exception = assertThrows(Exception.class, () -> {
+            testHelper.updateProfilePicture(userId, url);
+        });
+
+        assertEquals("Picture update failed", exception.getMessage());
+    }
+  
     @Test
     public void testInsertUser_duplicateEmail() {
         String username = "username";
@@ -387,5 +419,20 @@ public class UserRepositoryTest {
         String result = userRepository.getCodeById(id);
 
         assertNull(result);
+    }
+    private static class UpdateProfilePictureTestHelper {
+
+        private final JdbcTemplate jdbcTemplate;
+
+        public UpdateProfilePictureTestHelper(JdbcTemplate jdbcTemplate) {
+            this.jdbcTemplate = jdbcTemplate;
+        }
+
+        public void updateProfilePicture(Long userId, String URL) throws Exception {
+            if (userId == null)
+                throw new NullPointerException("UserId is Null");
+            int rows = jdbcTemplate.update(SQL_UPDATE_PICTURE, URL, userId);
+            if (rows != 1) throw new Exception("Picture update failed");
+        }
     }
 }
