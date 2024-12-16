@@ -188,7 +188,7 @@ public class AdministrativeFacade {
             throw new RuntimeException("Invalid token");
         }
     }
-    public Map<String,Object> getCommunityInfo(Map<String,Object> map) throws Exception {
+    public Community getCommunityInfo(Map<String,Object> map) throws Exception {
         String token = (String) map.get("jwt");
         Claims claim = AuthenticationService.parseToken(token);
         String userName = claim.getSubject();
@@ -197,7 +197,7 @@ public class AdministrativeFacade {
         Community community = communityService.getCommunityById((Long)map.get("communityId"));
         System.out.println(map.get("communityId"));
         CommunityAdapter communityAdapter = new CommunityAdapter();
-        return communityAdapter.toMap(community);
+        return community;//communityAdapter.toMap(community);
     }
     public boolean createCommunity(Map<String,Object> map){
         try {
@@ -321,22 +321,20 @@ public class AdministrativeFacade {
             String token = (String) req.get("jwt");
             Claims claim = AuthenticationService.parseToken(token);
             long userId = Long.parseLong(claim.getId());
-            return communityService.joinCommunity(Long.parseLong((String) req.get("communityId"))
+            return communityService.joinCommunity( Long.valueOf((Integer)req.get("communityId"))
                     ,userId);
         } catch (IllegalArgumentException e) {
             return false;
         }
     }
-    public Map<String, Object> getUserJoinedCommunities(String jwt) throws Exception {
+    public List<Community> getUserJoinedCommunities(String jwt) throws Exception {
         Claims claim = AuthenticationService.parseToken(jwt);
         Long id = Long.parseLong(claim.getId());
         System.out.println(id);
         //if (id == null )throw new Exception("UnAuthorized");
         List<Community> comms = communityService.getUserCommunities(id);
         System.out.println("here");
-        Map<String, Object> response = Map.of(
-                "joined-communities", comms
-        );
-        return response;
+
+        return comms;
     }
 }

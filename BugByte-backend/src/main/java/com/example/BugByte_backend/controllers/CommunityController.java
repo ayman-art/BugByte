@@ -1,6 +1,7 @@
 package com.example.BugByte_backend.controllers;
 
 import com.example.BugByte_backend.facades.AdministrativeFacade;
+import com.example.BugByte_backend.models.Community;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class CommunityController {
                 "communityId", CommunityId
         );
         try {
-            Map<String, Object> response = administrativeFacade.getCommunityInfo(userdata);
+            Community response = administrativeFacade.getCommunityInfo(userdata);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -118,8 +119,10 @@ public class CommunityController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping("/joinCommunity")
-    public ResponseEntity<?> joinCommunity(@RequestBody Map<String, Object> communityData) {
+    @PutMapping("/joinCommunity")
+    public ResponseEntity<?> joinCommunity(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> communityData) {
+        token = token.replace("Bearer ", "");
+        communityData.put("jwt", token);
         try {
             if(administrativeFacade.joinCommunity(communityData)) {
                 return new ResponseEntity<>("user joined  Successfully", HttpStatus.OK);

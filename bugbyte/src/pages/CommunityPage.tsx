@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getCommunity } from '../API/CommunityAPI';
+import { getCommunity, joinCommunity } from '../API/CommunityAPI';
 import { useParams } from 'react-router-dom';
 
-interface Community {
+export interface Community {
   id: number;
   name: string;
   description: string;
@@ -30,7 +30,13 @@ const CommunityPage: React.FC = () => {
 
         // Check if the community is in the user's joined list
         const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
-        setJoined(joinedCommunities.includes(data.id)); // Update the joined state
+        //console.log(joinedCommunities)
+        console.log(data)
+        console.log(joinedCommunities.includes(data));
+        const isJoined = joinedCommunities.some(
+            (joinedCommunity: { id: number }) => joinedCommunity.id === data.id
+          );
+        setJoined(isJoined); // Update the joined state
       } catch (err: any) {
         setError(err.message || 'An error occurred');
       } finally {
@@ -41,19 +47,17 @@ const CommunityPage: React.FC = () => {
     fetchCommunityData();
   }, [communityId]);
 
-  const handleJoinClick = () => {
-    if (joined) {
-      // Remove the community from the joined list
-      const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
-      const updatedJoinedCommunities = joinedCommunities.filter((id: number) => id !== community?.id);
-      localStorage.setItem('joinedCommunities', JSON.stringify(updatedJoinedCommunities));
-      setJoined(false);
-    } else {
-      // Add the community to the joined list
-      const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
-      joinedCommunities.push(community?.id);
-      localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
-      setJoined(true);
+  const handleJoinClick = async () => {
+    // Add the community to the joined list
+    const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
+    const token= localStorage.getItem('authToken');
+    try{
+        await joinCommunity(token!, community?.id!)
+        
+        //localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
+        setJoined(true);
+    }catch(e){
+        alert(e)
     }
   };
 
@@ -61,8 +65,8 @@ const CommunityPage: React.FC = () => {
     container: {
       padding: '20px',
       fontFamily: 'Arial, sans-serif',
-      width: '100%', // Full width of the page
-      minHeight: '100vh', // Ensures the container covers the full viewport height
+      width: '100%',
+      minHeight: '100vh',
       backgroundColor: '#f9f9f9',
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     },
@@ -87,8 +91,8 @@ const CommunityPage: React.FC = () => {
     divider: {
       margin: '20px 0',
       border: 'none',
-      height: '2px', // Makes the divider thicker
-      backgroundColor: '#4CAF50', // Adds a strong green color for visibility
+      height: '2px',
+      backgroundColor: '#4CAF50',
     },
     error: {
       color: '#d32f2f',
@@ -99,19 +103,15 @@ const CommunityPage: React.FC = () => {
       textAlign: 'center',
     },
     button: {
-      padding: '8px 12px', // Smaller padding for a smaller button
-      fontSize: '14px', // Smaller font size
+      padding: '8px 12px',
+      fontSize: '14px',
       color: 'white',
       backgroundColor: '#4CAF50',
       border: 'none',
       borderRadius: '4px',
       cursor: 'pointer',
       marginTop: '20px',
-      width: 'auto', // Auto width to prevent it from stretching
-      float: 'right', // Align the button to the right
-    },
-    buttonLeave: {
-      backgroundColor: '#d32f2f', // Red background for "Leave" button
+      float: 'right',
     },
   };
 
@@ -132,18 +132,18 @@ const CommunityPage: React.FC = () => {
               {new Date(community.creationDate).toLocaleDateString()}
             </p>
           </div>
-          {/* Join/Leave Button above the divider */}
-          <button
-            style={{
-              ...styles.button,
-              ...(joined ? styles.buttonLeave : {}),
-            }}
-            onClick={handleJoinClick}
-          >
-            {joined ? 'Leave' : 'Join'} Community
-          </button>
 
-          <hr style={styles.divider} /> {/* Clearer divider */}
+          {/* Render Join Button only if not joined */}
+          {!joined && (
+            <button
+              style={styles.button}
+              onClick={handleJoinClick}
+            >
+              Join Community
+            </button>
+          )}
+
+          <hr style={styles.divider} />
         </div>
       ) : (
         <p style={styles.value}>No community data available.</p>

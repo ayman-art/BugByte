@@ -1,3 +1,4 @@
+import { Community } from '../pages/CommunityPage';
 import { API_URLS } from './ApiUrls';
 
 export const authorizeToken = async(token :string)=> {
@@ -58,7 +59,10 @@ export const fetchJoinedCommunities = async()=>{
       }
     });
   const data = await response.json()
+  const comms : Community = data
+  console.log(comms)
+  localStorage.setItem('joinedCommunities', JSON.stringify(comms));
   if (!response.ok) throw new Error(data["message"])
-  console.log(data)
+  //console.log(data)
 
 }

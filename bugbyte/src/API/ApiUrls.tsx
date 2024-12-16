@@ -19,5 +19,6 @@ export const API_URLS = {
   UPLOAD_IMAGE: `${API_BASE_URL}/images/upload`,
   UPDATE_PROFILE_PICTURE: `${API_BASE_URL}/users/update-picture`,
   LOAD_COMMUNITY: `${API_BASE_URL}/communities/getCommunity`,
-  JOINED_COMMUNITITES: `${API_BASE_URL}/communities/joinedCommunities`
+  JOINED_COMMUNITITES: `${API_BASE_URL}/communities/joinedCommunities`,
+  JOIN_COMMUNITY: `${API_BASE_URL}/communities/joinCommunity`
 };
