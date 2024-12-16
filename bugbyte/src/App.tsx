@@ -4,11 +4,14 @@ import HomePage from './pages/HomePage';
 import Login from './pages/LoginPage';
 import SignUpPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
+import FollowersPage from './pages/FollowersPage';
+import FollowingsPage from './pages/FollowingsPage';
 import { authorizeToken, saveData } from './API/HomeAPI';
 import Layout from './layouts/MainLayout';
 import { useNavbar } from '@nextui-org/navbar';
 import PostPage from './pages/PostPage';
 import TestPage from './pages/TestPage';
+import CommunityPage from './pages/CommunityPage';
 
 const isLoggedIn = false;
 
@@ -56,7 +59,9 @@ const App: React.FC = () => {
           <>
             <Route path="/" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />
             <Route path="/Profile/:userName" element={<Layout onLogout={handleLogout}><ProfilePage /></Layout>} />
-            <Route path="/Posts/:postId" element={<Layout onLogout={handleLogout}><PostPage /></Layout>} />
+            <Route path="/Profile/:userName/Followers" element={<Layout onLogout={handleLogout}><FollowersPage/></Layout>} />
+            <Route path="/Profile/:userName/Followings" element={<Layout onLogout={handleLogout}><FollowingsPage/></Layout>} />
+            {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
             <Route path="/SignUp" element={<Navigate to="/" />}/>
             <Route path="/LogIn" element={<Navigate to="/" />} />
           </>
@@ -68,7 +73,7 @@ const App: React.FC = () => {
             <Route path="*" element={<Navigate to="/LogIn" />} />
           </>
         )}
-        <Route path="testPage" element={<Layout onLogout={handleLogout}><TestPage/></Layout>}/>
+        <Route path="testPage" element={<Layout onLogout={handleLogout}><CommunityPage/></Layout>}/>
       </Routes>
     </BrowserRouter>
       );

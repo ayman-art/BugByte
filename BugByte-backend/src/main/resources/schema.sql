@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     bio TEXT,
     reputation BIGINT DEFAULT 0,
-    is_admin BOOLEAN DEFAULT FALSE
+    is_admin BOOLEAN DEFAULT FALSE,
+    picture TEXT
 );
 
 CREATE TABLE IF NOT EXISTS validation_codes (
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS posts (
 
 CREATE TABLE IF NOT EXISTS questions (
     id BIGINT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
     community_id BIGINT NOT NULL,
     up_votes BIGINT DEFAULT 0,
     down_votes BIGINT DEFAULT 0,
@@ -76,6 +78,21 @@ CREATE TABLE IF NOT EXISTS replies (
     FOREIGN KEY (answer_id) REFERENCES answers(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS upVotes (
+    userName VARCHAR(255) NOT NULL,
+    post_id BIGINT NOT NULL,
+    PRIMARY KEY (userName, post_id),
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (userName) REFERENCES users(user_name) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS downVotes (
+    userName VARCHAR(255) NOT NULL,
+    post_id BIGINT NOT NULL,
+    PRIMARY KEY (userName, post_id),
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (userName) REFERENCES users(user_name) ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS tag (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -86,7 +103,7 @@ CREATE TABLE IF NOT EXISTS question_tag (
     question_id BIGINT NOT NULL,
     tag_id BIGINT NOT NULL,
     PRIMARY KEY (question_id, tag_id),
-    FOREIGN KEY (question_id) REFERENCES questions(id),
+    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tag(id)
 );
 
@@ -94,7 +111,7 @@ CREATE TABLE IF NOT EXISTS community_tag (
     community_id BIGINT NOT NULL,
     tag_id BIGINT NOT NULL,
     PRIMARY KEY (community_id, tag_id),
-    FOREIGN KEY (community_id) REFERENCES communities(id),
+    FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tag(id)
 );
 

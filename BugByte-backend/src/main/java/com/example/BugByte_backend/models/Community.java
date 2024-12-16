@@ -1,6 +1,10 @@
 package com.example.BugByte_backend.models;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,20 +13,29 @@ import java.util.List;
 
 @Getter
 @Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Document(indexName = "community")
 public class Community {
+    @Id
+    @Field(type = FieldType.Long)
     private Long id;
 
+    @Field(type = FieldType.Text, analyzer = "standard", searchAnalyzer = "standard")
     private String name;
 
+    @Field(type = FieldType.Text, analyzer = "standard", searchAnalyzer = "standard")
     private String description;
 
+    @Field(type = FieldType.Long)
     private Long adminId;
 
+    @Field(type = FieldType.Date)
     private Date creationDate = new Date();
 
+    @Field(type = FieldType.Keyword)
     private List<String> tags = new ArrayList<>();
 
     public Community(String name, String description, Long adminId, Date creationDate) {
@@ -31,6 +44,11 @@ public class Community {
         this.adminId = adminId;
         this.creationDate = creationDate;
         this.id = 0L;
+    }
+    public Community(Long id,String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.id =id;
     }
 
     public Community(String name, String description, Long adminId) {
@@ -48,48 +66,4 @@ public class Community {
         this.id = 0L;
     }
 
-    public Community() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getAdminId() {
-        return admin.getId();
-    }
-
-    public void setAdminId(Long adminId) {
-        this.admin.setId(adminId);
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-
-    }
 }

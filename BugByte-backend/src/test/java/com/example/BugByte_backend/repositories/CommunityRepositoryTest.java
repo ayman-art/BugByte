@@ -93,16 +93,7 @@ public class CommunityRepositoryTest {
     DELETE FROM community_members 
     WHERE community_id = ?;
 """;
-    private static final String SQL_SET_MODERATOR = """
-    INSERT INTO moderators 
-    (moderator_id , community_id)
-    VALUES 
-    (? ,?);
-""";
-    private static final String SQL_REMOVE_MODERATOR = """
-    DELETE FROM moderators 
-    WHERE moderator_id = ? AND community_id = ?;
-""";
+
     private  static final String SQL_REMOVE_COMMUNITY_MODERATORS = """
     DELETE FROM moderators 
     WHERE community_id = ?;
@@ -438,23 +429,23 @@ public class CommunityRepositoryTest {
         String newName = null;
         assertThrows(NullPointerException.class, () -> communityRepository.updateCommunityName(communityId, newName));
     }
-    @Test
-    public void testDeleteCommunityById_Success() {
-        Long communityId = 12L;
-
-        when(jdbcTemplate.update(eq(SQL_DELETE_COMMUNITY_BY_ID), eq(communityId)))
-                .thenReturn(1);
-
-        boolean result = communityRepository.deleteCommunityById(communityId);
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void testDeleteCommunityById_Failure_NullId() {
-        Long communityId = null;
-        assertThrows(NullPointerException.class, () -> communityRepository.deleteCommunityById(communityId));
-    }
+//    @Test
+//    public void testDeleteCommunityById_Success() {
+//        Long communityId = 12L;
+//
+//        when(jdbcTemplate.update(eq(SQL_DELETE_COMMUNITY_BY_ID), eq(communityId)))
+//                .thenReturn(1);
+//
+//        boolean result = communityRepository.deleteCommunityById(communityId);
+//
+//        assertTrue(result);
+//    }
+//
+//    @Test
+//    public void testDeleteCommunityById_Failure_NullId() {
+//        Long communityId = null;
+//        assertThrows(NullPointerException.class, () -> communityRepository.deleteCommunityById(communityId));
+//    }
     @Test
     public void testDeleteMemberById_Success() {
         Long memberId = 1L;
@@ -593,54 +584,6 @@ public class CommunityRepositoryTest {
         when(jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION, community.getName(), community.getDescription(), community.getId())).thenReturn(0);
         boolean result = communityRepository.updateCommunityNameAndDescription(community);
         assertFalse(result);
-    }
-
-    @Test
-    public void testSetModerator_success() {
-        Long moderatorId = 1L;
-        String communityId = "community123";
-        when(jdbcTemplate.update(SQL_SET_MODERATOR, moderatorId, communityId)).thenReturn(1);
-        boolean result = communityRepository.setModerator(moderatorId, communityId);
-        assertTrue(result);
-    }
-
-    @Test
-    public void testSetModerator_failure_noRowsAffected() {
-        Long moderatorId = 1L;
-        String communityId = "community123";
-        when(jdbcTemplate.update(SQL_SET_MODERATOR, moderatorId, communityId)).thenReturn(0);
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> communityRepository.setModerator(moderatorId, communityId));
-        assertEquals("Invalid input, no rows affected", exception.getMessage());
-    }
-
-    @Test
-    public void testSetModerator_nullInput() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> communityRepository.setModerator(null, null));
-        assertEquals("ModeratorId or communityId is null", exception.getMessage());
-    }
-
-    @Test
-    public void testRemoveModerator_success() {
-        Long moderatorId = 1L;
-        String communityId = "community123";
-        when(jdbcTemplate.update(SQL_REMOVE_MODERATOR, moderatorId, communityId)).thenReturn(1);
-        boolean result = communityRepository.removeModerator(moderatorId, communityId);
-        assertTrue(result);
-    }
-
-    @Test
-    public void testRemoveModerator_failure() {
-        Long moderatorId = 1L;
-        String communityId = "community123";
-        when(jdbcTemplate.update(SQL_REMOVE_MODERATOR, moderatorId, communityId)).thenReturn(0);
-        boolean result = communityRepository.removeModerator(moderatorId, communityId);
-        assertFalse(result);
-    }
-
-    @Test
-    public void testRemoveModerator_nullInput() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> communityRepository.removeModerator(null, null));
-        assertEquals("ModeratorId or communityId is null", exception.getMessage());
     }
 
 

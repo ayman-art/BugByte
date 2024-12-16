@@ -6,9 +6,11 @@ import com.example.BugByte_backend.repositories.PostingRepository;
 import com.example.BugByte_backend.repositories.TagsRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class PostingService {
     @Autowired
     PostingRepository postingRepository;
@@ -21,6 +23,15 @@ public class PostingService {
     @Autowired
     TagsRepository tagsRepository;
 
+    @Autowired
+    SearchingFilteringQuestionService filteringQuestionService;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    RecommendationSystemService recommendationSystemService;
+
     public Post getPost(long postId) throws Exception{
         try {
             Post post = postingRepository.getPostByID(postId);
@@ -32,13 +43,56 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
+    public Question getQuestion(long questionId) throws Exception{
+        try {
+            Post post = postingRepository.getPostByID(questionId);
+            if (post == null)
+                throw new Exception("post is null");
+            return postingRepository.getQuestionById(questionId);
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Answer getAnswer(long answerId) throws Exception{
+        try {
+            Post post = postingRepository.getPostByID(answerId);
+            if (post == null)
+                throw new Exception("post is null");
+            return postingRepository.getAnswerById(answerId);
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+    public Reply getReply(long replyId) throws Exception{
+        try {
+            Post post = postingRepository.getPostByID(replyId);
+            if (post == null)
+                throw new Exception("post is null");
+            return postingRepository.getReplyById(replyId);
+        }
+        catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+
     public long postQuestion(Question q) throws Exception {
         try {
-            Long postId = postingRepository.insertPost(q.getMdContent() , q.getCreatorUserName());
+            Long postId = postingRepository.insertPost(q.getMdContent(), q.getCreatorUserName());
             if (postId == null)
                 throw new Exception("post id is null");
-            if (postingRepository.insertQuestion(postId , q.getCommunityId())) {
-                tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
+            if (postingRepository.insertQuestion(postId, q.getTitle(), q.getCommunityId())) {
+                if (q.getTags() != null && !q.getTags().isEmpty())
+                    tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
+                q.setId(postId);
+
+                filteringQuestionService.saveQuestion(q);
+                List<User> followers = userService.getFollowers(q.getCreatorUserName());
+                List<User> joinedMembers = communityRepository.getCommunityMembers(q.getCommunityId());
+
+                recommendationSystemService.updateUsersFeed(followers, q);
+                recommendationSystemService.updateUsersFeed(joinedMembers, q);
 
                 return postId;
             }
@@ -76,97 +130,126 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
-    public boolean deleteQuestion(long questionId) throws Exception{
+    public boolean deleteQuestion(long questionId , String userName) throws Exception{
         try {
-             return postingRepository.deleteQuestion(questionId);
+            Post post = postingRepository.getPostByID(questionId);
+            if (! post.getCreatorUserName().equals(userName)) {
+                throw new Exception("this user can't delete this post");
+            }
+            Question question = postingRepository.getQuestionById(questionId);
+            boolean res = postingRepository.deleteQuestion(questionId);
+            filteringQuestionService.deleteQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean deleteAnswer(long answerId) throws Exception{
+    public boolean deleteAnswer(long answerId , String userName) throws Exception{
         try {
+            Post post = postingRepository.getPostByID(answerId);
+            if (! post.getCreatorUserName().equals(userName))
+                throw new Exception("this user can't delete this post");
             return postingRepository.deleteAnswer(answerId);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean deleteReply(long replyId) throws Exception{
+    public boolean deleteReply(long replyId , String userName) throws Exception{
         try {
+            Post post = postingRepository.getPostByID(replyId);
+            if (! post.getCreatorUserName().equals(userName))
+                throw new Exception("this user can't delete this post");
             return postingRepository.deleteReply(replyId);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean upVoteQuestion(long questionId) throws Exception{
+    public boolean upVoteQuestion(long questionId , String userName) throws Exception{
         try {
-            return postingRepository.upVoteQuestion(questionId , 1);
+            boolean res = postingRepository.upVoteQuestion(questionId , 1 , userName);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeUpVoteFromQuestion(long questionId) throws Exception{
+    public boolean removeUpVoteFromQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.upVoteQuestion(questionId , -1);
+            boolean res = postingRepository.upVoteQuestion(questionId , -1 , userName);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean downVoteQuestion(long questionId) throws Exception{
+    public boolean downVoteQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteQuestion(questionId , 1);
+            boolean res = postingRepository.downVoteQuestion(questionId , 1 , userName);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeDownVoteFromQuestion(long questionId) throws Exception{
+    public boolean removeDownVoteFromQuestion(long questionId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteQuestion(questionId , -1);
+            boolean res = postingRepository.downVoteQuestion(questionId , -1 , userName);
+            Question question = postingRepository.getQuestionById(questionId);
+            filteringQuestionService.saveQuestion(question);
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean upVoteAnswer(long answerId) throws Exception{
+    public boolean upVoteAnswer(long answerId ,  String userName) throws Exception{
         try {
-            return postingRepository.upVoteAnswer(answerId , 1);
+            return postingRepository.upVoteAnswer(answerId , 1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeUpFromVoteAnswer(long answerId) throws Exception{
+    public boolean removeUpVoteFromAnswer(long answerId ,  String userName) throws Exception{
         try {
-            return postingRepository.upVoteAnswer(answerId , -1);
+            return postingRepository.upVoteAnswer(answerId , -1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean downVoteAnswer(long answerId) throws Exception{
+    public boolean downVoteAnswer(long answerId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteAnswer(answerId , 1);
+            return postingRepository.downVoteAnswer(answerId , 1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean removeDownVoteAnswer(long answerId) throws Exception{
+    public boolean removeDownVoteAnswer(long answerId ,  String userName) throws Exception{
         try {
-            return postingRepository.downVoteAnswer(answerId , -1);
+            return postingRepository.downVoteAnswer(answerId , -1 , userName);
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
-    public boolean verifyAnswer(long answerId) throws Exception{
+    public boolean verifyAnswer(long answerId , String userName) throws Exception{
         try {
-            return postingRepository.verifyAnswer(answerId);
+            Answer answer = postingRepository.getAnswerById(answerId);
+            Post post = postingRepository.getPostByID(answer.getQuestionId());
+            if (! post.getCreatorUserName().equals(userName))
+                throw new Exception("this user can't delete this post");
+            return postingRepository.verifyAnswer(answerId, answer.getQuestionId());
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -174,7 +257,13 @@ public class PostingService {
     }
     public boolean editPost(long postId , String mdContent) throws Exception{
         try {
-            return postingRepository.editPost(postId , mdContent);
+            boolean res = postingRepository.editPost(postId , mdContent);
+            try {
+                Question question = postingRepository.getQuestionById(postId);
+                filteringQuestionService.saveQuestion(question);
+            } catch (Exception ignored) {}
+
+            return res;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -280,6 +369,35 @@ public class PostingService {
             throw new Exception(e.getMessage());
         }
     }
+    public boolean isUpVoted(String userName , long postId) throws Exception {
+        User user  = userRepositoryImp.findByIdentity(userName);
+        if (user == null){
+            throw new Exception("user is null");
+        }
+        Post post = postingRepository.getPostByID(postId);
+        if (post == null){
+            throw new Exception("post is null");
+        }
+       return postingRepository.is_UpVoted(userName , postId);
+    }
+    public boolean isDownVoted(String userName , long postId) throws Exception {
+        User user  = userRepositoryImp.findByIdentity(userName);
+        if (user == null){
+            throw new Exception("user is null");
+        }
+        Post post = postingRepository.getPostByID(postId);
+        if (post == null){
+            throw new Exception("post is null");
+        }
+        return postingRepository.is_DownVoted(userName , postId);
+    }
+    public String getQuestionCommunity(long communityId) throws Exception {
+        Community community = communityRepository.findCommunityById(communityId);
+        if (community == null)
+            throw new Exception("community is null");
+        return community.getName();
+    }
+
 
     private void addTagsToQuestions(List<Question> questions) {
         for (Question question : questions) {

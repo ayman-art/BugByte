@@ -15,7 +15,7 @@ public interface IPostingRepository {
 
      Post getPostByID(Long postId);
 
-     Boolean insertQuestion(Long questionId, Long communityId);
+     Boolean insertQuestion(Long questionId, String title, Long communityId);
 
      Boolean insertAnswer(Long answerId, Long questionId);
 
@@ -27,17 +27,17 @@ public interface IPostingRepository {
 
      Boolean deleteReply(Long replyId);
 
-     Boolean upVoteQuestion(Long questionId, Integer value);
+     Boolean upVoteQuestion(Long questionId, Integer value, String userName) throws Exception;
 
-     Boolean downVoteQuestion(Long questionId, Integer value);
+     Boolean downVoteQuestion(Long questionId, Integer value , String userName) throws Exception;
 
-     Boolean upVoteAnswer(Long AnswerId, Integer value);
+     Boolean upVoteAnswer(Long AnswerId, Integer value , String userName) throws Exception;
 
-     Boolean downVoteAnswer(Long AnswerId, Integer value);
+     Boolean downVoteAnswer(Long AnswerId, Integer value , String userName) throws Exception;
 
-     Boolean verifyAnswer(Long answerId);
+    Boolean verifyAnswer(Long answerId, Long questionId);
 
-     Boolean editPost(Long postId, String md_content);
+    Boolean editPost(Long postId, String md_content);
 
      List<Question> getQuestionsByUserName(String userName, Integer limit, Integer offset);
 

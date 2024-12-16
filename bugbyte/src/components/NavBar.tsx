@@ -1,37 +1,41 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// Navbar.tsx
+import React, { useEffect, useState } from 'react';
 import logoPath from '../assets/bugbyteLogo.svg';
 import profilePath from '../assets/user-profile.svg';
-import PostModal from './PostModal';
-
+import { Link, useNavigate } from 'react-router-dom';
+import { Cursor } from 'react-simple-typewriter';
+import { updateProfilePicture } from '../API/ProfileAPI';
+import { API_URLS } from '../API/ApiUrls';
 interface NavbarProps {
   onLogout: () => void;
 }
-
-interface PostDetails {
-  title?: string; 
-  content: string; 
-  community?: string; 
-  tags?: string[] 
-}
-const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
-  const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
-
-  const visitProfile = () => {
-    const username = localStorage.getItem('name');
-    navigate(`/Profile/${username}`);
-  };
-
-  const handleSavePost = (postDetails: PostDetails) => {
-    console.log('Post saved:', postDetails);
- 
-    const id = 1
-    navigate(`/Posts/${id}`);
-
-
-  };
-
+const Navbar: React.FC<NavbarProps> = ({onLogout}) => {
+  const [profilePicFetched, setProfilePic] = useState<string | null>(null)
+  const visitProfile = ()=>{
+    const username = localStorage.getItem("name");
+    navigate(`/Profile/${username}`)
+  }
+  const navigate = useNavigate()
+  // useEffect(()=>{
+  //   async function fetchPicture(): Promise<void>{
+      
+  //     const token = localStorage.getItem('authToken')
+  //     const response2 = await fetch(`${API_URLS.UPDATE_PROFILE_PICTURE}`, {
+  //             method: 'POST',
+  //             headers: {
+  //               'Authorization': `Bearer ${token}`,
+  //               'Content-Type': 'application/json'
+  //             },
+  //             body:JSON.stringify({
+  //               'url': url
+  //             })
+  //           });
+  //           if(!response2.ok){
+  //             throw new Error(`Updating Profile Picture failed`)
+  //           }
+  //   }
+  //   fetchPicture();
+  // })
   return (
     <nav style={styles.navbar}>
       {/* Logo and Brand Name */}
@@ -42,16 +46,12 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
 
       {/* Profile and Logout */}
       <div style={styles.rightContainer}>
-        <button style={styles.plusButton} onClick={() => setShowModal(true)}>
-          +
-        </button>
-        <img
-          src={profilePath}
-          alt="Profile"
-          style={styles.profileIcon}
-          onClick={visitProfile}
-        />
-        <button style={styles.logoutButton} onClick={onLogout}>
+      <img 
+        src={profilePicFetched || profilePath} alt="Profile" 
+        style={styles.profileIcon}
+        onClick={visitProfile} 
+       />
+      <button style={styles.logoutButton} onClick={onLogout}>
           Logout
         </button>
       </div>

@@ -47,7 +47,4 @@ public interface CommunityRepositoryInterface {
 
     boolean updateCommunityNameAndDescription(Community community);
 
-    boolean setModerator(Long modratorId, String CommunityId);
-
-    boolean removeModerator(Long modratorId, String CommunityId);
 }
