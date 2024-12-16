@@ -337,4 +337,13 @@ public class AdministrativeFacade {
 
         return comms;
     }
+    public List<Community> getAllCommunities(String jwt , int pageSize , int pageNumber) throws Exception {
+        Claims claim = AuthenticationService.parseToken(jwt);
+        Long id = Long.parseLong(claim.getId());
+        System.out.println(id);
+        //if (id == null )throw new Exception("UnAuthorized");
+        List<Community> comms = communityService.getAllCommunities(pageSize,pageNumber);
+        System.out.println("get All communities");
+        return comms;
+    }
 }
