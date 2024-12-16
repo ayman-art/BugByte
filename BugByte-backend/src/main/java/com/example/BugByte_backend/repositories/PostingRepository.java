@@ -1,11 +1,15 @@
 package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.*;
+import org.elasticsearch.script.TimeSeries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -172,7 +176,10 @@ public class PostingRepository implements IPostingRepository{
             throw new NullPointerException("md content or username is null");
 
         Date date = new Date();
-        int rows = jdbcTemplate.update(SQL_INSERT_POST, op_name, mdContent, date);
+        Timestamp sqlTimestamp = new Timestamp(date.getTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = formatter.format(sqlTimestamp);
+        int rows = jdbcTemplate.update(SQL_INSERT_POST, op_name, mdContent, formattedDate);
 
         if (rows == 0)
             throw new RuntimeException("Invalid input");
@@ -183,9 +190,12 @@ public class PostingRepository implements IPostingRepository{
     public Long getPostByOpAndTime(String userName, Date date) {
         if(userName == null || date == null)
             throw new NullPointerException("username or date is null");
-
+        Timestamp sqlTimestamp = new Timestamp(date.getTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = formatter.format(sqlTimestamp);
+        System.out.println(formattedDate);
         return jdbcTemplate.queryForObject(SQL_GET_POST_BY_USERNAME_AND_TIME,
-                new Object[]{date, userName}, Long.class);
+                new Object[]{formattedDate, userName}, Long.class);
     }
 
     @Override

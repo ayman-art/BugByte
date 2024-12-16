@@ -13,6 +13,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,8 @@ public class InteractionFacade {
             question.setCreatorUserName(opName);
             question.setCommunityId((Long) postData.get("communityId"));
             question.setMdContent((String) postData.get("mdContent"));
+            question.setTitle((String) postData.get("title"));
+            question.setTags((List<String>) postData.get("tags"));
             long questionId = postingService.postQuestion(question);
             Map<String , Object> questionData = new HashMap<>();
             questionData.put("questionId" , questionId);
