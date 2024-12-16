@@ -16,9 +16,7 @@ export const createCommunity = async (name: string, description: string ,token: 
     if (!response.ok) {
       throw new Error(`failed to create the community: ${response.statusText}`);
     }
-
     const data = await response.text();
-
 
     console.log('create Community Response:', data);
 
