@@ -21,7 +21,8 @@ public interface CommunityRepositoryInterface {
 
     Community findCommunityByName(String name);
 
-    List<Community> findAllCommunities();
+
+    List<Community> findAllCommunities(int pageNumber, int pageSize);
 
     List<Long> findCommunityMembersIds(Long communityId);
 
@@ -35,9 +36,9 @@ public interface CommunityRepositoryInterface {
 
     boolean deleteMemberById(Long memberId, Long communityId);
 
-    List<Community> getUserCommunities(Long userId);
-
     List<User> getCommunityMembers(Long communityId);
+
+    List<Community> getUserCommunities(Long userId);
 
     List<String> getCommunityMembersNames(Long communityId);
 
