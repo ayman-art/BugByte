@@ -17,6 +17,7 @@ public class PostingController {
         token = token.replace("Bearer ", "");
         question.put("jwt", token);
         question.put("communityId", communityId);
+        System.out.println(question);
         try {
             return new ResponseEntity<>(interactionFacade.postQuestion(question), HttpStatus.OK);
         } catch (Exception e) {
@@ -46,7 +47,7 @@ public class PostingController {
         }
     }
     @GetMapping("questions")
-    public ResponseEntity<?> getQuestions(@RequestHeader("Authorization") String token, @RequestParam("questionId") Long questionId) {
+    public ResponseEntity<?> getQuestion(@RequestHeader("Authorization") String token, @RequestParam("questionId") Long questionId) {
         token = token.replace("Bearer ", "");
         Map<String, Object> questionData = Map.of("jwt", token, "questionId", questionId);
         try {

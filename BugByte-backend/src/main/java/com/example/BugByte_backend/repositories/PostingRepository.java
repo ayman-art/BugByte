@@ -50,7 +50,7 @@ public class PostingRepository implements IPostingRepository{
     private static final String SQL_GET_POST_BY_ID = "SELECT * FROM posts WHERE id = ?;";
     private static final String SQL_GET_POST_BY_USERNAME_AND_TIME = """
                 SELECT id FROM posts
-                "WHERE posted_on = ? AND op_name = ?;
+                WHERE posted_on = ? AND op_name = ?;
             """;
     private static final String SQL_DELETE_QUESTION_BY_ID = "DELETE FROM questions WHERE id = ?;";
     private static final String SQL_DELETE_ANSWER_BY_ID = "DELETE FROM answers WHERE id = ?;";
