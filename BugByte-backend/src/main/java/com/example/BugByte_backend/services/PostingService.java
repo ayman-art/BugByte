@@ -83,7 +83,8 @@ public class PostingService {
             if (postId == null)
                 throw new Exception("post id is null");
             if (postingRepository.insertQuestion(postId, q.getTitle(), q.getCommunityId())) {
-                tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
+                if (q.getTags() != null && !q.getTags().isEmpty())
+                    tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
                 q.setId(postId);
 
                 filteringQuestionService.saveQuestion(q);
@@ -132,10 +133,11 @@ public class PostingService {
     public boolean deleteQuestion(long questionId , String userName) throws Exception{
         try {
             Post post = postingRepository.getPostByID(questionId);
-            if (! post.getCreatorUserName().equals(userName))
+            if (! post.getCreatorUserName().equals(userName)) {
                 throw new Exception("this user can't delete this post");
-            boolean res = postingRepository.deleteQuestion(questionId);
+            }
             Question question = postingRepository.getQuestionById(questionId);
+            boolean res = postingRepository.deleteQuestion(questionId);
             filteringQuestionService.deleteQuestion(question);
             return res;
         }
@@ -247,7 +249,7 @@ public class PostingService {
             Post post = postingRepository.getPostByID(answer.getQuestionId());
             if (! post.getCreatorUserName().equals(userName))
                 throw new Exception("this user can't delete this post");
-            return postingRepository.verifyAnswer(answerId);
+            return postingRepository.verifyAnswer(answerId, answer.getQuestionId());
         }
         catch (Exception e){
             throw new Exception(e.getMessage());

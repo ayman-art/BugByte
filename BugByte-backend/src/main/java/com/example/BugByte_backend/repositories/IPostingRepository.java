@@ -35,9 +35,9 @@ public interface IPostingRepository {
 
      Boolean downVoteAnswer(Long AnswerId, Integer value , String userName) throws Exception;
 
-     Boolean verifyAnswer(Long answerId);
+    Boolean verifyAnswer(Long answerId, Long questionId);
 
-     Boolean editPost(Long postId, String md_content);
+    Boolean editPost(Long postId, String md_content);
 
      List<Question> getQuestionsByUserName(String userName, Integer limit, Integer offset);
 
