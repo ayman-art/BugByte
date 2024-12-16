@@ -32,10 +32,12 @@ public class CommunityController {
         }
     }
     @PostMapping("/createCommunity")
-    public ResponseEntity<?> createCommunity(@RequestBody Map<String, Object> communityData) {
+    public ResponseEntity<?> createCommunity(@RequestBody Map<String, Object> communityData ,@RequestHeader("Authorization") String token) {
         try {
-            if(administrativeFacade.createCommunity(communityData))
-            return new ResponseEntity<>("Community Created Successfully" , HttpStatus.OK);
+            token = token.replace("Bearer ", "");
+            communityData.put("jwt", token);
+            if (administrativeFacade.createCommunity(communityData))
+                return new ResponseEntity<>("Community Created Successfully" , HttpStatus.OK);
             else {
                 return new ResponseEntity<>("error creating community", HttpStatus.BAD_REQUEST);
             }

@@ -1,0 +1,42 @@
+/* SearchAndTagFields.css */
+
+.container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+.searchField {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc; /* Increased border weight */
+    border-radius: 4px;
+    width: 500px;
+}
+
+.tagField {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc; /* Increased border weight */
+    border-radius: 4px;
+    width: 100px;
+     margin-left: 10px;
+}
+
+.searchButton {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 2px solid #ccc; /* Increased border weight */
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s;
+    width: auto;
+    margin-left: 10px; /* Small margin between the fields and button */
+}
+
+.searchButton:active {
+    background-color: #45a049;
+}

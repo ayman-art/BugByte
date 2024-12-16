@@ -1,60 +1,68 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from "react";
+import PostListing from "../components/PostListing";
+import { getFeed } from "../API/FeedApi";
+import { fetchJoinedCommunities } from "../API/HomeAPI";
 
-import CommunityPost from '../components/QuestionPreview';
-import { Container } from 'lucide-react';
-import { fetchJoinedCommunities } from '../API/HomeAPI';
+interface Post {
+  id: string;
+  communityId: number;
+  title: string;
+  creatoruserName: string;
+  mdContent: string;
+  upVotes: number;
+  downVotes: number;
+}
 
 const HomePage: React.FC = () => {
-    useEffect(()=>{
-    const prep = async()=>{
-        fetchJoinedCommunities()
-    };
-    prep();
-},[]);
-    return (
-            
-            <div style={styles.container}>
-                <div>
-                <CommunityPost 
-                    postId="123"
-                    communityName="depressed programmers"
-                    authorName="Ali Al jayyar"
-                    content="asking questions"
-                    upvotes={150}
-                    downvotes={30}
-                    />
-                </div>
+  const [posts, setPosts] = useState<Post[]>([]); // List of posts
+  const [page, setPage] = useState(1); // Current page
+  const [loading, setLoading] = useState(false); // Loading state
+  const [hasMore, setHasMore] = useState(true); // If more posts are available
 
-                <div>
-                    <CommunityPost 
-                        postId="125"
-                        communityName="depressed lawyers searching for a career shifts"
-                        authorName="Saul Goodman"
-                        content="asking another questions"
-                        upvotes={1000}
-                        downvotes={0}
-                        />
-                </div>
+  // Fetch posts from the API
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("authToken");
+      const feed = await getFeed(token!);
 
-                <div>
-                    <CommunityPost 
-                        postId="126"
-                        communityName="new mexico community"
-                        authorName="Walter White"
-                        content="just ask"
-                        upvotes={0}
-                        downvotes={0}
-                        />
-                </div>
-            </div>
-
-      );
-};
-
-const styles: { [key: string]: React.CSSProperties } = {
-    container: {
-        marginLeft: '80px'
+      if (feed.length === 0) {
+        setHasMore(false); // No more posts
+      } else {
+        setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
+        setPage((prevPage) => prevPage + 1); // Increment page
+      }
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    } finally {
+      setLoading(false);
     }
-}
+  };
+
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        await fetchJoinedCommunities();
+        await fetchPosts(); // Initial post fetch
+      } catch (error) {
+        console.error("Error during initialization:", error);
+      }
+    };
+
+    initialize();
+  }, []);
+
+  return (
+    <div>
+      <h1>Home Page</h1>
+      <PostListing
+        posts={posts}
+        fetchPosts={fetchPosts}
+        loading={loading}
+        hasMore={hasMore}
+      />
+    </div>
+  );
+};
 
 export default HomePage;

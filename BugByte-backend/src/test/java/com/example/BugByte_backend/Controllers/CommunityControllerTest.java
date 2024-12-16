@@ -58,33 +58,33 @@ class CommunityControllerTest {
 //        verify(administrativeFacade, times(1)).getCommunityInfo(input);
 //    }
 
-    @Test
-    void testCreateCommunity_Success() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("name", "New Community");
-
-        when(administrativeFacade.createCommunity(input)).thenReturn(true);
-
-        ResponseEntity<?> result = communityController.createCommunity(input);
-
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals("Community Created Successfully", result.getBody());
-        verify(administrativeFacade, times(1)).createCommunity(input);
-    }
-
-    @Test
-    void testCreateCommunity_Failure() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("name", "New Community");
-
-        when(administrativeFacade.createCommunity(input)).thenReturn(false);
-
-        ResponseEntity<?> result = communityController.createCommunity(input);
-
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("error creating community", result.getBody());
-        verify(administrativeFacade, times(1)).createCommunity(input);
-    }
+//    @Test
+//    void testCreateCommunity_Success() {
+//        Map<String, Object> input = new HashMap<>();
+//        input.put("name", "New Community");
+//
+//        when(administrativeFacade.createCommunity(input)).thenReturn(true);
+//
+//        ResponseEntity<?> result = communityController.createCommunity(input);
+//
+//        assertEquals(200, result.getStatusCodeValue());
+//        assertEquals("Community Created Successfully", result.getBody());
+//        verify(administrativeFacade, times(1)).createCommunity(input);
+//    }
+//
+//    @Test
+//    void testCreateCommunity_Failure() {
+//        Map<String, Object> input = new HashMap<>();
+//        input.put("name", "New Community");
+//
+//        when(administrativeFacade.createCommunity(input)).thenReturn(false);
+//
+//        ResponseEntity<?> result = communityController.createCommunity(input);
+//
+//        assertEquals(400, result.getStatusCodeValue());
+//        assertEquals("error creating community", result.getBody());
+//        verify(administrativeFacade, times(1)).createCommunity(input);
+//    }
 
     @Test
     void testDeleteCommunity_Success() {

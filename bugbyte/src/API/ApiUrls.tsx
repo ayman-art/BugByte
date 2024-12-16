@@ -13,6 +13,8 @@ export const API_URLS = {
   BIO_UPDATE: `${API_BASE_URL}/users/update-bio`,
   FOLLOW: `${API_BASE_URL}/users/follow`,
   UNFOLLOW: `${API_BASE_URL}/users/unfollow`,
+  GET_FOLLOWERS: `${API_BASE_URL}/users/followers`,
+  GET_FOLLOWINGS: `${API_BASE_URL}/users/following`,
   ADMIN: `${API_BASE_URL}/users/make-admin`,
   UPVOTE:`${API_BASE_URL}/posts/upvote`,
   DOWNVOTE:`${API_BASE_URL}/posts/downvote`,
@@ -20,5 +22,12 @@ export const API_URLS = {
   UPDATE_PROFILE_PICTURE: `${API_BASE_URL}/users/update-picture`,
   LOAD_COMMUNITY: `${API_BASE_URL}/communities/getCommunity`,
   JOINED_COMMUNITITES: `${API_BASE_URL}/communities/joinedCommunities`,
-  JOIN_COMMUNITY: `${API_BASE_URL}/communities/joinCommunity`
+  JOIN_COMMUNITY: `${API_BASE_URL}/communities/joinCommunity`,
+  SEARCH_COMMUNITIES:`${API_BASE_URL}/search/community`,
+  SEARCH_QUESTIONS:`${API_BASE_URL}/search/question`,
+  SEARCH_FILTERED_QUESTIONS: `${API_BASE_URL}/search/filterQuestion`,
+  SEARCH_FILTERED_COMMUNITIES: `${API_BASE_URL}/search/filterCommunity`,
+  CREATE_COMMUNITY: `${API_BASE_URL}/communities/createCommunity`,
+  GET_FEED: `${API_BASE_URL}/recommendation/feed`,
+  
 };
