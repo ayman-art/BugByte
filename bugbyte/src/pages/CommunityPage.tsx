@@ -49,7 +49,7 @@ const CommunityPage: React.FC = () => {
 
   const handleJoinClick = async () => {
     // Add the community to the joined list
-    const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
+    //const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
     const token= localStorage.getItem('authToken');
     try{
         await joinCommunity(token!, community?.id!)
