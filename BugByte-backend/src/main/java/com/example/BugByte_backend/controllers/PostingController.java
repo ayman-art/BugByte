@@ -117,9 +117,8 @@ public class PostingController {
         token = token.replace("Bearer ", "");
         Map<String, Object> questionData = Map.of("jwt", token, "questionId", Integer.valueOf(questionId.toString()));
         try {
+            return new ResponseEntity<>(interactionFacade.deleteQuestion(questionData), HttpStatus.OK);
 
-            interactionFacade.deleteQuestion(questionData);
-            return new ResponseEntity<>(Map.of("message", "Question deleted successfully"), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
