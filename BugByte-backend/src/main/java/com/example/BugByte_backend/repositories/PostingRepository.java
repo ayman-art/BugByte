@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 @Repository
@@ -296,6 +297,9 @@ public class PostingRepository implements IPostingRepository{
 
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, questionId);
         }
+        if (is_DownVoted(userName , questionId)) {
+            jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_QUESTIONS, value * -1, questionId);
+        }
         int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_QUESTIONS ,value, questionId);
 
         if (rows == 0)
@@ -322,6 +326,9 @@ public class PostingRepository implements IPostingRepository{
 
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, questionId);
         }
+        if (is_UpVoted(userName , questionId)) {
+            jdbcTemplate.update(SQL_UPDATE_UP_VOTES_QUESTIONS, value * -1, questionId);
+        }
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_QUESTIONS ,value ,questionId);
 
         if (rows == 0)
@@ -347,7 +354,12 @@ public class PostingRepository implements IPostingRepository{
 
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
         }
-
+        if (is_DownVoted(userName , answerId)) {
+            jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_QUESTIONS, value * -1, answerId);
+        }
+        if (is_DownVoted(userName , answerId)) {
+            jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_ANSWERS, value * -1, answerId);
+        }
         int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_ANSWERS ,value ,answerId);
 
         if (rows == 0)
@@ -372,6 +384,9 @@ public class PostingRepository implements IPostingRepository{
                 throw new Exception("user didn't up vote this answer before");
 
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
+        }
+        if (is_UpVoted(userName , answerId)) {
+            jdbcTemplate.update(SQL_UPDATE_UP_VOTES_ANSWERS, value * -1, answerId);
         }
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,answerId);
 
