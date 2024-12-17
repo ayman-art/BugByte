@@ -23,8 +23,8 @@ import { IAnswer } from '../../types';
 import { downvoteAnswer, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
 
 interface AnswerProps extends IAnswer {
-  onDelete: (answerId: number) => void;
-  onVerify: (answerId: number) => void;
+  onDelete: (answerId: string) => void;
+  onVerify: (answerId: string) => void;
 }
 const Answer: React.FC<AnswerProps> = ({
   answerId,

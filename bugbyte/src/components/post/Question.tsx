@@ -22,7 +22,7 @@ import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils
 import { downvoteQuestion, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
-  onDelete: (questionId: number) => void;
+  onDelete: (questionId: string) => void;
 }
 const Question: React.FC<QuestionProps> = ({
   questionId,

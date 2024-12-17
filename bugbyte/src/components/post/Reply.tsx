@@ -21,10 +21,10 @@ import PostModal from '../PostModal';
 import { IReply } from '../../types';
 
 interface ReplyProps extends IReply{
-
+  onDelete: (replyId: string, answerId: string) => void;
 }
 
-const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdContent }) => {
+const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdContent, onDelete }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
             )}
 
             {canDelete && (
-              <button className="action-button delete-button">
+              <button className="action-button delete-button" onClick={() => onDelete(replyId)}>
                 <FaTrash /> {/* Delete icon */}
               </button>
             )}

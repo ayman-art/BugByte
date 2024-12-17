@@ -5,7 +5,7 @@ import Question from '../components/post/Question';
 import Answer from '../components/post/Answer';
 import Reply from '../components/post/Reply';
 import '../styles/PostPage.css';
-import { deleteAnswer, deleteQuestion, getAnswersFromQuestion, getQuestion, getRepliesFromAnswer } from '../API/PostAPI';
+import { deleteAnswer, deleteQuestion, deleteReply, getAnswersFromQuestion, getQuestion, getRepliesFromAnswer, verifyAnswer } from '../API/PostAPI';
 import { IQuestion, IAnswer, IReply } from '../types/index';
 interface QuestionProps  extends IQuestion {
   onDelete: (questionId: string) => void;
@@ -78,6 +78,7 @@ const PostPage: React.FC = () => {
           });
         }
       
+        console.log("HW",replies)
         setHasNextReplies(nextReplies);
       };
       
@@ -185,8 +186,26 @@ const PostPage: React.FC = () => {
     return <p>Question not found.</p>;
   }
 
-  const onVerify = (answerId: string) => {
-    // Update the verified answer in the state
+  const onDeleteReply = async (replyId: string, answerId: string) => {
+    // Delete the reply from the API
+    await deleteReply(replyId, token!);
+
+    // Update the replies state to remove the deleted reply
+    setReplies((prev) => {
+      const newReplies = new Map(prev);
+      console.log("NEW",newReplies);
+      console.log("answerId",answerId)
+      const currentReplies = newReplies.get(answerId) || [];
+      console.log("D",currentReplies)
+      newReplies.set(answerId, currentReplies.filter((reply) => reply.replyId !== replyId));
+      return newReplies;
+    }
+    );
+  }
+
+  const onVerify = async (answerId: string) => {
+
+    await verifyAnswer(answerId, token!);
     setAnswers((prev) =>
       prev.map((answer) => {
         if (answer.answerId === answerId) {
@@ -209,7 +228,7 @@ const PostPage: React.FC = () => {
             <div className="replies-section">
               {(replies.get(answer.answerId) || []).map((reply) => (
                 <div key={reply.replyId} className="reply-container">
-                  <Reply {...reply} />
+                  <Reply {...reply} onDelete={() => onDeleteReply(reply.replyId, answer.answerId)} />
                 </div>
               ))}
               {hasNextReplies.get(answer.answerId) && (

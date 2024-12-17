@@ -351,7 +351,7 @@ export const deleteReply = async (replyId: string, token: string): Promise<any> 
         throw new Error(errorData.message || 'Failed to delete reply');
         }
 
-        const data = await response.json();
+        const data = await response.text();
         return data;
     } catch (error) {
         console.error('Error deleting reply:', error);
