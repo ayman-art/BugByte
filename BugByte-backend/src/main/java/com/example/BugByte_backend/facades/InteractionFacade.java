@@ -361,15 +361,18 @@ public class InteractionFacade {
             String userName = claim.getSubject();
             Question question = postingService.getQuestion(Long.valueOf((Integer) questionData.get("questionId")));
             Map<String , Object> questionMap = questionAdapter.toMap(question);
-            if (question.getValidatedAnswerId() != null){
+            if (question.getValidatedAnswerId() != 0){
                 Answer answer = postingService.getAnswer(question.getValidatedAnswerId());
                 questionMap.put("answerMdContent" , answer.getMdContent());
                 questionMap.put("answerOp" , answer.getCreatorUserName());
                 questionMap.put("answerUpVotes" , answer.getUpVotes());
                 questionMap.put("answerDownVotes" , answer.getDownVotes());
                 questionMap.put("answerPostedOn" ,answer.getPostedOn());
+                questionMap.put("isUpVoted", postingService.isUpVoted(userName , question.getValidatedAnswerId()));
+                questionMap.put("isDownVoted", postingService.isDownVoted(userName , question.getValidatedAnswerId()));
             }
             try {
+                System.out.println("1234");
                 questionMap.put("communityName" , postingService.getQuestionCommunity(question.getCommunityId()));
                 questionMap.put("isUpVoted", postingService.isUpVoted(userName , question.getId()));
                 questionMap.put("isDownVoted", postingService.isDownVoted(userName , question.getId()));
