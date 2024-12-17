@@ -18,13 +18,13 @@ interface QuestionProps {
   isUpVoted: boolean;
   answerMdContent: string;
   downVotes: number;
-  tags: string | null;
+  tags: string[] | null;
   answerUpVotes: number;
   opName: string;
   postedOn: string; // Can be a Date object if you need to work with it in that format
   answerPostedOn: string; // Can be a Date object as well
   communityName: string;
-  communityId: number;
+  communityId: string;
 }
 interface AnswerProps {
   id: string;

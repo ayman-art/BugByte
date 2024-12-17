@@ -1,24 +1,44 @@
 import { API_URLS } from './ApiUrls';
 
-interface Question {
-    answerDownVotes: number;
+export interface QuestionData {
+    answerDownVotes?: number;
     questionId: number;
-    validatedAnswerId: number;
-    answerOp: string;
+    validatedAnswerId?: number;
+    answerOp?: string;
     upVotes: number;
     mdContent: string;
     isDownVoted: boolean;
     title: string;
     isUpVoted: boolean;
-    answerMdContent: string;
+    answerMdContent?: string;
     downVotes: number;
     tags: string[] | null;
-    answerUpVotes: number;
+    answerUpVotes?: number;
     opName: string;
     postedOn: string;
-    answerPostedOn: string;
+    answerPostedOn?: string;
     communityName: string;
     communityId: number;
+  }
+
+  export interface AnswerData {
+    answerId: number;
+    questionId: number;
+    opName: string;
+    postedOn: string; // ISO date format as string
+    upVotes: number;
+    mdContent: string;
+    isDownVoted: boolean;
+    isUpVoted: boolean;
+    downVotes: number;
+  }
+
+  export interface ReplyData {
+    answerId: number;
+    opName: string;
+    replyId: number;
+    postedOn: string; // ISO date format as string
+    mdContent: string;
   }
 
 export const postQuestion = async (
@@ -73,7 +93,7 @@ export const postAnswer = async (
 
     const data = await response.json();
     console.log(data);
-    return data;
+    return data.answerId;
   } catch (error) {
     console.error('Error posting answer:', error);
     throw error;
@@ -101,7 +121,7 @@ export const postReply = async (
         }
     
         const data = await response.json();
-        return data;
+        return data.replyId
     } catch (error) {
         console.error('Error posting reply:', error);
         throw error;
@@ -125,7 +145,7 @@ export const getQuestion = async (questionId: string, token: string): Promise<Qu
         }
 
         const data = await response.json();
-            const tags = data.tags || [];
+            const tags = data.tags || []; // handling null
             return { ...data, tags };
     } catch (error) {
         console.error('Error getting question:', error);
@@ -136,40 +156,40 @@ export const getQuestion = async (questionId: string, token: string): Promise<Qu
 
 export const getAnswer = async (answerId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.ANSWER}?answerId=${answerId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+        const response = await fetch(`${API_URLS.ANSWER}/${answerId}`, { // Path variable
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
         });
 
         if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to get answer');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to get answer');
         }
 
         const data = await response.json();
-        return data;
+        return data.answerId;
     } catch (error) {
         console.error('Error getting answer:', error);
         throw error;
     }
 }
 
-export const getReply = async (replyId: string, token: string): Promise<any> => {
+export const getReply = async (replyId: string, token: string): Promise<ReplyData> => {
     try {
-        const response = await fetch(`${API_URLS.REPLY}?replyId=${replyId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+        const response = await fetch(`${API_URLS.REPLY}/${replyId}`, { // Path variable
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
         });
 
         if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to get reply');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to get reply');
         }
 
         const data = await response.json();
@@ -347,7 +367,189 @@ export const verifyAnswer = async (answerId: string, token: string): Promise<any
     }
 }
 
+export const upvoteQuestion = async (questionId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.POST}/upvoteQuestion?questionId=${questionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
 
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upvote question');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error upvoting question:', error);
+        throw error;
+    }
+}
+
+export const downvoteQuestion = async (questionId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.POST}/downvoteQuestion?questionId=${questionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to downvote question');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error downvoting question:', error);
+        throw error;
+    }
+}
+
+export const removeUpvoteQuestion = async (questionId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.POST}/removeUpvoteQuestion?questionId=${questionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to remove upvote question');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error removing upvote question:', error);
+        throw error;
+    }
+}
+
+export const removeDownvoteQuestion = async (questionId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.POST}/removeDownvoteQuestion?questionId=${questionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to remove downvote question');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error removing downvote question:', error);
+        throw error;
+    }
+}
+
+export const upvoteAnswer = async (answerId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.POST}/upvoteAnswer?answerId=${answerId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upvote answer');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error upvoting answer:', error);
+        throw error;
+    }
+}
+
+export const downvoteAnswer = async (answerId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.POST}/downvoteAnswer?answerId=${answerId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to downvote answer');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error downvoting answer:', error);
+        throw error;
+    }
+}
+
+export const removeUpvoteAnswer = async (answerId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.POST}/removeUpvoteAnswer?answerId=${answerId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to remove upvote answer');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error removing upvote answer:', error);
+        throw error;
+    }
+}
+
+export const removeDownvoteAnswer = async (answerId: string, token: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URLS.POST}/removeDownvoteAnswer?answerId=${answerId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
+
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to remove downvote answer');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error removing downvote answer:', error);
+        throw error;
+    }
+}
 
 
 
