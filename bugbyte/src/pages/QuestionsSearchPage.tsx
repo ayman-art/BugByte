@@ -22,7 +22,7 @@ const QuestionSearchPage: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [tagValue, setTagValue] = useState("");
   //   const [questions, setQuestions] = useState<Question[]>([]);
-  let size = 1;
+  let size = 10;
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);

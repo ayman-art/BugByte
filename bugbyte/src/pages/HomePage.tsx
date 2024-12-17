@@ -22,47 +22,23 @@ const HomePage: React.FC = () => {
   const [page, setPage] = useState(1); // Current page
   const [loading, setLoading] = useState(false); // Loading state
   const [hasMore, setHasMore] = useState(true); // If more posts are available
-  const [searchValue, setSearchValue] = useState("");
-  const [tagValue, setTagValue] = useState("");
-  const [questions, setQuestions] = useState<Question[]>([]);
   let size = 10;
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value);
-  };
-
-  const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTagValue(event.target.value);
-  };
-
-  const handleSearchClick = async () => {
-    try {
-      if (!(searchValue === "" && tagValue === "")) {
-        const fetchedQuestions = await sendRequest(
-          searchValue,
-          tagValue,
-          "home",
-          page,
-          size
-        );
-        setQuestions(fetchedQuestions);
-        console.log(fetchedQuestions);
-        //setTagValue("");
-        //setSearchValue("");
-      }
-    } catch (error) {
-      console.error("Error fetching questions:", error);
-    }
-  };
   // Fetch posts from the API
   const fetchPosts = async () => {
     setLoading(true);
     try {
+      console.log("FEEED");
       const token = localStorage.getItem("authToken");
       const feed = await getFeed(token!);
 
       if (feed.length === 0) {
         setHasMore(false); // No more posts
+      } else if (feed.length < size) {
+        console.log(feed.length);
+        setHasMore(false); // No more posts
+        setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
+        setPage((prevPage) => prevPage + 1); // Increment page
       } else {
         setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
         setPage((prevPage) => prevPage + 1); // Increment page
@@ -77,6 +53,10 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const initialize = async () => {
       try {
+        setPosts([]);
+        setLoading(false);
+        setHasMore(true);
+        setPage(1);
         await fetchJoinedCommunities();
         await fetchPosts(); // Initial post fetch
       } catch (error) {
