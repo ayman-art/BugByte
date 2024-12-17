@@ -5,7 +5,7 @@ import '../styles/PostModal.css';
 interface PostDetails {
   title?: string; 
   content: string; 
-  community?: string; 
+  communityId?: string;
   tags?: string[] 
 }
 
@@ -14,7 +14,6 @@ interface PostModalProps {
   onClose: () => void;
   onSave: (postDetails: PostDetails) => void;
   type?: 'full' | 'md-only' | 'no-community';
-  communities?: string[];
   initialData?: PostDetails;
 }
 
@@ -23,15 +22,16 @@ const PostModal: React.FC<PostModalProps> = ({
   onClose, 
   onSave, 
   type = 'full',
-  communities = ['Tech Enthusiasts', 'Bug Hunters', 'Developers Hub'],
   initialData
 }) => {
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState<string>('');
-  const [selectedCommunity, setSelectedCommunity] = useState<string>(initialData?.community || '');
+  const [selectedCommunity, setSelectedCommunity] = useState<string>(initialData?.communityId || '');
   const [postContent, setPostContent] = useState<string>(initialData?.content || '');
   const [postTitle, setPostTitle] = useState<string>(initialData?.title || '');
 
+  
+  const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
       setTags((prevTags) => [...prevTags, tagInput.trim()]);
@@ -51,7 +51,7 @@ const PostModal: React.FC<PostModalProps> = ({
   const clearPost = () => {
     setTagInput('');
     setTags(initialData?.tags || []);
-    setSelectedCommunity(initialData?.community || '');
+    setSelectedCommunity(initialData?.communityId || '');
     setPostContent(initialData?.content || '');
     setPostTitle(initialData?.title || '');
   }
@@ -65,7 +65,7 @@ const PostModal: React.FC<PostModalProps> = ({
     }
 
     if (type === 'full') {
-      postDetails.community = selectedCommunity;
+      postDetails.communityId = selectedCommunity;
     }
 
     onSave(postDetails);
@@ -101,23 +101,24 @@ const PostModal: React.FC<PostModalProps> = ({
 
           {type === 'full' && (
             <div className="communityDropdown">
-              <label htmlFor="communitySelect">Select Community:</label>
-              <select
-                id="communitySelect"
-                value={selectedCommunity}
-                onChange={(e) => setSelectedCommunity(e.target.value)}
-                className="dropdown"
-              >
-                <option value="" disabled>
-                  Choose a community
+            <label htmlFor="communitySelect">Select Community:</label>
+            <select
+              id="communitySelect"
+              value={selectedCommunity}
+              onChange={(e) => setSelectedCommunity(e.target.value)}
+              className="dropdown"
+            >
+              <option value="" disabled>
+                Choose a community
+              </option>
+              {joinedCommunities.map((community: { id: string; name: string }, index: number) => (
+                <option key={community.id} value={community.id}>
+                  {community.name}
                 </option>
-                {communities.map((community, index) => (
-                  <option key={index} value={community}>
-                    {community}
-                  </option>
-                ))}
-              </select>
-            </div>
+              ))}
+            </select>
+          </div>
+          
           )}
 
           {type !== 'md-only' && (

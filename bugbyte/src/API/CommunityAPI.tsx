@@ -42,7 +42,7 @@ export const joinCommunity = async(token: string, id: number)=>{
           throw new Error(`Failed to Join Community`);
         }
         const joinedCommunities = await fetchJoinedCommunities()
-        localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
+        // localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
         const data = await response.text();
         return data;
       

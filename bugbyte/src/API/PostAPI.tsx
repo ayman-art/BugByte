@@ -1,5 +1,26 @@
 import { API_URLS } from './ApiUrls';
 
+interface Question {
+    answerDownVotes: number;
+    questionId: number;
+    validatedAnswerId: number;
+    answerOp: string;
+    upVotes: number;
+    mdContent: string;
+    isDownVoted: boolean;
+    title: string;
+    isUpVoted: boolean;
+    answerMdContent: string;
+    downVotes: number;
+    tags: string[] | null;
+    answerUpVotes: number;
+    opName: string;
+    postedOn: string;
+    answerPostedOn: string;
+    communityName: string;
+    communityId: number;
+  }
+
 export const postQuestion = async (
   mdContent: string, 
   title: string, 
@@ -23,7 +44,7 @@ export const postQuestion = async (
     }
 
     const data = await response.json();
-    return data;
+    return data.questionId;
   } catch (error) {
     console.error('Error posting question:', error);
     throw error;
@@ -87,8 +108,9 @@ export const postReply = async (
     }
 };
 
-export const getQuestion = async (questionId: string, token: string): Promise<any> => {
+export const getQuestion = async (questionId: string, token: string): Promise<Question> => {
     try {
+        console.log(token)
         const response = await fetch(`${API_URLS.QUESTION}?questionId=${questionId}`, {
         method: 'GET',
         headers: {
@@ -103,7 +125,8 @@ export const getQuestion = async (questionId: string, token: string): Promise<an
         }
 
         const data = await response.json();
-        return data;
+            const tags = data.tags || [];
+            return { ...data, tags };
     } catch (error) {
         console.error('Error getting question:', error);
         throw error;

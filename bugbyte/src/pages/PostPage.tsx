@@ -4,20 +4,28 @@ import Question from '../components/post/Question';
 import Answer from '../components/post/Answer';
 import Reply from '../components/post/Reply';
 import '../styles/PostPage.css';
+import { getQuestion } from '../API/PostAPI';
 
 interface QuestionProps {
-  postId: string;
+  answerDownVotes: number;
+  questionId: number;
+  validatedAnswerId: number;
+  answerOp: string;
+  upVotes: number;
+  mdContent: string;
+  isDownVoted: boolean;
   title: string;
-  questionText: string;
-  tags: string[];
-  upvotes: number;
-  downvotes: number;
+  isUpVoted: boolean;
+  answerMdContent: string;
+  downVotes: number;
+  tags: string | null;
+  answerUpVotes: number;
   opName: string;
-  date: string;
-  communityId: string;
+  postedOn: string; // Can be a Date object if you need to work with it in that format
+  answerPostedOn: string; // Can be a Date object as well
   communityName: string;
+  communityId: number;
 }
-
 interface AnswerProps {
   id: string;
   postId: string;
@@ -52,7 +60,8 @@ const PostPage: React.FC = () => {
 
   useEffect(() => {
     const fetchQuestion = async () => {
-      const fetchedQuestion = questionsEx.find((q) => q.postId === postId);
+      const fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
+      console.log(fetchedQuestion);
       const fetchedAnswers = answersEx.filter((answer) => answer.postId === postId).slice(0, pageSize);
       const hasNext = answersEx.filter((answer) => answer.postId === postId).length > pageSize;
 

@@ -1,12 +1,11 @@
-// Navbar.tsx
 import React, { useEffect, useState } from 'react';
 import logoPath from '../assets/bugbyteLogo.svg';
 import profilePath from '../assets/user-profile.svg';
 import { Link, useNavigate } from 'react-router-dom';
-import { Cursor } from 'react-simple-typewriter';
-import { updateProfilePicture } from '../API/ProfileAPI';
 import { API_URLS } from '../API/ApiUrls';
 import PostModal from './PostModal';
+import { postQuestion } from '../API/PostAPI';
+
 interface NavbarProps {
   onLogout: () => void;
 }
@@ -15,49 +14,110 @@ interface PostDetails {
   title?: string; 
   content: string; 
   community?: string; 
-  tags?: string[] 
+  tags?: string[];
+  communityId?: string;
 }
+
 const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [profilePicFetched, setProfilePicFetched] = useState<string | null>(null);
 
-  
+  // Fetch profile picture on component mount
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          console.error('No auth token found');
+          return;
+        }
 
-  
-  const [profilePicFetched, setProfilePic] = useState<string | null>(null)
-  const visitProfile = ()=>{
+        const response = await fetch(API_URLS.GET_PROFILE_PICTURE, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile picture');
+        }
+
+        const data = await response.json();
+        setProfilePicFetched(data.profilePictureUrl);
+      } catch (error) {
+        console.error('Error fetching profile picture:', error);
+      }
+    };
+
+    fetchProfilePicture();
+  }, []);
+
+  const visitProfile = () => {
     const username = localStorage.getItem("name");
-    navigate(`/Profile/${username}`)
-  }
-
-
-  const handleSavePost = (postDetails: PostDetails) => {
-    console.log('Post saved:', postDetails);
- 
-    const id = 1
-    navigate(`/Posts/${id}`);
+    navigate(`/Profile/${username}`);
   };
 
-  // useEffect(()=>{
-  //   async function fetchPicture(): Promise<void>{
-      
-  //     const token = localStorage.getItem('authToken')
-  //     const response2 = await fetch(`${API_URLS.UPDATE_PROFILE_PICTURE}`, {
-  //             method: 'POST',
-  //             headers: {
-  //               'Authorization': `Bearer ${token}`,
-  //               'Content-Type': 'application/json'
-  //             },
-  //             body:JSON.stringify({
-  //               'url': url
-  //             })
-  //           });
-  //           if(!response2.ok){
-  //             throw new Error(`Updating Profile Picture failed`)
-  //           }
-  //   }
-  //   fetchPicture();
-  // })
+  const handleSavePost = async (postDetails: PostDetails) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
+      if (!postDetails.communityId) {
+        console.error('Community ID is required');
+        return;
+      }
+
+      const id = await postQuestion(
+        postDetails.content,
+        postDetails.title || '',
+        postDetails.tags || [],
+        postDetails.communityId,
+        token
+      );
+
+      // Close modal and navigate to the newly created post
+      setShowModal(false);
+      navigate(`/Posts/${id}`);
+    } catch (error) {
+      console.error('Error saving post:', error);
+      // Optionally, show an error message to the user
+    }
+  };
+
+  const handleUpdateProfilePicture = async (url: string) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
+      const response = await fetch(API_URLS.UPDATE_PROFILE_PICTURE, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url })
+      });
+
+      if (!response.ok) {
+        throw new Error('Updating Profile Picture failed');
+      }
+
+      // Update local state with new profile picture
+      setProfilePicFetched(url);
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+    }
+  };
+
   return (
     <nav style={styles.navbar}>
       {/* Logo and Brand Name */}
@@ -67,17 +127,18 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       </div>
 
       {/* Profile and Logout */}
-      
       <div style={styles.rightContainer}>
-      <button style={styles.plusButton} onClick={() => setShowModal(true)}>
+        <button style={styles.plusButton} onClick={() => setShowModal(true)}>
           +
-      </button>
-      <img 
-        src={profilePicFetched || profilePath} alt="Profile" 
-        style={styles.profileIcon}
-        onClick={visitProfile} 
-       />
-      <button style={styles.logoutButton} onClick={onLogout}>
+        </button>
+
+        <img 
+          src={profilePicFetched || profilePath} 
+          alt="Profile" 
+          style={styles.profileIcon}
+          onClick={visitProfile} 
+        />
+        <button style={styles.logoutButton} onClick={onLogout}>
           Logout
         </button>
       </div>
