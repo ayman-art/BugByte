@@ -178,6 +178,11 @@ public class PostingService {
             boolean res = postingRepository.upVoteQuestion(questionId , 1 , userName);
             Question question = postingRepository.getQuestionById(questionId);
             addTagsToQuestions(List.of(question));
+
+            question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+            question.setIsUpVoted(isUpVoted(userName, question.getId()));
+            question.setIsDownVoted(isDownVoted(userName, question.getId()));
+
             filteringQuestionService.saveQuestion(question);
             return res;
         }
@@ -190,6 +195,11 @@ public class PostingService {
             boolean res = postingRepository.upVoteQuestion(questionId , -1 , userName);
             Question question = postingRepository.getQuestionById(questionId);
             addTagsToQuestions(List.of(question));
+
+            question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+            question.setIsUpVoted(isUpVoted(userName, question.getId()));
+            question.setIsDownVoted(isDownVoted(userName, question.getId()));
+
             filteringQuestionService.saveQuestion(question);
             return res;
         }
@@ -202,6 +212,11 @@ public class PostingService {
             boolean res = postingRepository.downVoteQuestion(questionId , 1 , userName);
             Question question = postingRepository.getQuestionById(questionId);
             addTagsToQuestions(List.of(question));
+
+            question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+            question.setIsUpVoted(isUpVoted(userName, question.getId()));
+            question.setIsDownVoted(isDownVoted(userName, question.getId()));
+
             filteringQuestionService.saveQuestion(question);
             return res;
         }
@@ -214,6 +229,11 @@ public class PostingService {
             boolean res = postingRepository.downVoteQuestion(questionId , -1 , userName);
             Question question = postingRepository.getQuestionById(questionId);
             addTagsToQuestions(List.of(question));
+
+            question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+            question.setIsUpVoted(isUpVoted(userName, question.getId()));
+            question.setIsDownVoted(isDownVoted(userName, question.getId()));
+
             filteringQuestionService.saveQuestion(question);
             return res;
         }
