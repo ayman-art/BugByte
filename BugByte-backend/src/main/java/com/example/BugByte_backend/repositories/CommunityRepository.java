@@ -162,7 +162,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     public Community findCommunityById(Long id) {
         if( id == null)
             throw new NullPointerException("id is Null");
-        System.out.println("test2");
         Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, communityRowMapper,id);
         if(com == null)
             throw new RuntimeException("No community with this id: " + id);
