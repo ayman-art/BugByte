@@ -185,10 +185,10 @@ const CommunityPage: React.FC = () => {
         <p style={styles.value}>No community data available.</p>
       )}
       <PostListing
-      posts={postList}
-      fetchPosts={fetchPosts}
-      loading={loading}
-      hasMore={hasMore}
+        posts={postList}
+        fetchPosts={fetchPosts}
+        loading={loading}
+        hasMore={hasMore}
       />
     </div>
   );

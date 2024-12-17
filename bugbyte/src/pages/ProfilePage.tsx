@@ -34,23 +34,7 @@ const Profile: React.FC = () => {
   }
   
   const {userName} = useParams<{ userName: string }>();
-  const [topPosts, setTopPosts] = useState<Post[]>([
-    {
-      id: 1,
-      title: "string",
-      content: "string"
-    },
-    {
-      id: 2,
-      title: "string",
-      content: "string"
-    },
-    {
-      id: 3,
-      title: "string",
-      content: "string"
-    }
-  ]);
+  const [topPosts, setTopPosts] = useState<Post[]>([]);
   const [profileLoading, setProfileLoading] = useState<boolean>(true);
   const [postsLoading, setPostsLoading] = useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
