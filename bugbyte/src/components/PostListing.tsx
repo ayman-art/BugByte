@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CommunityPost from "./QuestionPreview";
 
-interface Post {
+export interface Post {
   id: string;
   communityId: number;
   title: string;

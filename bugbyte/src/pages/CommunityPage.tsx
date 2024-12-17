@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getCommunity, joinCommunity } from '../API/CommunityAPI';
+import { getCommunity, getCommunityPosts, joinCommunity } from '../API/CommunityAPI';
 import { useParams } from 'react-router-dom';
+import PostListing, { Post } from '../components/PostListing';
+import { Question } from '../Models/Question';
 
 export interface Community {
   id: number;
@@ -15,7 +17,41 @@ const CommunityPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [joined, setJoined] = useState<boolean>(false); // Track if the community is joined
   const { communityId } = useParams<{ communityId: string }>();
-
+  const limit = 5;
+  const [page, setPage] = useState<number>(0);
+  const [postList, setPostList]= useState<Post[]>([]);
+  const [hasMore, setHasMore] = useState(true); // If more posts are available
+  
+  const fetchPosts = async ()=>{
+    setLoading(true);
+    try{
+      const jwt = localStorage.getItem('authToken');
+      const data = await getCommunityPosts( jwt!, community?.id!, limit, page*limit);
+      const posts: Post[] = data.map(((item: { questionId: any; title: any; opName: any; mdContent: any; upVotes: any; communityId: any; downVotes: any; tags: any; })  => ({
+        id: item.questionId,
+        title: item.title,
+        creatorUserName: item.opName,
+        mdContent: item.mdContent,
+        upVotes: item.upVotes,
+        downVotes: item.downVotes,
+        communityId: item.communityId,
+        tags: item.tags
+      })));
+      console.log(posts)
+      if(posts.length=== 0){
+        setHasMore(false);
+      }else{
+        console.log("...")
+        setPostList((prevPosts) => [...prevPosts, ...posts]); // Append new posts
+        setPage((prevPage) => prevPage + 1); // Increment page
+      }
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    } finally {
+      setLoading(false);
+    }
+    
+    }
   useEffect(() => {
     const fetchCommunityData = async () => {
       try {
@@ -30,13 +66,13 @@ const CommunityPage: React.FC = () => {
 
         // Check if the community is in the user's joined list
         const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
-        //console.log(joinedCommunities)
-        console.log(data)
-        console.log(joinedCommunities.includes(data));
+  
         const isJoined = joinedCommunities.some(
             (joinedCommunity: { id: number }) => joinedCommunity.id === data.id
           );
+        await fetchPosts()
         setJoined(isJoined); // Update the joined state
+        
       } catch (err: any) {
         setError(err.message || 'An error occurred');
       } finally {
@@ -148,6 +184,12 @@ const CommunityPage: React.FC = () => {
       ) : (
         <p style={styles.value}>No community data available.</p>
       )}
+      <PostListing
+      posts={postList}
+      fetchPosts={fetchPosts}
+      loading={loading}
+      hasMore={hasMore}
+      />
     </div>
   );
 };

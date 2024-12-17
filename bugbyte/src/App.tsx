@@ -95,9 +95,18 @@ const App: React.FC = () => {
                 </Layout>
               }
             />
+            <Route
+                path="communities/:communityId"
+                element={
+                  <Layout onLogout={handleLogout}>
+                    <CommunityPage />
+                  </Layout>
+                }
+            />
             {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
             <Route path="/SignUp" element={<Navigate to="/" />} />
             <Route path="/LogIn" element={<Navigate to="/" />} />
+            
             <Route
               path="/Search"
               element={
@@ -117,14 +126,7 @@ const App: React.FC = () => {
             <Route path="/LogIn" element={<Login onLogin={handleLogin} />} />
           </>
         )}
-        <Route
-          path="testPage/:communityId"
-          element={
-            <Layout onLogout={handleLogout}>
-              <CommunityPage />
-            </Layout>
-          }
-        />
+        
       </Routes>
     </BrowserRouter>
   );
