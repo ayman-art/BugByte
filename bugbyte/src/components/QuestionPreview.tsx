@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { upvotePost, downvotePost } from "../API/QuestionAPI";
+import { upvotePost, downvotePost, removeDownvoteQuestion, removeUpvoteQuestion } from "../API/QuestionAPI";
 
 interface CommunityPostProps {
   postId: string;
@@ -9,7 +9,7 @@ interface CommunityPostProps {
   content?: string;
   upvotes: number;
   downvotes: number;
-  tags?: string[]; // New prop for tags list
+  tags?: string[];
 }
 
 const CommunityPost: React.FC<CommunityPostProps> = ({
@@ -23,14 +23,53 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
 }) => {
   const [upvotes, setUpvotes] = useState(initialUpvotes);
   const [downvotes, setDownvotes] = useState(initialDownvotes);
+  const [isUpvoted, setIsUpvoted] = useState(false); // Track upvote state
+  const [isDownvoted, setIsDownvoted] = useState(false); // Track downvote state
+  const token = localStorage.getItem("authToken");
 
   const handleVote = async (type: "up" | "down") => {
     if (type === "up") {
-      const success = await upvotePost(postId);
-      if (success) setUpvotes((prev) => prev + 1);
+
+      if (isUpvoted) {
+        setUpvotes((prev) => prev - 1);
+        removeUpvoteQuestion(postId, token!);
+        setIsUpvoted(false);
+        return;
+      }
+
+      const success = await upvotePost(postId, token!);
+      if (success) {
+        setUpvotes((prev) => prev + 1);
+
+        if(isDownvoted) {
+          setDownvotes((prev) => prev - 1);
+          removeDownvoteQuestion(postId, token!);
+        }
+
+        setIsUpvoted(true);
+        setIsDownvoted(false);
+      }
     } else if (type === "down") {
-      const success = await downvotePost(postId);
-      if (success) setDownvotes((prev) => prev + 1);
+
+      if (isDownvoted) {
+        setDownvotes((prev) => prev - 1);
+        removeDownvoteQuestion(postId, token!);
+        setIsDownvoted(false);
+        return;
+      }
+
+      const success = await downvotePost(postId, token!);
+      if (success) {
+        setDownvotes((prev) => prev + 1);
+
+        if(isUpvoted) {
+          setUpvotes((prev) => prev - 1);
+          removeUpvoteQuestion(postId, token!);
+        }
+
+        setIsDownvoted(true);
+        setIsUpvoted(false);
+      }
     }
   };
 
@@ -55,7 +94,10 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
       <div>
         <div style={styles.container} onClick={handleContentClick}>
           <div style={styles.postBox}>
-            <a onClick={stopPropagation} style={styles.postNaming}>
+            <a 
+            href={`/communities/${communityName}`} 
+            onClick={stopPropagation}
+            style={styles.postNaming}>
               Community: {communityName} <br />
             </a>
           </div>
@@ -66,7 +108,7 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
               onClick={stopPropagation}
               style={styles.postNaming}
             >
-              OP: {authorName}
+              {authorName}
             </a>
           </div>
 
@@ -90,14 +132,20 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
           >
             <button
               onClick={() => handleVote("up")}
-              style={styles.upVoteButton}
+              style={{
+                ...styles.upVoteButton,
+                backgroundColor: isUpvoted ? "#a5d6a7" : "#e8f5e9", // Darker green when upvoted
+              }}
             >
               <ArrowUp />
               <span>{upvotes}</span>
             </button>
             <button
               onClick={() => handleVote("down")}
-              style={styles.downVoteButton}
+              style={{
+                ...styles.downVoteButton,
+                backgroundColor: isDownvoted ? "#ef9a9a" : "#ffebee", // Darker red when downvoted
+              }}
             >
               <ArrowDown />
               <span>{downvotes}</span>
@@ -171,10 +219,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     margin: "5px",
   },
 
-  tagHover: {
-    backgroundColor: "#c8e6c9",
-  },
-
   upVoteButton: {
     display: "flex",
     alignItems: "center",
@@ -190,10 +234,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: "bold",
     transition: "background-color 0.2s, transform 0.1s",
     margin: "5px",
-  },
-
-  upVoteHover: {
-    backgroundColor: "#c8e6c9",
   },
 
   downVoteButton: {
@@ -212,9 +252,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: "background-color 0.2s, transform 0.1s",
     margin: "5px",
   },
-
-  downVoteHover: {
-    backgroundColor: "#ffcdd2",
-  },
 };
+
 export default CommunityPost;

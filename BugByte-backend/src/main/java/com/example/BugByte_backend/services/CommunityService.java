@@ -144,14 +144,21 @@ public class CommunityService {
             throw e;
         }
     }
-//
-//    public List<User> getCommunityUsers(Long communityId) {
-//        try {
-//            return communityRepository.getCommunityMembers(communityId);
-//        } catch (Exception e) {
-//            throw e;
-//        }
-//    }
+
+    public List<User> getCommunityUsers(Long communityId) {
+        try {
+            return communityRepository.getCommunityMembers(communityId);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+    public List<Community> getAllCommunities(int pageSize ,int pageNumber ) {
+        try {
+            return communityRepository.findAllCommunities(pageSize,pageNumber);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
 //    public List<String> getCommunityMembersNames(Long communityId) {
 //        try {

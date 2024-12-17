@@ -145,5 +145,14 @@ public class CommunityController {
             return new ResponseEntity<>(Map.of("message", "unauthorized"), HttpStatus.UNAUTHORIZED);
         }
     }
-
+    @GetMapping("/allCommunities")
+    public ResponseEntity<?> getAllCommunities(@RequestHeader("Authorization") String token , @RequestParam("page") Integer pageNumber ,
+                                               @RequestParam("size") Integer pageSize){
+        token = token.replace("Bearer ", "");
+        try{
+            return new ResponseEntity<>(administrativeFacade.getAllCommunities(token , pageSize , pageNumber), HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>(Map.of("message", "unauthorized"), HttpStatus.UNAUTHORIZED);
+        }
+    }
 }

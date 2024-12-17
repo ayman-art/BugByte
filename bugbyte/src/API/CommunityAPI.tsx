@@ -64,3 +64,25 @@ export const getCommunityPosts = async(token: string, id: number, limit: number,
   console.log(posts)
   return posts;
 }
+export const fetchCommunities = async (token:string, page:number, size:number)=>{
+  try {
+    const response = await fetch(`${API_URLS.ALL_COMMUNITIES}?page=${page}&size=${size}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      console.error('Error while getting communities', response.statusText);
+      return [];
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching communities:', error);
+    return [];
+  }
+}

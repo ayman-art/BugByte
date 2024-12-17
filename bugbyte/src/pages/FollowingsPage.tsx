@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { getFollowings } from '../API/FollowingsAPI';
+import { useParams } from "react-router-dom";
 
 const followings: React.FC = () => {
-    const username = localStorage.getItem("name");
+    const {userName} = useParams<{ userName: string }>();
     const token = localStorage.getItem('authToken');
     const [followings, setfollowings] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (username) {
-            getFollowings(username, token!).then((fetchedFollowings) => {
+        if (userName) {
+            getFollowings(userName, token!).then((fetchedFollowings) => {
                 setfollowings(fetchedFollowings);
                 setLoading(false);
             }).catch((error) => {
@@ -17,7 +18,7 @@ const followings: React.FC = () => {
                 setLoading(false);
             });
         }
-    }, [username]);
+    }, [userName]);
 
     const directFollowing = (followingUsername: string) => {
         
@@ -28,7 +29,7 @@ const followings: React.FC = () => {
             {loading ? "Loading..." : (
                 followings.length > 0 ? (
                     <div>
-                        <h3>Followings of {username}:</h3>
+                        <h3>Followings of {userName}:</h3>
                         <ul>
                             {followings.map((following, index) => (
                                 <div

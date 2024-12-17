@@ -15,8 +15,12 @@ export const API_URLS = {
   UNFOLLOW: `${API_BASE_URL}/users/unfollow`,
   GET_FOLLOWERS: `${API_BASE_URL}/users/followers`,
   GET_FOLLOWINGS: `${API_BASE_URL}/users/following`,
+  POST: `${API_BASE_URL}/posts`,
   ADMIN: `${API_BASE_URL}/users/make-admin`,
-  UPVOTE:`${API_BASE_URL}/posts/upvote`,
+  UPVOTE:`${API_BASE_URL}/posts/upvoteQuestion`,
+  DONWVOTE:`${API_BASE_URL}/posts/downvoteQuestion`,
+  REMOVE_UPVOTE: `${API_BASE_URL}/posts/removeUpvoteQuestion`,
+  REMOVE_DOWNVOTE: `${API_BASE_URL}/posts/removeDownvoteQuestion`,
   DOWNVOTE:`${API_BASE_URL}/posts/downvote`,
   UPLOAD_IMAGE: `${API_BASE_URL}/images/upload`,
   UPDATE_PROFILE_PICTURE: `${API_BASE_URL}/users/update-picture`,
@@ -30,6 +34,7 @@ export const API_URLS = {
   CREATE_COMMUNITY: `${API_BASE_URL}/communities/createCommunity`,
   GET_FEED: `${API_BASE_URL}/recommendation/feed`,
   COMMUNITY_POSTS: `${API_BASE_URL}/posts/questions/communityQuestions`,
-  USER_POSTS: `${API_BASE_URL}/posts/questions/userQuestions`
+  USER_POSTS: `${API_BASE_URL}/posts/questions/userQuestions`,
+  ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`
   
 };

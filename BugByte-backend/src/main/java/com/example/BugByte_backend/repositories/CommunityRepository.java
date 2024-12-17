@@ -1,7 +1,6 @@
 package com.example.BugByte_backend.repositories;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
-import org.apache.lucene.analysis.miscellaneous.ConcatenateGraphFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,7 +47,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM communities WHERE name = ?;";
     private static final String SQL_FIND_COMMUNITY_MEMBERS_ID = "SELECT member_id FROM community_members WHERE community_id =?;";
     private static final String SQL_FIND_USER_COMMUNITIES_ID = "SELECT community_id FROM community_members WHERE member_id =?;";
-    private static final String SQL_FIND_ALL_COMMUNITIES = "SELECT * FROM communities;";
+    private static final String SQL_FIND_ALL_COMMUNITIES = "SELECT * FROM communities LIMIT ? OFFSET ?;";
     private static final String SQL_UPDATE_DESCRIPTION = "UPDATE communities SET description = ? WHERE id = ?;";
     private static final String SQL_UPDATE_COMMUNITY_NAME = "UPDATE communities SET name = ? WHERE id = ?;";
     private static final String SQL_DELETE_COMMUNITY_BY_ID = "DELETE FROM communities WHERE id = ?;";
@@ -60,13 +58,13 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     FROM communities c
     INNER JOIN community_members cm ON c.id = cm.community_id
     WHERE cm.member_id = ?;
-""";
+    """;
     private static final String SQL_FIND_USERS_BY_COMMUNITY_ID = """
     SELECT *
     FROM users u
     INNER JOIN community_members cm ON u.id = cm.member_id
     WHERE cm.community_id = ?;
-""";
+    """;
     private static final String SQL_FIND_COMMUNITIES_NAMES_BY_USER_ID = """
     SELECT name
     FROM communities c
@@ -179,8 +177,8 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     @Override
-    public List<Community> findAllCommunities() {
-        return jdbcTemplate.query(SQL_FIND_ALL_COMMUNITIES,
+    public List<Community> findAllCommunities(int pageSize, int pageNumber) {
+        return jdbcTemplate.query(SQL_FIND_ALL_COMMUNITIES,new Object[]{pageSize,pageNumber},
                 (rs, rowNum) -> Community.builder()
                         .id(rs.getLong("id"))
                         .name(rs.getString("name"))
@@ -188,7 +186,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
                         .adminId(rs.getLong("admin_id"))
                         .creationDate(rs.getDate("creation_date"))
                         .build()
-                );
+        );
     }
 
     @Override
@@ -275,7 +273,8 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new NullPointerException("userId is null");
 
         List<Community> communities = jdbcTemplate.query(SQL_FIND_COMMUNITIES_BY_USER_ID,
-                new Object[] {userId}, (rs, rowNum) -> Community.builder()
+                new Object[] {userId},
+                (rs, rowNum) -> Community.builder()
                         .id(rs.getLong("id"))
                         .name(rs.getString("name"))
                         .description(rs.getString("description"))
@@ -285,7 +284,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         );
 
         if (communities.isEmpty())
-            return new ArrayList<Community>();
+            throw new RuntimeException("User is not a member of any communities.");
 
         return communities;
     }
