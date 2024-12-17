@@ -5,27 +5,12 @@ import Answer from '../components/post/Answer';
 import Reply from '../components/post/Reply';
 import '../styles/PostPage.css';
 import { getQuestion } from '../API/PostAPI';
-
-interface QuestionProps {
-  answerDownVotes: number;
-  questionId: number;
-  validatedAnswerId: number;
-  answerOp: string;
-  upVotes: number;
-  mdContent: string;
-  isDownVoted: boolean;
-  title: string;
-  isUpVoted: boolean;
-  answerMdContent: string;
-  downVotes: number;
-  tags: string[] | null;
-  answerUpVotes: number;
-  opName: string;
-  postedOn: string; // Can be a Date object if you need to work with it in that format
-  answerPostedOn: string; // Can be a Date object as well
-  communityName: string;
-  communityId: string;
+import { IQuestion } from '../types';
+interface QuestionProps  extends IQuestion {
+  onDelete: (questionId: string) => void;
 }
+
+
 interface AnswerProps {
   id: string;
   postId: string;
@@ -51,7 +36,7 @@ interface ReplyProps {
 const PostPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
 
-  const [question, setQuestion] = useState<QuestionProps | null>(null);
+  const [question, setQuestion] = useState<IQuestion | null>(null);
   const [answers, setAnswers] = useState<AnswerProps[]>([]);
   const [replies, setReplies] = useState<Map<string, ReplyProps[]>>(new Map());
   const [hasNextAnswers, setHasNextAnswers] = useState(true);
@@ -61,7 +46,7 @@ const PostPage: React.FC = () => {
   useEffect(() => {
     const fetchQuestion = async () => {
       const fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
-      console.log(fetchedQuestion);
+      console.log("FETCHED QUESITON:", fetchedQuestion);
       const fetchedAnswers = answersEx.filter((answer) => answer.postId === postId).slice(0, pageSize);
       const hasNext = answersEx.filter((answer) => answer.postId === postId).length > pageSize;
 
@@ -144,6 +129,11 @@ const PostPage: React.FC = () => {
     });
   };
 
+  const onDelteQuestion = (questionId: string) => {
+    console.log(1111)
+    setQuestion(null)
+  }
+
   const onDeleteAnswer = (answerId: string) => {
     setAnswers((prev) => prev.filter((answer) => answer.id !== answerId));
 
@@ -180,7 +170,7 @@ const PostPage: React.FC = () => {
 
   return (
     <div className="post-page">
-      <Question {...question} />
+      <Question {...question} onDelete={onDelteQuestion} />
       <div className="answers-section">
         {answers.map((answer) => (
           <div key={answer.id} className="answer-container">

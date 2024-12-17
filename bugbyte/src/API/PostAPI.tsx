@@ -1,6 +1,7 @@
 import { API_URLS } from './ApiUrls';
+import { IQuestion } from '../types/index'
 
-export interface QuestionData {
+export interface QuestionResponse {
     answerDownVotes?: number;
     questionId: number;
     validatedAnswerId?: number;
@@ -128,7 +129,7 @@ export const postReply = async (
     }
 };
 
-export const getQuestion = async (questionId: string, token: string): Promise<Question> => {
+export const getQuestion = async (questionId: string, token: string): Promise<IQuestion> => {
     try {
         console.log(token)
         const response = await fetch(`${API_URLS.QUESTION}?questionId=${questionId}`, {
@@ -143,7 +144,6 @@ export const getQuestion = async (questionId: string, token: string): Promise<Qu
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to get question');
         }
-
         const data = await response.json();
             const tags = data.tags || []; // handling null
             return { ...data, tags };

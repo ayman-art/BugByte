@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaReply } from 'react-icons/fa';
+import { IQuestion } from '../../types/index'
 import { MDXEditor, 
   headingsPlugin,
   listsPlugin,
@@ -19,35 +20,28 @@ import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 
-interface QuestionProps {
-  postId: string;
-  title: string;
-  questionText: string;
-  tags: string[];
-  upvotes: number;
-  downvotes: number;
-  opName: string;
-  date: string;
-  communityId: string;
-  communityName: string;
-  initialVoteStatus: 'upvoted' | 'downvoted' | 'neutral'; // New prop for the initial vote status
+interface QuestionProps extends IQuestion {
+  onDelete: (questionId: string) => void;
 }
-
 const Question: React.FC<QuestionProps> = ({
+  questionId,
+  upVotes,
+  mdContent,
+  isDownVoted,
   title,
-  questionText,
-  tags,
-  upvotes,
-  downvotes,
+  isUpVoted,
+  downVotes,
+  tags = [],
   opName,
-  date,
-  communityId,
+  postedOn,
   communityName,
-  initialVoteStatus, // Access the new prop
+  communityId,
+  onDelete
+  
 }) => {
-  const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
-  const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
-  const [voteStatus, setVoteStatus] = useState(initialVoteStatus || 'neutral'); // Track vote status
+  const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
+  const [currentDownvotes, setCurrentDownvotes] = useState(downVotes);
+  const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -110,6 +104,7 @@ const Question: React.FC<QuestionProps> = ({
     setIsEditModalOpen(false);
   };
 
+
   const canEdit = loggedInUsername === opName;
   const canDelete = loggedInUsername === opName || isAdmin;
 
@@ -129,7 +124,7 @@ const Question: React.FC<QuestionProps> = ({
           </p>
           <section className="question-body">
             <MDXEditor
-              markdown={questionText}
+              markdown={mdContent}
               readOnly
               plugins={[
                 headingsPlugin(),
@@ -149,7 +144,7 @@ const Question: React.FC<QuestionProps> = ({
           </section>
         </header>
 
-        <p className="question-date">on {date}</p>
+        <p className="question-date">on {postedOn}</p>
 
         <footer className="question-footer">
           <div className="question-tags">
@@ -185,7 +180,7 @@ const Question: React.FC<QuestionProps> = ({
             )}
 
             {canDelete && (
-              <button className="action-button delete-button">
+              <button className="action-button delete-button" onClick={() =>onDelete(questionId)}>
                 <FaTrash />
               </button>
             )}
@@ -210,7 +205,7 @@ const Question: React.FC<QuestionProps> = ({
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: questionText }}
+        initialData={{ content: mdContent }}
         type="no-community"
       />
     </div>
