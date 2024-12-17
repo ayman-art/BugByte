@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 @Repository
@@ -287,7 +288,9 @@ public class PostingRepository implements IPostingRepository{
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already up voted this question");
-
+            if (is_DownVoted(userName , questionId)) {
+                jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_QUESTIONS,  -1, questionId);
+            }
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE ,userName , questionId);
             jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, questionId);
         }else{
@@ -313,7 +316,9 @@ public class PostingRepository implements IPostingRepository{
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already down voted this question");
-
+            if (is_UpVoted(userName , questionId)) {
+                jdbcTemplate.update(SQL_UPDATE_UP_VOTES_QUESTIONS,  -1, questionId);
+            }
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, questionId);
             jdbcTemplate.update(SQL_INSERT_DOWNVOTE, userName, questionId);
         }else{
@@ -338,6 +343,9 @@ public class PostingRepository implements IPostingRepository{
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already up voted this answer");
+            if (is_DownVoted(userName , answerId)) {
+                jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_ANSWERS,  -1, answerId);
+            }
 
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
             jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, answerId);
@@ -364,6 +372,9 @@ public class PostingRepository implements IPostingRepository{
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already up voted this answer");
+            if (is_UpVoted(userName , answerId)) {
+                jdbcTemplate.update(SQL_UPDATE_UP_VOTES_ANSWERS,  -1, answerId);
+            }
 
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
             jdbcTemplate.update(SQL_INSERT_DOWNVOTE, userName, answerId);
@@ -373,6 +384,7 @@ public class PostingRepository implements IPostingRepository{
 
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
         }
+
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,answerId);
 
         if (rows == 0)
