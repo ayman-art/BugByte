@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import profilePath from '../assets/user-profile.svg';
 import TextPopUp from '../components/BioPopup'
-import { followUser, getProfile, makeAdmin, unfollowUser, updateBio, updateProfilePicture } from '../API/ProfileAPI';
+import { followUser, getProfile, getUserPosts, makeAdmin, unfollowUser, updateBio, updateProfilePicture } from '../API/ProfileAPI';
 import { useNavigate, useParams } from 'react-router-dom';
+import PostListing, { Post } from '../components/PostListing';
 interface UserProfile {
   username: string;
   reputation: number;
@@ -13,11 +14,11 @@ interface UserProfile {
   is_admin: boolean; // Add this to match the fetched user profile structure
   profile_picture?: string; // New optional field for profile picture
 }
-interface Post {
-  id: number;
-  title: string;
-  content: string;
-}
+// interface Post {
+//   id: number;
+//   title: string;
+//   content: string;
+// }
 
 const Profile: React.FC = () => {
   const navigate = useNavigate()
@@ -59,11 +60,45 @@ const Profile: React.FC = () => {
 
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
+  const limit = 5;
+  const [page, setPage] = useState<number>(0);
+  const [hasMore, setHasMore] = useState(true); // If more posts are available
+  const [postList, setPostList]= useState<Post[]>([]);
+  
 
   const handleButtonClick = () => {
     setIsPopupOpen(true);
   };
-
+  const fetchPosts = async ()=>{
+    setPostsLoading(true);
+    try{
+      const jwt = localStorage.getItem('authToken');
+      const data = await getUserPosts( jwt!, limit, page*limit);
+      const posts: Post[] = data.map(((item: { questionId: any; title: any; opName: any; mdContent: any; upVotes: any; communityId: any; downVotes: any; tags: any; })  => ({
+        id: item.questionId,
+        title: item.title,
+        creatorUserName: item.opName,
+        mdContent: item.mdContent,
+        upVotes: item.upVotes,
+        downVotes: item.downVotes,
+        communityId: item.communityId,
+        tags: item.tags
+      })));
+      console.log(posts)
+      if(posts.length=== 0){
+        setHasMore(false);
+      }else{
+        console.log("...")
+        setPostList((prevPosts) => [...prevPosts, ...posts]); // Append new posts
+        setPage((prevPage) => prevPage + 1); // Increment page
+      }
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    } finally {
+      setPostsLoading(false);
+    }
+    
+    }
   const handlePopupSubmit = (newText: string) => {
     // PUT request HERE
     let newUserProfile = userProfile;
@@ -419,113 +454,15 @@ const Profile: React.FC = () => {
         {/* Top Posts Section */}
         <div style={styles.posts}>
           <h3>Top Posts:</h3>
-          {postsLoading ? (
-            <p>Loading top posts...</p>
-          ) : (
-            <ul>
-              {topPosts.map((post) => (
-                <li key={post.id} style={styles.post}>
-                  <h4 style={styles.postTitle}>{post.title}</h4>
-                  <p style={styles.postContent}>{post.content}</p>
-                </li>
-              ))}
-            </ul>
-          )}
+            <PostListing
+              posts={postList}
+              fetchPosts={fetchPosts}
+              loading={postsLoading}
+              hasMore={hasMore}
+            />
         </div>
       </div>
   );
 };
-// Inline style definitions
-const styles = {
-  errorMessge: {
-    color: 'red',
-    fontSize: '12px', 
-    marginTop: '10px', 
-    textAlign: 'center' as 'center', 
-  },
-  container: {
-    margin: '0 auto',
-    padding: '20px',
-    backgroundColor: '#f5f5f5',
-    borderRadius: '10px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    fontFamily: 'Arial, sans-serif',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-    marginBottom: '20px',
-    justifyContent: 'space-between', // Add space between the profile info and the buttons
-  },
-  profilePicture: {
-    width: '100px',
-    height: '100px',
-    borderRadius: '50%',
-    border: '2px solid #ddd',
-  },
-  profileInfo: {
-    margin: 0,
-  },
-  followStats: {
-    display: 'flex',
-    gap: '20px',
-    fontSize: '14px',
-    color: '#555',
-  },
-  bio: {
-    marginBottom: '20px',
-    padding: '10px',
-    backgroundColor: '#eaeaea',
-    borderRadius: '8px',
-  },
-  posts: {
-    marginTop: '20px',
-  },
-  post: {
-    backgroundColor: '#fff',
-    padding: '10px',
-    marginBottom: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-  },
-  openButton: {
-    padding: '8px 12px',
-    fontSize: '14px',
-    borderRadius: '5px',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  editButton: {
-    backgroundColor: '#ADD8E6', // Light blue
-    color: '#333',
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: '14px',
-    fontWeight: 'bold',
-  },
-  postTitle: {
-    margin: '0 0 5px 0',
-    fontSize: '16px',
-  },
-  postContent: {
-    margin: 0,
-    fontSize: '14px',
-    color: '#555',
-  },
-  button: {
-    padding: '8px 12px',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-  },
-  followButton: {
-    backgroundColor: '#4caf50',
-    color: 'white',
-  },
-  adminButton: {
-    backgroundColor: '#f44336',
-    color: 'white',
-  },
-};
+
 export default Profile;
