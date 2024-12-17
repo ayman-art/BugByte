@@ -19,7 +19,7 @@ export const upvotePost = async (postId: string, token:string): Promise<boolean>
 
   export const removeUpvoteQuestion = async (questionId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/removeUpvoteQuestion?postId=${questionId}`, {
+        const response = await fetch(`${API_URLS.REMOVE_UPVOTE}?postId=${questionId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export const upvotePost = async (postId: string, token:string): Promise<boolean>
   
   export const removeDownvoteQuestion = async (questionId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/removeDownvoteQuestion?postId=${questionId}`, {
+        const response = await fetch(`${API_URLS.REMOVE_DOWNVOTE}?postId=${questionId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
