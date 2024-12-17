@@ -1,11 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Question from '../components/post/Question';
 import Answer from '../components/post/Answer';
 import Reply from '../components/post/Reply';
 import '../styles/PostPage.css';
-import { getQuestion } from '../API/PostAPI';
-import { IQuestion, IAnswer } from '../types/index';
+import { getAnswersFromQuestion, getQuestion, getRepliesFromAnswer } from '../API/PostAPI';
+import { IQuestion, IAnswer, IReply } from '../types/index';
 interface QuestionProps  extends IQuestion {
   onDelete: (questionId: string) => void;
 }
@@ -13,127 +14,157 @@ interface QuestionProps  extends IQuestion {
 
 
 
-interface ReplyProps {
-  id: string;
-  answerId: string;
-  text: string;
-  upvotes: number;
-  downvotes: number;
-  opName: string;
-  date: string;
-}
 
 const PostPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
 
   const [question, setQuestion] = useState<IQuestion | null>(null);
   const [answers, setAnswers] = useState<IAnswer[]>([]);
-  const [replies, setReplies] = useState<Map<string, ReplyProps[]>>(new Map());
+  const [replies, setReplies] = useState<Map<string, IReply[]>>(new Map());
   const [hasNextAnswers, setHasNextAnswers] = useState(true);
   const [hasNextReplies, setHasNextReplies] = useState<Map<string, boolean>>(new Map());
-  const pageSize = 2;
+  const pageSize = 3;
+  const token = localStorage.getItem('authToken');
 
   useEffect(() => {
-    const fetchQuestion = async () => {
-      const fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
-      setQuestion(fetchedQuestion[0]);
-
-      if (fetchedQuestion[1]) {
+      const fetchQuestion = async () => {
+        const fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
+        setQuestion(fetchedQuestion[0]);
         
-        setAnswers([...answers, { ...fetchedQuestion[1], isVerified:true, enabledVerify: false }]);
-      }
+        const initialAnswers = [];
+        if (fetchedQuestion[1]) {
+          initialAnswers.push({ ...fetchedQuestion[1], isVerified: true, enabledVerify: false });
+        }
       
-      // console.log("FETCHED QUESITON:", fetchedQuestion);
-      const fetchedAnswers = answersEx.filter((answer) => answer.postId === postId).slice(0, pageSize);
-      const hasNext = answersEx.filter((answer) => answer.postId === postId).length > pageSize;
-
-      ;
-      console.log("FETCHED QUESITON:", fetchedQuestion[0]);
-      console.log("FETCHED ANSWERS:", fetchedQuestion[1]);
-
-      setHasNextAnswers(hasNext);
-
-      // Initialize `hasNextReplies` for all fetched answers
-      const nextReplies = new Map<string, boolean>();
-      fetchedAnswers.forEach((answer) => {
-        const hasMoreReplies = (repliesEx[answer.id]?.length || 0) > pageSize;
-        nextReplies.set(answer.id, hasMoreReplies);
-        setReplies((prev) => {
-          const newReplies = new Map(prev);
-          newReplies.set(answer.id, (repliesEx[answer.id]?.slice(0, pageSize)) || []);
-          return newReplies;
-        });
-      });
-      setHasNextReplies(nextReplies);
-    };
-
-    fetchQuestion();
+        const fetchedAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
+        console.log(fetchedAnswers.length, pageSize, fetchedQuestion[1]);
+      
+        const hasNext = fetchedAnswers.length > pageSize;
+        if (hasNext) {
+          fetchedAnswers.pop();
+        }
+      
+        // Filter out the verified answer from fetched answers to prevent duplication
+        const nonDuplicates = fetchedAnswers.filter(
+          (answer) => !fetchedQuestion[1] || answer.answerId !== fetchedQuestion[1].answerId
+        );
+      
+        // Mark other answers as not verified
+        const processedAnswers = nonDuplicates.map((answer) => ({
+          ...answer,
+          isVerified: false,
+          enabledVerify: !fetchedQuestion[1],
+        }));
+      
+        // Combine initial answers with fetched answers
+        setAnswers([...initialAnswers, ...processedAnswers]);
+        setHasNextAnswers(hasNext);
+      
+        // Fetch replies for each answer
+        const nextReplies = new Map<string, boolean>();
+      
+        // Loop over each answer to fetch its replies
+        for (const answer of processedAnswers) {
+          const fetchedReplies = await getRepliesFromAnswer(answer.answerId, token!, 0, pageSize + 1);
+      
+          // Check if there are more replies beyond the current page
+          const hasMoreReplies = fetchedReplies.length > pageSize;
+          nextReplies.set(answer.answerId, hasMoreReplies);
+      
+          setReplies((prev) => {
+            const newReplies = new Map(prev);
+            newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize)); // Store replies for this answer
+            return newReplies;
+          });
+        }
+      
+        setHasNextReplies(nextReplies);
+      };
+      
+      fetchQuestion();
+      
   }, [postId]);
 
-  const fetchMoreAnswers = () => {
-    const newAnswers = answersEx.slice(answers.length, answers.length + pageSize + 1);
-    const addedAnswers = newAnswers.slice(0, pageSize);
+  const fetchMoreAnswers = async () => {
+    const newAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
+    let addedAnswers = newAnswers.slice(0, pageSize);
     const hasNext = newAnswers.length > pageSize;
     
 
-    const hasVerifiedAnswer = answers.some((answer) => answer.verified);
+    const hasVerifiedAnswer = answers.some((answer) => answer.isVerified);
+    if (hasVerifiedAnswer) {
+      const verifiedAnswer = answers.find((answer) => answer.isVerified);
+      // Filter out the verified answer from fetched answers to prevent duplication
+       addedAnswers = addedAnswers.filter(
+        (answer) => answer.answerId !== verifiedAnswer?.answerId
+      );
+    }
     const enableVerify = !hasVerifiedAnswer;
 
-    addedAnswers.forEach((answer) => {
-      answer.enabledVerify = enableVerify;
-    });
+    addedAnswers.forEach((answer) => ({
+      ...answer,
+      isVerified: false,
+      enabledVerify: enableVerify
+    }));
 
-    // Initialize replies and hasNextReplies for the newly added answers
     const nextReplies = new Map<string, boolean>();
-    addedAnswers.forEach((answer) => {
-      const hasMoreReplies = (repliesEx[answer.id]?.length || 0) > pageSize;
-      nextReplies.set(answer.id, hasMoreReplies);
+      
+    // Loop over each answer to fetch its replies
+    for (const answer of addedAnswers) {
+      const fetchedReplies = await getRepliesFromAnswer(answer.answerId, token!, 0, pageSize + 1);
+  
+      // Check if there are more replies beyond the current page
+      const hasMoreReplies = fetchedReplies.length > pageSize;
+      nextReplies.set(answer.answerId, hasMoreReplies);
   
       setReplies((prev) => {
         const newReplies = new Map(prev);
-        newReplies.set(answer.id, (repliesEx[answer.id]?.slice(0, pageSize)) || []);
+        newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize)); // Store replies for this answer
         return newReplies;
       });
-    });
-  
-    setHasNextReplies((prev) => {
-      const newHasNextReplies = new Map(prev);
-      nextReplies.forEach((value, key) => {
-        newHasNextReplies.set(key, value);
-      });
-      return newHasNextReplies;
-    });
+    }
+
+
   
     setAnswers((prev) => [...prev, ...addedAnswers]);
     setHasNextAnswers(hasNext);
   };
   
 
-  const fetchMoreReplies = (answerId: string) => {
+  const fetchMoreReplies = async (answerId: string) => {
+    // Get the current replies for the specific answerId
     const currentReplies = replies.get(answerId) || [];
-    const newReplies = repliesEx[answerId]?.slice(currentReplies.length, currentReplies.length + pageSize + 1) || [];
+  
+    // Fetch the next set of replies for the given answerId
+    const newReplies = await getRepliesFromAnswer(answerId, token!, currentReplies.length, pageSize + 1);
+  
+    // Add only up to pageSize replies to avoid excess
     const addedReplies = newReplies.slice(0, pageSize);
+  
+    // Check if there are more replies beyond the current page
     const hasNext = newReplies.length > pageSize;
-
+  
+    // Update the replies state to include the new replies
     setReplies((prev) => {
       const newRepliesMap = new Map(prev);
-      newRepliesMap.set(answerId, [...(prev.get(answerId) || []), ...addedReplies]);
+      newRepliesMap.set(answerId, [...currentReplies, ...addedReplies]);
       return newRepliesMap;
     });
-
+  
+    // Update the hasNextReplies state to keep track of whether there are more replies
     setHasNextReplies((prev) => {
       const newHasNextReplies = new Map(prev);
       newHasNextReplies.set(answerId, hasNext);
       return newHasNextReplies;
     });
   };
-
-  const onDelteQuestion = (questionId: number) => {
+  
+  const onDelteQuestion = (questionId: string) => {
     console.log(1111)
     setQuestion(null)
   }
 
-  const onDeleteAnswer = (answerId: number) => {
+  const onDeleteAnswer = (answerId: string) => {
     setAnswers((prev) => prev.filter((answer) => answer.answerId !== answerId));
 
     setReplies((prev) => {
@@ -153,7 +184,7 @@ const PostPage: React.FC = () => {
     return <p>Question not found.</p>;
   }
 
-  const onVerify = (answerId: number) => {
+  const onVerify = (answerId: string) => {
     // Update the verified answer in the state
     setAnswers((prev) =>
       prev.map((answer) => {
@@ -172,16 +203,16 @@ const PostPage: React.FC = () => {
       <Question {...question} onDelete={onDelteQuestion} />
       <div className="answers-section">
         {answers.map((answer) => (
-          <div key={answer.id} className="answer-container">
+          <div key={answer.answerId} className="answer-container">
             <Answer {...answer} onDelete={onDeleteAnswer} onVerify={onVerify} />
             <div className="replies-section">
-              {(replies.get(answer.id) || []).map((reply) => (
-                <div key={reply.id} className="reply-container">
+              {(replies.get(answer.answerId) || []).map((reply) => (
+                <div key={reply.replyId} className="reply-container">
                   <Reply {...reply} />
                 </div>
               ))}
-              {hasNextReplies.get(answer.id) && (
-                <button className="show-more-replies" onClick={() => fetchMoreReplies(answer.id)}>
+              {hasNextReplies.get(answer.answerId) && (
+                <button className="show-more-replies" onClick={() => fetchMoreReplies(answer.answerId)}>
                   Show More Replies
                 </button>
               )}

@@ -18,20 +18,13 @@ import { MDXEditor,
 import '@mdxeditor/editor/style.css';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import PostModal from '../PostModal';
+import { IReply } from '../../types';
 
-interface ReplyProps {
-  id: string;
-  answerId: string;
-  text: string;
-  upvotes: number;
-  downvotes: number;
-  opName: string;
-  date: string;
+interface ReplyProps extends IReply{
+
 }
 
-const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date }) => {
-  const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
-  const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
+const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdContent }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
   const navigate = useNavigate();
@@ -39,13 +32,6 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
   const isAdmin = localStorage.getItem('is_admin') === 'true';
 
 
-  const handleUpvote = () => {
-    setCurrentUpvotes(currentUpvotes + 1);
-  };
-
-  const handleDownvote = () => {
-    setCurrentDownvotes(currentDownvotes + 1);
-  };
 
   const handleEditSave = (postDetails: { content: string }) => {
     console.log(postDetails);
@@ -73,7 +59,7 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
         {/* Use MDXEditor for markdown reply content */}
         <section className="reply-body">
           <MDXEditor
-            markdown={text}
+            markdown={mdContent}
             readOnly
             plugins={[
               headingsPlugin(),
@@ -92,12 +78,12 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
           />
         </section>
 
-        <p className="reply-date">on {date}</p>
+        <p className="reply-date">on {postedOn}</p>
 
         <footer className="reply-footer"> 
           {/* Action buttons */}
           <div className="reply-actions">
-            { (
+            {canEdit && (
               <button className="action-button edit-button"
                 onClick={() => setIsEditModalOpen(true)}>
                 <FaEdit /> {/* Edit icon */}
@@ -117,7 +103,7 @@ const Reply: React.FC<ReplyProps> = ({ text, upvotes, downvotes, opName, date })
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: text }}
+        initialData={{ content: mdContent }}
         type="md-only"
       />
     </div>

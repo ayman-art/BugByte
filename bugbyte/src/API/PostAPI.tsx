@@ -572,3 +572,76 @@ export const removeDownvoteAnswer = async (answerId: string, token: string): Pro
 
 
 
+export const getAnswersFromQuestion = async (
+    questionId: string,
+    token: string,
+    offset: number,
+    limit: number
+): Promise<IAnswer[]> => {
+    try {
+        const response = await fetch(`${API_URLS.ANSWER}?questionId=${questionId}&offset=${offset}&limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to get answers');
+        }
+
+        const data = await response.json();
+        return data.map((answer: any): IAnswer => ({
+            answerId: answer.answerId,
+            questionId: answer.questionId,
+            mdContent: answer.mdContent,
+            upVotes: answer.upVotes,
+            downVotes: answer.downVotes,
+            postedOn: answer.postedOn,
+            opName: answer.opName,
+            isDownVoted: false,
+            isUpVoted: false,
+            isVerified: false,
+            enabledVerify: true,
+        }));
+    } catch (error) {
+        console.error('Error getting answers:', error);
+        throw error;
+    }
+};
+
+export const getRepliesFromAnswer = async (
+    answerId: string,
+    token: string,
+    offset: number,
+    limit: number
+): Promise<ReplyData[]> => {
+    try {
+        const response = await fetch(`${API_URLS.REPLY}?answerId=${answerId}&offset=${offset}&limit=${limit}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to get replies');
+        }
+
+        const data = await response.json();
+        return data.map((reply: any): ReplyData => ({
+            answerId: reply.answerId,
+            opName: reply.opName,
+            replyId: reply.replyId,
+            postedOn: reply.postedOn,
+            mdContent: reply.mdContent,
+        }));
+    } catch (error) {
+        console.error('Error getting replies:', error);
+        throw error;
+    }
+};

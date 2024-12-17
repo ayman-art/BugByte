@@ -34,3 +34,11 @@ export  interface IQuestion {
     isVerified: boolean;
     enabledVerify: boolean;
   }
+
+  export interface IReply {
+    replyId: string;
+    answerId: string;
+    opName: string;
+    postedOn: string; // ISO date format as string
+    mdContent: string;
+  }
