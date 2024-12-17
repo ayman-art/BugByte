@@ -288,7 +288,9 @@ public class PostingRepository implements IPostingRepository{
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already up voted this question");
-
+            if (is_DownVoted(userName , questionId)) {
+                jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_QUESTIONS,  -1, questionId);
+            }
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE ,userName , questionId);
             jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, questionId);
         }else{
@@ -296,9 +298,6 @@ public class PostingRepository implements IPostingRepository{
                 throw new Exception("user didn't up vote this question before");
 
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, questionId);
-        }
-        if (is_DownVoted(userName , questionId)) {
-            jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_QUESTIONS, value * -1, questionId);
         }
         int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_QUESTIONS ,value, questionId);
 
@@ -317,7 +316,9 @@ public class PostingRepository implements IPostingRepository{
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already down voted this question");
-
+            if (is_UpVoted(userName , questionId)) {
+                jdbcTemplate.update(SQL_UPDATE_UP_VOTES_QUESTIONS,  -1, questionId);
+            }
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, questionId);
             jdbcTemplate.update(SQL_INSERT_DOWNVOTE, userName, questionId);
         }else{
@@ -325,9 +326,6 @@ public class PostingRepository implements IPostingRepository{
                 throw new Exception("user didn't down vote this question before");
 
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, questionId);
-        }
-        if (is_UpVoted(userName , questionId)) {
-            jdbcTemplate.update(SQL_UPDATE_UP_VOTES_QUESTIONS, value * -1, questionId);
         }
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_QUESTIONS ,value ,questionId);
 
@@ -345,6 +343,9 @@ public class PostingRepository implements IPostingRepository{
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already up voted this answer");
+            if (is_DownVoted(userName , answerId)) {
+                jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_ANSWERS,  -1, answerId);
+            }
 
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
             jdbcTemplate.update(SQL_INSERT_UPVOTE, userName, answerId);
@@ -354,12 +355,7 @@ public class PostingRepository implements IPostingRepository{
 
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
         }
-        if (is_DownVoted(userName , answerId)) {
-            jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_QUESTIONS, value * -1, answerId);
-        }
-        if (is_DownVoted(userName , answerId)) {
-            jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_ANSWERS, value * -1, answerId);
-        }
+
         int rows = jdbcTemplate.update( SQL_UPDATE_UP_VOTES_ANSWERS ,value ,answerId);
 
         if (rows == 0)
@@ -376,6 +372,9 @@ public class PostingRepository implements IPostingRepository{
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already up voted this answer");
+            if (is_UpVoted(userName , answerId)) {
+                jdbcTemplate.update(SQL_UPDATE_UP_VOTES_ANSWERS,  -1, answerId);
+            }
 
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
             jdbcTemplate.update(SQL_INSERT_DOWNVOTE, userName, answerId);
@@ -385,9 +384,7 @@ public class PostingRepository implements IPostingRepository{
 
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
         }
-        if (is_UpVoted(userName , answerId)) {
-            jdbcTemplate.update(SQL_UPDATE_UP_VOTES_ANSWERS, value * -1, answerId);
-        }
+
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,answerId);
 
         if (rows == 0)
