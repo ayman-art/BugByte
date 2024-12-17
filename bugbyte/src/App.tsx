@@ -18,6 +18,8 @@ import TestPage from "./pages/TestPage";
 import CommunityPage from "./pages/CommunityPage";
 import { Home } from "lucide-react";
 import HomePage from "./pages/HomePage";
+import CommunityListingPage from "./pages/CommunityListPage";
+import CommunitySearchPage from "./pages/CommunitySearchPage";
 
 const isLoggedIn = false;
 
@@ -103,10 +105,18 @@ const App: React.FC = () => {
                   </Layout>
                 }
             />
+            <Route
+              path="/communities"
+              element={
+                <Layout onLogout={handleLogout}>
+                  <CommunityListingPage/>
+                </Layout>
+              }
+            />
             {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
             <Route path="/SignUp" element={<Navigate to="/" />} />
             <Route path="/LogIn" element={<Navigate to="/" />} />
-            
+            <Route path="/search-community" element={<Layout onLogout={handleLogout}><CommunitySearchPage/></Layout>}/>
             <Route
               path="/Search"
               element={

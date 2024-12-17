@@ -18,7 +18,7 @@ export const getFeed = async (token:string, page:number=0, size:number=10) => {
     const data = await response.json();
     return data['feed'];
   } catch (error) {
-    console.error('Error fetching followers:', error);
+    console.error('Error fetching feed:', error);
     return [];
   }
 };

@@ -238,8 +238,8 @@ public class InteractionFacade {
         try {
             QuestionAdapter questionAdapter = new QuestionAdapter();
             String token = (String) userdata.get("jwt");
-            Claims claim = AuthenticationService.parseToken(token);
-            String userName = claim.getSubject();
+            AuthenticationService.parseToken(token);
+            String userName = (String) userdata.get("name");
             List<Question> questions = postingService.getUserQuestions(userName
             , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
             return questions.stream().map(question -> {
