@@ -1,27 +1,46 @@
 import {API_URLS} from './ApiUrls';
 
-export const upvotePost = async (postId: string): Promise<boolean> => {
+export const upvotePost = async (postId: string, token:string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_URLS.UPVOTE}?=${postId}`, {
-        method: 'POST',
+      const response = await fetch(`${API_URLS.UPVOTE}?postId=${postId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ voteType: postId }),
+          'Authorization': `Bearer ${token}`
+        }
       });
       return response.ok;
     } catch (error) {
+
       console.error('Error upvoting post:', error);
       return false;
     }
   };
-  
-  export const downvotePost = async (postId: string): Promise<boolean> => {
+
+  export const removeUpvotePost = async (postId: string, token:string): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_URLS.DOWNVOTE}?=${postId}`, {
-        method: 'POST',
+      const response = await fetch(`${API_URLS.REMOVE_UPVOTE}?postId=${postId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.ok;
+    } catch (error) {
+
+      console.error('Error updating upvoting post:', error);
+      return false;
+    }
+  };
+  
+  export const downvotePost = async (postId: string, token: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URLS.DONWVOTE}?postId=${postId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ voteType: postId }),
       });
@@ -32,3 +51,19 @@ export const upvotePost = async (postId: string): Promise<boolean> => {
     }
   };
   
+  export const removeDownvotePost = async (postId: string, token:string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_URLS.REMOVE_DOWNVOTE}?postId=${postId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.ok;
+    } catch (error) {
+
+      console.error('Error updating upvoting post:', error);
+      return false;
+    }
+  };
