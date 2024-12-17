@@ -25,16 +25,13 @@ const Profile: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const visitFollowers = () => {
-    const username = localStorage.getItem("name");
-    navigate(`/Profile/${username}/Followers`)
+    navigate(`/Profile/${userName}/Followers`)
   }
   const visitFollowings = () => {
-    const username = localStorage.getItem("name");
-    navigate(`/Profile/${username}/Followings`)
+    navigate(`/Profile/${userName}/Followings`)
   }
   
   const {userName} = useParams<{ userName: string }>();
-  const [topPosts, setTopPosts] = useState<Post[]>([]);
   const [profileLoading, setProfileLoading] = useState<boolean>(true);
   const [postsLoading, setPostsLoading] = useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -57,7 +54,7 @@ const Profile: React.FC = () => {
     setPostsLoading(true);
     try{
       const jwt = localStorage.getItem('authToken');
-      const data = await getUserPosts( jwt!, limit, page*limit);
+      const data = await getUserPosts( jwt!, limit, page*limit, userName!);
       const posts: Post[] = data.map(((item: { questionId: any; title: any; opName: any; mdContent: any; upVotes: any; communityId: any; downVotes: any; tags: any; })  => ({
         id: item.questionId,
         title: item.title,

@@ -285,10 +285,14 @@ public class PostingController {
     @GetMapping("questions/userQuestions")
     public ResponseEntity<?> getUserQuestions(@RequestHeader("Authorization") String token,
                                               @RequestParam("limit") int limit,
-                                              @RequestParam("offset") int offset) {
+                                              @RequestParam("offset") int offset,
+                                              @RequestParam("name") String username
+    ) {
         Map<String, Object> userData = Map.of("jwt", token.replace("Bearer ", ""),
                 "limit", limit,
-                "offset", offset);
+                "offset", offset,
+                "name", username
+        );
         try {
             List<Map<String, Object>> questions = interactionFacade.getUserQuestions(userData);
             return new ResponseEntity<>(questions, HttpStatus.OK);

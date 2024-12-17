@@ -149,8 +149,8 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
       throw error;
     }
   };
-  export const getUserPosts = async(token:string,limit: number, offset: number)=>{
-    const response = await fetch(`${API_URLS.USER_POSTS}?&limit=${limit}&offset=${offset}`, {
+  export const getUserPosts = async(token:string,limit: number, offset: number, name: string)=>{
+    const response = await fetch(`${API_URLS.USER_POSTS}?&limit=${limit}&offset=${offset}&name=${name}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
