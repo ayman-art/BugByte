@@ -145,4 +145,5 @@ public class CommunityController {
             return new ResponseEntity<>(Map.of("message", "unauthorized"), HttpStatus.UNAUTHORIZED);
         }
     }
+
 }

@@ -1,151 +1,281 @@
-//package com.example.BugByte_backend.facades;
-//
-//import static org.mockito.Mockito.*;
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//import com.example.BugByte_backend.facades.AdministrativeFacade;
-//import com.example.BugByte_backend.models.Community;
-//import com.example.BugByte_backend.models.User;
-//import com.example.BugByte_backend.services.CommunityService;
-//import com.example.BugByte_backend.services.ModeratorService;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.*;
-//import java.util.*;
-//
-//public class AdministrativeFacadeCommunityTest {
-//
-//    @Mock
-//    private CommunityService communityService;
-//
-//    @Mock
-//    private ModeratorService moderatorService;
-//
-//    @InjectMocks
-//    private AdministrativeFacade administrativeFacade;
-//
-//    @BeforeEach
-//    public void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//    }
-//
-//    @Test
-//    public void testGetCommunityInfo() {
-//        Long communityId = 1L;
-//        Community community = new Community(communityId, "Community1", "Description");
-//        when(communityService.getCommunityById(communityId)).thenReturn(community);
-//
-//        Map<String, Object> communityInfo = administrativeFacade.getCommunityInfo(communityId);
-//
-//        assertNotNull(communityInfo);
-//        assertEquals("Community1", communityInfo.get("name"));
-//        assertEquals("Description", communityInfo.get("description"));
-//    }
-//
-//    @Test
-//    public void testCreateCommunity() {
-//        Map<String, Object> communityMap = new HashMap<>();
-//        communityMap.put("name", "Community2");
-//        communityMap.put("description", "Description");
-//
-//        when(communityService.createCommunity(any(Community.class))).thenReturn(1L);
-//
-//        boolean result = administrativeFacade.createCommunity(communityMap);
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    public void testDeleteCommunity() {
-//        Long communityId = 1L;
-//        when(communityService.deleteCommunity(communityId)).thenReturn(true);
-//
-//        boolean result = administrativeFacade.deleteCommunity(communityId);
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    public void testEditCommunity() {
-//        Long communityId = 1L;
-//        Map<String, Object> updateData = new HashMap<>();
-//        updateData.put("name", "Updated Community");
-//        updateData.put("description", "Updated Description");
-//
-//        when(communityService.updateCommunity(any(Community.class))).thenReturn(true);
-//
-//        boolean result = administrativeFacade.editCommunity(communityId, updateData);
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    public void testSetModerator() {
-//        Map<String, Object> req = new HashMap<>();
-//        req.put("moderator_id", 1L);
-//        req.put("community_id", 1L);
-//
-//        when(moderatorService.setModerator(1L, 1L)).thenReturn(true);
-//
-//        boolean result = administrativeFacade.setModerator(req);
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    public void testRemoveModerator() {
-//        Map<String, Object> req = new HashMap<>();
-//        req.put("moderator_id", 1L);
-//        req.put("community_id", 1L);
-//
-//        when(moderatorService.removeModerator(1L, 1L)).thenReturn(true);
-//
-//        boolean result = administrativeFacade.removeModerator(req);
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    public void testRemoveMember() {
-//        Map<String, Object> req = new HashMap<>();
-//        req.put("community_id", 1L);
-//        req.put("user_name", "user1");
-//
-//        when(communityService.deleteMember(1L, "user1")).thenReturn(true);
-//
-//        boolean result = administrativeFacade.removeMember(req);
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    public void testGetAdmins() {
-//        Long communityId = 1L;
-//        List<User> admins = new ArrayList<>();
-//        User admin = User.builder().userName("admin1").build();
-//        admins.add(admin);
-//
-//        when(communityService.getCommunityAdmins(communityId)).thenReturn(admins);
-//
-//        List<Map<String, Object>> adminsMap = administrativeFacade.getAdmins(communityId);
-//
-//        assertNotNull(adminsMap);
-//        assertFalse(adminsMap.isEmpty());
-//        assertEquals("admin1", adminsMap.get(0).get("userName"));
-//        assertFalse(adminsMap.get(0).containsKey("password"));
-//        assertFalse(adminsMap.get(0).containsKey("email"));
-//    }
-//
-//    @Test
-//    public void testJoinCommunity() {
-//        Map<String, Object> req = new HashMap<>();
-//        req.put("community_id", 1L);
-//        req.put("id", 1L);
-//
-//        when(communityService.joinCommunity(1L, 1L)).thenReturn(true);
-//
-//        boolean result = administrativeFacade.joinCommunity(req);
-//
-//        assertTrue(result);
-//    }
-//}
+package com.example.BugByte_backend.facades;
+
+import com.example.BugByte_backend.models.Community;
+import com.example.BugByte_backend.models.User;
+import com.example.BugByte_backend.services.AuthenticationService;
+import com.example.BugByte_backend.services.CommunityService;
+import com.example.BugByte_backend.services.ModeratorService;
+import com.example.BugByte_backend.services.RegistrationService;
+import com.example.BugByte_backend.services.UserService;
+import io.jsonwebtoken.Claims;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class AdministrativeFacadeCommunityTest {
+
+    @InjectMocks
+    private AdministrativeFacade administrativeFacade;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private RegistrationService registrationService;
+
+    @Mock
+    private CommunityService communityService;
+
+    @Mock
+    private ModeratorService moderatorService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+
+    @Test
+    public void testGetCommunityInfo() throws Exception {
+        // Given
+        String jwt = "valid.jwt.token";
+        Long communityId = 123L;
+        Map<String, Object> map = Map.of("jwt", jwt, "communityId", communityId);
+
+        Claims claims = mock(Claims.class);
+        when(claims.getSubject()).thenReturn("testUser");
+        when(AuthenticationService.parseToken(jwt)).thenReturn(claims);
+
+        Community community = new Community(communityId, "Test Community", "Description");
+        when(communityService.getCommunityById(communityId)).thenReturn(community);
+
+        Community expectedCommunity = community; // This will be returned as per your current implementation
+
+        // When
+        Community result = administrativeFacade.getCommunityInfo(map);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(expectedCommunity.getId(), result.getId());
+        assertEquals(expectedCommunity.getName(), result.getName());
+        assertEquals(expectedCommunity.getDescription(), result.getDescription());
+    }
+
+
+    @Test
+    void testCreateCommunity_Success() {
+        // Mock token parsing
+        Claims claims = mock(Claims.class);
+        when(claims.get("is_admin")).thenReturn(true);
+        when(claims.getId()).thenReturn("1");
+
+        // Mock community service
+        when(communityService.createCommunity(any(Community.class))).thenReturn(1L);
+
+        // Input data
+        Map<String, Object> input = new HashMap<>();
+        input.put("jwt", "dummyToken");
+        input.put("name", "New Community");
+        input.put("description", "A test community");
+
+        // Test
+        boolean result = administrativeFacade.createCommunity(input);
+
+        // Verify
+        assertTrue(result);
+        verify(communityService, times(1)).createCommunity(any(Community.class));
+    }
+
+    @Test
+    void testCreateCommunity_UserNotAdmin() {
+        // Mock token parsing
+        Claims claims = mock(Claims.class);
+        when(claims.get("is_admin")).thenReturn(false);
+
+        // Input data
+        Map<String, Object> input = new HashMap<>();
+        input.put("jwt", "dummyToken");
+        input.put("name", "New Community");
+        input.put("description", "A test community");
+
+        // Test
+        boolean result = administrativeFacade.createCommunity(input);
+
+        // Verify
+        assertFalse(result);
+        verify(communityService, never()).createCommunity(any(Community.class));
+    }
+
+    @Test
+    void testDeleteCommunity_Success() {
+        // Mock token parsing
+        Claims claims = mock(Claims.class);
+        when(claims.get("is_admin")).thenReturn(true);
+
+        // Mock community service
+        when(communityService.deleteCommunity(1L)).thenReturn(true);
+
+        // Input data
+        Map<String, Object> input = new HashMap<>();
+        input.put("jwt", "dummyToken");
+        input.put("communityId", "1");
+
+        // Test
+        boolean result = administrativeFacade.deleteCommunity(input);
+
+        // Verify
+        assertTrue(result);
+        verify(communityService, times(1)).deleteCommunity(1L);
+    }
+
+    @Test
+    void testDeleteCommunity_UserNotAdmin() {
+        // Mock token parsing
+        Claims claims = mock(Claims.class);
+        when(claims.get("is_admin")).thenReturn(false);
+
+        // Input data
+        Map<String, Object> input = new HashMap<>();
+        input.put("jwt", "dummyToken");
+        input.put("communityId", "1");
+
+        // Test
+        boolean result = administrativeFacade.deleteCommunity(input);
+
+        // Verify
+        assertFalse(result);
+        verify(communityService, never()).deleteCommunity(anyLong());
+    }
+
+    @Test
+    void testJoinCommunity_Success() {
+        // Mock token parsing
+        Claims claims = mock(Claims.class);
+        when(claims.getId()).thenReturn("1");
+
+        // Mock community service
+        when(communityService.joinCommunity(anyLong(), anyLong())).thenReturn(true);
+
+        // Input data
+        Map<String, Object> input = new HashMap<>();
+        input.put("jwt", "dummyToken");
+        input.put("communityId", 1);
+
+        // Test
+        boolean result = administrativeFacade.joinCommunity(input);
+
+        // Verify
+        assertTrue(result);
+        verify(communityService, times(1)).joinCommunity(1L, 1L);
+    }
+
+    @Test
+    public void testGetProfile_Success() throws Exception {
+        Map<String, Object> userdata = new HashMap<>();
+        userdata.put("userName", "test_user");
+        userdata.put("jwt", "token");
+
+        Map<String, Object> mockProfile = Map.of(
+                "userName", "test_user",
+                "reputation", 100,
+                "isAdmin", true,
+                "no-followers", 50,
+                "no-following", 30
+        );
+
+        when(AuthenticationService.parseToken(anyString())).thenReturn(null);
+        when(userService.getProfile("test_user")).thenReturn(mockProfile);
+
+        Map<String, Object> result = administrativeFacade.getProfile(userdata);
+
+        assertEquals(mockProfile, result);
+        assertEquals("test_user", result.get("userName"));
+        assertEquals(100, result.get("reputation"));
+        assertEquals(true, result.get("isAdmin"));
+        assertEquals(50, result.get("no-followers"));
+        assertEquals(30, result.get("no-following"));
+
+        verify(userService, times(1)).getProfile("test_user");
+    }
+
+    @Test
+    public void testGetProfile_Failure() throws Exception {
+        Map<String, Object> userdata = Map.of("userName", "test_user");
+
+        when(userService.getProfile("test_user")).thenThrow(new Exception());
+
+        assertThrows(Exception.class, () -> administrativeFacade.getProfile(userdata));
+
+        verify(userService, times(1)).getProfile("test_user");
+    }
+
+    @Test
+    public void testGetFollowers_Success() throws Exception {
+        Map<String, Object> userdata = Map.of("userName", "test_user");
+
+        List<User> mockedResult = List.of(
+                User.builder()
+                        .id(1L)
+                        .userName("test_user1")
+                        .email("email1")
+                        .password("password1")
+                        .reputation(100L)
+                        .isAdmin(false)
+                        .build(),
+                User.builder()
+                        .id(2L)
+                        .userName("test_user2")
+                        .email("email2")
+                        .password("password2")
+                        .reputation(200L)
+                        .isAdmin(true)
+                        .build()
+        );
+
+        when(userService.getFollowers("test_user")).thenReturn(mockedResult);
+
+        List<Map<String, Object>> result = administrativeFacade.getFollowers(userdata);
+
+        assertEquals(2, result.size());
+
+        assertFalse(result.get(0).containsKey("id"));
+        assertFalse(result.get(0).containsKey("password"));
+        assertFalse(result.get(0).containsKey("email"));
+        assertEquals("test_user1", result.get(0).get("userName"));
+        assertEquals(100L, result.get(0).get("reputation"));
+        assertFalse((boolean) result.get(0).get("isAdmin"));
+
+        assertFalse(result.get(1).containsKey("id"));
+        assertFalse(result.get(1).containsKey("password"));
+        assertFalse(result.get(1).containsKey("email"));
+        assertEquals("test_user2", result.get(1).get("userName"));
+        assertEquals(200L, result.get(1).get("reputation"));
+        assertTrue((boolean) result.get(1).get("isAdmin"));
+
+        verify(userService, times(1)).getFollowers("test_user");
+    }
+
+    @Test
+    public void testGetFollowers_Failure() throws Exception {
+        Map<String, Object> userdata = Map.of("userName", "test_user");
+
+        when(userService.getFollowers("test_user")).thenThrow(new Exception());
+
+        assertThrows(Exception.class, () -> administrativeFacade.getFollowers(userdata));
+
+        verify(userService, times(1)).getFollowers("test_user");
+    }
+
+}
+
+

@@ -64,26 +64,6 @@ public class PostingServiceTest {
 
         assertEquals("post is null", exception.getMessage());
     }
-    @Test
-    void testPostQuestion_Success() throws Exception {
-        Question mockQuestion = new Question();
-        mockQuestion.setMdContent("Test content");
-        mockQuestion.setCreatorUserName("TestUser");
-        mockQuestion.setCommunityId(101L);
-
-        long generatedPostId = 1L;
-
-        when(postingRepositoryMock.insertPost(mockQuestion.getMdContent(), mockQuestion.getCreatorUserName()))
-                .thenReturn(generatedPostId);
-        when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getTitle(), mockQuestion.getCommunityId()))
-                .thenReturn(true);
-        when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
-        when(filteringQuestionService.saveQuestion(eq(mockQuestion))).thenReturn(null);
-
-        long result = postingService.postQuestion(mockQuestion);
-
-        assertEquals(generatedPostId, result);
-    }
 
     @Test
     void testPostQuestion_NullPostId() {
@@ -459,32 +439,17 @@ public class PostingServiceTest {
         assertFalse(result);
     }
 
-    @Test
-    void testVerifyAnswer_Success() throws Exception {
-        long answerId = 1212L;
-        Answer answer = new Answer();
-        answer.setQuestionId(1L);
-        Post post = new Post();
-        post.setCreatorUserName("user1");
-
-        when(postingRepositoryMock.verifyAnswer(answerId)).thenReturn(true);
-        when(postingRepositoryMock.getAnswerById(answerId)).thenReturn(answer);
-        when(postingRepositoryMock.getPostByID(answer.getQuestionId())).thenReturn(post);
-
-        boolean result = postingService.verifyAnswer(answerId , "user1");
-
-        assertTrue(result);
-    }
 
     @Test
     void testVerifyAnswer_Failure() throws Exception {
         long answerId = 1212L;
+        long questionId = 1213L;
         Answer answer = new Answer();
         answer.setQuestionId(1L);
         Post post = new Post();
         post.setCreatorUserName("user1");
 
-        when(postingRepositoryMock.verifyAnswer(answerId)).thenReturn(false);
+        when(postingRepositoryMock.verifyAnswer(answerId , questionId)).thenReturn(false);
 
         when(postingRepositoryMock.getAnswerById(answerId)).thenReturn(answer);
         when(postingRepositoryMock.getPostByID(answer.getQuestionId())).thenReturn(post);

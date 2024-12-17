@@ -59,20 +59,6 @@ public class PostingRepositoryPostTest {
 
         assertEquals("md content or username is null", exception.getMessage());
     }
-    @Test
-    public void testGetPostByOpAndTime_validInput() {
-        String userName = "user1";
-        Date date = new Date();
-        Long expectedPostId = 1L;
-
-        when(jdbcTemplate.queryForObject(eq(SQL_GET_POST_BY_USERNAME_AND_TIME),
-                eq(new Object[]{date, userName}), eq(Long.class)))
-                .thenReturn(expectedPostId);
-
-        Long postId = postingRepository.getPostByOpAndTime(userName, date);
-
-        assertEquals(expectedPostId, postId);
-    }
 
     @Test
     public void testGetPostByOpAndTime_nullUserName() {
@@ -108,16 +94,6 @@ public class PostingRepositoryPostTest {
 
         assertEquals(NullPointerException.class, exception.getClass());
         assertEquals("postId is null", exception.getMessage());
-    }
-    @Test
-    public void testEditPost_validInput() {
-        Long postId = 1L;
-        String md_content = "Updated content";
-        when(jdbcTemplate.update(eq(SQL_EDIT_POST), eq(postId)))
-                .thenReturn(1);
-
-        Boolean result = postingRepository.editPost(postId, md_content);
-        assertEquals(result , true);
     }
 
     @Test

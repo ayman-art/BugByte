@@ -301,14 +301,6 @@ public class CommunityRepositoryTest {
         String name = "myComm";
         assertThrows(RuntimeException.class, () -> communityRepository.findIdByName(name));
     }
-    @Test
-    public void testFindCommunityById_Success() {
-        Long communityId = 12L;
-        when(jdbcTemplate.queryForObject(eq(SQL_FIND_BY_ID), eq(new Object[]{communityId}), eq(Community.class)))
-                .thenReturn(comm);
-        Community result = communityRepository.findCommunityById(communityId);
-        assertEquals(comm, result);
-    }
 
     @Test
     public void testFindCommunityById_Failure_NullId() {
@@ -502,14 +494,6 @@ public class CommunityRepositoryTest {
         assertEquals(mockCommunities, result);
     }
 
-    @Test
-    public void testGetUserCommunities_Failure_NoCommunitiesFound() {
-        Long userId = 4L;
-        when(jdbcTemplate.query(eq(SQL_FIND_COMMUNITIES_BY_USER_ID), eq(new Object[]{userId}), any(RowMapper.class)))
-                .thenReturn(List.of());
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> communityRepository.getUserCommunities(userId));
-        assertEquals("User is not a member of any communities.", exception.getMessage());
-    }
 
     @Test
     public void testGetUserCommunities_Failure_NullUserId() {

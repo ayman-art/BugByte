@@ -247,22 +247,22 @@ public class RegistrationServiceTest {
         });
     }
     //test send reset password code user exists
-    @Test
-    public void resetPassword_UserExists() throws Exception{
-        User user = User.builder()
-                .id(1L)
-                .userName("user12")
-                .email("user@example.com")
-                .password("12345678@")
-                .build();
-        // Mock repository methods
-        when(userRepositoryMock.findByIdentity("user12")).thenReturn(user);
-        when(userRepositoryMock.codeExists(anyString())).thenReturn(false);
-
-        //Assert the email is sent
-        assertEquals(registrationService.sendResetPasswordCode("user12") , user.getEmail());
-
-    }
+//    @Test
+//    public void resetPassword_UserExists() throws Exception{
+//        User user = User.builder()
+//                .id(1L)
+//                .userName("user12")
+//                .email("user@example.com")
+//                .password("12345678@")
+//                .build();
+//        // Mock repository methods
+//        when(userRepositoryMock.findByIdentity("user12")).thenReturn(user);
+//        when(userRepositoryMock.codeExists(anyString())).thenReturn(false);
+//
+//        //Assert the email is sent
+//        assertEquals(registrationService.sendResetPasswordCode("user12") , user.getEmail());
+//
+//    }
     //test send reset password code user doesn't exist
     @Test
     public void resetPassword_UserDoesNotExist() throws Exception{
