@@ -150,6 +150,36 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
       {/* Voting Section */}
       <div style={styles.votingContainer}>
         <button
+          className="vote-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleVote("up");
+          }}
+          style={{
+            ...styles.voteButton,
+            backgroundColor: isUpvote ? "#a5d6a7" : "#e8f5e9",
+          }}
+        >
+          <ArrowUp />
+          <span>{upvotes}</span>
+        </button>
+        <button
+          className="vote-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleVote("down");
+          }}
+          style={{
+            ...styles.voteButton,
+            backgroundColor: isDownvoted ? "#ef9a9a" : "#ffebee",
+          }}
+        >
+          <ArrowDown />
+          <span>{downvotes}</span>
+        </button>
+      </div>
+      {/* <div style={styles.votingContainer}>
+        <button
           onClick={() => handleVote("up")}
           style={{
             ...styles.voteButton,
@@ -169,7 +199,7 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
           <ArrowDown />
           <span>{downvotes}</span>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

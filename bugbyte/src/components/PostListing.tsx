@@ -63,15 +63,15 @@ const PostListing: React.FC<PostListingProps> = ({
           id={post.id}
           creatorUserName={post.creatorUserName}
           mdContent={post.mdContent}
-          postedOn={post.postedOn} // Example: Replace with actual `postedOn` field if available
-          title={post.title || "Untitled Post"} // Ensure `post.title` is valid or fallback to a default
+          postedOn={post.postedOn}
+          title={post.title || "Untitled Post"}
           communityId={post.communityId}
           upVotes={post.upVotes}
           downVotes={post.downVotes}
           tags={post.tags}
           communityName={post.communityName || `Community ${post.communityId}`}
-          isUpvoted={post.isUpvoted} // Replace with actual logic
-          isDownVoted={post.isDownVoted} // Replace with actual logic
+          isUpvoted={post.isUpvoted}
+          isDownVoted={post.isDownVoted}
         />
       ))}
 
