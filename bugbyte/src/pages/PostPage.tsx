@@ -37,8 +37,10 @@ const PostPage: React.FC = () => {
     const fetchQuestion = async () => {
       const fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
       setQuestion(fetchedQuestion[0]);
+
       if (fetchedQuestion[1]) {
-        setAnswers([...answers, fetchedQuestion[1]]);
+        
+        setAnswers([...answers, { ...fetchedQuestion[1], isVerified:true, enabledVerify: false }]);
       }
       
       // console.log("FETCHED QUESITON:", fetchedQuestion);
@@ -151,11 +153,11 @@ const PostPage: React.FC = () => {
     return <p>Question not found.</p>;
   }
 
-  const onVerify = (answerId: string) => {
+  const onVerify = (answerId: number) => {
     // Update the verified answer in the state
     setAnswers((prev) =>
       prev.map((answer) => {
-        if (answer.id === answerId) {
+        if (answer.answerId === answerId) {
           return { ...answer, verified: true, enabledVerify: false };
         } else {
           return { ...answer, verified: false, enabledVerify: false };

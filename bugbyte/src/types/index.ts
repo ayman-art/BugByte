@@ -29,4 +29,6 @@ export  interface IQuestion {
     isDownVoted: boolean;
     isUpVoted: boolean;
     downVotes: number;
+    isVerified: boolean;
+    enabledVerify: boolean;
   }

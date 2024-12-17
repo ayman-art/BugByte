@@ -22,8 +22,6 @@ import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils
 import { IAnswer } from '../../types';
 
 interface AnswerProps extends IAnswer {
-  enabledVerify?: boolean;
-  isVerified?: boolean;
   onDelete: (answerId: number) => void;
   onVerify: (answerId: number) => void;
 }
@@ -52,7 +50,7 @@ const Answer: React.FC<AnswerProps> = ({
   const navigate = useNavigate();
 
   const loggedInUsername = localStorage.getItem('name') || '';
-  const isAdmin = true; // Simulated admin check, replace as necessary
+  const isAdmin = localStorage.getItem('is_admin') === 'true';
 
   const handleUpvoteAnswer = () => {
     if (voteStatus === 'upvoted') {
@@ -96,6 +94,8 @@ const Answer: React.FC<AnswerProps> = ({
 
   const canEdit = loggedInUsername === opName;
   const canDelete = loggedInUsername === opName || isAdmin;
+  console.log('isAdmin:', isAdmin);
+  console.log(loggedInUsername, opName);
 
   // Verify the answer
   const handleVerify = () => {

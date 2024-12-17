@@ -160,6 +160,7 @@ export const getQuestion = async (
           opName: data.answerOp || '',
           isDownVoted: false,
           isUpVoted: false,
+            verified: true
         };
       }
   
