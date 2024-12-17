@@ -22,11 +22,8 @@ const CommunityListing: React.FC<CommunityListingProps> = ({
   useEffect(() => {
     const observer = new IntersectionObserver(
       async (entries) => {
-        if (entries[0].isIntersecting && hasMore && !lock) {
-          console.log(hasMore);
-          setLock(true);
-          await fetchCommunities(); // Fetch communities when loader is visible
-          setLock(false);
+        if (entries[0].isIntersecting && hasMore) {
+          console.log(hasMore); fetchCommunities(); 
         }
       },
       { threshold: 1.0 }
