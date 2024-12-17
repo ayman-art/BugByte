@@ -6,12 +6,17 @@ import SearchAndTagFields, {
 
 interface Question {
   id: string;
-  communityId: number;
-  title: string;
   creatorUserName: string;
   mdContent: string;
+  postedOn: Date;
+  title: string;
+  communityId: number;
   upVotes: number;
   downVotes: number;
+  tags?: string[];
+  communityName?: string;
+  isUpvoted: boolean;
+  isDownVoted: boolean;
 }
 
 const QuestionSearchPage: React.FC = () => {
@@ -59,8 +64,29 @@ const QuestionSearchPage: React.FC = () => {
         );
         if (fetchedQuestions.length === 0) {
           setHasMore(false); // No more posts
+        } else if (fetchedQuestions.length < size) {
+          console.log(fetchedQuestions.length);
+          setHasMore(false); // No more posts
+          // setPosts((prevPosts) => [...prevPosts, ...fetchedQuestions]); // Append new posts
+          setPosts((prevPosts) => {
+            const mergedPosts = [...prevPosts, ...fetchedQuestions];
+            const uniquePosts = Array.from(
+              new Map(mergedPosts.map((post) => [post.id, post])).values()
+            );
+            return uniquePosts;
+          });
+
+          setPage((prevPage) => prevPage + 1); // Increment page
         } else {
-          setPosts((prevPosts) => [...prevPosts, ...fetchedQuestions]); // Append new posts
+          // setPosts((prevPosts) => [...prevPosts, ...fetchedQuestions]); // Append new posts
+          setPosts((prevPosts) => {
+            const mergedPosts = [...prevPosts, ...fetchedQuestions];
+            const uniquePosts = Array.from(
+              new Map(mergedPosts.map((post) => [post.id, post])).values()
+            );
+            return uniquePosts;
+          });
+
           setPage((prevPage) => prevPage + 1); // Increment page
           console.log(page);
         }

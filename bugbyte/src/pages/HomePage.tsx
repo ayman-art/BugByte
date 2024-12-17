@@ -2,19 +2,20 @@ import React, { useEffect, useState } from "react";
 import PostListing from "../components/PostListing";
 import { getFeed } from "../API/FeedApi";
 import { fetchJoinedCommunities } from "../API/HomeAPI";
-import SearchAndTagFields, {
-  sendRequest,
-} from "../components/SearchAndTagFields";
 
 interface Question {
   id: string;
-  communityId: number;
-  title: string;
   creatorUserName: string;
   mdContent: string;
+  postedOn: Date;
+  title: string;
+  communityId: number;
   upVotes: number;
   downVotes: number;
   tags?: string[];
+  communityName?: string;
+  isUpvoted: boolean;
+  isDownVoted: boolean;
 }
 
 const HomePage: React.FC = () => {
@@ -37,10 +38,25 @@ const HomePage: React.FC = () => {
       } else if (feed.length < size) {
         console.log(feed.length);
         setHasMore(false); // No more posts
-        setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
+        // setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
+
+        setPosts((prevPosts) => {
+          const mergedPosts = [...prevPosts, ...feed];
+          const uniquePosts = Array.from(
+            new Map(mergedPosts.map((post) => [post.id, post])).values()
+          );
+          return uniquePosts;
+        });
         setPage((prevPage) => prevPage + 1); // Increment page
       } else {
-        setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
+        // setPosts((prevPosts) => [...prevPosts, ...feed]); // Append new posts
+        setPosts((prevPosts) => {
+          const mergedPosts = [...prevPosts, ...feed];
+          const uniquePosts = Array.from(
+            new Map(mergedPosts.map((post) => [post.id, post])).values()
+          );
+          return uniquePosts;
+        });
         setPage((prevPage) => prevPage + 1); // Increment page
       }
     } catch (error) {

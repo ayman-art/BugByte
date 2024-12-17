@@ -1,70 +1,84 @@
 import React, { useState } from "react";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { upvotePost, downvotePost, removeDownvoteQuestion, removeUpvoteQuestion } from "../API/QuestionAPI";
+
+import {
+  upvotePost,
+  downvotePost,
+  removeDownvoteQuestion,
+  removeUpvoteQuestion,
+} from "../API/QuestionAPI";
 
 interface CommunityPostProps {
-  postId: string;
-  communityName: string;
-  authorName: string;
-  content?: string;
-  upvotes: number;
-  downvotes: number;
+  id: string;
+  creatorUserName: string;
+  mdContent: string;
+  postedOn: Date;
+  title: string;
+  communityId: number;
+  upVotes: number;
+  downVotes: number;
   tags?: string[];
+  communityName?: string;
+  isUpvoted: boolean;
+  isDownVoted: boolean;
 }
 
 const CommunityPost: React.FC<CommunityPostProps> = ({
-  postId,
-  communityName = "Community Name",
-  authorName = "Author Name",
-  content = "",
-  upvotes: initialUpvotes = 150,
-  downvotes: initialDownvotes = 30,
-  tags = [], // Default empty array for tags
+  id,
+  creatorUserName,
+  mdContent,
+  postedOn,
+  title,
+  communityId,
+  upVotes,
+  downVotes,
+  tags = [],
+  communityName = "",
+  isUpvoted,
+  isDownVoted,
 }) => {
-  const [upvotes, setUpvotes] = useState(initialUpvotes);
-  const [downvotes, setDownvotes] = useState(initialDownvotes);
-  const [isUpvoted, setIsUpvoted] = useState(false); // Track upvote state
-  const [isDownvoted, setIsDownvoted] = useState(false); // Track downvote state
+  const [upvotes, setUpvotes] = useState(upVotes);
+  const [downvotes, setDownvotes] = useState(downVotes);
+  const [isUpvote, setIsUpvoted] = useState(isUpvoted);
+  const [isDownvoted, setIsDownvoted] = useState(isDownVoted);
   const token = localStorage.getItem("authToken");
 
   const handleVote = async (type: "up" | "down") => {
     if (type === "up") {
-
-      if (isUpvoted) {
+      if (isUpvote) {
         setUpvotes((prev) => prev - 1);
-        removeUpvoteQuestion(postId, token!);
+        removeUpvoteQuestion(id, token!);
         setIsUpvoted(false);
         return;
       }
 
-      const success = await upvotePost(postId, token!);
+      const success = await upvotePost(id, token!);
       if (success) {
         setUpvotes((prev) => prev + 1);
 
-        if(isDownvoted) {
+        if (isDownvoted) {
           setDownvotes((prev) => prev - 1);
-          removeDownvoteQuestion(postId, token!);
+          removeDownvoteQuestion(id, token!);
         }
 
         setIsUpvoted(true);
         setIsDownvoted(false);
       }
     } else if (type === "down") {
-
       if (isDownvoted) {
         setDownvotes((prev) => prev - 1);
-        removeDownvoteQuestion(postId, token!);
+        removeDownvoteQuestion(id, token!);
         setIsDownvoted(false);
         return;
       }
 
-      const success = await downvotePost(postId, token!);
+      const success = await downvotePost(id, token!);
       if (success) {
         setDownvotes((prev) => prev + 1);
 
-        if(isUpvoted) {
+        if (isUpvote) {
           setUpvotes((prev) => prev - 1);
-          removeUpvoteQuestion(postId, token!);
+          removeUpvoteQuestion(id, token!);
         }
 
         setIsDownvoted(true);
@@ -81,8 +95,7 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
     ) {
       return;
     }
-
-    window.location.href = `/posts/${postId}`;
+    window.location.href = `/posts/${id}`;
   };
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -90,167 +103,158 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
   };
 
   return (
-    <div className="p-4">
+    <div style={styles.container} onClick={handleContentClick}>
+      {/* Title */}
+      <h2 style={styles.title}>{title}</h2>
+
+      {/* Community Name */}
       <div>
-        <div style={styles.container} onClick={handleContentClick}>
-          <div style={styles.postBox}>
-            <a 
-            href={`/communities/${communityName}`} 
-            onClick={stopPropagation}
-            style={styles.postNaming}>
-              Community: {communityName} <br />
-            </a>
-          </div>
+        <a
+          href={`/communities/${communityId}`}
+          onClick={stopPropagation}
+          style={styles.communityLink}
+        >
+          {communityName || `Community ${communityId}`}
+        </a>
+      </div>
 
-          <div style={styles.postBox}>
-            <a
-              href={`/Profile/${authorName}`}
-              onClick={stopPropagation}
-              style={styles.postNaming}
-            >
-              {authorName}
-            </a>
-          </div>
+      {/* Author and Date */}
+      <div style={styles.metadata}>
+        <a
+          href={`/Profile/${creatorUserName}`}
+          onClick={stopPropagation}
+          style={styles.authorLink}
+        >
+          {creatorUserName}
+        </a>
+        <span style={styles.postedOn}>
+          {new Date(postedOn).toLocaleDateString()}{" "}
+          {new Date(postedOn).toLocaleTimeString()}
+        </span>
+      </div>
 
-          <div style={styles.content}>{content}</div>
+      {/* Content */}
+      <div style={styles.content}>{mdContent}</div>
 
-          {/* Tags Section */}
-          {tags != null && tags.length > 0 && (
-            <div style={styles.tagsContainer} onClick={stopPropagation}>
-              {tags.map((tag, index) => (
-                <span key={index} style={styles.tag}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Voting Buttons */}
-          <div
-            onClick={stopPropagation}
-            style={{ display: "flex", gap: "8px" }}
-          >
-            <button
-              onClick={() => handleVote("up")}
-              style={{
-                ...styles.upVoteButton,
-                backgroundColor: isUpvoted ? "#a5d6a7" : "#e8f5e9", // Darker green when upvoted
-              }}
-            >
-              <ArrowUp />
-              <span>{upvotes}</span>
-            </button>
-            <button
-              onClick={() => handleVote("down")}
-              style={{
-                ...styles.downVoteButton,
-                backgroundColor: isDownvoted ? "#ef9a9a" : "#ffebee", // Darker red when downvoted
-              }}
-            >
-              <ArrowDown />
-              <span>{downvotes}</span>
-            </button>
-          </div>
+      {/* Tags */}
+      {tags.length > 0 && (
+        <div style={styles.tagsContainer}>
+          {tags.map((tag, index) => (
+            <span key={index} style={styles.tag}>
+              #{tag}
+            </span>
+          ))}
         </div>
+      )}
+
+      {/* Voting Section */}
+      <div style={styles.votingContainer}>
+        <button
+          onClick={() => handleVote("up")}
+          style={{
+            ...styles.voteButton,
+            backgroundColor: isUpvote ? "#a5d6a7" : "#e8f5e9",
+          }}
+        >
+          <ArrowUp />
+          <span>{upvotes}</span>
+        </button>
+        <button
+          onClick={() => handleVote("down")}
+          style={{
+            ...styles.voteButton,
+            backgroundColor: isDownvoted ? "#ef9a9a" : "#ffebee",
+          }}
+        >
+          <ArrowDown />
+          <span>{downvotes}</span>
+        </button>
       </div>
     </div>
   );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-  postBox: {
-    border: "3px solid #B1E9A3",
-    borderRadius: "10px",
-    color: "black",
-    margin: "5px",
-  },
-
-  postNaming: {
-    marginLeft: "10px",
-    textDecoration: "none",
-    color: "black",
-    margin: "5px",
-  },
-
   container: {
-    height: "auto",
-    width: "787px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    padding: "20px",
-    boxSizing: "border-box",
-    border: "3px solid #4caf50",
-    borderRadius: "10px",
-    backgroundColor: "#ffffff",
-    margin: "5px",
-  },
-
-  content: {
-    background: "#F4F4F4",
-    minHeight: "160px",
     width: "100%",
+    maxWidth: "800px",
+    margin: "20px auto",
+    padding: "20px",
+    border: "1px solid #ccc",
     borderRadius: "10px",
-    padding: "10px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "5px",
+    backgroundColor: "#fff",
+    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+    cursor: "pointer",
+    transition: "transform 0.2s",
   },
-
+  title: {
+    fontSize: "1.5rem",
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: "10px",
+  },
+  communityLink: {
+    fontSize: "1rem",
+    fontWeight: "500",
+    color: "#4caf50",
+    textDecoration: "none",
+    marginBottom: "5px",
+    display: "block",
+  },
+  metadata: {
+    fontSize: "0.9rem",
+    color: "#666",
+    marginBottom: "15px",
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+  },
+  authorLink: {
+    textDecoration: "none",
+    color: "#1e88e5",
+    fontWeight: "bold",
+  },
+  postedOn: {
+    color: "#999",
+  },
+  content: {
+    padding: "10px",
+    backgroundColor: "#f4f4f4",
+    borderRadius: "10px",
+    marginBottom: "15px",
+    color: "#333",
+    fontSize: "1rem",
+  },
   tagsContainer: {
     display: "flex",
     flexWrap: "wrap",
-    gap: "10px",
-    marginTop: "8px",
+    gap: "8px",
+    marginBottom: "15px",
   },
-
   tag: {
     backgroundColor: "#e8f5e9",
     color: "#1b5e20",
-    padding: "4px 12px",
+    padding: "5px 10px",
     borderRadius: "12px",
     fontSize: "0.85rem",
     fontWeight: "500",
     cursor: "pointer",
+  },
+  votingContainer: {
+    display: "flex",
+    gap: "10px",
+  },
+  voteButton: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "5px",
+    padding: "10px 20px",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold",
     transition: "background-color 0.2s",
-    margin: "5px",
-  },
-
-  upVoteButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-    width: "90px",
-    padding: "8px 12px",
-    backgroundColor: "#e8f5e9",
-    border: "1px solid #a5d6a7",
-    borderRadius: "8px",
-    cursor: "pointer",
-    color: "#1b5e20",
-    fontWeight: "bold",
-    transition: "background-color 0.2s, transform 0.1s",
-    margin: "5px",
-  },
-
-  downVoteButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-    width: "90px",
-    padding: "8px 12px",
-    backgroundColor: "#ffebee",
-    border: "1px solid #ef9a9a",
-    borderRadius: "8px",
-    cursor: "pointer",
-    color: "#b71c1c",
-    fontWeight: "bold",
-    transition: "background-color 0.2s, transform 0.1s",
-    margin: "5px",
   },
 };
 

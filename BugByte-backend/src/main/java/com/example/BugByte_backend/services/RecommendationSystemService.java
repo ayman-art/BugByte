@@ -1,9 +1,10 @@
 package com.example.BugByte_backend.services;
 
+import com.example.BugByte_backend.models.Community;
+import com.example.BugByte_backend.models.Post;
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.repositories.RecommendationSystemRepository;
-import com.example.BugByte_backend.repositories.TagsRepository;
+import com.example.BugByte_backend.repositories.*;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,9 +23,18 @@ public class RecommendationSystemService {
     private TagsRepository tagsRepository;
 
     @Autowired
+    private PostingRepository postingRepository;
+
+    @Autowired
+    private UserRepositoryImp userRepositoryImp;
+
+    @Autowired
+    private CommunityRepository communityRepository;
+
+    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public List<Question> generateFeedForUser(String token, int pageSize) {
+    public List<Question> generateFeedForUser(String token, int pageSize) throws Exception {
         Long id = getUserIdFromToken(token);
 
         String cacheKey = "feed:" + id;
@@ -34,6 +44,9 @@ public class RecommendationSystemService {
             List<Question> newFeed = recommendationSystemRepository.generateFeedForUser(id);
             for (Question question : newFeed) {
                 question.setTags(tagsRepository.findTagsByQuestion(question.getId()));
+                question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+                question.setIsUpVoted(isUpVoted(question.getCreatorUserName(), question.getId()));
+                question.setIsDownVoted(isDownVoted(question.getCreatorUserName(), question.getId()));
                 redisTemplate.opsForList().rightPush(cacheKey, question);
             }
         }
@@ -76,4 +89,34 @@ public class RecommendationSystemService {
         Claims claim = AuthenticationService.parseToken(token);
         return Long.parseLong(claim.getId());
     }
+
+    private boolean isUpVoted(String userName , long postId) throws Exception {
+        User user  = userRepositoryImp.findByIdentity(userName);
+        if (user == null){
+            throw new Exception("user is null");
+        }
+        Post post = postingRepository.getPostByID(postId);
+        if (post == null){
+            throw new Exception("post is null");
+        }
+        return postingRepository.is_UpVoted(userName , postId);
+    }
+    private boolean isDownVoted(String userName , long postId) throws Exception {
+        User user  = userRepositoryImp.findByIdentity(userName);
+        if (user == null){
+            throw new Exception("user is null");
+        }
+        Post post = postingRepository.getPostByID(postId);
+        if (post == null){
+            throw new Exception("post is null");
+        }
+        return postingRepository.is_DownVoted(userName , postId);
+    }
+    private String getQuestionCommunity(long communityId) throws Exception {
+        Community community = communityRepository.findCommunityById(communityId);
+        if (community == null)
+            throw new Exception("community is null");
+        return community.getName();
+    }
+
 }
