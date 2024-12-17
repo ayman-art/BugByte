@@ -5,7 +5,7 @@ import Question from '../components/post/Question';
 import Answer from '../components/post/Answer';
 import Reply from '../components/post/Reply';
 import '../styles/PostPage.css';
-import { deleteAnswer, getAnswersFromQuestion, getQuestion, getRepliesFromAnswer } from '../API/PostAPI';
+import { deleteAnswer, deleteQuestion, getAnswersFromQuestion, getQuestion, getRepliesFromAnswer } from '../API/PostAPI';
 import { IQuestion, IAnswer, IReply } from '../types/index';
 interface QuestionProps  extends IQuestion {
   onDelete: (questionId: string) => void;
@@ -159,8 +159,8 @@ const PostPage: React.FC = () => {
     });
   };
   
-  const onDelteQuestion = (questionId: string) => {
-    console.log(1111)
+  const onDelteQuestion = async (questionId: string) => {
+    await deleteQuestion(questionId, token!);
     setQuestion(null)
   }
 
