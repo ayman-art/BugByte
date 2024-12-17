@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { upvotePost, downvotePost, removeUpvotePost, removeDownvotePost } from "../API/QuestionAPI";
+import { upvotePost, downvotePost, removeDownvoteQuestion, removeUpvoteQuestion } from "../API/QuestionAPI";
 
 interface CommunityPostProps {
   postId: string;
@@ -29,26 +29,42 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
 
   const handleVote = async (type: "up" | "down") => {
     if (type === "up") {
+
+      if (isUpvoted) {
+        setUpvotes((prev) => prev - 1);
+        removeUpvoteQuestion(postId, token!);
+        setIsUpvoted(false);
+        return;
+      }
+
       const success = await upvotePost(postId, token!);
       if (success) {
         setUpvotes((prev) => prev + 1);
 
         if(isDownvoted) {
           setDownvotes((prev) => prev - 1);
-          removeDownvotePost(postId, token!)
+          removeDownvoteQuestion(postId, token!);
         }
 
         setIsUpvoted(true);
         setIsDownvoted(false);
       }
     } else if (type === "down") {
+
+      if (isDownvoted) {
+        setDownvotes((prev) => prev - 1);
+        removeDownvoteQuestion(postId, token!);
+        setIsDownvoted(false);
+        return;
+      }
+
       const success = await downvotePost(postId, token!);
       if (success) {
         setDownvotes((prev) => prev + 1);
 
         if(isUpvoted) {
           setUpvotes((prev) => prev - 1);
-          removeUpvotePost(postId, token!);
+          removeUpvoteQuestion(postId, token!);
         }
 
         setIsDownvoted(true);

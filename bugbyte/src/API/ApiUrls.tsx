@@ -15,6 +15,7 @@ export const API_URLS = {
   UNFOLLOW: `${API_BASE_URL}/users/unfollow`,
   GET_FOLLOWERS: `${API_BASE_URL}/users/followers`,
   GET_FOLLOWINGS: `${API_BASE_URL}/users/following`,
+  POST: `${API_BASE_URL}/posts`,
   ADMIN: `${API_BASE_URL}/users/make-admin`,
   UPVOTE:`${API_BASE_URL}/posts/upvoteQuestion`,
   DONWVOTE:`${API_BASE_URL}/posts/downvoteQuestion`,

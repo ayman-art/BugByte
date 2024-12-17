@@ -17,22 +17,28 @@ export const upvotePost = async (postId: string, token:string): Promise<boolean>
     }
   };
 
-  export const removeUpvotePost = async (postId: string, token:string): Promise<boolean> => {
+  export const removeUpvoteQuestion = async (questionId: string, token: string): Promise<any> => {
     try {
-      const response = await fetch(`${API_URLS.REMOVE_UPVOTE}?postId=${postId}`, {
+        const response = await fetch(`${API_URLS.POST}/removeUpvoteQuestion?postId=${questionId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      return response.ok;
-    } catch (error) {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
 
-      console.error('Error updating upvoting post:', error);
-      return false;
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to remove upvote question');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error removing upvote question:', error);
+        throw error;
     }
-  };
+}
   
   export const downvotePost = async (postId: string, token: string): Promise<boolean> => {
     try {
@@ -51,19 +57,25 @@ export const upvotePost = async (postId: string, token:string): Promise<boolean>
     }
   };
   
-  export const removeDownvotePost = async (postId: string, token:string): Promise<boolean> => {
+  export const removeDownvoteQuestion = async (questionId: string, token: string): Promise<any> => {
     try {
-      const response = await fetch(`${API_URLS.REMOVE_DOWNVOTE}?postId=${postId}`, {
+        const response = await fetch(`${API_URLS.POST}/removeDownvoteQuestion?postId=${questionId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      return response.ok;
-    } catch (error) {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        });
 
-      console.error('Error updating upvoting post:', error);
-      return false;
+        if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to remove downvote question');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error removing downvote question:', error);
+        throw error;
     }
-  };
+}
