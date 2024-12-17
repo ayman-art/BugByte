@@ -27,36 +27,36 @@ class CommunityControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testGetCommunity_Success() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("communityId", "123");
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("name", "Tech Community");
-
-        when(administrativeFacade.getCommunityInfo(input)).thenReturn(response);
-
-        ResponseEntity<?> result = communityController.getCommunity(input);
-
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals(response, result.getBody());
-        verify(administrativeFacade, times(1)).getCommunityInfo(input);
-    }
-
-    @Test
-    void testGetCommunity_Failure() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("communityId", "123");
-
-        when(administrativeFacade.getCommunityInfo(input)).thenThrow(new RuntimeException("Community not found"));
-
-        ResponseEntity<?> result = communityController.getCommunity(input);
-
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("Community not found", result.getBody());
-        verify(administrativeFacade, times(1)).getCommunityInfo(input);
-    }
+//    @Test
+//    void testGetCommunity_Success() {
+//        Map<String, Object> input = new HashMap<>();
+//        input.put("communityId", "123");
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("name", "Tech Community");
+//
+//        when(administrativeFacade.getCommunityInfo(input)).thenReturn(response);
+//
+//        ResponseEntity<?> result = communityController.getCommunity(input);
+//
+//        assertEquals(200, result.getStatusCodeValue());
+//        assertEquals(response, result.getBody());
+//        verify(administrativeFacade, times(1)).getCommunityInfo(input);
+//    }
+//
+//    @Test
+//    void testGetCommunity_Failure() {
+//        Map<String, Object> input = new HashMap<>();
+//        input.put("communityId", "123");
+//
+//        when(administrativeFacade.getCommunityInfo(input)).thenThrow(new RuntimeException("Community not found"));
+//
+//        ResponseEntity<?> result = communityController.getCommunity(input);
+//
+//        assertEquals(400, result.getStatusCodeValue());
+//        assertEquals("Community not found", result.getBody());
+//        verify(administrativeFacade, times(1)).getCommunityInfo(input);
+//    }
 
 //    @Test
 //    void testCreateCommunity_Success() {

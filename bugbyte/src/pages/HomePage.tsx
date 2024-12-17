@@ -1,27 +1,61 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PostListing from "../components/PostListing";
 import { getFeed } from "../API/FeedApi";
+import { fetchJoinedCommunities } from "../API/HomeAPI";
+import SearchAndTagFields, {
+  sendRequest,
+} from "../components/SearchAndTagFields";
 
-interface Post {
+interface Question {
   id: string;
   communityId: number;
   title: string;
-  creatoruserName: string;
+  creatorUserName: string;
   mdContent: string;
   upVotes: number;
   downVotes: number;
+  tags?: string[];
 }
 
 const HomePage: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]); // List of posts
+  const [posts, setPosts] = useState<Question[]>([]); // List of posts
   const [page, setPage] = useState(1); // Current page
   const [loading, setLoading] = useState(false); // Loading state
   const [hasMore, setHasMore] = useState(true); // If more posts are available
+  const [searchValue, setSearchValue] = useState("");
+  const [tagValue, setTagValue] = useState("");
+  const [questions, setQuestions] = useState<Question[]>([]);
+  let size = 10;
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTagValue(event.target.value);
+  };
+
+  const handleSearchClick = async () => {
+    try {
+      if (!(searchValue === "" && tagValue === "")) {
+        const fetchedQuestions = await sendRequest(
+          searchValue,
+          tagValue,
+          "home",
+          page,
+          size
+        );
+        setQuestions(fetchedQuestions);
+        console.log(fetchedQuestions);
+        //setTagValue("");
+        //setSearchValue("");
+      }
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    }
+  };
   // Fetch posts from the API
   const fetchPosts = async () => {
-    if (loading || !hasMore) return;
-
     setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
@@ -40,9 +74,21 @@ const HomePage: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        await fetchJoinedCommunities();
+        await fetchPosts(); // Initial post fetch
+      } catch (error) {
+        console.error("Error during initialization:", error);
+      }
+    };
+
+    initialize();
+  }, []);
+
   return (
     <div>
-      <h1>Home Page</h1>
       <PostListing
         posts={posts}
         fetchPosts={fetchPosts}

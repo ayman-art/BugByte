@@ -1,6 +1,7 @@
 package com.example.BugByte_backend.repositories;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
+import org.apache.lucene.analysis.miscellaneous.ConcatenateGraphFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -160,7 +162,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     public Community findCommunityById(Long id) {
         if( id == null)
             throw new NullPointerException("id is Null");
-
         Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, communityRowMapper,id);
         if(com == null)
             throw new RuntimeException("No community with this id: " + id);
@@ -284,7 +285,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         );
 
         if (communities.isEmpty())
-            throw new RuntimeException("User is not a member of any communities.");
+            return new ArrayList<Community>();
 
         return communities;
     }

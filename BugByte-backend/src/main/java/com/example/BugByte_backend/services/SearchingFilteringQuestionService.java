@@ -26,6 +26,7 @@ public class SearchingFilteringQuestionService {
             throw new NullPointerException("Query can't be null");
 
         Pageable pageable = PageRequest.of(page, size);
+        System.out.println("Page");
         return questionRepository.findByMdContentAndTags(query, pageable);
     }
 
