@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CommunityAdapter {
@@ -19,13 +20,15 @@ public class CommunityAdapter {
                     "id", community.getId(),
                     "name", community.getName(),
                     "description", community.getDescription(),
-                    "creationDate", community.getCreationDate());
+                    "creationDate", community.getCreationDate(),
+                    "tags", community.getTags());
         }
 
     public Community fromMap(Map<String, Object> map) {
         Community comm = new Community((String) map.get("name")
                 ,(Long) map.get("admin_id"));
         if(map.containsKey("description")) comm.setDescription((String)map.get("description"));
+        if (map.containsKey("tags")) comm.setTags((List<String>) map.get("tags"));
         return comm;
     }
     public String toJson(Community community) {
