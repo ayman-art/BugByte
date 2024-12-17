@@ -17,6 +17,8 @@ export  interface IQuestion {
     postedOn: string;
     communityName: string;
     communityId: number;
+    isUpvoted: boolean;
+    isDownvoted: boolean;
   }
 
   export interface IAnswer {

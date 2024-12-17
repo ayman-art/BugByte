@@ -183,7 +183,7 @@ const Answer: React.FC<AnswerProps> = ({
               </button>
             )}
 
-            {isAdmin &&  enableVerifyState && (
+            {canEdit &&  enableVerifyState && (
               <button
                 className="action-button verify-button"
                 onClick={handleVerify}

@@ -19,6 +19,7 @@ import { MDXEditor,
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
+import { downvoteQuestion, removeDownvoteAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
   onDelete: (questionId: string) => void;
@@ -47,23 +48,26 @@ const Question: React.FC<QuestionProps> = ({
   const navigate = useNavigate();
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
+  
+  const token = localStorage.getItem('authToken');
 
  
 
   const handleUpvoteQuestion = () => {
     if (voteStatus === 'upvoted') {
-      // todo: call api(remove upvote)
+      removeUpvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
       setVoteStatus('neutral');
       console.log('FROM upvoted to neutral');
     } else if (voteStatus === 'downvoted') {
-      // call api(remove downvote, add upvote)
+      removeDownvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
+      upvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
       console.log('FROM downvoted to upvoted');
     } else {
-      // call api(add upvote)
+      upvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
       console.log('FROM neutral to upvoted');
@@ -72,18 +76,19 @@ const Question: React.FC<QuestionProps> = ({
 
   const handleDownvoteQuestion = () => {
     if (voteStatus === 'downvoted') {
-      // todo: call api(remove downvote)
+      removeDownvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
       setVoteStatus('neutral');
       console.log('FROM downvoted to neutral');
     } else if (voteStatus === 'upvoted') {
-      // call api(remove upvote, add downvote)
+      removeUpvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
+      downvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
       console.log('FROM upvoted to downvoted');
     } else {
-      // call api(add downvote)
+      downvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
       console.log('FROM neutral to downvoted');

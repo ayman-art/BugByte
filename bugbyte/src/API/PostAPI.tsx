@@ -160,7 +160,8 @@ export const getQuestion = async (
           opName: data.answerOp || '',
           isDownVoted: false,
           isUpVoted: false,
-            verified: true
+            isVerified: false,
+            enabledVerify: true,
         };
       }
   
@@ -386,8 +387,8 @@ export const verifyAnswer = async (answerId: string, token: string): Promise<any
 
 export const upvoteQuestion = async (questionId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/upvoteQuestion?questionId=${questionId}`, {
-        method: 'POST',
+        const response = await fetch(`${API_URLS.POST}/upvoteQuestion?postId=${questionId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -409,8 +410,8 @@ export const upvoteQuestion = async (questionId: string, token: string): Promise
 
 export const downvoteQuestion = async (questionId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/downvoteQuestion?questionId=${questionId}`, {
-        method: 'POST',
+        const response = await fetch(`${API_URLS.POST}/downvoteQuestion?postId=${questionId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -432,8 +433,8 @@ export const downvoteQuestion = async (questionId: string, token: string): Promi
 
 export const removeUpvoteQuestion = async (questionId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/removeUpvoteQuestion?questionId=${questionId}`, {
-        method: 'POST',
+        const response = await fetch(`${API_URLS.POST}/removeUpvoteQuestion?postId=${questionId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -455,8 +456,8 @@ export const removeUpvoteQuestion = async (questionId: string, token: string): P
 
 export const removeDownvoteQuestion = async (questionId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/removeDownvoteQuestion?questionId=${questionId}`, {
-        method: 'POST',
+        const response = await fetch(`${API_URLS.POST}/removeDownvoteQuestion?postId=${questionId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -478,8 +479,8 @@ export const removeDownvoteQuestion = async (questionId: string, token: string):
 
 export const upvoteAnswer = async (answerId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/upvoteAnswer?answerId=${answerId}`, {
-        method: 'POST',
+        const response = await fetch(`${API_URLS.POST}/upvoteAnswer?postId=${answerId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -501,8 +502,8 @@ export const upvoteAnswer = async (answerId: string, token: string): Promise<any
 
 export const downvoteAnswer = async (answerId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/downvoteAnswer?answerId=${answerId}`, {
-        method: 'POST',
+        const response = await fetch(`${API_URLS.POST}/downvoteAnswer?postId=${answerId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -524,8 +525,8 @@ export const downvoteAnswer = async (answerId: string, token: string): Promise<a
 
 export const removeUpvoteAnswer = async (answerId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/removeUpvoteAnswer?answerId=${answerId}`, {
-        method: 'POST',
+        const response = await fetch(`${API_URLS.POST}/removeUpvoteAnswer?postId=${answerId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -547,8 +548,8 @@ export const removeUpvoteAnswer = async (answerId: string, token: string): Promi
 
 export const removeDownvoteAnswer = async (answerId: string, token: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_URLS.POST}/removeDownvoteAnswer?answerId=${answerId}`, {
-        method: 'POST',
+        const response = await fetch(`${API_URLS.POST}/removeDownvoteAnswer?postId=${answerId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
