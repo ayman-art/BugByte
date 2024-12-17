@@ -3,6 +3,7 @@ package com.example.BugByte_backend.services;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.CommunityRepository;
+import com.example.BugByte_backend.repositories.TagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ public class CommunityService {
 
     @Autowired
     private SearchingFilteringCommunityService searchingFilteringCommunityService;
+
+    @Autowired
+    private TagsRepository tagsRepository;
 
     private final LinkedHashMap<String, Community> communityPool =
             new LinkedHashMap<>(poolCapacity, 0.75f, true) {
@@ -83,6 +87,9 @@ public class CommunityService {
             cacheCommunity(inCommunity);
 
             inCommunity.setId(communityId);
+            if (!inCommunity.getTags().isEmpty())
+                tagsRepository.bulkAddTagsToCommunity(communityId, inCommunity.getTags());
+            
             searchingFilteringCommunityService.saveCommunity(inCommunity);
 
             return communityId;
@@ -139,7 +146,10 @@ public class CommunityService {
 
     public List<Community> getUserCommunities(Long userId) {
         try {
-            return communityRepository.getUserCommunities(userId);
+            List<Community> communities = communityRepository.getUserCommunities(userId);
+            for (Community community : communities)
+                community.setTags(tagsRepository.findTagsByCommunity(community.getId()));
+            return communities;
         } catch (Exception e) {
             throw e;
         }
@@ -154,7 +164,10 @@ public class CommunityService {
     }
     public List<Community> getAllCommunities(int pageSize ,int pageNumber ) {
         try {
-            return communityRepository.findAllCommunities(pageSize,pageNumber);
+            List<Community> communities = communityRepository.findAllCommunities(pageSize,pageNumber);
+            for (Community community : communities)
+                community.setTags(tagsRepository.findTagsByCommunity(community.getId()));
+            return communities;
         } catch (Exception e) {
             throw e;
         }
@@ -180,7 +193,10 @@ public class CommunityService {
     public Community getCommunityById(Long communityId) {
         try {
             System.out.println(communityId);
-              return communityRepository.findCommunityById(communityId);
+            Community community = communityRepository.findCommunityById(communityId);
+
+            community.setTags(tagsRepository.findTagsByCommunity(communityId));
+            return community;
         } catch (IllegalArgumentException e) {
             throw  e;
         }
