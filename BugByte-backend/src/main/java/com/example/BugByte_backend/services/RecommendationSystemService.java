@@ -36,6 +36,7 @@ public class RecommendationSystemService {
 
     public List<Question> generateFeedForUser(String token, int pageSize) throws Exception {
         Long id = getUserIdFromToken(token);
+        String userName = getUserNameFromToken(token);
 
         String cacheKey = "feed:" + id;
 
@@ -45,8 +46,8 @@ public class RecommendationSystemService {
             for (Question question : newFeed) {
                 question.setTags(tagsRepository.findTagsByQuestion(question.getId()));
                 question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
-                question.setIsUpVoted(isUpVoted(question.getCreatorUserName(), question.getId()));
-                question.setIsDownVoted(isDownVoted(question.getCreatorUserName(), question.getId()));
+                question.setIsUpVoted(isUpVoted(userName, question.getId()));
+                question.setIsDownVoted(isDownVoted(userName, question.getId()));
                 redisTemplate.opsForList().rightPush(cacheKey, question);
             }
         }
@@ -88,6 +89,15 @@ public class RecommendationSystemService {
         token = token.replace("Bearer ", "");
         Claims claim = AuthenticationService.parseToken(token);
         return Long.parseLong(claim.getId());
+    }
+
+    private String getUserNameFromToken(String token) {
+        if (token == null)
+            throw new NullPointerException("Token can't be null");
+
+        token = token.replace("Bearer ", "");
+        Claims claim = AuthenticationService.parseToken(token);
+        return claim.getSubject();
     }
 
     private boolean isUpVoted(String userName , long postId) throws Exception {

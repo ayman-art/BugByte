@@ -14,7 +14,7 @@ interface Question {
   downVotes: number;
   tags?: string[];
   communityName?: string;
-  isUpvoted: boolean;
+  isUpVoted: boolean;
   isDownVoted: boolean;
 }
 

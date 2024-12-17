@@ -12,7 +12,7 @@ export interface Post {
   downVotes: number;
   tags?: string[];
   communityName?: string;
-  isUpvoted: boolean;
+  isUpVoted: boolean;
   isDownVoted: boolean;
 }
 
@@ -68,9 +68,9 @@ const PostListing: React.FC<PostListingProps> = ({
           communityId={post.communityId}
           upVotes={post.upVotes}
           downVotes={post.downVotes}
-          tags={post.tags}
+          tags={post.tags || []}
           communityName={post.communityName || `Community ${post.communityId}`}
-          isUpvoted={post.isUpvoted}
+          isUpvoted={post.isUpVoted}
           isDownVoted={post.isDownVoted}
         />
       ))}

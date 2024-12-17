@@ -42,6 +42,7 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
   const [isUpvote, setIsUpvoted] = useState(isUpvoted);
   const [isDownvoted, setIsDownvoted] = useState(isDownVoted);
   const token = localStorage.getItem("authToken");
+  if (isUpvoted) console.log("Upvoteddd");
 
   const handleVote = async (type: "up" | "down") => {
     if (type === "up") {
@@ -178,28 +179,6 @@ const CommunityPost: React.FC<CommunityPostProps> = ({
           <span>{downvotes}</span>
         </button>
       </div>
-      {/* <div style={styles.votingContainer}>
-        <button
-          onClick={() => handleVote("up")}
-          style={{
-            ...styles.voteButton,
-            backgroundColor: isUpvote ? "#a5d6a7" : "#e8f5e9",
-          }}
-        >
-          <ArrowUp />
-          <span>{upvotes}</span>
-        </button>
-        <button
-          onClick={() => handleVote("down")}
-          style={{
-            ...styles.voteButton,
-            backgroundColor: isDownvoted ? "#ef9a9a" : "#ffebee",
-          }}
-        >
-          <ArrowDown />
-          <span>{downvotes}</span>
-        </button>
-      </div> */}
     </div>
   );
 };
