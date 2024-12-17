@@ -20,6 +20,7 @@ import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import { IAnswer } from '../../types';
+import { downvoteAnswer, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
 
 interface AnswerProps extends IAnswer {
   onDelete: (answerId: number) => void;
@@ -51,30 +52,47 @@ const Answer: React.FC<AnswerProps> = ({
 
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
+  const token = localStorage.getItem('authToken');
 
   const handleUpvoteAnswer = () => {
     if (voteStatus === 'upvoted') {
-      setCurrentUpvotes((prev) => prev - 1);
+      removeUpvoteAnswer(answerId, token!);
+      setCurrentUpvotes(currentUpvotes - 1);
       setVoteStatus('neutral');
-    } else {
-      setCurrentUpvotes((prev) => prev + 1);
-      if (voteStatus === 'downvoted') {
-        setCurrentDownvotes((prev) => prev - 1);
-      }
+      console.log('FROM upvoted to neutral');
+    } else if (voteStatus === 'downvoted') {
+      removeDownvoteAnswer(answerId, token!);
+      setCurrentDownvotes(currentDownvotes - 1);
+      upvoteAnswer(answerId, token!);
+      setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
+      console.log('FROM downvoted to upvoted');
+    } else {
+      upvoteAnswer(answerId, token!);
+      setCurrentUpvotes(currentUpvotes + 1);
+      setVoteStatus('upvoted');
+      console.log('FROM neutral to upvoted');
     }
   };
 
   const handleDownvoteAnswer = () => {
     if (voteStatus === 'downvoted') {
-      setCurrentDownvotes((prev) => prev - 1);
+      removeDownvoteAnswer(answerId, token!);
+      setCurrentDownvotes(currentDownvotes - 1);
       setVoteStatus('neutral');
-    } else {
-      setCurrentDownvotes((prev) => prev + 1);
-      if (voteStatus === 'upvoted') {
-        setCurrentUpvotes((prev) => prev - 1);
-      }
+      console.log('FROM downvoted to neutral');
+    } else if (voteStatus === 'upvoted') {
+      removeUpvoteAnswer(answerId, token!);
+      setCurrentUpvotes(currentUpvotes - 1);
+      downvoteAnswer(answerId, token!);
+      setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
+      console.log('FROM upvoted to downvoted');
+    } else {
+      downvoteAnswer(answerId, token!);
+      setCurrentDownvotes(currentDownvotes + 1);
+      setVoteStatus('downvoted');
+      console.log('FROM neutral to downvoted');
     }
   };
 

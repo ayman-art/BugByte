@@ -16,14 +16,14 @@ export  interface IQuestion {
     opName: string;
     postedOn: string;
     communityName: string;
-    communityId: number;
+    communityId: string;
     isUpvoted: boolean;
     isDownvoted: boolean;
   }
 
   export interface IAnswer {
-    answerId: number;
-    questionId: number;
+    answerId: string;
+    questionId: string;
     opName: string;
     postedOn: string; // ISO date format as string
     upVotes: number;

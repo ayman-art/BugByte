@@ -15,7 +15,7 @@ interface PostDetails {
   content: string; 
   community?: string; 
   tags?: string[];
-  communityId?: string;
+  communityId?: number;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {

@@ -3,8 +3,8 @@ import { IQuestion, IAnswer } from '../types/index'
 
 export interface QuestionResponse {
     answerDownVotes?: number;
-    questionId: number;
-    validatedAnswerId: number;
+    questionId: string;
+    validatedAnswerId: string;
     answerOp?: string;
     upVotes: number;
     mdContent: string;
@@ -19,15 +19,15 @@ export interface QuestionResponse {
     postedOn: string;
     answerPostedOn?: string;
     communityName: string;
-    communityId: number;
+    communityId: string;
   }
 
 
 
   export interface ReplyData {
-    answerId: number;
+    answerId: string;
     opName: string;
-    replyId: number;
+    replyId: string;
     postedOn: string; // ISO date format as string
     mdContent: string;
   }

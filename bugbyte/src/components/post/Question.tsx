@@ -19,10 +19,10 @@ import { MDXEditor,
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
-import { downvoteQuestion, removeDownvoteAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
+import { downvoteQuestion, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
-  onDelete: (questionId: string) => void;
+  onDelete: (questionId: number) => void;
 }
 const Question: React.FC<QuestionProps> = ({
   questionId,
