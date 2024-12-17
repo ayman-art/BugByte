@@ -69,7 +69,13 @@ const CommunityPage: React.FC = () => {
         setHasMore(false);
       } else {
         console.log("...");
-        setPostList((prevPosts) => [...prevPosts, ...posts]); // Append new posts
+        setPostList((prevPosts) => {
+          const mergedPosts = [...prevPosts, ...posts];
+          const uniquePosts = Array.from(
+            new Map(mergedPosts.map((post) => [post.id, post])).values()
+          );
+          return uniquePosts;
+        });
         setPage((prevPage) => prevPage + 1); // Increment page
       }
     } catch (error) {
