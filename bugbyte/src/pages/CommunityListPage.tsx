@@ -12,45 +12,27 @@ const CommunitySearchPage: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const size = 10;
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value);
-  };
 
-  const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTagValue(event.target.value);
-  };
-
-  const fetchCommunities = async (reset: boolean = false) => {
-    try {
-      if (!hasMore && !reset) return;
-
+  const fetchCommunities = async () => {
       setLoading(true);
 
-      const newPage = reset ? 0 : page;
-      const fetchedCommunities = await sendRequest(
-        searchValue,
-        tagValue,
-        "community",
-        newPage,
-        size
-      );
-
-      setCommunities((prev) =>
-        reset ? fetchedCommunities : [...prev, ...fetchedCommunities]
-      );
-      setHasMore(fetchedCommunities.length === size);
-      setPage(reset ? 1 : newPage + 1);
-    } catch (error) {
-      console.error("Error fetching communities:", error);
-    } finally {
-      setLoading(false);
-    }
+     try {
+           const token = localStorage.getItem("authToken");
+           const comms = await getCommunities(token!);
+     
+           if (comms.length === 0) {
+             setHasMore(false); // No more posts
+           } else {
+             setCommunities((prevPosts) => [...prevPosts, ...comms]); // Append new posts
+             setPage((prevPage) => prevPage + 1); // Increment page
+           }
+         } catch (error) {
+           console.error("Failed to fetch posts:", error);
+         } finally {
+           setLoading(false);
+         }
   };
 
-  const handleSearchClick = async () => {
-    if (searchValue === "" && tagValue === "") return;
-    await fetchCommunities(true); // Reset the list when a new search is performed
-  };
 
   return (
     <div style={styles.container}>
@@ -59,7 +41,7 @@ const CommunitySearchPage: React.FC = () => {
       {/* Community Listing */}
       <CommunityListing
         comms={communities}
-        fetchCommunities={() => fetchCommunities(false)} // Fetch more data for infinite scrolling
+        fetchCommunities={fetchCommunities} // Fetch more data for infinite scrolling
         loading={loading}
         hasMore={hasMore}
       />

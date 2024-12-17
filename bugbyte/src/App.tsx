@@ -18,8 +18,7 @@ import TestPage from "./pages/TestPage";
 import CommunityPage from "./pages/CommunityPage";
 import { Home } from "lucide-react";
 import HomePage from "./pages/HomePage";
-import CommunityListing from "./pages/CommunityListingPage";
-import CommunityListingPage from "./pages/CommunityListingPage";
+import CommunityListingPage from "./pages/CommunityListPage";
 
 const isLoggedIn = false;
 
