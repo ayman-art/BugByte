@@ -28,8 +28,4 @@ public class CommunityAdapter {
         if(map.containsKey("description")) comm.setDescription((String)map.get("description"));
         return comm;
     }
-    public String toJson(Community community) {
-        Gson gson = new Gson();
-        return gson.toJson(community);
-    }
 }
