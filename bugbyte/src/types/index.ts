@@ -18,3 +18,15 @@ export  interface IQuestion {
     communityName: string;
     communityId: number;
   }
+
+  export interface IAnswer {
+    answerId: number;
+    questionId: number;
+    opName: string;
+    postedOn: string; // ISO date format as string
+    upVotes: number;
+    mdContent: string;
+    isDownVoted: boolean;
+    isUpVoted: boolean;
+    downVotes: number;
+  }

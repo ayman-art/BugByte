@@ -19,36 +19,32 @@ import {
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
+import { IAnswer } from '../../types';
 
-interface AnswerProps {
-  id: string;
-  postId: string;
-  text: string; // Markdown content
-  upvotes: number;
-  downvotes: number;
-  opName: string;
-  date: string;
+interface AnswerProps extends IAnswer {
+  enabledVerify?: boolean;
   isVerified?: boolean;
-  enabledVerify?: boolean; // Prop for enabling/disabling verify
-  onDelete: (answerId: string) => void;
-  onVerify: (answerId: string) => void;
+  onDelete: (answerId: number) => void;
+  onVerify: (answerId: number) => void;
 }
-
 const Answer: React.FC<AnswerProps> = ({
-  id,
-  text,
-  upvotes,
-  downvotes,
+  answerId,
+  questionId,
   opName,
-  date,
+  postedOn, // ISO date format as string
+  upVotes,
+  mdContent,
+  isDownVoted,
+  isUpVoted,
+  downVotes,
   isVerified = false,  // default to false if not provided
   enabledVerify = true, // prop for enabling/disabling verify button
   onDelete,
   onVerify,
 }) => {
-  const [currentUpvotes, setCurrentUpvotes] = useState(upvotes);
-  const [currentDownvotes, setCurrentDownvotes] = useState(downvotes);
-  const [voteStatus, setVoteStatus] = useState<'upvoted' | 'downvoted' | 'neutral'>('neutral');
+  const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
+  const [currentDownvotes, setCurrentDownvotes] = useState(downVotes);
+  const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [verified, setVerified] = useState(isVerified);
@@ -104,7 +100,7 @@ const Answer: React.FC<AnswerProps> = ({
   // Verify the answer
   const handleVerify = () => {
     setVerified(true);
-    onVerify(id);
+    onVerify(answerId);
   };
   useEffect(() => {
     setEnableVerify(enabledVerify);
@@ -129,7 +125,7 @@ const Answer: React.FC<AnswerProps> = ({
 
         <section className="answer-body">
           <MDXEditor
-            markdown={text}
+            markdown={mdContent}
             readOnly
             plugins={[
               headingsPlugin(),
@@ -148,7 +144,7 @@ const Answer: React.FC<AnswerProps> = ({
           />
         </section>
 
-        <p className="answer-date">on {date}</p>
+        <p className="answer-date">on {postedOn}</p>
 
         <footer className="answer-footer">
           <div className="answer-votes">
@@ -181,7 +177,7 @@ const Answer: React.FC<AnswerProps> = ({
             {canDelete && (
               <button
                 className="action-button delete-button"
-                onClick={() => onDelete(id)}
+                onClick={() => onDelete(answerId)}
               >
                 <FaTrash />
               </button>
@@ -217,7 +213,7 @@ const Answer: React.FC<AnswerProps> = ({
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: text }}
+        initialData={{ content: mdContent }}
         type="md-only"
       />
     </div>

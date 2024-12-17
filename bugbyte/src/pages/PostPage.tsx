@@ -5,23 +5,13 @@ import Answer from '../components/post/Answer';
 import Reply from '../components/post/Reply';
 import '../styles/PostPage.css';
 import { getQuestion } from '../API/PostAPI';
-import { IQuestion } from '../types';
+import { IQuestion, IAnswer } from '../types/index';
 interface QuestionProps  extends IQuestion {
   onDelete: (questionId: string) => void;
 }
 
 
-interface AnswerProps {
-  id: string;
-  postId: string;
-  text: string;
-  upvotes: number;
-  downvotes: number;
-  opName: string;
-  date: string;
-  verified?: boolean;
-  enabledVerify?: boolean;
-}
+
 
 interface ReplyProps {
   id: string;
@@ -37,7 +27,7 @@ const PostPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
 
   const [question, setQuestion] = useState<IQuestion | null>(null);
-  const [answers, setAnswers] = useState<AnswerProps[]>([]);
+  const [answers, setAnswers] = useState<IAnswer[]>([]);
   const [replies, setReplies] = useState<Map<string, ReplyProps[]>>(new Map());
   const [hasNextAnswers, setHasNextAnswers] = useState(true);
   const [hasNextReplies, setHasNextReplies] = useState<Map<string, boolean>>(new Map());
@@ -46,12 +36,19 @@ const PostPage: React.FC = () => {
   useEffect(() => {
     const fetchQuestion = async () => {
       const fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
-      console.log("FETCHED QUESITON:", fetchedQuestion);
+      setQuestion(fetchedQuestion[0]);
+      if (fetchedQuestion[1]) {
+        setAnswers([...answers, fetchedQuestion[1]]);
+      }
+      
+      // console.log("FETCHED QUESITON:", fetchedQuestion);
       const fetchedAnswers = answersEx.filter((answer) => answer.postId === postId).slice(0, pageSize);
       const hasNext = answersEx.filter((answer) => answer.postId === postId).length > pageSize;
 
-      setQuestion(fetchedQuestion || null);
-      setAnswers(fetchedAnswers);
+      ;
+      console.log("FETCHED QUESITON:", fetchedQuestion[0]);
+      console.log("FETCHED ANSWERS:", fetchedQuestion[1]);
+
       setHasNextAnswers(hasNext);
 
       // Initialize `hasNextReplies` for all fetched answers
@@ -129,13 +126,13 @@ const PostPage: React.FC = () => {
     });
   };
 
-  const onDelteQuestion = (questionId: string) => {
+  const onDelteQuestion = (questionId: number) => {
     console.log(1111)
     setQuestion(null)
   }
 
-  const onDeleteAnswer = (answerId: string) => {
-    setAnswers((prev) => prev.filter((answer) => answer.id !== answerId));
+  const onDeleteAnswer = (answerId: number) => {
+    setAnswers((prev) => prev.filter((answer) => answer.answerId !== answerId));
 
     setReplies((prev) => {
       const newReplies = new Map(prev);

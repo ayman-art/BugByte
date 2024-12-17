@@ -1,10 +1,10 @@
 import { API_URLS } from './ApiUrls';
-import { IQuestion } from '../types/index'
+import { IQuestion, IAnswer } from '../types/index'
 
 export interface QuestionResponse {
     answerDownVotes?: number;
     questionId: number;
-    validatedAnswerId?: number;
+    validatedAnswerId: number;
     answerOp?: string;
     upVotes: number;
     mdContent: string;
@@ -22,17 +22,7 @@ export interface QuestionResponse {
     communityId: number;
   }
 
-  export interface AnswerData {
-    answerId: number;
-    questionId: number;
-    opName: string;
-    postedOn: string; // ISO date format as string
-    upVotes: number;
-    mdContent: string;
-    isDownVoted: boolean;
-    isUpVoted: boolean;
-    downVotes: number;
-  }
+
 
   export interface ReplyData {
     answerId: number;
@@ -129,31 +119,57 @@ export const postReply = async (
     }
 };
 
-export const getQuestion = async (questionId: string, token: string): Promise<IQuestion> => {
+export const getQuestion = async (
+    questionId: string,
+    token: string
+  ): Promise<[IQuestion, IAnswer | null]> => {
     try {
-        console.log(token)
-        const response = await fetch(`${API_URLS.QUESTION}?questionId=${questionId}`, {
+      console.log(token);
+      const response = await fetch(`${API_URLS.QUESTION}?questionId=${questionId}`, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-        });
-
-        if (!response.ok) {
+      });
+  
+      if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to get question');
-        }
-        const data = await response.json();
-            const tags = data.tags || []; // handling null
-            return { ...data, tags };
+      }
+  
+      const data = await response.json();
+      const tags = data.tags || []; // Handle null tags
+  
+      // Construct the question object
+      const question: IQuestion = {
+        ...data,
+        tags,
+      };
+  
+      // Parse the validated answer if it exists
+      let validatedAnswer: IAnswer | null = null;
+      if (data.validatedAnswerId !== 0 && data.answerMdContent) {
+        validatedAnswer = {
+          answerId: data.validatedAnswerId,
+          questionId: data.questionId,
+          mdContent: data.answerMdContent,
+          upVotes: data.answerUpVotes || 0,
+          downVotes: data.answerDownVotes || 0,
+          postedOn: data.answerPostedOn || '',
+          opName: data.answerOp || '',
+          isDownVoted: false,
+          isUpVoted: false,
+        };
+      }
+  
+      return [question, validatedAnswer];
     } catch (error) {
-        console.error('Error getting question:', error);
-        throw error;
+      console.error('Error getting question:', error);
+      throw error;
     }
-}
-    
-
+  };
+  
 export const getAnswer = async (answerId: string, token: string): Promise<any> => {
     try {
         const response = await fetch(`${API_URLS.ANSWER}/${answerId}`, { // Path variable
