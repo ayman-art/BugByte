@@ -1,14 +1,15 @@
 package com.example.BugByte_backend.facades;
 
+import com.example.BugByte_backend.Adapters.CommunityAdapter;
 import com.example.BugByte_backend.Adapters.UserAdapter;
 import com.example.BugByte_backend.controllers.GoogleAuthController;
+import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
-import com.example.BugByte_backend.services.AuthenticationService;
-import com.example.BugByte_backend.services.RegistrationService;
-import com.example.BugByte_backend.services.UserService;
+import com.example.BugByte_backend.services.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import io.jsonwebtoken.Claims;
+import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,13 @@ public class AdministrativeFacade {
 
     @Autowired
     private RegistrationService registrationService;
+
+    @Autowired
+    CommunityService communityService;
+    @Autowired
+    ModeratorService moderatorService;
+    @Autowired
+    AuthenticationService authenticationService;
 
     /*
     Expected input format:
@@ -50,7 +58,6 @@ public class AdministrativeFacade {
             "jwt", jwt,
             "isAdmin", isAdmin
         );
-
     }
 
     public  String loginUser(Map<String, Object> userdata) throws Exception{
@@ -71,7 +78,6 @@ public class AdministrativeFacade {
     public  String resetPassword(Map<String, Object> userdata) throws Exception {
         String email = (String) userdata.get("email");
         return registrationService.sendResetPasswordCode(email);
-
     }
 
     public String validateEmailedCode(Map<String, Object> userdata) throws Exception {
@@ -80,7 +86,6 @@ public class AdministrativeFacade {
         String email = (String) userdata.get("email");
         String code = (String) userdata.get("code");
         Map<String, Object> userMap = adapter.toMap(registrationService.validateCode(email, code));
-        Long id = (Long)userMap.get("id");
         return AuthenticationService.generateJWT((Long)userMap.get("id"),
                 (String)userMap.get("userName"), (boolean)userMap.get("isAdmin"));
     }
@@ -104,29 +109,29 @@ public class AdministrativeFacade {
 
         return profileData;
     }
+
     public void updateProfile(Map<String, Object> userdata) throws Exception {
         try {
-
-            Claims claim =AuthenticationService.parseToken((String) userdata.get("jwt"));
+            Claims claim = AuthenticationService.parseToken((String) userdata.get("jwt"));
             long id = Long.parseLong(claim.getId());
             userService.updateProfile(String.valueOf(userdata.get("bio")), id);
-        }catch (Exception e){
+        } catch (Exception e){
             throw new Exception("Unauthorized operation: "+ e.getMessage());
         }
-
     }
+
     public boolean followUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
-        return userService.followUser(id, (String)userdata.get("userName"));
+        return userService.followUser(id, (String) userdata.get("userName"));
     }
 
     public boolean unfollowUser(Map<String, Object> userdata) throws Exception {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
-        return userService.unfollowUser(id, (String)userdata.get("userName"));
+        return userService.unfollowUser(id, (String) userdata.get("userName"));
     }
 
     public List<Map<String, Object>> getFollowers(Map<String, Object> userdata) throws Exception {
@@ -140,7 +145,6 @@ public class AdministrativeFacade {
         }
         return followersMap;
     }
-
 
     public List<Map<String, Object>> getFollowings(Map<String, Object> userdata) throws Exception {
         List<User> followings = userService.getFollowings((String)userdata.get("userName"));
@@ -160,6 +164,7 @@ public class AdministrativeFacade {
         long id = Long.parseLong(claim.getId());
         return userService.makeAdmin(id, (String)userdata.get("userName"));
     }
+
     public Map<String, Object> googleOAuthSignUp(@RequestBody Map<String, String> requestBody) throws Exception {
         String tokenRequest = requestBody.get("token");
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
@@ -173,10 +178,10 @@ public class AdministrativeFacade {
             String email = payload.getEmail();
             String name = (String) payload.get("name");
             UserAdapter adapter = new UserAdapter();
-            Map<String, Object> userMap = adapter.toMap(registrationService.registerUsingGoogle(name , email));
-            String jwt = AuthenticationService.generateJWT((long)userMap.get("id"),
-                    (String)userMap.get("userName"), (boolean)userMap.get("isAdmin"));
-            boolean isAdmin = (boolean)userMap.get("isAdmin");
+            Map<String, Object> userMap = adapter.toMap(registrationService.registerUsingGoogle(name, email));
+            String jwt = AuthenticationService.generateJWT((long) userMap.get("id"),
+                    (String) userMap.get("userName"), (boolean) userMap.get("isAdmin"));
+            boolean isAdmin = (boolean) userMap.get("isAdmin");
             return Map.of(
                     "jwt", jwt,
                     "isAdmin", isAdmin
@@ -185,9 +190,156 @@ public class AdministrativeFacade {
             throw new RuntimeException("Invalid token");
         }
     }
+    public Community getCommunityInfo(Map<String,Object> map) throws Exception {
+        String token = (String) map.get("jwt");
+        String userName = authenticationService.getUserNameFromJwt(token);
+        if (userName == null) throw new Exception("userName is null");
+        Community community = communityService.getCommunityById((Long)map.get("communityId"));
+        System.out.println(map.get("communityId"));
+        CommunityAdapter communityAdapter = new CommunityAdapter();
+        return community;//communityAdapter.toMap(community);
+    }
+    public boolean createCommunity(Map<String,Object> map){
+        try {
+            String token = (String) map.get("jwt");
+            boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
+            System.out.println(isAdmin);
+            if (!isAdmin) throw new Exception("user is not an admin");
+            CommunityAdapter communityAdapter = new CommunityAdapter();
+            map.remove("jwt");
+            map.put("admin_id" , Long.parseLong(authenticationService.getUserNameFromJwt(token)));
+            Long id = communityService.createCommunity(communityAdapter.fromMap(map));
+            return  true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+    public boolean deleteCommunity(Map<String,Object> map)
+    {
+        try {
+            String token = (String) map.get("jwt");
+            boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
+            if (!isAdmin) throw new Exception("user is not an admin");
+            return communityService.deleteCommunity(Long.parseLong((String) map.get("communityId")));
+        } catch (IllegalArgumentException e) {
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public boolean editCommunity(Map<String,Object> map)
+    {
+        try {
+            String token = (String) map.get("jwt");
+            boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
+            if (!isAdmin) throw new Exception("user is not an admin");
+            Community comm = new Community(Long.parseLong((String) map.get("communityId")),(String)map.get("name"),(String) map.get("desription"));
+            return communityService.updateCommunity(comm);
+        } catch (IllegalArgumentException e) {
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    public void authorizeToken(String token){
-        Claims claim = AuthenticationService.parseToken(token);
+    public void updateUserProfilePicture(Map<String, Object> map) throws Exception {
+        String jwt = (String) map.get("jwt");
+        Claims claim = AuthenticationService.parseToken(jwt);
+        if(claim.getId()==null) throw new Exception("User Unauthorized ");
+        Long id = Long.valueOf(claim.getId());
+        String url = (String) map.get("url");
+        userService.updatePicture(id, url);
+    }
 
+    public boolean setModerator(Map<String , Object>req) {
+        try {
+            String token = (String) req.get("jwt");
+            boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
+            if (!isAdmin) throw new Exception("user is not an admin");
+        return moderatorService.setModerator((String) req.get("moderatorName"),
+                Long.parseLong((String) req.get("communityId")));
+        } catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+    public boolean removeModerator(Map<String , Object>req)
+    {
+        try {
+            String token = (String) req.get("jwt");
+            boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
+            if (!isAdmin) throw new Exception("user is not an admin");
+            return moderatorService.removeModerator((String) req.get("moderatorName"),
+                    Long.parseLong((String) req.get("communityId")));
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+    public boolean removeMember(Map<String,Object>req)
+    {
+        try {
+            String token = (String) req.get("jwt");
+            boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
+            if (!isAdmin) throw new Exception("user is not an admin");
+            return communityService.deleteMember(Long.parseLong((String) req.get("communityId"))
+                    ,(String)req.get("user_name"));
+        } catch (IllegalArgumentException e) {
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Map<String, Object>> getAdmins(Map<String , Object>req) throws Exception {
+        String token = (String) req.get("jwt");
+        boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
+        if (!isAdmin) throw new Exception("user is not an admin");
+        List<User> admins = communityService.getCommunityAdmins(Long.parseLong((String) req.get("communityId")));
+        UserAdapter adapter = new UserAdapter();
+        List <Map<String, Object>> adminsMap = admins.stream().map(adapter::toMap).toList();
+        for (Map<String, Object> admin : adminsMap) {
+            admin.remove("password");
+            admin.remove("email");
+            admin.remove("id");
+        }
+        return adminsMap;
+    }
+
+    public boolean joinCommunity(Map<String,Object>req)
+    {
+        try {
+            String token = (String) req.get("jwt");
+            long userId = authenticationService.getIdFromJwt(token);
+            return communityService.joinCommunity( Long.valueOf((Integer)req.get("communityId"))
+                    ,userId);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+    public List<Community> getUserJoinedCommunities(String jwt) throws Exception {
+        long userId = authenticationService.getIdFromJwt(jwt);
+        System.out.println(userId);
+        //if (id == null )throw new Exception("UnAuthorized");
+        List<Community> comms = communityService.getUserCommunities(userId);
+        System.out.println("here");
+
+        return comms;
+    }
+    public List<Community> getAllCommunities(String jwt , int pageSize , int pageNumber) throws Exception {
+        long userId = authenticationService.getIdFromJwt(jwt);
+        System.out.println(userId);
+        //if (id == null )throw new Exception("UnAuthorized");
+        List<Community> comms = communityService.getAllCommunities(pageSize,pageNumber);
+        System.out.println("get All communities");
+        return comms;
+    }
+    public boolean leaveCommunity(String jwt , String communityName)
+    {
+        Claims claim = AuthenticationService.parseToken(jwt);
+        Long id = Long.parseLong(claim.getId());
+        return communityService.leaveCommunity(communityName,id);
     }
 }

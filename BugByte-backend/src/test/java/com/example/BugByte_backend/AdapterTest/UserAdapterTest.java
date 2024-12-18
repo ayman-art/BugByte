@@ -13,9 +13,14 @@ public class UserAdapterTest {
     // test - 1
     @Test
     public void testToMap() {
-        User user = new User("user1", "user@gmail.com", "12345678");
-        user.setReputation(10L);
-        user.setBio("simple bio");
+        User user = User.builder()
+                .userName("user1")
+                .email("user@gmail.com")
+                .password("12345678")
+                .reputation(10L)
+                .bio("simple bio")
+                .isAdmin(false)
+                .build();
 
         Map<String, Object> userMap = userAdapter.toMap(user);
 
@@ -79,10 +84,15 @@ public class UserAdapterTest {
     // test - 4
     @Test
     public void testToJson() {
-        User user = new User("user1", "user@gmail.com", "12345678");
-        user.setReputation(10L);
-        user.setId((long) 5);
-        user.setBio("simple bio");
+        User user = User.builder()
+                .id(5L)
+                .userName("user1")
+                .email("user@gmail.com")
+                .password("12345678")
+                .reputation(10L)
+                .bio("simple bio")
+                .isAdmin(false)
+                .build();
 
         String userString = userAdapter.toJson(user);
         String expected = "{\"id\":5,\"userName\":\"" +
@@ -96,8 +106,15 @@ public class UserAdapterTest {
     //test 5
     @Test
     public void testToJsonWithNullValues() {
-        User user = new User("user1", "user@gmail.com", "12345678");
-        user.setBio("simple bio");
+        User user = User.builder()
+                .id(0L)
+                .userName("user1")
+                .email("user@gmail.com")
+                .password("12345678")
+                .bio("simple bio")
+                .reputation(0L)
+                .isAdmin(false)
+                .build();
 
         String userString = userAdapter.toJson(user);
 

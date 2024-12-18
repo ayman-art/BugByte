@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import profilePath from '../assets/user-profile.svg';
-import Layout from '../layouts/MainLayout';
 import TextPopUp from '../components/BioPopup'
-import { followUser, getProfile, makeAdmin, unfollowUser, updateBio } from '../API/ProfileAPI';
+import { followUser, getProfile, getUserPosts, makeAdmin, unfollowUser, updateBio, updateProfilePicture } from '../API/ProfileAPI';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useNavbar } from '@nextui-org/navbar';
+import PostListing, { Post } from '../components/PostListing';
 interface UserProfile {
   username: string;
   reputation: number;
@@ -13,46 +12,74 @@ interface UserProfile {
   bio: string;
   is_following: boolean;
   is_admin: boolean; // Add this to match the fetched user profile structure
+  profile_picture?: string; // New optional field for profile picture
 }
-interface Post {
-  id: number;
-  title: string;
-  content: string;
-}
+// interface Post {
+//   id: number;
+//   title: string;
+//   content: string;
+// }
 
 const Profile: React.FC = () => {
   const navigate = useNavigate()
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const visitFollowers = () => {
+    navigate(`/Profile/${userName}/Followers`)
+  }
+  const visitFollowings = () => {
+    navigate(`/Profile/${userName}/Followings`)
+  }
+  
   const {userName} = useParams<{ userName: string }>();
-  const [topPosts, setTopPosts] = useState<Post[]>([
-    {
-      id: 1,
-      title: "string",
-      content: "string"
-    },
-    {
-      id: 2,
-      title: "string",
-      content: "string"
-    },
-    {
-      id: 3,
-      title: "string",
-      content: "string"
-    }
-  ]);
   const [profileLoading, setProfileLoading] = useState<boolean>(true);
   const [postsLoading, setPostsLoading] = useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isProfilePicPopupOpen, setIsProfilePicPopupOpen] = useState(false);
   const [error, setError] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
+  const limit = 5;
+  const [page, setPage] = useState<number>(0);
+  const [hasMore, setHasMore] = useState(true); // If more posts are available
+  const [postList, setPostList]= useState<Post[]>([]);
+  
 
   const handleButtonClick = () => {
     setIsPopupOpen(true);
   };
-
+  const fetchPosts = async ()=>{
+    setPostsLoading(true);
+    try{
+      const jwt = localStorage.getItem('authToken');
+      const data = await getUserPosts( jwt!, limit, page*limit, userName!);
+      const posts: Post[] = data.map(((item: { questionId: any; title: any; opName: any; mdContent: any; upVotes: any; communityId: any; downVotes: any; tags: any; })  => ({
+        id: item.questionId,
+        title: item.title,
+        creatorUserName: item.opName,
+        mdContent: item.mdContent,
+        upVotes: item.upVotes,
+        downVotes: item.downVotes,
+        communityId: item.communityId,
+        tags: item.tags
+      })));
+      console.log(posts)
+      if(posts.length=== 0){
+        setHasMore(false);
+      }else{
+        console.log("...")
+        setPostList((prevPosts) => [...prevPosts, ...posts]); // Append new posts
+        setPage((prevPage) => prevPage + 1); // Increment page
+      }
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+    } finally {
+      setPostsLoading(false);
+    }
+    
+    }
   const handlePopupSubmit = (newText: string) => {
     // PUT request HERE
     let newUserProfile = userProfile;
@@ -65,7 +92,38 @@ const Profile: React.FC = () => {
       setError("Failed to update bio");
     }
   };
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
+      setIsProfilePicPopupOpen(true);
+    }
+  };
+  
+  // Upload profile picture
+  const handleProfilePictureUpload = async () => {
+    if (!selectedFile) return;
 
+    try {
+      const token = localStorage.getItem('authToken');
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const updatedProfilePic = await updateProfilePicture(formData, token!);
+      
+      setUserProfile((prevProfile) => 
+        prevProfile ? { 
+          ...prevProfile, 
+          profile_picture: updatedProfilePic 
+        } : null
+      );
+      
+      setIsProfilePicPopupOpen(false);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      setError("Failed to upload profile picture");
+    }
+  };
   const handlePopupClose = () => {
     setIsPopupOpen(false);
   };
@@ -83,7 +141,8 @@ const Profile: React.FC = () => {
           following: data['followingsCount'],
           bio: data['bio'],
           is_admin: data['isAdmin'],
-          is_following: data['is_following']
+          is_following: data['is_following'],
+          profile_picture: data['picture']
         });
         
       } catch (error) {
@@ -94,17 +153,11 @@ const Profile: React.FC = () => {
     }
 
     fetchProfile();
-  }, []);
+  }, [userName]);
   const handleFollow= async () => {
     try {
       const token = localStorage.getItem('authToken')
       await followUser(userName!, token!)
-      // Update state immutably
-      // setUserProfile((prevProfile) => {
-      //   const updatedProfile = { ...prevProfile!, is_following: true };
-      //   console.log('Updated Profile:', updatedProfile);
-      //   return updatedProfile;
-      // });
       setUserProfile((prevProfile) => 
         prevProfile ? { 
           ...prevProfile, 
@@ -120,12 +173,6 @@ const Profile: React.FC = () => {
     try {
       const token = localStorage.getItem('authToken')
       await unfollowUser(userName!, token!)
-        // Update state immutably
-      // setUserProfile((prevProfile) => {
-      //   const updatedProfile = { ...prevProfile!, is_following: false };
-      //   console.log('Updated Profile:', updatedProfile);
-      //   return updatedProfile;
-      // });
       setUserProfile((prevProfile) => 
         prevProfile ? { 
           ...prevProfile, 
@@ -141,12 +188,6 @@ const Profile: React.FC = () => {
     try {
       const token = localStorage.getItem('authToken')
       await makeAdmin(userName!, token!)
-      // Update state immutably
-      // setUserProfile((prevProfile) => {
-      //   const updatedProfile = { ...prevProfile!, is_following: true };
-      //   console.log('Updated Profile:', updatedProfile);
-      //   return updatedProfile;
-      // });
       setUserProfile((prevProfile) => 
         prevProfile ? { 
           ...prevProfile, 
@@ -158,23 +199,6 @@ const Profile: React.FC = () => {
       console.error('Error following user:', error);
     }
   }
-  // Fetch top posts data
-  // useEffect(() => {
-  //   async function fetchTopPosts(): Promise<void> {
-  //     try {
-  //       const response = await fetch('/api/top-posts');
-  //       if (!response.ok) throw new Error('Failed to fetch top posts');
-  //       const data: Post[] = await response.json();
-  //       setTopPosts(data);
-  //     } catch (error) {
-  //       console.error('Error fetching top posts:', error);
-  //     } finally {
-  //       setPostsLoading(false);
-  //     }
-  //   }
-
-  //   fetchTopPosts();
-  // }, []);
 
   if (profileLoading) {
     return <div style={{ textAlign: 'center', marginTop: '20px' }}>Loading profile...</div>;
@@ -184,7 +208,6 @@ const Profile: React.FC = () => {
     return <div style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}>Error loading profile. Please try again later.</div>;
   }
 
-  // Inline style definitions
   const styles = {
     errorMessge: {
       color: 'red',
@@ -221,6 +244,7 @@ const Profile: React.FC = () => {
       gap: '20px',
       fontSize: '14px',
       color: '#555',
+      cursor:'pointer'
     },
     bio: {
       marginBottom: '20px',
@@ -282,23 +306,91 @@ const Profile: React.FC = () => {
       <div style={styles.container}>
         {/* Profile Header */}
         <div style={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          {/*<img
-            src={userProfile.profilePicture}
-            alt="Profile"
-            style={styles.profilePicture}
-          />*/}
-          <img
-            src={profilePath}
-            alt="Profile"
-            style={styles.profilePicture}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }} >
+          {/* Profile Picture with Click to Upload */}
+          <div style={{ position: 'relative', cursor: 'pointer' }}>
+          {loggedInUsername === userName && (
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleFileSelect}
+              style={{ display: 'none' }} 
+              id="profile-pic-upload"
+            />)}
+            <label htmlFor="profile-pic-upload">
+              <img
+                src={userProfile?.profile_picture || profilePath}
+                alt="Profile"
+                style={styles.profilePicture}
+              />
+              {loggedInUsername === userName && (
+                <div style={{
+                  position: 'absolute', 
+                  bottom: 0, 
+                  right: 0, 
+                  backgroundColor: 'rgba(0,0,0,0.5)', 
+                  color: 'white', 
+                  padding: '2px 5px', 
+                  borderRadius: '50%'
+                }}>
+                  📷
+                </div>
+              )}
+            </label>
+          </div>
+
+          {/* Profile Picture Upload Popup */}
+          {isProfilePicPopupOpen && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                backgroundColor: 'white',
+                padding: '20px',
+                borderRadius: '10px',
+                textAlign: 'center'
+              }}>
+                <h3>Upload Profile Picture</h3>
+                {selectedFile && (
+                  <img 
+                    src={URL.createObjectURL(selectedFile)} 
+                    alt="Selected" 
+                    style={{ 
+                      maxWidth: '200px', 
+                      maxHeight: '200px', 
+                      marginBottom: '10px' 
+                    }} 
+                  />
+                )}
+                <div>
+                  <button onClick={handleProfilePictureUpload}>
+                    Upload
+                  </button>
+                  <button onClick={() => {
+                    setIsProfilePicPopupOpen(false);
+                    setSelectedFile(null);
+                  }}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div>
             <h1>{userProfile.username}</h1>
             <p>Reputation: {userProfile.reputation}</p>
             <div style={styles.followStats}>
-              <p>Followers: {userProfile.followers}</p>
-              <p>Following: {userProfile.following}</p>
+              <li onClick={visitFollowers}>Followers: {userProfile.followers}</li>
+              <li onClick={visitFollowings}>Following: {userProfile.following}</li>
             </div>
           </div>
         </div>
@@ -343,22 +435,15 @@ const Profile: React.FC = () => {
         {/* Top Posts Section */}
         <div style={styles.posts}>
           <h3>Top Posts:</h3>
-          {postsLoading ? (
-            <p>Loading top posts...</p>
-          ) : (
-            <ul>
-              {topPosts.map((post) => (
-                <li key={post.id} style={styles.post}>
-                  <h4 style={styles.postTitle}>{post.title}</h4>
-                  <p style={styles.postContent}>{post.content}</p>
-                </li>
-              ))}
-            </ul>
-          )}
+            <PostListing
+              posts={postList}
+              fetchPosts={fetchPosts}
+              loading={postsLoading}
+              hasMore={hasMore}
+            />
         </div>
       </div>
   );
 };
 
 export default Profile;
-

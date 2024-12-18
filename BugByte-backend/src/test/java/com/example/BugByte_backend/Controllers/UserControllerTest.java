@@ -29,7 +29,69 @@ class UserControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+    @Test
+    void testUpdateProfilePicture_Success() throws Exception {
+        // Arrange
+        String token = "Bearer validToken";
+        String expectedToken = "validToken";
+        Map<String, Object> data = new HashMap<>();
+        data.put("profilePicture", "newPictureData");
 
+        doNothing().when(administrativeFacade).updateUserProfilePicture(anyMap());
+
+        // Act
+        ResponseEntity<?> response = userController.updateProfilePicture(token, data);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Profile picture updated successfully", response.getBody());
+
+        // Verify
+        data.put("jwt", expectedToken);
+        verify(administrativeFacade, times(1)).updateUserProfilePicture(data);
+    }
+
+    @Test
+    void testUpdateProfilePicture_InvalidToken() {
+        // Arrange
+        String token = "InvalidToken";
+        Map<String, Object> data = new HashMap<>();
+        data.put("profilePicture", "newPictureData");
+
+        // Act
+        ResponseEntity<?> response = userController.updateProfilePicture(token, data);
+
+        // Assert
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("JWT String argument cannot be null or empty.", response.getBody()); // Adjust based on your exception message
+    }
+
+    @Test
+    void testUpdateProfilePicture_ExceptionThrown() throws Exception {
+        // Arrange
+        String token = "Bearer validToken";
+        String expectedToken = "validToken";
+        Map<String, Object> data = new HashMap<>();
+        data.put("profilePicture", "newPictureData");
+
+        doThrow(new RuntimeException("Unexpected error"))
+                .when(administrativeFacade).updateUserProfilePicture(anyMap());
+
+        // Act
+        ResponseEntity<?> response = userController.updateProfilePicture(token, data);
+
+        // Assert
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Unexpected error", response.getBody());
+
+        // Verify
+        data.put("jwt", expectedToken);
+        verify(administrativeFacade, times(1)).updateUserProfilePicture(data);
+    }
     @Test
     void testGetProfile_Success() throws Exception {
         // Mock input and behavior
@@ -127,7 +189,7 @@ class UserControllerTest {
         String token = "Bearer validToken";
         String username = "john_doe";
         List<Map<String, Object>> followings = List.of(Map.of("username", "jane_doe"));
-        when(administrativeFacade.getFollowings(Map.of("jwt", "validToken", "user-name", username))).thenReturn(followings);
+        when(administrativeFacade.getFollowings(Map.of("jwt", "validToken", "userName", username))).thenReturn(followings);
 
         // Call the method
         ResponseEntity<?> result = userController.getFollowings(token, username);
@@ -142,7 +204,7 @@ class UserControllerTest {
         // Mock input and behavior
         String token = "Bearer invalidToken";
         String username = "john_doe";
-        when(administrativeFacade.getFollowings(Map.of("jwt", "invalidToken", "user-name", username))).thenThrow(new Exception("Unauthorized"));
+        when(administrativeFacade.getFollowings(Map.of("jwt", "invalidToken", "userName", username))).thenThrow(new Exception("Unauthorized"));
 
         // Call the method
         ResponseEntity<?> result = userController.getFollowings(token, username);
