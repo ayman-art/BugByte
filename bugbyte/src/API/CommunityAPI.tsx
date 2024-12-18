@@ -99,6 +99,8 @@ export const LeaveCommunity = async(token: string, name: string)=>{
   if (!response.ok) {
     throw new Error(`Failed to Leave Community`);
   }
+   const joinedCommunities = await fetchJoinedCommunities()
+    localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
     const data = await response.text();
     console.log(response);
   return data;
