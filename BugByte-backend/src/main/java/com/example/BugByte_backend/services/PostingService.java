@@ -48,7 +48,11 @@ public class PostingService {
             Post post = postingRepository.getPostByID(questionId);
             if (post == null)
                 throw new Exception("post is null");
-            return postingRepository.getQuestionById(questionId);
+            Question question = postingRepository.getQuestionById(questionId);
+
+            question.setTags(tagsRepository.findTagsByQuestion(questionId));
+
+            return question;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
@@ -173,6 +177,12 @@ public class PostingService {
         try {
             boolean res = postingRepository.upVoteQuestion(questionId , 1 , userName);
             Question question = postingRepository.getQuestionById(questionId);
+            addTagsToQuestions(List.of(question));
+
+            question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+            question.setIsUpVoted(isUpVoted(userName, question.getId()));
+            question.setIsDownVoted(isDownVoted(userName, question.getId()));
+
             filteringQuestionService.saveQuestion(question);
             return res;
         }
@@ -184,6 +194,12 @@ public class PostingService {
         try {
             boolean res = postingRepository.upVoteQuestion(questionId , -1 , userName);
             Question question = postingRepository.getQuestionById(questionId);
+            addTagsToQuestions(List.of(question));
+
+            question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+            question.setIsUpVoted(isUpVoted(userName, question.getId()));
+            question.setIsDownVoted(isDownVoted(userName, question.getId()));
+
             filteringQuestionService.saveQuestion(question);
             return res;
         }
@@ -195,6 +211,12 @@ public class PostingService {
         try {
             boolean res = postingRepository.downVoteQuestion(questionId , 1 , userName);
             Question question = postingRepository.getQuestionById(questionId);
+            addTagsToQuestions(List.of(question));
+
+            question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+            question.setIsUpVoted(isUpVoted(userName, question.getId()));
+            question.setIsDownVoted(isDownVoted(userName, question.getId()));
+
             filteringQuestionService.saveQuestion(question);
             return res;
         }
@@ -206,6 +228,12 @@ public class PostingService {
         try {
             boolean res = postingRepository.downVoteQuestion(questionId , -1 , userName);
             Question question = postingRepository.getQuestionById(questionId);
+            addTagsToQuestions(List.of(question));
+
+            question.setCommunityName(getQuestionCommunity(question.getCommunityId()));
+            question.setIsUpVoted(isUpVoted(userName, question.getId()));
+            question.setIsDownVoted(isDownVoted(userName, question.getId()));
+
             filteringQuestionService.saveQuestion(question);
             return res;
         }
@@ -262,6 +290,7 @@ public class PostingService {
             boolean res = postingRepository.editPost(postId , mdContent);
             try {
                 Question question = postingRepository.getQuestionById(postId);
+                addTagsToQuestions(List.of(question));
                 filteringQuestionService.saveQuestion(question);
             } catch (Exception ignored) {}
 
@@ -399,7 +428,6 @@ public class PostingService {
             throw new Exception("community is null");
         return community.getName();
     }
-
 
     private void addTagsToQuestions(List<Question> questions) {
         for (Question question : questions) {

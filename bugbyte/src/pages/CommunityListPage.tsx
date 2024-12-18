@@ -25,7 +25,13 @@ const CommunityListPage: React.FC = () => {
       if (comms.length === 0) {
         setHasMore(false); // No more posts
       } else {
-        setCommunities((prevPosts) => [...prevPosts, ...comms]); // Append new posts
+        setCommunities((prevPosts) => {
+          const mergedPosts = [...prevPosts, ...comms];
+          const uniquePosts = Array.from(
+            new Map(mergedPosts.map((post) => [post.id, post])).values()
+          );
+          return uniquePosts;
+        });
         setPage((prevPage) => prevPage + 1); // Increment page
       }
     } catch (error) {
@@ -44,7 +50,9 @@ const CommunityListPage: React.FC = () => {
     <div style={styles.container}>
       {/* Search Section */}
       <div style={styles.searchSection}>
-        <button onClick={handleSearchClick} style={styles.searchButton}>Search</button>
+        <button onClick={handleSearchClick} style={styles.searchButton}>
+          Search
+        </button>
       </div>
 
       {/* Community Listing */}

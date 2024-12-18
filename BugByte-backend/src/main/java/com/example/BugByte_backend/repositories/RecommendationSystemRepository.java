@@ -16,9 +16,10 @@ public class RecommendationSystemRepository {
             	SELECT p.id, op_name, title, md_content, community_id, up_votes, down_votes, validated_answer_id, posted_on
             	FROM posts p
             	JOIN questions q ON q.id = p.id
-            	WHERE p.id in (
-            		SELECT followed_id FROM followers WHERE follower_id = ?
-            	)
+            	JOIN users u ON op_name = u.user_name
+              	WHERE u.id in (
+              		SELECT followed_id FROM followers WHERE follower_id = ?
+              	)
             	AND posted_on >= NOW() - INTERVAL 1 DAY
             	ORDER BY RAND()
             	LIMIT 30
@@ -43,6 +44,8 @@ public class RecommendationSystemRepository {
             	JOIN questions q ON q.id = p.id
             	AND q.community_id = ?
             	AND posted_on >= NOW() - INTERVAL 1 DAY
+            	JOIN users u ON op_name = u.user_name
+                AND u.id <> ?
             	ORDER BY (up_votes - down_votes) DESC
             	LIMIT 20
             )
@@ -59,7 +62,7 @@ public class RecommendationSystemRepository {
             throw new NullPointerException("User id can't be null!");
 
         return jdbcTemplate.query(SQL_GET_RECOMMENDED_QUESTIONS,
-                new Object[] { userId, userId, GENERAL_COMMUNITY, GENERAL_COMMUNITY },
+                new Object[] { userId, userId, GENERAL_COMMUNITY, GENERAL_COMMUNITY, userId },
                 questionRowMapper);
     }
 

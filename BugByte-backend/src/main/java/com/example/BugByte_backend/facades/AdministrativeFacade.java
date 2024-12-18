@@ -336,4 +336,10 @@ public class AdministrativeFacade {
         System.out.println("get All communities");
         return comms;
     }
+    public boolean leaveCommunity(String jwt , String communityName)
+    {
+        Claims claim = AuthenticationService.parseToken(jwt);
+        Long id = Long.parseLong(claim.getId());
+        return communityService.leaveCommunity(communityName,id);
+    }
 }
