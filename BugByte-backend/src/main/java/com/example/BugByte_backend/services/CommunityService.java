@@ -3,6 +3,7 @@ package com.example.BugByte_backend.services;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.CommunityRepository;
+import com.example.BugByte_backend.repositories.TagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
