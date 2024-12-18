@@ -361,7 +361,7 @@ public class InteractionFacade {
             String userName = claim.getSubject();
             Question question = postingService.getQuestion(Long.valueOf((Integer) questionData.get("questionId")));
             Map<String , Object> questionMap = questionAdapter.toMap(question);
-            if (question.getValidatedAnswerId() != null){
+            if (question.getValidatedAnswerId() != 0){
                 Answer answer = postingService.getAnswer(question.getValidatedAnswerId());
                 questionMap.put("answerMdContent" , answer.getMdContent());
                 questionMap.put("answerOp" , answer.getCreatorUserName());

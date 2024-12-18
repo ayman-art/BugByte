@@ -48,7 +48,11 @@ public class PostingService {
             Post post = postingRepository.getPostByID(questionId);
             if (post == null)
                 throw new Exception("post is null");
-            return postingRepository.getQuestionById(questionId);
+            Question question = postingRepository.getQuestionById(questionId);
+
+            question.setTags(tagsRepository.findTagsByQuestion(questionId));
+
+            return question;
         }
         catch (Exception e){
             throw new Exception(e.getMessage());
