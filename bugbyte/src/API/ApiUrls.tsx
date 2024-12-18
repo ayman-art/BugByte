@@ -35,6 +35,6 @@ export const API_URLS = {
   GET_FEED: `${API_BASE_URL}/recommendation/feed`,
   COMMUNITY_POSTS: `${API_BASE_URL}/posts/questions/communityQuestions`,
   USER_POSTS: `${API_BASE_URL}/posts/questions/userQuestions`,
-  ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`
-  
+  ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`,
+  LEAVE_COMMUNITY: `${API_BASE_URL}/communities/leaveCommunity`
 };
