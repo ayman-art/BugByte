@@ -163,7 +163,10 @@ public class CommunityService {
     }
     public List<Community> getAllCommunities(int pageSize ,int pageNumber ) {
         try {
-            return communityRepository.findAllCommunities(pageSize,pageNumber);
+            List<Community> communities = communityRepository.findAllCommunities(pageSize,pageNumber);
+            for (Community community : communities)
+                community.setTags(tagsRepository.findTagsByCommunity(community.getId()));
+            return communities;
         } catch (Exception e) {
             throw e;
         }

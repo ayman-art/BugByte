@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Community } from "../Models/Community.tsx";
-import SearchAndTagFields, { sendRequest } from "../components/SearchAndTagFields.tsx";
+import SearchAndTagFields, {
+  sendRequest,
+} from "../components/SearchAndTagFields.tsx";
 import CommunityListing from "../components/CommunityListing.tsx";
 
 const CommunitySearchPage: React.FC = () => {
@@ -35,11 +37,15 @@ const CommunitySearchPage: React.FC = () => {
         size
       );
 
-      setCommunities((prev) =>
-        reset ? fetchedCommunities : [...prev, ...fetchedCommunities]
-      );
+      setCommunities((prevPosts) => {
+        const mergedPosts = [...prevPosts, ...fetchedCommunities];
+        const uniquePosts = Array.from(
+          new Map(mergedPosts.map((post) => [post.id, post])).values()
+        );
+        return uniquePosts;
+      });
       setHasMore(fetchedCommunities.length === size);
-      setPage(reset ? 1 : newPage + 1);
+      setPage((prevPage) => prevPage + 1); // Increment page
     } catch (error) {
       console.error("Error fetching communities:", error);
     } finally {
