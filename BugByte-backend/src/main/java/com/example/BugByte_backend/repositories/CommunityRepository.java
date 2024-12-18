@@ -368,7 +368,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             throw new NullPointerException("memberId or communityId is null");
         int rows = jdbcTemplate.update(SQL_LEAVE_COMMUNITY, memberId, communityName);
         return rows == 1;
-
     }
 
     private final RowMapper<Community> communityRowMapper = ((rs, rowNum) -> Community.builder()
