@@ -3,13 +3,17 @@ import CommunityPost from "./QuestionPreview";
 
 export interface Post {
   id: string;
-  communityId: number;
-  title: string;
   creatorUserName: string;
   mdContent: string;
+  postedOn: Date;
+  title: string;
+  communityId: number;
   upVotes: number;
   downVotes: number;
   tags?: string[];
+  communityName?: string;
+  isUpVoted: boolean;
+  isDownVoted: boolean;
 }
 
 interface PostListingProps {
@@ -56,13 +60,18 @@ const PostListing: React.FC<PostListingProps> = ({
       {posts.map((post, index) => (
         <CommunityPost
           key={`${post.id}+${index}`}
-          postId={post.id}
-          communityName={`${post.communityId}`}
-          authorName={post.creatorUserName}
-          content={post.mdContent}
-          upvotes={post.upVotes}
-          downvotes={post.downVotes}
-          tags={post.tags}
+          id={post.id}
+          creatorUserName={post.creatorUserName}
+          mdContent={post.mdContent}
+          postedOn={post.postedOn}
+          title={post.title || "Untitled Post"}
+          communityId={post.communityId}
+          upVotes={post.upVotes}
+          downVotes={post.downVotes}
+          tags={post.tags || []}
+          communityName={post.communityName || `Community ${post.communityId}`}
+          isUpvoted={post.isUpVoted}
+          isDownVoted={post.isDownVoted}
         />
       ))}
 

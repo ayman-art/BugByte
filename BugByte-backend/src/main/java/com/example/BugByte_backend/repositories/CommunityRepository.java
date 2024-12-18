@@ -268,8 +268,8 @@ public class CommunityRepository implements CommunityRepositoryInterface{
                         rs.getString("picture")
                 ));
 
-        if (users.isEmpty())
-            throw new RuntimeException("No users found in this community.");
+//        if (users.isEmpty())
+//            throw new RuntimeException("No users found in this community.");
 
         return users;
     }
@@ -290,8 +290,8 @@ public class CommunityRepository implements CommunityRepositoryInterface{
                         .build()
         );
 
-        if (communities.isEmpty())
-            throw new RuntimeException("User is not a member of any communities.");
+//        if (communities.isEmpty())
+//            throw new RuntimeException("User is not a member of any communities.");
 
         return communities;
     }
