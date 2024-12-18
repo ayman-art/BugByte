@@ -2,6 +2,7 @@ package com.example.BugByte_backend.repositories;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.CommunityMember;
 import com.example.BugByte_backend.models.User;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -9,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import java.util.Date;
 import java.util.List;
@@ -570,5 +572,4 @@ public class CommunityRepositoryTest {
         assertFalse(result);
     }
 
-
-}
+  }
