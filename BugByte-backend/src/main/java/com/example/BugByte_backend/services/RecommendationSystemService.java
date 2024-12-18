@@ -68,7 +68,7 @@ public class RecommendationSystemService {
         return paginatedFeed;
     }
 
-    private Long getUserIdFromToken(String token) {
+    public Long getUserIdFromToken(String token) {
         if (token == null)
             throw new NullPointerException("Token can't be null");
 

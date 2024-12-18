@@ -8,9 +8,6 @@ import lombok.Setter;
 import java.util.Date;
 
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class CommunityMember {
     private Long communityId;
 

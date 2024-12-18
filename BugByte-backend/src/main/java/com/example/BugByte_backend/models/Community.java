@@ -38,13 +38,6 @@ public class Community {
     @Field(type = FieldType.Keyword)
     private List<String> tags = new ArrayList<>();
 
-    public Community(String name, String description, Long adminId, Date creationDate) {
-        this.name = name;
-        this.description = description;
-        this.adminId = adminId;
-        this.creationDate = creationDate;
-        this.id = 0L;
-    }
     public Community(Long id,String name, String description) {
         this.name = name;
         this.description = description;

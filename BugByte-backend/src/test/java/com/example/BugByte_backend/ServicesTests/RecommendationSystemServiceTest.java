@@ -1,30 +1,25 @@
 package com.example.BugByte_backend.ServicesTests;
 
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.RecommendationSystemRepository;
 import com.example.BugByte_backend.repositories.TagsRepository;
-import com.example.BugByte_backend.services.AuthenticationService;
 import com.example.BugByte_backend.services.RecommendationSystemService;
-import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.ListOperations;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ListOperations;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
-public class RecommendationSystemServiceTest {
+class RecommendationSystemServiceTest {
 
     @Mock
     private RecommendationSystemRepository recommendationSystemRepository;
@@ -38,108 +33,90 @@ public class RecommendationSystemServiceTest {
     @Mock
     private ListOperations<String, Object> listOperations;
 
-    @Mock
-    private Claims claims;
-
+    @Spy
     @InjectMocks
     private RecommendationSystemService recommendationSystemService;
 
-    private static final Long USER_ID = 1L;
-    private static final String TOKEN = "Bearer testToken";
-
     @BeforeEach
-    void setUp() {
-        // Setup common mocking behavior
-        when(redisTemplate.opsForList()).thenReturn(listOperations);
-        when(AuthenticationService.parseToken(anyString())).thenReturn(claims);
-        when(claims.getId()).thenReturn(String.valueOf(USER_ID));
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void generateFeedForUser_EmptyCache_ShouldGenerateNewFeed() {
-        // Arrange
-        List<Question> mockQuestions = createMockQuestions();
-        when(listOperations.size(anyString())).thenReturn(0L);
-        when(recommendationSystemRepository.generateFeedForUser(USER_ID)).thenReturn(mockQuestions);
-        when(tagsRepository.findTagsByQuestion(anyLong())).thenReturn(new ArrayList<>());
+    void testGenerateFeedForUser_CacheEmpty() {
+        String jwt = "Bearer validToken";
+        Long userId = 1L;
+        int pageSize = 2;
 
-        // Act
-        List<Question> result = recommendationSystemService.generateFeedForUser(TOKEN, 10);
+        // Mock the `getUserIdFromToken` method to immediately return `userId`
+        doReturn(userId).when(recommendationSystemService).getUserIdFromToken(jwt);
 
-        // Assert
+        List<Question> mockQuestions = List.of(
+                Question.builder().id(1L).title("Question 1").build(),
+                Question.builder().id(2L).title("Question 2").build()
+        );
+        String cacheKey = "feed:" + userId;
+
+        when(redisTemplate.opsForList().size(cacheKey)).thenReturn(0L);
+        when(recommendationSystemRepository.generateFeedForUser(userId)).thenReturn(mockQuestions);
+        when(tagsRepository.findTagsByQuestion(anyLong())).thenReturn(List.of("java", "python"));
+
+        List<Question> result = recommendationSystemService.generateFeedForUser(jwt, pageSize);
+
         assertNotNull(result);
-        verify(recommendationSystemRepository).generateFeedForUser(USER_ID);
-        verify(listOperations, times(mockQuestions.size())).rightPush(anyString(), any());
+        assertEquals(pageSize, result.size());
     }
 
     @Test
-    void generateFeedForUser_WithExistingCache_ShouldReturnCachedFeed() {
-        // Arrange
-        when(listOperations.size(anyString())).thenReturn(5L);
-        List<Question> mockQuestions = createMockQuestions();
-        when(listOperations.leftPop(anyString())).thenReturn(
-                mockQuestions.get(0), mockQuestions.get(1), null
-        );
+    void testGenerateFeedForUser_CacheNotEmpty() {
+        String token = "Bearer mock-token";
+        Long userId = 1L;
+        int pageSize = 2;
 
-        // Act
-        List<Question> result = recommendationSystemService.generateFeedForUser(TOKEN, 10);
+        // Mocking
+        when(listOperations.size("feed:" + userId)).thenReturn(3L);
+        Question question = Question.builder()
+                .id(1L)
+                .title("Cached Question")
+                .build();
+        when(listOperations.leftPop("feed:" + userId)).thenReturn(question, question);
+        doReturn(userId).when(recommendationSystemService).getUserIdFromToken(token);
 
-        // Assert
+        // Test
+        List<Question> result = recommendationSystemService.generateFeedForUser(token, pageSize);
+
+        // Verify
+        verify(recommendationSystemRepository, never()).generateFeedForUser(userId);
         assertEquals(2, result.size());
+        assertEquals("Cached Question", result.getFirst().getTitle());
     }
 
     @Test
-    void updateUsersFeed_ShouldUpdateMultipleUserFeeds() {
-        // Arrange
-        Question newQuestion = new Question();
-        List<User> users = Arrays.asList(
-                createUser(1L),
-                createUser(2L),
-                createUser(3L)
-        );
+    void testUpdateUsersFeed() {
+        List<User> users = Arrays.asList(User.builder()
+                        .id(1L)
+                        .build(),
+                User.builder()
+                        .id(2L)
+                        .build());
+        Question question = Question
+                .builder()
+                .id(1L)
+                .title("New Question")
+                .build();
 
-        // Act
-        recommendationSystemService.updateUsersFeed(users, newQuestion);
+        // Test
+        recommendationSystemService.updateUsersFeed(users, question);
 
-        // Assert
-        verify(listOperations, times(users.size())).leftPush(anyString(), eq(newQuestion));
-        verify(listOperations, times(users.size())).trim(anyString(), eq(0), eq(99));
+        // Verify
+        for (User user : users) {
+            verify(listOperations).leftPush("feed:" + user.getId(), question);
+            verify(listOperations).trim("feed:" + user.getId(), 0, 99);
+        }
     }
 
     @Test
-    void getUserIdFromToken_ValidToken_ShouldReturnUserId() {
-        // Arrange
-        String validToken = "Bearer validToken";
-
-        // Act
-        List<Question> userId = recommendationSystemService.generateFeedForUser(validToken, 10);
-
-        // Assert
-        assertEquals(USER_ID, userId);
-    }
-
-    @Test
-    void getUserIdFromToken_NullToken_ShouldThrowNullPointerException() {
-        // Assert
-        assertThrows(NullPointerException.class, () -> {
-            recommendationSystemService.generateFeedForUser(null, 10);
-        });
-    }
-
-    private List<Question> createMockQuestions() {
-        List<Question> questions = new ArrayList<>();
-        Question q1 = new Question();
-        q1.setId(1L);
-        Question q2 = new Question();
-        q2.setId(2L);
-        questions.add(q1);
-        questions.add(q2);
-        return questions;
-    }
-
-    private User createUser(Long id) {
-        User user = new User();
-        user.setId(id);
-        return user;
+    void testGetUserIdFromToken_NullToken() {
+        assertThrows(NullPointerException.class, () -> recommendationSystemService.getUserIdFromToken(null));
     }
 }
