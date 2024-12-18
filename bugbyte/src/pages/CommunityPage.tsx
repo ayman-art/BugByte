@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCommunity, getCommunityPosts, joinCommunity } from '../API/CommunityAPI';
+import { getCommunity, getCommunityPosts, joinCommunity , LeaveCommunity } from '../API/CommunityAPI';
 import { useParams } from 'react-router-dom';
 import PostListing, { Post } from '../components/PostListing';
 import { Question } from '../Models/Question';
@@ -96,6 +96,16 @@ const CommunityPage: React.FC = () => {
         alert(e)
     }
   };
+    const handleLeaveClick = async () => {
+
+      const token= localStorage.getItem('authToken');
+      try{
+          await LeaveCommunity(token!, community?.name!)
+          setJoined(false);
+      }catch(e){
+          alert(e)
+      }
+    };
 
   const styles: { [key: string]: React.CSSProperties } = {
     container: {
@@ -169,13 +179,17 @@ const CommunityPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Render Join Button only if not joined */}
-          {!joined && (
-            <button
-              style={styles.button}
-              onClick={handleJoinClick}
-            >
+          {/* Join or Leave Button */}
+          {!joined ? (
+            <button style={styles.button} onClick={handleJoinClick}>
               Join Community
+            </button>
+          ) : (
+            <button
+              style={{ ...styles.button, backgroundColor: '#d32f2f' }}
+              onClick={handleLeaveClick}
+            >
+              Leave Community
             </button>
           )}
 
@@ -192,6 +206,7 @@ const CommunityPage: React.FC = () => {
       />
     </div>
   );
+
 };
 
 export default CommunityPage;
