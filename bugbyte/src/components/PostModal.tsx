@@ -1,11 +1,43 @@
 import React, { useState } from 'react';
 import MDEditor from './MDEditor';
 import '../styles/PostModal.css';
+import { postQuestion } from '../API/PostAPI';
+import { useNavigate } from 'react-router-dom';
+import { 
+  MDXEditor, 
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  linkPlugin,
+  imagePlugin,
+  tablePlugin,
+  markdownShortcutPlugin,
+  toolbarPlugin,
+  UndoRedo,
+  BoldItalicUnderlineToggles,
+  CodeToggle,
+  ListsToggle,
+  CreateLink,
+  thematicBreakPlugin,
+  InsertImage,
+  InsertTable,
+  Separator,
+  linkDialogPlugin,
+  codeBlockPlugin,
+  sandpackPlugin,
+  codeMirrorPlugin,
+  InsertCodeBlock,
+  InsertThematicBreak,
+} from '@mdxeditor/editor';
+
+import '@mdxeditor/editor/style.css';
+import imageUploadHandler, { languages, simpleSandpackConfig } from '../utils/MDconfig';
+
 
 interface PostDetails {
   title?: string; 
   content: string; 
-  communityId?: string;
+  communityId?: number;
   tags?: string[] 
 }
 
@@ -24,12 +56,17 @@ const PostModal: React.FC<PostModalProps> = ({
   type = 'full',
   initialData
 }) => {
+  const [markdown, setMarkdown] = useState(`
+      Title!
+      ---
+      content
+      `);
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState<string>('');
-  const [selectedCommunity, setSelectedCommunity] = useState<string>(initialData?.communityId || '');
+  const [selectedCommunity, setSelectedCommunity] = useState<number>(initialData?.communityId!);
   const [postContent, setPostContent] = useState<string>(initialData?.content || '');
   const [postTitle, setPostTitle] = useState<string>(initialData?.title || '');
-
+ const navigate = useNavigate();
   
   const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
   const handleAddTag = () => {
@@ -51,13 +88,13 @@ const PostModal: React.FC<PostModalProps> = ({
   const clearPost = () => {
     setTagInput('');
     setTags(initialData?.tags || []);
-    setSelectedCommunity(initialData?.communityId || '');
+    setSelectedCommunity(initialData?.communityId!);
     setPostContent(initialData?.content || '');
     setPostTitle(initialData?.title || '');
   }
 
-  const handleSavePost = () => {
-    const postDetails: PostDetails = { content: postContent };
+  const handleSavePost = async () => {
+    const postDetails: PostDetails = { content: markdown };
 
     if (type !== 'md-only') {
       postDetails.title = postTitle;
@@ -67,8 +104,32 @@ const PostModal: React.FC<PostModalProps> = ({
     if (type === 'full') {
       postDetails.communityId = selectedCommunity;
     }
-
-    onSave(postDetails);
+    try {
+          const token = localStorage.getItem('authToken');
+          if (!token) {
+            console.error('No auth token found');
+            return;
+          }
+    
+          if (!postDetails.communityId) {
+            console.error('Community ID is required');
+            return;
+          }
+    
+          const id = await postQuestion(
+            postDetails.content,
+            postDetails.title || '',
+            postDetails.tags || [],
+            postDetails.communityId,
+            token
+          );
+    
+          navigate(`/Posts/${id}`);
+        } catch (error) {
+          console.error('Error saving post:', error);
+          // Optionally, show an error message to the user
+        }
+    //onSave(postDetails);
     clearPost();
     onClose();
   };
@@ -93,10 +154,45 @@ const PostModal: React.FC<PostModalProps> = ({
           )}
           
           <div className="editorContainer">
-            <MDEditor
-              markdown={postContent}
-              onChange={setPostContent}
-            />
+            <MDXEditor
+                        markdown={markdown}
+                        onChange={setMarkdown}
+                        plugins={[
+                            headingsPlugin(),
+                            listsPlugin(),
+                            quotePlugin(),
+                            linkPlugin(),
+                            imagePlugin({imageUploadHandler}),
+                            tablePlugin(),
+                            codeBlockPlugin({defaultCodeBlockLanguage: 'js'}),
+                            sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
+                            codeMirrorPlugin(languages),
+                            linkDialogPlugin(),
+                            thematicBreakPlugin(),
+                            markdownShortcutPlugin(),
+                            toolbarPlugin({
+                            toolbarContents: () => (
+                                <>
+                                <UndoRedo />
+                                <Separator />
+                                <BoldItalicUnderlineToggles />
+                                <InsertThematicBreak />
+                                <Separator />
+                                <CodeToggle />
+                                <InsertCodeBlock />
+                                <Separator />
+                                <ListsToggle />
+                                <InsertTable />
+                                <Separator />
+                                <CreateLink />
+                                <InsertImage />
+            
+                                </>
+                            )
+                            })
+                        ]}
+                        className="h-[400px]"
+                        />
           </div>
 
           {type === 'full' && (
@@ -105,7 +201,7 @@ const PostModal: React.FC<PostModalProps> = ({
             <select
               id="communitySelect"
               value={selectedCommunity}
-              onChange={(e) => setSelectedCommunity(e.target.value)}
+              onChange={(e) => setSelectedCommunity(parseInt(e.target.value))}
               className="dropdown"
             >
               <option value="" disabled>

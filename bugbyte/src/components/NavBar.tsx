@@ -62,33 +62,9 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   };
 
   const handleSavePost = async (postDetails: PostDetails) => {
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        console.error('No auth token found');
-        return;
-      }
-
-      if (!postDetails.communityId) {
-        console.error('Community ID is required');
-        return;
-      }
-
-      const id = await postQuestion(
-        postDetails.content,
-        postDetails.title || '',
-        postDetails.tags || [],
-        postDetails.communityId,
-        token
-      );
-
-      // Close modal and navigate to the newly created post
-      setShowModal(false);
-      navigate(`/Posts/${id}`);
-    } catch (error) {
-      console.error('Error saving post:', error);
-      // Optionally, show an error message to the user
-    }
+    // Close modal and navigate to the newly created post
+    setShowModal(false);
+    
   };
 
   const handleUpdateProfilePicture = async (url: string) => {
