@@ -362,11 +362,11 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             return user;
         }
     }
-    public boolean  leaveCommunity(String communityname , Long memberId)
+    public boolean  leaveCommunity(String communityName , Long memberId)
     {
-        if(memberId==null || communityname==null)
+        if(memberId==null || communityName==null)
             throw new NullPointerException("memberId or communityId is null");
-        int rows = jdbcTemplate.update(SQL_LEAVE_COMMUNITY, memberId, communityname);
+        int rows = jdbcTemplate.update(SQL_LEAVE_COMMUNITY, memberId, communityName);
         return rows == 1;
 
     }
