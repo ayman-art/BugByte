@@ -35,6 +35,7 @@ public class RecommendationSystemControllerTest {
     void testGetFeed_Success() throws Exception {
         String token = "valid-token";
         int size = 10;
+        int page = 1;
         List<String> tags = List.of("java", "python");
         Question q1 = Question.builder()
                 .id(1L)
@@ -61,7 +62,7 @@ public class RecommendationSystemControllerTest {
         List<Question> mockFeed = List.of(q1, q2);
         when(recommendationSystemService.generateFeedForUser(token, size)).thenReturn(mockFeed);
 
-        ResponseEntity<?> response = recommendationSystemController.getFeed(token, size);
+        ResponseEntity<?> response = recommendationSystemController.getFeed(token,page, size);
 
         verify(recommendationSystemService, times(1)).generateFeedForUser(token, size);
         assert response.getStatusCode() == HttpStatus.OK;
@@ -74,10 +75,11 @@ public class RecommendationSystemControllerTest {
     void testGetFeed_Unauthorized() throws Exception {
         String token = "invalid-token";
         int size = 5;
+        int page = 1;
         when(recommendationSystemService.generateFeedForUser(token, size))
                 .thenThrow(new RuntimeException("Unauthorized"));
 
-        ResponseEntity<?> response = recommendationSystemController.getFeed(token, size);
+        ResponseEntity<?> response = recommendationSystemController.getFeed(token,page, size);
 
         verify(recommendationSystemService, times(1)).generateFeedForUser(token, size);
         assert response.getStatusCode() == HttpStatus.UNAUTHORIZED;

@@ -82,7 +82,7 @@ public class RecommendationSystemService {
         return paginatedFeed;
     }
 
-    private Long getUserIdFromToken(String token) {
+    public Long getUserIdFromToken(String token) {
         if (token == null)
             throw new NullPointerException("Token can't be null");
 
@@ -91,7 +91,7 @@ public class RecommendationSystemService {
         return Long.parseLong(claim.getId());
     }
 
-    private String getUserNameFromToken(String token) {
+    public String getUserNameFromToken(String token) {
         if (token == null)
             throw new NullPointerException("Token can't be null");
 
@@ -100,7 +100,7 @@ public class RecommendationSystemService {
         return claim.getSubject();
     }
 
-    private boolean isUpVoted(String userName , long postId) throws Exception {
+    public boolean isUpVoted(String userName , long postId) throws Exception {
         User user  = userRepositoryImp.findByIdentity(userName);
         if (user == null){
             throw new Exception("user is null");
@@ -111,7 +111,7 @@ public class RecommendationSystemService {
         }
         return postingRepository.is_UpVoted(userName , postId);
     }
-    private boolean isDownVoted(String userName , long postId) throws Exception {
+    public boolean isDownVoted(String userName , long postId) throws Exception {
         User user  = userRepositoryImp.findByIdentity(userName);
         if (user == null){
             throw new Exception("user is null");
@@ -122,7 +122,7 @@ public class RecommendationSystemService {
         }
         return postingRepository.is_DownVoted(userName , postId);
     }
-    private String getQuestionCommunity(long communityId) throws Exception {
+    public String getQuestionCommunity(long communityId) throws Exception {
         Community community = communityRepository.findCommunityById(communityId);
         if (community == null)
             throw new Exception("community is null");

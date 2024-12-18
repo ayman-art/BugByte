@@ -1,4 +1,4 @@
-package com.example.BugByte_backend.ServicesTests;
+package com.example.BugByte_backend.repositories;
 
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.repositories.RecommendationSystemRepository;

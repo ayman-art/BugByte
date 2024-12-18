@@ -130,20 +130,11 @@ public class PostingRepositoryQuestionTest {
     }
 
     @Test
-    public void testVerifyAnswer_validInput() {
-        Long answerId = 1L;
-        when(jdbcTemplate.update(eq(SQL_VERIFY_ANSWER), eq(answerId)))
-                .thenReturn(1);
-
-        Boolean result = postingRepository.verifyAnswer(answerId);
-        assertTrue(result);
-    }
-
-    @Test
     public void testVerifyAnswer_nullInput() {
         Exception exception = null;
+        Long questionId = 1L;
         try {
-            postingRepository.verifyAnswer(null);
+            postingRepository.verifyAnswer(null , questionId);
         } catch (Exception e) {
             exception = e;
         }

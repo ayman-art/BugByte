@@ -53,4 +53,16 @@ public class AuthenticationService {
             throw new IllegalStateException("Unable to refresh token: " + e.getMessage());
         }
     }
+    public String getUserNameFromJwt(String token){
+        Claims claim = AuthenticationService.parseToken(token);
+        return claim.getSubject();
+    }
+    public boolean getIsAdminFromJwt(String token){
+        Claims claim = AuthenticationService.parseToken(token);
+        return (boolean) claim.get("is_admin");
+    }
+    public long getIdFromJwt(String token){
+        Claims claim = AuthenticationService.parseToken(token);
+        return Long.parseLong(claim.getId());
+    }
 }

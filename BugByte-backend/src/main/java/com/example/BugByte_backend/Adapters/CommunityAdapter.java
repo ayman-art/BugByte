@@ -32,8 +32,4 @@ public class CommunityAdapter {
         System.out.println(comm.getTags());
         return comm;
     }
-    public String toJson(Community community) {
-        Gson gson = new Gson();
-        return gson.toJson(community);
-    }
 }

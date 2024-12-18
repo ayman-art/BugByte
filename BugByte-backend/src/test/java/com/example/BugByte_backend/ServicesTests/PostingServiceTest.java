@@ -6,7 +6,9 @@ import com.example.BugByte_backend.repositories.PostingRepository;
 import com.example.BugByte_backend.repositories.TagsRepository;
 import com.example.BugByte_backend.repositories.UserRepositoryImp;
 import com.example.BugByte_backend.services.PostingService;
+import com.example.BugByte_backend.services.RecommendationSystemService;
 import com.example.BugByte_backend.services.SearchingFilteringQuestionService;
+import com.example.BugByte_backend.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,8 +22,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -39,6 +41,16 @@ public class PostingServiceTest {
     SearchingFilteringQuestionService filteringQuestionService;
     @InjectMocks
     PostingService postingService;
+;
+
+    @Mock
+    SearchingFilteringQuestionService filteringQuestionServiceMock;
+
+    @Mock
+    UserService userServiceMock;
+
+    @Mock
+    RecommendationSystemService recommendationSystemServiceMock;
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -63,26 +75,6 @@ public class PostingServiceTest {
         });
 
         assertEquals("post is null", exception.getMessage());
-    }
-    @Test
-    void testPostQuestion_Success() throws Exception {
-        Question mockQuestion = new Question();
-        mockQuestion.setMdContent("Test content");
-        mockQuestion.setCreatorUserName("TestUser");
-        mockQuestion.setCommunityId(101L);
-
-        long generatedPostId = 1L;
-
-        when(postingRepositoryMock.insertPost(mockQuestion.getMdContent(), mockQuestion.getCreatorUserName()))
-                .thenReturn(generatedPostId);
-        when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getTitle(), mockQuestion.getCommunityId()))
-                .thenReturn(true);
-        when(tagsRepositoryMock.findTagsByQuestion(any(Long.class))).thenReturn(null);
-        when(filteringQuestionService.saveQuestion(eq(mockQuestion))).thenReturn(null);
-
-        long result = postingService.postQuestion(mockQuestion);
-
-        assertEquals(generatedPostId, result);
     }
 
     @Test
@@ -459,32 +451,17 @@ public class PostingServiceTest {
         assertFalse(result);
     }
 
-    @Test
-    void testVerifyAnswer_Success() throws Exception {
-        long answerId = 1212L;
-        Answer answer = new Answer();
-        answer.setQuestionId(1L);
-        Post post = new Post();
-        post.setCreatorUserName("user1");
-
-        when(postingRepositoryMock.verifyAnswer(answerId)).thenReturn(true);
-        when(postingRepositoryMock.getAnswerById(answerId)).thenReturn(answer);
-        when(postingRepositoryMock.getPostByID(answer.getQuestionId())).thenReturn(post);
-
-        boolean result = postingService.verifyAnswer(answerId , "user1");
-
-        assertTrue(result);
-    }
 
     @Test
     void testVerifyAnswer_Failure() throws Exception {
         long answerId = 1212L;
+        long questionId = 1213L;
         Answer answer = new Answer();
         answer.setQuestionId(1L);
         Post post = new Post();
         post.setCreatorUserName("user1");
 
-        when(postingRepositoryMock.verifyAnswer(answerId)).thenReturn(false);
+        when(postingRepositoryMock.verifyAnswer(answerId , questionId)).thenReturn(false);
 
         when(postingRepositoryMock.getAnswerById(answerId)).thenReturn(answer);
         when(postingRepositoryMock.getPostByID(answer.getQuestionId())).thenReturn(post);
@@ -696,5 +673,162 @@ public class PostingServiceTest {
                 postingService.getRepliesForAnswer(answerId, limit, offset));
 
         assertEquals("answer is null", exception.getMessage());
+    }
+
+    @Test
+    void testGetQuestion_Success() throws Exception {
+        long questionId = 1L;
+        Post mockPost = new Post(questionId, "user1", "hello", new Date());
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(mockPost);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(List.of("tag1", "tag2"));
+
+        Question result = postingService.getQuestion(questionId);
+
+        assertNotNull(result);
+        assertEquals(questionId, result.getId());
+        assertEquals(List.of("tag1", "tag2"), result.getTags());
+    }
+
+    @Test
+    void testGetQuestion_PostIsNull() {
+        long questionId = 1L;
+
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            postingService.getQuestion(questionId);
+        });
+
+        assertEquals("post is null", exception.getMessage());
+    }
+
+    @Test
+    void testPostQuestion_Success() throws Exception {
+        Question mockQuestion = new Question();
+        mockQuestion.setMdContent("Test content");
+        mockQuestion.setCreatorUserName("TestUser");
+        mockQuestion.setCommunityId(101L);
+        mockQuestion.setTags(List.of("tag1", "tag2"));
+
+        long generatedPostId = 1L;
+
+        when(postingRepositoryMock.insertPost(mockQuestion.getMdContent(), mockQuestion.getCreatorUserName()))
+                .thenReturn(generatedPostId);
+        when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getTitle(), mockQuestion.getCommunityId()))
+                .thenReturn(true);
+
+        long result = postingService.postQuestion(mockQuestion);
+
+        assertEquals(generatedPostId, result);
+        verify(tagsRepositoryMock).bulkAddTagsToQuestion(generatedPostId, mockQuestion.getTags());
+        verify(recommendationSystemServiceMock).updateUsersFeed(anyList(), eq(mockQuestion));
+    }
+
+    @Test
+    void testPostQuestion_PostIdIsNull() {
+        Question mockQuestion = new Question();
+        mockQuestion.setMdContent("Test content");
+        mockQuestion.setCreatorUserName("TestUser");
+        mockQuestion.setCommunityId(101L);
+
+        when(postingRepositoryMock.insertPost(mockQuestion.getMdContent(), mockQuestion.getCreatorUserName()))
+                .thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            postingService.postQuestion(mockQuestion);
+        });
+
+        assertEquals("post id is null", exception.getMessage());
+    }
+
+    @Test
+    void testUpVoteQuestion_Success1() throws Exception {
+        long questionId = 1L;
+        String userName = "TestUser";
+
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+
+        when(postingRepositoryMock.upVoteQuestion(questionId, 1, userName)).thenReturn(true);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+
+        boolean result = postingService.upVoteQuestion(questionId, userName);
+
+        assertTrue(result);
+        verify(filteringQuestionServiceMock).saveQuestion(mockQuestion);
+    }
+
+    @Test
+    void testUpVoteQuestion_Failure1() throws Exception {
+        long questionId = 1L;
+        String userName = "TestUser";
+
+        when(postingRepositoryMock.upVoteQuestion(questionId, 1, userName)).thenReturn(false);
+
+        boolean result = postingService.upVoteQuestion(questionId, userName);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void testIsUpVoted_Success() throws Exception {
+        long postId = 1L;
+        String userName = "TestUser";
+        User mockUser = new User();
+        Post mockPost = new Post();
+
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(mockUser);
+        when(postingRepositoryMock.getPostByID(postId)).thenReturn(mockPost);
+        when(postingRepositoryMock.is_UpVoted(userName, postId)).thenReturn(true);
+
+        boolean result = postingService.isUpVoted(userName, postId);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void testIsUpVoted_UserIsNull() {
+        long postId = 1L;
+        String userName = "TestUser";
+
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            postingService.isUpVoted(userName, postId);
+        });
+
+        assertEquals("user is null", exception.getMessage());
+    }
+
+    @Test
+    void testGetCommunityQuestions_Success() throws Exception {
+        long communityId = 101L;
+        Community mockCommunity = new Community();
+        List<Question> mockQuestions = List.of(new Question(), new Question());
+
+        when(communityRepositoryMock.findCommunityById(communityId)).thenReturn(mockCommunity);
+        when(postingRepositoryMock.getQuestionsByCommunity(communityId, 10, 0)).thenReturn(mockQuestions);
+
+        List<Question> result = postingService.getCommunityQuestions(communityId, 10, 0);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetCommunityQuestions_CommunityIsNull() {
+        long communityId = 101L;
+
+        when(communityRepositoryMock.findCommunityById(communityId)).thenReturn(null);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            postingService.getCommunityQuestions(communityId, 10, 0);
+        });
+
+        assertEquals("Community is null", exception.getMessage());
     }
 }

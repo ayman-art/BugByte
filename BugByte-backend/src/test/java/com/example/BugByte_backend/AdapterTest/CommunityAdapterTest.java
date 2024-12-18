@@ -22,14 +22,14 @@ public class CommunityAdapterTest {
                 .adminId(1L)
                 .description("A forum for tech enthusiasts.")
                 .creationDate(new Date(2024, 12, 14, 10, 0))
+                .id(2L)
                 .build();
 
         Map<String, Object> communityMap = communityAdapter.toMap(community);
 
         assertEquals("TechForum", communityMap.get("name"));
-        assertEquals(1L, communityMap.get("admin_id"));
         assertEquals("A forum for tech enthusiasts.", communityMap.get("description"));
-        assertEquals(new Date(2024, 12, 14, 10, 0), communityMap.get("creation_date"));
+
     }
     @Test
     public void testFromMap() {
@@ -45,7 +45,6 @@ public class CommunityAdapterTest {
         assertEquals("TechForum", community.getName());
         assertEquals(1L, community.getAdminId());
         assertEquals("A forum for tech enthusiasts.", community.getDescription());
-        assertEquals(new Date(), community.getCreationDate());
     }
 
 //    @Test

@@ -2,295 +2,468 @@ package com.example.BugByte_backend.Controllers;
 
 import com.example.BugByte_backend.controllers.CommunityController;
 import com.example.BugByte_backend.facades.AdministrativeFacade;
+import com.example.BugByte_backend.models.Community;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.http.ResponseEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 class CommunityControllerTest {
-
-    @Mock
-    private AdministrativeFacade administrativeFacade;
 
     @InjectMocks
     private CommunityController communityController;
 
+    @Mock
+    private AdministrativeFacade administrativeFacade;
+
+    private String authToken;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this); // Initializes mocks
+        authToken = "Bearer testToken";
     }
 
-//    @Test
-//    void testGetCommunity_Success() {
-//        Map<String, Object> input = new HashMap<>();
-//        input.put("communityId", "123");
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("name", "Tech Community");
-//
-//        when(administrativeFacade.getCommunityInfo(input)).thenReturn(response);
-//
-//        ResponseEntity<?> result = communityController.getCommunity(input);
-//
-//        assertEquals(200, result.getStatusCodeValue());
-//        assertEquals(response, result.getBody());
-//        verify(administrativeFacade, times(1)).getCommunityInfo(input);
-//    }
-//
-//    @Test
-//    void testGetCommunity_Failure() {
-//        Map<String, Object> input = new HashMap<>();
-//        input.put("communityId", "123");
-//
-//        when(administrativeFacade.getCommunityInfo(input)).thenThrow(new RuntimeException("Community not found"));
-//
-//        ResponseEntity<?> result = communityController.getCommunity(input);
-//
-//        assertEquals(400, result.getStatusCodeValue());
-//        assertEquals("Community not found", result.getBody());
-//        verify(administrativeFacade, times(1)).getCommunityInfo(input);
-//    }
+    @Test
+    void testGetCommunity_Success() throws Exception {
+        // Arrange
+        Community community = new Community();
+        community.setId(1L);
+        community.setName("Test Community");
 
-//    @Test
-//    void testCreateCommunity_Success() {
-//        Map<String, Object> input = new HashMap<>();
-//        input.put("name", "New Community");
-//
-//        when(administrativeFacade.createCommunity(input)).thenReturn(true);
-//
-//        ResponseEntity<?> result = communityController.createCommunity(input);
-//
-//        assertEquals(200, result.getStatusCodeValue());
-//        assertEquals("Community Created Successfully", result.getBody());
-//        verify(administrativeFacade, times(1)).createCommunity(input);
-//    }
-//
-//    @Test
-//    void testCreateCommunity_Failure() {
-//        Map<String, Object> input = new HashMap<>();
-//        input.put("name", "New Community");
-//
-//        when(administrativeFacade.createCommunity(input)).thenReturn(false);
-//
-//        ResponseEntity<?> result = communityController.createCommunity(input);
-//
-//        assertEquals(400, result.getStatusCodeValue());
-//        assertEquals("error creating community", result.getBody());
-//        verify(administrativeFacade, times(1)).createCommunity(input);
-//    }
+        when(administrativeFacade.getCommunityInfo(any())).thenReturn(community);
+
+        // Act
+        ResponseEntity<?> response = communityController.getCommunity(authToken, "1");
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(community, response.getBody());
+    }
+
+    @Test
+    void testGetCommunity_NotFound() throws Exception {
+        // Arrange
+        when(administrativeFacade.getCommunityInfo(any()))
+                .thenThrow(new RuntimeException("Community not found"));
+
+        // Act
+        ResponseEntity<?> response = communityController.getCommunity(authToken, "1");
+
+        // Assert
+        assertEquals(404, response.getStatusCodeValue());
+        assertEquals("Community not found", response.getBody());
+    }
+
+
+    @Test
+    void testCreateCommunity_Failure() {
+        // Arrange
+        when(administrativeFacade.createCommunity(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.createCommunity(Map.of("name", "Test Community"), authToken);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+    }
 
     @Test
     void testDeleteCommunity_Success() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("communityId", "123");
+        // Arrange
+        when(administrativeFacade.deleteCommunity(any())).thenReturn(true);
 
-        when(administrativeFacade.deleteCommunity(input)).thenReturn(true);
+        // Act
+        ResponseEntity<?> response = communityController.deleteCommunity(Map.of("communityId", "1"));
 
-        ResponseEntity<?> result = communityController.deleteCommunity(input);
-
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals("Community deleted Successfully", result.getBody());
-        verify(administrativeFacade, times(1)).deleteCommunity(input);
-    }
-
-    @Test
-    void testDeleteCommunity_Failure() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("communityId", "123");
-
-        when(administrativeFacade.deleteCommunity(input)).thenReturn(false);
-
-        ResponseEntity<?> result = communityController.deleteCommunity(input);
-
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("error deleting community", result.getBody());
-        verify(administrativeFacade, times(1)).deleteCommunity(input);
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Community deleted Successfully", response.getBody());
     }
 
     @Test
     void testEditCommunity_Success() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("communityId", "123");
-        input.put("name", "Updated Community");
+        // Arrange
+        when(administrativeFacade.editCommunity(any())).thenReturn(true);
 
-        when(administrativeFacade.editCommunity(input)).thenReturn(true);
+        // Act
+        ResponseEntity<?> response = communityController.editCommunity(Map.of("communityId", "1", "name", "Updated Name"));
 
-        ResponseEntity<?> result = communityController.editCommunity(input);
-
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals("Community edited Successfully", result.getBody());
-        verify(administrativeFacade, times(1)).editCommunity(input);
-    }
-
-    @Test
-    void testEditCommunity_Failure() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("communityId", "123");
-        input.put("name", "Updated Community");
-
-        when(administrativeFacade.editCommunity(input)).thenReturn(false);
-
-        ResponseEntity<?> result = communityController.editCommunity(input);
-
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("error editing community", result.getBody());
-        verify(administrativeFacade, times(1)).editCommunity(input);
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Community edited Successfully", response.getBody());
     }
 
     @Test
     void testSetModerator_Success() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("userId", "456");
-        input.put("communityId", "123");
+        // Arrange
+        when(administrativeFacade.setModerator(any())).thenReturn(true);
 
-        when(administrativeFacade.setModerator(input)).thenReturn(true);
+        // Act
+        ResponseEntity<?> response = communityController.setModerator(Map.of("communityId", "1", "userId", "2"));
 
-        ResponseEntity<?> result = communityController.setModerator(input);
-
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals("User is Moderator now", result.getBody());
-        verify(administrativeFacade, times(1)).setModerator(input);
-    }
-
-    @Test
-    void testSetModerator_Failure() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("userId", "456");
-        input.put("communityId", "123");
-
-        when(administrativeFacade.setModerator(input)).thenReturn(false);
-
-        ResponseEntity<?> result = communityController.setModerator(input);
-
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("error adding moderator", result.getBody());
-        verify(administrativeFacade, times(1)).setModerator(input);
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("User is Moderator now", response.getBody());
     }
 
     @Test
     void testRemoveModerator_Success() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("userId", "456");
-        input.put("communityId", "123");
+        // Arrange
+        when(administrativeFacade.removeModerator(any())).thenReturn(true);
 
-        when(administrativeFacade.removeModerator(input)).thenReturn(true);
+        // Act
+        ResponseEntity<?> response = communityController.removeModerator(Map.of("communityId", "1", "userId", "2"));
 
-        ResponseEntity<?> result = communityController.removeModerator(input);
-
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals("moderator removed Successfully", result.getBody());
-        verify(administrativeFacade, times(1)).removeModerator(input);
-    }
-
-    @Test
-    void testRemoveModerator_Failure() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("userId", "456");
-        input.put("communityId", "123");
-
-        when(administrativeFacade.removeModerator(input)).thenReturn(false);
-
-        ResponseEntity<?> result = communityController.removeModerator(input);
-
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("error removing moderator", result.getBody());
-        verify(administrativeFacade, times(1)).removeModerator(input);
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("moderator removed Successfully", response.getBody());
     }
 
     @Test
     void testRemoveMember_Success() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("userId", "456");
-        input.put("communityId", "123");
+        // Arrange
+        when(administrativeFacade.removeMember(any())).thenReturn(true);
 
-        when(administrativeFacade.removeMember(input)).thenReturn(true);
+        // Act
+        ResponseEntity<?> response = communityController.removeMember(Map.of("communityId", "1", "userId", "3"));
 
-        ResponseEntity<?> result = communityController.removeMember(input);
-
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals("member removed Successfully", result.getBody());
-        verify(administrativeFacade, times(1)).removeMember(input);
-    }
-
-    @Test
-    void testRemoveMember_Failure() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("userId", "456");
-        input.put("communityId", "123");
-
-        when(administrativeFacade.removeMember(input)).thenReturn(false);
-
-        ResponseEntity<?> result = communityController.removeMember(input);
-
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("error removing member", result.getBody());
-        verify(administrativeFacade, times(1)).removeMember(input);
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("member removed Successfully", response.getBody());
     }
 
     @Test
     void testGetAdmins_Success() throws Exception {
-        Map<String, Object> input = new HashMap<>();
-        input.put("communityId", "123");
+        // Arrange
+        List<Map<String, Object>> admins = List.of(
+                Map.of("id", 1, "name", "Admin 1"),
+                Map.of("id", 2, "name", "Admin 2")
+        );
+        when(administrativeFacade.getAdmins(any())).thenReturn(admins);
 
-        List<Map<String, Object>> admins = List.of(Map.of("userId", "1"), Map.of("userId", "2"));
+        // Act
+        ResponseEntity<?> response = communityController.getAdmins(Map.of("communityId", "1"));
 
-        when(administrativeFacade.getAdmins(input)).thenReturn(admins);
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(Map.of("adminsList", admins), response.getBody());
+    }
 
-        ResponseEntity<?> result = communityController.getAdmins(input);
 
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals(Map.of("adminsList", admins), result.getBody());
-        verify(administrativeFacade, times(1)).getAdmins(input);
+    @Test
+    void testJoinedCommunities_Unauthorized() throws Exception {
+        // Arrange
+        when(administrativeFacade.getUserJoinedCommunities(any()))
+                .thenThrow(new RuntimeException("unauthorized"));
+
+        // Act
+        ResponseEntity<?> response = communityController.joinedCommunities(authToken);
+
+        // Assert
+        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(Map.of("message", "unauthorized"), response.getBody());
     }
 
     @Test
-    void testGetAdmins_Failure() throws Exception {
-        Map<String, Object> input = new HashMap<>();
-        input.put("communityId", "123");
+    void testGetAllCommunities_Unauthorized() throws Exception {
+        // Arrange
+        String token = "Bearer invalidToken";
+        Integer pageNumber = 1;
+        Integer pageSize = 10;
+        when(administrativeFacade.getAllCommunities(any(), any(), any())).thenThrow(new RuntimeException("unauthorized"));
 
-        when(administrativeFacade.getAdmins(input)).thenThrow(new RuntimeException("No admins found"));
+        // Act
+        ResponseEntity<?> response = communityController.getAllCommunities(token, pageNumber, pageSize);
 
-        ResponseEntity<?> result = communityController.getAdmins(input);
+        // Assert
+        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(Map.of("message", "unauthorized"), response.getBody());
+    }
+    @Test
+    void testLeaveCommunity_Success() {
+        // Arrange
+        String token = "Bearer testToken";
+        String communityName = "Community 1";
+        when(administrativeFacade.leaveCommunity(any(), any())).thenReturn(true);
 
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("No admins found", result.getBody());
-        verify(administrativeFacade, times(1)).getAdmins(input);
+        // Act
+        ResponseEntity<?> response = communityController.updateQuestion(token, communityName);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(true, response.getBody());
+    }
+
+    @Test
+    void testLeaveCommunity_Unauthorized() {
+        // Arrange
+        String token = "Bearer invalidToken";
+        String communityName = "Community 1";
+        when(administrativeFacade.leaveCommunity(any(), any())).thenThrow(new RuntimeException("unauthorized"));
+
+        // Act
+        ResponseEntity<?> response = communityController.updateQuestion(token, communityName);
+
+        // Assert
+        assertEquals(401, response.getStatusCodeValue());
+        assertEquals("unauthorized", response.getBody());
     }
 
     @Test
     void testJoinCommunity_Success() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("userId", "456");
-        input.put("communityId", "123");
+        // Arrange
+        String token = "Bearer testToken";
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.joinCommunity(any())).thenReturn(true);
 
-        when(administrativeFacade.joinCommunity(input)).thenReturn(true);
+        // Act
+        ResponseEntity<?> response = communityController.joinCommunity(token, communityData);
 
-        ResponseEntity<?> result = communityController.joinCommunity(input);
-
-        assertEquals(200, result.getStatusCodeValue());
-        assertEquals("user joined  Successfully", result.getBody());
-        verify(administrativeFacade, times(1)).joinCommunity(input);
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("user joined Successfully", response.getBody());
     }
 
     @Test
     void testJoinCommunity_Failure() {
-        Map<String, Object> input = new HashMap<>();
-        input.put("userId", "456");
-        input.put("communityId", "123");
+        // Arrange
+        String token = "Bearer testToken";
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.joinCommunity(any())).thenReturn(false);
 
-        when(administrativeFacade.joinCommunity(input)).thenReturn(false);
+        // Act
+        ResponseEntity<?> response = communityController.joinCommunity(token, communityData);
 
-        ResponseEntity<?> result = communityController.joinCommunity(input);
-
-        assertEquals(400, result.getStatusCodeValue());
-        assertEquals("error joining community", result.getBody());
-        verify(administrativeFacade, times(1)).joinCommunity(input);
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error joining community", response.getBody());
     }
+
+    @Test
+    void testJoinCommunity_Exception() {
+        // Arrange
+        String token = "Bearer testToken";
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.joinCommunity(any())).thenThrow(new RuntimeException("error"));
+
+        // Act
+        ResponseEntity<?> response = communityController.joinCommunity(token, communityData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error", response.getBody());
+    }
+
+    @Test
+    void testCreateCommunity_Error() {
+        // Arrange
+        String token = "Bearer testToken";
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.createCommunity(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.createCommunity(communityData, token);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals(null, response.getBody());
+    }
+
+    @Test
+    void testDeleteCommunity_Error() {
+        // Arrange
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.deleteCommunity(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.deleteCommunity(communityData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error deleting community", response.getBody());
+    }
+
+    @Test
+    void testEditCommunity_Error() {
+        // Arrange
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.editCommunity(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.editCommunity(communityData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error editing community", response.getBody());
+    }
+
+    @Test
+    void testSetModerator_Error() {
+        // Arrange
+        Map<String, Object> moderatorData = Map.of("communityName", "Test Community", "userName", "testUser");
+        when(administrativeFacade.setModerator(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.setModerator(moderatorData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error adding moderator", response.getBody());
+    }
+
+    @Test
+    void testRemoveModerator_Error() {
+        // Arrange
+        Map<String, Object> moderatorData = Map.of("communityName", "Test Community", "userName", "testUser");
+        when(administrativeFacade.removeModerator(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.removeModerator(moderatorData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error removing moderator", response.getBody());
+    }
+
+    @Test
+    void testRemoveMember_Error() {
+        // Arrange
+        Map<String, Object> memberData = Map.of("communityName", "Test Community", "userName", "testUser");
+        when(administrativeFacade.removeMember(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.removeMember(memberData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error removing member", response.getBody());
+    }
+
+    @Test
+    void testGetAdmins_Error() throws Exception {
+        // Arrange
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.getAdmins(any())).thenThrow(new RuntimeException("error fetching admins"));
+
+        // Act
+        ResponseEntity<?> response = communityController.getAdmins(communityData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error fetching admins", response.getBody());
+    }
+    @Test
+    void testCreateCommunity_Error9() {
+        // Arrange
+        String token = "Bearer testToken";
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.createCommunity(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.createCommunity(communityData, token);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals(null, response.getBody());
+    }
+
+    @Test
+    void testDeleteCommunity_Error8() {
+        // Arrange
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.deleteCommunity(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.deleteCommunity(communityData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error deleting community", response.getBody());
+    }
+
+    @Test
+    void testEditCommunity_Error6() {
+        // Arrange
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.editCommunity(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.editCommunity(communityData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error editing community", response.getBody());
+    }
+
+    @Test
+    void testSetModerator_Error5() {
+        // Arrange
+        Map<String, Object> moderatorData = Map.of("communityName", "Test Community", "userName", "testUser");
+        when(administrativeFacade.setModerator(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.setModerator(moderatorData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error adding moderator", response.getBody());
+    }
+
+    @Test
+    void testRemoveModerator_Error1() {
+        // Arrange
+        Map<String, Object> moderatorData = Map.of("communityName", "Test Community", "userName", "testUser");
+        when(administrativeFacade.removeModerator(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.removeModerator(moderatorData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error removing moderator", response.getBody());
+    }
+
+    @Test
+    void testRemoveMember_Error4() {
+        // Arrange
+        Map<String, Object> memberData = Map.of("communityName", "Test Community", "userName", "testUser");
+        when(administrativeFacade.removeMember(any())).thenReturn(false);
+
+        // Act
+        ResponseEntity<?> response = communityController.removeMember(memberData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error removing member", response.getBody());
+    }
+
+    @Test
+    void testGetAdmins_Error2() throws Exception {
+        // Arrange
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.getAdmins(any())).thenThrow(new RuntimeException("error fetching admins"));
+
+        // Act
+        ResponseEntity<?> response = communityController.getAdmins(communityData);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error fetching admins", response.getBody());
+    }
+
 }
+
+
+
