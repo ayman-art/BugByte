@@ -211,4 +211,8 @@ public class CommunityService {
            throw (e);
         }
     }
+    public  boolean leaveCommunity(String communityName ,Long memberId)
+    {
+        return communityRepository.leaveCommunity(communityName,memberId);
+    }
 }
