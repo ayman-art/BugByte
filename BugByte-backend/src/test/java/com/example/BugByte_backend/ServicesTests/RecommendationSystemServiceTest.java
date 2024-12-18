@@ -43,7 +43,7 @@ class RecommendationSystemServiceTest {
     }
 
     @Test
-    void testGenerateFeedForUser_CacheEmpty() {
+    void testGenerateFeedForUser_CacheEmpty() throws Exception {
         String jwt = "Bearer validToken";
         Long userId = 1L;
         int pageSize = 2;
@@ -68,7 +68,7 @@ class RecommendationSystemServiceTest {
     }
 
     @Test
-    void testGenerateFeedForUser_CacheNotEmpty() {
+    void testGenerateFeedForUser_CacheNotEmpty() throws Exception {
         String token = "Bearer mock-token";
         Long userId = 1L;
         int pageSize = 2;

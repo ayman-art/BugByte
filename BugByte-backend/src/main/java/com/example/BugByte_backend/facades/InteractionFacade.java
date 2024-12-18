@@ -270,43 +270,43 @@ public class InteractionFacade {
             throw new Exception(e.getMessage());
         }
     }
-    public List<Map<String , Object>> getUserAnswers(Map<String, Object> userdata) throws Exception {
-        try {
-            AnswerAdapter answerAdapter = new AnswerAdapter();
-            String token = (String) userdata.get("jwt");
-            Claims claim = AuthenticationService.parseToken(token);
-            String userName = claim.getSubject();
-            List<Answer> answers = postingService.getUserAnswers((String) userdata.get("userName")
-                    , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
-            return answers.stream().map(answer -> {
-                Map<String, Object> answerMap = answerAdapter.toMap(answer);
-                try {
-                    answerMap.put("isUpVoted", postingService.isUpVoted(userName , answer.getId()));
-                    answerMap.put("isDownVoted", postingService.isDownVoted(userName , answer.getId()));
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                return answerMap;
-            }).toList();
-        }
-        catch (Exception e){
-            throw new Exception(e.getMessage());
-        }
-    }
-    public List<Map<String , Object>> getUserReplies(Map<String, Object> userdata) throws Exception {
-        try {
-            String token = (String) userdata.get("jwt");
-            Claims claim = AuthenticationService.parseToken(token);
-            String userName = claim.getSubject();
-            ReplyAdapter replyAdapter = new ReplyAdapter();
-            List<Reply> replies = postingService.getUserReplies((String) userdata.get("userName")
-                    , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
-            return replies.stream().map(replyAdapter::toMap).toList();
-        }
-        catch (Exception e){
-            throw new Exception(e.getMessage());
-        }
-    }
+//    public List<Map<String , Object>> getUserAnswers(Map<String, Object> userdata) throws Exception {
+//        try {
+//            AnswerAdapter answerAdapter = new AnswerAdapter();
+//            String token = (String) userdata.get("jwt");
+//            Claims claim = AuthenticationService.parseToken(token);
+//            String userName = claim.getSubject();
+//            List<Answer> answers = postingService.getUserAnswers((String) userdata.get("userName")
+//                    , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
+//            return answers.stream().map(answer -> {
+//                Map<String, Object> answerMap = answerAdapter.toMap(answer);
+//                try {
+//                    answerMap.put("isUpVoted", postingService.isUpVoted(userName , answer.getId()));
+//                    answerMap.put("isDownVoted", postingService.isDownVoted(userName , answer.getId()));
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
+//                return answerMap;
+//            }).toList();
+//        }
+//        catch (Exception e){
+//            throw new Exception(e.getMessage());
+//        }
+//    }
+//    public List<Map<String , Object>> getUserReplies(Map<String, Object> userdata) throws Exception {
+//        try {
+//            String token = (String) userdata.get("jwt");
+//            Claims claim = AuthenticationService.parseToken(token);
+//            String userName = claim.getSubject();
+//            ReplyAdapter replyAdapter = new ReplyAdapter();
+//            List<Reply> replies = postingService.getUserReplies((String) userdata.get("userName")
+//                    , (Integer) userdata.get("limit"), (Integer) userdata.get("offset"));
+//            return replies.stream().map(replyAdapter::toMap).toList();
+//        }
+//        catch (Exception e){
+//            throw new Exception(e.getMessage());
+//        }
+//    }
     public List<Map<String , Object>> getAnswersForQuestion(Map<String, Object> questionData) throws Exception {
         try {
             String token = (String) questionData.get("jwt");
