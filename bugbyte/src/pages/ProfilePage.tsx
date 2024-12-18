@@ -153,7 +153,7 @@ const Profile: React.FC = () => {
     }
 
     fetchProfile();
-  }, []);
+  }, [userName]);
   const handleFollow= async () => {
     try {
       const token = localStorage.getItem('authToken')

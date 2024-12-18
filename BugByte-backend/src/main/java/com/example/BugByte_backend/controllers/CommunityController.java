@@ -155,4 +155,13 @@ public class CommunityController {
             return new ResponseEntity<>(Map.of("message", "unauthorized"), HttpStatus.UNAUTHORIZED);
         }
     }
+    @PutMapping("/leaveCommunity")
+    public ResponseEntity<?> updateQuestion(@RequestHeader("Authorization") String token, @RequestParam("communityName") String communityName) {
+        token = token.replace("Bearer ", "");
+        try {
+            return new ResponseEntity<>(administrativeFacade.leaveCommunity(token , communityName), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
 }

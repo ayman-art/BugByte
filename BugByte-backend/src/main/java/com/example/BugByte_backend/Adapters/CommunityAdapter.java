@@ -29,6 +29,7 @@ public class CommunityAdapter {
                 ,(Long) map.get("admin_id"));
         if(map.containsKey("description")) comm.setDescription((String)map.get("description"));
         if (map.containsKey("tags")) comm.setTags((List<String>) map.get("tags"));
+        System.out.println(comm.getTags());
         return comm;
     }
     public String toJson(Community community) {

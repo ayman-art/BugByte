@@ -3,7 +3,6 @@ package com.example.BugByte_backend.services;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.CommunityRepository;
-import com.example.BugByte_backend.repositories.TagsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -89,6 +88,7 @@ public class CommunityService {
             inCommunity.setId(communityId);
             if (!inCommunity.getTags().isEmpty())
                 tagsRepository.bulkAddTagsToCommunity(communityId, inCommunity.getTags());
+            
             searchingFilteringCommunityService.saveCommunity(inCommunity);
 
             return communityId;
@@ -193,6 +193,7 @@ public class CommunityService {
         try {
             System.out.println(communityId);
             Community community = communityRepository.findCommunityById(communityId);
+
             community.setTags(tagsRepository.findTagsByCommunity(communityId));
             return community;
         } catch (IllegalArgumentException e) {
@@ -224,5 +225,9 @@ public class CommunityService {
         {
            throw (e);
         }
+    }
+    public  boolean leaveCommunity(String communityName ,Long memberId)
+    {
+        return communityRepository.leaveCommunity(communityName,memberId);
     }
 }

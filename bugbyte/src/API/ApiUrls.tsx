@@ -16,6 +16,9 @@ export const API_URLS = {
   GET_FOLLOWERS: `${API_BASE_URL}/users/followers`,
   GET_FOLLOWINGS: `${API_BASE_URL}/users/following`,
   POST: `${API_BASE_URL}/posts`,
+  QUESTION: `${API_BASE_URL}/posts/questions`,
+  ANSWER: `${API_BASE_URL}/posts/answers`,
+  REPLY: `${API_BASE_URL}/posts/replies`,
   ADMIN: `${API_BASE_URL}/users/make-admin`,
   UPVOTE:`${API_BASE_URL}/posts/upvoteQuestion`,
   DONWVOTE:`${API_BASE_URL}/posts/downvoteQuestion`,
@@ -35,6 +38,6 @@ export const API_URLS = {
   GET_FEED: `${API_BASE_URL}/recommendation/feed`,
   COMMUNITY_POSTS: `${API_BASE_URL}/posts/questions/communityQuestions`,
   USER_POSTS: `${API_BASE_URL}/posts/questions/userQuestions`,
-  ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`
-  
+  ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`,
+  LEAVE_COMMUNITY: `${API_BASE_URL}/communities/leaveCommunity`
 };

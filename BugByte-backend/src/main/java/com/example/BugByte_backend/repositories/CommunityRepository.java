@@ -52,6 +52,13 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     private static final String SQL_UPDATE_COMMUNITY_NAME = "UPDATE communities SET name = ? WHERE id = ?;";
     private static final String SQL_DELETE_COMMUNITY_BY_ID = "DELETE FROM communities WHERE id = ?;";
     private static final String SQL_DELETE_MEMBER_BY_ID = "DELETE FROM community_members WHERE member_id = ? AND community_id=?;";
+    private static final String SQL_LEAVE_COMMUNITY = """
+    DELETE cm
+    FROM community_members cm
+    INNER JOIN communities c
+    ON cm.community_id = c.id
+    WHERE cm.member_id = ? AND c.name = ?;
+    """;
 
     private static final String SQL_FIND_COMMUNITIES_BY_USER_ID = """
     SELECT *
@@ -354,6 +361,13 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             user.setIsAdmin(rs.getBoolean("is_admin"));
             return user;
         }
+    }
+    public boolean  leaveCommunity(String communityName , Long memberId)
+    {
+        if(memberId==null || communityName==null)
+            throw new NullPointerException("memberId or communityId is null");
+        int rows = jdbcTemplate.update(SQL_LEAVE_COMMUNITY, memberId, communityName);
+        return rows == 1;
     }
 
     private final RowMapper<Community> communityRowMapper = ((rs, rowNum) -> Community.builder()

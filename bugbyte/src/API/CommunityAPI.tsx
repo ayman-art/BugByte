@@ -86,3 +86,23 @@ export const fetchCommunities = async (token:string, page:number, size:number)=>
     return [];
   }
 }
+export const LeaveCommunity = async(token: string, name: string)=>{
+
+  const response = await fetch(`${API_URLS.LEAVE_COMMUNITY}?communityName=${name}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to Leave Community`);
+  }
+   const joinedCommunities = await fetchJoinedCommunities()
+    localStorage.setItem('joinedCommunities', JSON.stringify(joinedCommunities));
+    const data = await response.text();
+    console.log(response);
+  return data;
+
+}

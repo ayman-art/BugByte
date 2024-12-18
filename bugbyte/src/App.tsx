@@ -14,9 +14,8 @@ import FollowersPage from "./pages/FollowersPage";
 import FollowingsPage from "./pages/FollowingsPage";
 import { authorizeToken, saveData } from "./API/HomeAPI";
 import Layout from "./layouts/MainLayout";
-import TestPage from "./pages/TestPage";
 import CommunityPage from "./pages/CommunityPage";
-import { Home } from "lucide-react";
+import PostPage from "./pages/PostPage";
 import HomePage from "./pages/HomePage";
 import CommunityListingPage from "./pages/CommunityListPage";
 import CommunitySearchPage from "./pages/CommunitySearchPage";
@@ -116,6 +115,13 @@ const App: React.FC = () => {
             {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
             <Route path="/SignUp" element={<Navigate to="/" />} />
             <Route path="/LogIn" element={<Navigate to="/" />} />
+            <Route path="/Posts/:postId" 
+              element={
+                <Layout onLogout={handleLogout}>
+                  <PostPage />
+                </Layout>
+              }
+            />
             <Route path="/search-community" element={<Layout onLogout={handleLogout}><CommunitySearchPage/></Layout>}/>
             <Route
               path="/Search"
