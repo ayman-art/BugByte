@@ -193,7 +193,6 @@ public class AdministrativeFacade {
         Claims claim = AuthenticationService.parseToken(token);
         String userName = claim.getSubject();
         if (userName == null) throw new Exception("userName is null");
-        System.out.println("test");
         Community community = communityService.getCommunityById((Long)map.get("communityId"));
         System.out.println(map.get("communityId"));
         CommunityAdapter communityAdapter = new CommunityAdapter();

@@ -87,8 +87,10 @@ public class PostingService {
             if (postId == null)
                 throw new Exception("post id is null");
             if (postingRepository.insertQuestion(postId, q.getTitle(), q.getCommunityId())) {
-                if (q.getTags() != null && !q.getTags().isEmpty())
+                if (q.getTags() != null && !q.getTags().isEmpty()) {
                     tagsRepository.bulkAddTagsToQuestion(postId, q.getTags());
+                    System.out.println("TAGSS");
+                }
                 q.setId(postId);
 
                 filteringQuestionService.saveQuestion(q);

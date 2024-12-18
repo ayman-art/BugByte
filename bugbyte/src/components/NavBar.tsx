@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import logoPath from '../assets/bugbyteLogo.svg';
-import profilePath from '../assets/user-profile.svg';
-import { Link, useNavigate } from 'react-router-dom';
-import { API_URLS } from '../API/ApiUrls';
 import PostModal from './PostModal';
 import { postQuestion } from '../API/PostAPI';
+import searchIconPath from "../assets/search.png"
+import profilePath from "../assets/user-profile.svg";
+import { Link, useNavigate } from "react-router-dom";
+import { API_URLS } from "../API/ApiUrls";
 
 interface NavbarProps {
   onLogout: () => void;
@@ -24,36 +25,36 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const [profilePicFetched, setProfilePicFetched] = useState<string | null>(null);
 
   // Fetch profile picture on component mount
-  useEffect(() => {
-    const fetchProfilePicture = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-          console.error('No auth token found');
-          return;
-        }
+  // useEffect(() => {
+  //   const fetchProfilePicture = async () => {
+  //     try {
+  //       const token = localStorage.getItem('authToken');
+  //       if (!token) {
+  //         console.error('No auth token found');
+  //         return;
+  //       }
 
-        const response = await fetch(API_URLS.GET_PROFILE_PICTURE, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
+  //       const response = await fetch(API_URLS.GET_PROFILE_PICTURE, {
+  //         method: 'GET',
+  //         headers: {
+  //           'Authorization': `Bearer ${token}`,
+  //           'Content-Type': 'application/json'
+  //         }
+  //       });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch profile picture');
-        }
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch profile picture');
+  //       }
 
-        const data = await response.json();
-        setProfilePicFetched(data.profilePictureUrl);
-      } catch (error) {
-        console.error('Error fetching profile picture:', error);
-      }
-    };
+  //       const data = await response.json();
+  //       setProfilePicFetched(data.profilePictureUrl);
+  //     } catch (error) {
+  //       console.error('Error fetching profile picture:', error);
+  //     }
+  //   };
 
-    fetchProfilePicture();
-  }, []);
+  //   fetchProfilePicture();
+  // }, []);
 
   const visitProfile = () => {
     const username = localStorage.getItem("name");
@@ -116,6 +117,9 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     } catch (error) {
       console.error('Error updating profile picture:', error);
     }
+  }
+  const goToSearch = () => {
+    navigate("/Search"); // Navigate to the search page
   };
 
   return (
@@ -126,17 +130,22 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
         <span style={styles.brandName}>BugByte</span>
       </div>
 
-      {/* Profile and Logout */}
+      {/* Profile, Search, and Logout */}
       <div style={styles.rightContainer}>
         <button style={styles.plusButton} onClick={() => setShowModal(true)}>
           +
         </button>
-
-        <img 
-          src={profilePicFetched || profilePath} 
-          alt="Profile" 
+        <img
+          src={searchIconPath} // Add search icon
+          alt="Search"
+          style={styles.searchIcon}
+          onClick={goToSearch} // Navigate to search page
+        />
+        <img
+          src={profilePicFetched || profilePath}
+          alt="Profile"
           style={styles.profileIcon}
-          onClick={visitProfile} 
+          onClick={visitProfile}
         />
         <button style={styles.logoutButton} onClick={onLogout}>
           Logout
@@ -151,18 +160,17 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       />
     </nav>
   );
-};
-
-
+  };
+export default Navbar;
 const styles = {
   navbar: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '10px 10%',
-    backgroundColor: '#099154',
-    color: 'white',
-    height: '80px',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "10px 10%",
+    backgroundColor: "#099154",
+    color: "white",
+    height: "80px",
   },
   logoContainer: {
     display: 'flex',
@@ -170,10 +178,10 @@ const styles = {
     cursor: 'pointer',
   },
   logo: {
-    color: '#ffffff',
-    height: '80px',
-    width: '80px',
-    marginRight: '10px',
+    color: "#ffffff",
+    height: "80px",
+    width: "80px",
+    marginRight: "10px",
   },
   brandName: {
     fontSize: '1.5rem',
@@ -181,8 +189,14 @@ const styles = {
     userSelect: 'none' as const,
   },
   rightContainer: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
+  },
+  searchIcon: {
+    height: "40px",
+    width: "40px",
+    marginRight: "10px",
+    cursor: "pointer", // Add cursor for clickable effect
   },
   profileIcon: {
     height: '50px',
@@ -205,13 +219,13 @@ const styles = {
     fontSize: '1.5rem',
   },
   logoutButton: {
-    backgroundColor: '#ff4757',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    padding: '8px 16px',
-    fontSize: '1rem',
-    cursor: 'pointer',
+    backgroundColor: "#ff4757",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    padding: "8px 16px",
+    fontSize: "1rem",
+    cursor: "pointer",
   },
   modal: {
     position: 'fixed',
@@ -308,4 +322,4 @@ const styles = {
   },
 };
 
-export default Navbar;
+

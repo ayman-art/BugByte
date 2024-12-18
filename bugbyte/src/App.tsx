@@ -14,9 +14,11 @@ import FollowersPage from "./pages/FollowersPage";
 import FollowingsPage from "./pages/FollowingsPage";
 import { authorizeToken, saveData } from "./API/HomeAPI";
 import Layout from "./layouts/MainLayout";
-import TestPage from "./pages/TestPage";
 import CommunityPage from "./pages/CommunityPage";
 import PostPage from "./pages/PostPage";
+import HomePage from "./pages/HomePage";
+import CommunityListingPage from "./pages/CommunityListPage";
+import CommunitySearchPage from "./pages/CommunitySearchPage";
 
 const isLoggedIn = false;
 
@@ -66,7 +68,7 @@ const App: React.FC = () => {
               path="/"
               element={
                 <Layout onLogout={handleLogout}>
-                  <QuestionSearchPage />
+                  <HomePage />
                 </Layout>
               }
             />
@@ -94,6 +96,22 @@ const App: React.FC = () => {
                 </Layout>
               }
             />
+            <Route
+                path="communities/:communityId"
+                element={
+                  <Layout onLogout={handleLogout}>
+                    <CommunityPage />
+                  </Layout>
+                }
+            />
+            <Route
+              path="/communities"
+              element={
+                <Layout onLogout={handleLogout}>
+                  <CommunityListingPage/>
+                </Layout>
+              }
+            />
             {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
             <Route path="/SignUp" element={<Navigate to="/" />} />
             <Route path="/LogIn" element={<Navigate to="/" />} />
@@ -104,6 +122,7 @@ const App: React.FC = () => {
                 </Layout>
               }
             />
+            <Route path="/search-community" element={<Layout onLogout={handleLogout}><CommunitySearchPage/></Layout>}/>
             <Route
               path="/Search"
               element={
@@ -123,14 +142,7 @@ const App: React.FC = () => {
             <Route path="/LogIn" element={<Login onLogin={handleLogin} />} />
           </>
         )}
-        <Route
-          path="testPage/:communityId"
-          element={
-            <Layout onLogout={handleLogout}>
-              <CommunityPage />
-            </Layout>
-          }
-        />
+        
       </Routes>
     </BrowserRouter>
   );

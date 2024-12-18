@@ -14,6 +14,7 @@ interface Question {
   mdContent: string;
   upVotes: number;
   downVotes: number;
+  tags?: string[];
 }
 
 const HomePage: React.FC = () => {
@@ -88,16 +89,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
-      <h1>Home</h1>
-      <div style={styles.searchSection}>
-        <SearchAndTagFields
-          searchValue={searchValue}
-          tagValue={tagValue}
-          onSearchChange={handleSearchChange}
-          onTagChange={handleTagChange}
-          onSearchClick={handleSearchClick}
-        />
-      </div>
       <PostListing
         posts={posts}
         fetchPosts={fetchPosts}
@@ -109,27 +100,3 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-
-// Styles for the page
-const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginTop: "20px",
-  },
-  searchSection: {
-    marginBottom: "20px",
-    display: "flex",
-    justifyContent: "center",
-    width: "100%",
-  },
-  questionCard: {
-    border: "1px solid #ccc",
-    padding: "10px",
-    margin: "10px",
-    borderRadius: "5px",
-    width: "80%",
-    boxSizing: "border-box",
-  },
-};

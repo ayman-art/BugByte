@@ -74,7 +74,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
             <ul style={styles.links}>
               <li onClick={() => navigate('/')}>Home</li>
               <li onClick={visitProfile}>Profile</li>
-              <li>Communities</li>
+              <li onClick={()=> navigate('/communities')}>Communities</li>
               {isAdmin && (
                 <li
                   onClick={() => setShowModal(true)}
@@ -141,7 +141,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: { display: 'flex', flexDirection: 'column', backgroundColor: '#f5f5f5' },
   main: { display: 'flex', flex: 1, padding: '0 10%', backgroundColor: '#f5f5f5' },
   sidebar: { width: '200px', padding: '10px', backgroundColor: '#f5f5f5' },
-  links: { listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' },
+  links: { listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px', cursor:'pointer' },
   createCommunityButton: { color: '#4caf50', fontWeight: 'bold', cursor: 'pointer' },
   content: {
     flex: 1,

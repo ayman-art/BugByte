@@ -149,3 +149,20 @@ export const updateBio = async (bio: string, token:string): Promise<any> => {
       throw error;
     }
   };
+  export const getUserPosts = async(token:string,limit: number, offset: number, name: string)=>{
+    const response = await fetch(`${API_URLS.USER_POSTS}?&limit=${limit}&offset=${offset}&name=${name}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Failed to Fetch User posts`);
+    }
+  
+    const posts = await response.json()
+    console.log(posts)
+    return posts;
+  }

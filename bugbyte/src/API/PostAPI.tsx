@@ -36,7 +36,7 @@ export const postQuestion = async (
   mdContent: string, 
   title: string, 
   tags: string[], 
-  communityId: string, 
+  communityId: number, 
   token: string
 ): Promise<any> => {
   try {

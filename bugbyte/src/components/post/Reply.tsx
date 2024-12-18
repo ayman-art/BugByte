@@ -91,7 +91,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
             )}
 
             {canDelete && (
-              <button className="action-button delete-button" onClick={() => onDelete(replyId)}>
+              <button className="action-button delete-button" onClick={() => onDelete(replyId, answerId)}>
                 <FaTrash /> {/* Delete icon */}
               </button>
             )}

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CommunityPost from "./QuestionPreview";
 
-interface Post {
+export interface Post {
   id: string;
   communityId: number;
   title: string;
@@ -9,6 +9,7 @@ interface Post {
   mdContent: string;
   upVotes: number;
   downVotes: number;
+  tags?: string[];
 }
 
 interface PostListingProps {
@@ -24,17 +25,18 @@ const PostListing: React.FC<PostListingProps> = ({
   loading,
   hasMore,
 }) => {
-  const [lock, setLock] = useState<boolean>(false)
+  const [lock, setLock] = useState<boolean>(false);
   const loader = useRef<HTMLDivElement>(null);
 
   // Observe when the loader div comes into view
   useEffect(() => {
     const observer = new IntersectionObserver(
-       async (entries) => {
-        if (entries[0].isIntersecting && hasMore && !lock ) {
-          setLock(true)
+      async (entries) => {
+        if (entries[0].isIntersecting && hasMore && !lock) {
+          console.log(hasMore);
+          setLock(true);
           await fetchPosts(); // Fetch posts when loader is visible
-          setLock(false)
+          setLock(false);
         }
       },
       { threshold: 1.0 }
@@ -60,6 +62,7 @@ const PostListing: React.FC<PostListingProps> = ({
           content={post.mdContent}
           upvotes={post.upVotes}
           downvotes={post.downVotes}
+          tags={post.tags}
         />
       ))}
 
