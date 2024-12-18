@@ -14,10 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -38,185 +35,254 @@ class AdministrativeFacadeCommunityTest {
 
     @Mock
     private ModeratorService moderatorService;
+    @Mock
+    AuthenticationService authenticationService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
-
     @Test
-    public void testGetCommunityInfo() throws Exception {
-        // Given
-        String jwt = "valid.jwt.token";
-        Long communityId = 123L;
-        Map<String, Object> map = Map.of("jwt", jwt, "communityId", communityId);
+    void testGetCommunityInfoThrowsException() {
+        // Arrange
+        Map<String, Object> map = new HashMap<>();
+        map.put("jwt", "mock_jwt_token");
 
-        Claims claims = mock(Claims.class);
-        when(claims.getSubject()).thenReturn("testUser");
-        when(AuthenticationService.parseToken(jwt)).thenReturn(claims);
+        when(authenticationService.getUserNameFromJwt(any(String.class))).thenReturn(null);
 
-        Community community = new Community(communityId, "Test Community", "Description");
-        when(communityService.getCommunityById(communityId)).thenReturn(community);
-
-        Community expectedCommunity = community; // This will be returned as per your current implementation
-
-        // When
-        Community result = administrativeFacade.getCommunityInfo(map);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(expectedCommunity.getId(), result.getId());
-        assertEquals(expectedCommunity.getName(), result.getName());
-        assertEquals(expectedCommunity.getDescription(), result.getDescription());
+        // Act & Assert
+        Exception exception = assertThrows(Exception.class, () -> administrativeFacade.getCommunityInfo(map));
+        assertEquals("userName is null", exception.getMessage());
     }
-
-
     @Test
-    void testCreateCommunity_Success() {
-        // Mock token parsing
-        Claims claims = mock(Claims.class);
-        when(claims.get("is_admin")).thenReturn(true);
-        when(claims.getId()).thenReturn("1");
+    void testDeleteCommunitySuccess() throws Exception {
+        // Arrange
+        Map<String, Object> map = new HashMap<>();
+        map.put("jwt", "mock_jwt_token");
+        map.put("communityId", "123");
 
-        // Mock community service
-        when(communityService.createCommunity(any(Community.class))).thenReturn(1L);
+        when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
+        when(communityService.deleteCommunity(123L)).thenReturn(true);
 
-        // Input data
-        Map<String, Object> input = new HashMap<>();
-        input.put("jwt", "dummyToken");
-        input.put("name", "New Community");
-        input.put("description", "A test community");
+        // Act
+        boolean result = administrativeFacade.deleteCommunity(map);
 
-        // Test
-        boolean result = administrativeFacade.createCommunity(input);
-
-        // Verify
+        // Assert
         assertTrue(result);
-        verify(communityService, times(1)).createCommunity(any(Community.class));
     }
-
     @Test
-    void testCreateCommunity_UserNotAdmin() {
-        // Mock token parsing
-        Claims claims = mock(Claims.class);
-        when(claims.get("is_admin")).thenReturn(false);
+    void testDeleteCommunityInvalidCommunityId() {
+        // Arrange
+        Map<String, Object> map = new HashMap<>();
+        map.put("jwt", "mock_jwt_token");
+        map.put("communityId", "invalid_id");
 
-        // Input data
-        Map<String, Object> input = new HashMap<>();
-        input.put("jwt", "dummyToken");
-        input.put("name", "New Community");
-        input.put("description", "A test community");
+        when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
 
-        // Test
-        boolean result = administrativeFacade.createCommunity(input);
+        // Act
+        boolean result = administrativeFacade.deleteCommunity(map);
 
-        // Verify
+        // Assert
         assertFalse(result);
-        verify(communityService, never()).createCommunity(any(Community.class));
     }
 
     @Test
-    void testDeleteCommunity_Success() {
-        // Mock token parsing
-        Claims claims = mock(Claims.class);
-        when(claims.get("is_admin")).thenReturn(true);
+    void testEditCommunityInvalidCommunityId() {
+        // Arrange
+        Map<String, Object> map = new HashMap<>();
+        map.put("jwt", "mock_jwt_token");
+        map.put("communityId", "invalid_id");
+        map.put("name", "New Community Name");
+        map.put("desription", "Updated Description");
 
-        // Mock community service
-        when(communityService.deleteCommunity(1L)).thenReturn(true);
+        when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
 
-        // Input data
-        Map<String, Object> input = new HashMap<>();
-        input.put("jwt", "dummyToken");
-        input.put("communityId", "1");
+        // Act
+        boolean result = administrativeFacade.editCommunity(map);
 
-        // Test
-        boolean result = administrativeFacade.deleteCommunity(input);
-
-        // Verify
-        assertTrue(result);
-        verify(communityService, times(1)).deleteCommunity(1L);
-    }
-
-    @Test
-    void testDeleteCommunity_UserNotAdmin() {
-        // Mock token parsing
-        Claims claims = mock(Claims.class);
-        when(claims.get("is_admin")).thenReturn(false);
-
-        // Input data
-        Map<String, Object> input = new HashMap<>();
-        input.put("jwt", "dummyToken");
-        input.put("communityId", "1");
-
-        // Test
-        boolean result = administrativeFacade.deleteCommunity(input);
-
-        // Verify
+        // Assert
         assertFalse(result);
-        verify(communityService, never()).deleteCommunity(anyLong());
     }
 
     @Test
-    void testJoinCommunity_Success() {
-        // Mock token parsing
-        Claims claims = mock(Claims.class);
-        when(claims.getId()).thenReturn("1");
+    void testEditCommunityInvalidData() {
+        // Arrange
+        Map<String, Object> map = new HashMap<>();
+        map.put("jwt", "mock_jwt_token");
+        map.put("communityId", "123");
+        map.put("name", null); // Invalid data
+        map.put("desription", "Updated Description");
 
-        // Mock community service
-        when(communityService.joinCommunity(anyLong(), anyLong())).thenReturn(true);
+        when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
 
-        // Input data
-        Map<String, Object> input = new HashMap<>();
-        input.put("jwt", "dummyToken");
-        input.put("communityId", 1);
+        // Act
+        boolean result = administrativeFacade.editCommunity(map);
 
-        // Test
-        boolean result = administrativeFacade.joinCommunity(input);
+        // Assert
+        assertFalse(result);
+    }
 
-        // Verify
+    @Test
+    void testRemoveModeratorSuccess() throws Exception {
+        // Arrange
+        Map<String, Object> req = new HashMap<>();
+        req.put("jwt", "mock_jwt_token");
+        req.put("moderatorName", "moderator1");
+        req.put("communityId", "1");
+
+        when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
+        when(moderatorService.removeModerator("moderator1", 1L)).thenReturn(true);
+
+        // Act
+        boolean result = administrativeFacade.removeModerator(req);
+
+        // Assert
         assertTrue(result);
-        verify(communityService, times(1)).joinCommunity(1L, 1L);
     }
 
     @Test
-    public void testGetProfile_Success() throws Exception {
-        Map<String, Object> userdata = new HashMap<>();
-        userdata.put("userName", "test_user");
-        userdata.put("jwt", "token");
+    void testRemoveModeratorException() {
+        // Arrange
+        Map<String, Object> req = new HashMap<>();
+        req.put("jwt", "mock_jwt_token");
+        req.put("moderatorName", "moderator1");
+        req.put("communityId", "1");
 
-        Map<String, Object> mockProfile = Map.of(
-                "userName", "test_user",
-                "reputation", 100,
-                "isAdmin", true,
-                "no-followers", 50,
-                "no-following", 30
-        );
+        when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
+        when(moderatorService.removeModerator("moderator1", 1L)).thenThrow(new RuntimeException("Service error"));
 
-        when(AuthenticationService.parseToken(anyString())).thenReturn(null);
-        when(userService.getProfile("test_user")).thenReturn(mockProfile);
+        // Act
+        boolean result = administrativeFacade.removeModerator(req);
 
-        Map<String, Object> result = administrativeFacade.getProfile(userdata);
+        // Assert
+        assertFalse(result);
+    }
+    @Test
+    void testRemoveMemberSuccess() throws Exception {
+        // Arrange
+        Map<String, Object> req = new HashMap<>();
+        req.put("jwt", "mock_jwt_token");
+        req.put("communityId", "1");
+        req.put("user_name", "testUser");
 
-        assertEquals(mockProfile, result);
-        assertEquals("test_user", result.get("userName"));
-        assertEquals(100, result.get("reputation"));
-        assertEquals(true, result.get("isAdmin"));
-        assertEquals(50, result.get("no-followers"));
-        assertEquals(30, result.get("no-following"));
+        when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
+        when(communityService.deleteMember(1L, "testUser")).thenReturn(true);
 
-        verify(userService, times(1)).getProfile("test_user");
+        // Act
+        boolean result = administrativeFacade.removeMember(req);
+
+        // Assert
+        assertTrue(result);
     }
 
     @Test
-    public void testGetProfile_Failure() throws Exception {
-        Map<String, Object> userdata = Map.of("userName", "test_user");
+    void testJoinCommunityInvalidToken() {
+        // Arrange
+        Map<String, Object> req = new HashMap<>();
+        req.put("jwt", "invalid_jwt_token");
 
-        when(userService.getProfile("test_user")).thenThrow(new Exception());
+        when(authenticationService.getIdFromJwt("invalid_jwt_token")).thenThrow(new IllegalArgumentException());
 
-        assertThrows(Exception.class, () -> administrativeFacade.getProfile(userdata));
+        // Act
+        boolean result = administrativeFacade.joinCommunity(req);
 
-        verify(userService, times(1)).getProfile("test_user");
+        // Assert
+        assertFalse(result);
+    }
+    @Test
+    void testGetUserJoinedCommunitiesSuccess() throws Exception {
+        // Arrange
+        String jwt = "mock_jwt_token";
+        long userId = 123L;
+
+        Community community1 = new Community(1L, "Community1", "Description1");
+        Community community2 = new Community(2L, "Community2", "Description2");
+        List<Community> communities = Arrays.asList(community1, community2);
+
+        when(authenticationService.getIdFromJwt(jwt)).thenReturn(userId);
+        when(communityService.getUserCommunities(userId)).thenReturn(communities);
+
+        // Act
+        List<Community> result = administrativeFacade.getUserJoinedCommunities(jwt);
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("Community1", result.get(0).getName());
+        assertEquals("Community2", result.get(1).getName());
+    }
+
+    @Test
+    void testGetUserJoinedCommunitiesException() throws Exception {
+        // Arrange
+        String jwt = "mock_jwt_token";
+        long userId = 123L;
+
+        when(authenticationService.getIdFromJwt(jwt)).thenReturn(userId);
+        when(communityService.getUserCommunities(userId)).thenThrow(new RuntimeException("Service error"));
+
+        // Act
+        Exception exception = assertThrows(RuntimeException.class, () -> administrativeFacade.getUserJoinedCommunities(jwt));
+
+        // Assert
+        assertEquals("Service error", exception.getMessage());
+    }
+
+    @Test
+    void testJoinCommunityException() {
+        // Arrange
+        Map<String, Object> req = new HashMap<>();
+        req.put("jwt", "mock_jwt_token");
+        req.put("communityId", 1);
+
+        when(authenticationService.getIdFromJwt("mock_jwt_token")).thenReturn(123L);
+        when(communityService.joinCommunity(1L, 123L)).thenThrow(new RuntimeException("Service error"));
+
+        // Act
+        Exception exception = assertThrows(RuntimeException.class, () -> administrativeFacade.joinCommunity(req));
+
+        // Assert
+        assertEquals("Service error", exception.getMessage());
+    }
+    @Test
+    void testGetAllCommunitiesSuccess() throws Exception {
+        // Arrange
+        String jwt = "mock_jwt_token";
+        long userId = 123L;
+        int pageSize = 10;
+        int pageNumber = 1;
+
+        Community community1 = new Community(1L, "Community1", "Description1");
+        Community community2 = new Community(2L, "Community2", "Description2");
+        List<Community> communities = Arrays.asList(community1, community2);
+
+        when(authenticationService.getIdFromJwt(jwt)).thenReturn(userId);
+        when(communityService.getAllCommunities(pageSize, pageNumber)).thenReturn(communities);
+
+        // Act
+        List<Community> result = administrativeFacade.getAllCommunities(jwt, pageSize, pageNumber);
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("Community1", result.get(0).getName());
+        assertEquals("Community2", result.get(1).getName());
+    }
+
+    @Test
+    void testGetAllCommunitiesException() throws Exception {
+        // Arrange
+        String jwt = "mock_jwt_token";
+        long userId = 123L;
+        int pageSize = 10;
+        int pageNumber = 1;
+
+        when(authenticationService.getIdFromJwt(jwt)).thenReturn(userId);
+        when(communityService.getAllCommunities(pageSize, pageNumber)).thenThrow(new RuntimeException("Service error"));
+
+        // Act
+        Exception exception = assertThrows(RuntimeException.class, () -> administrativeFacade.getAllCommunities(jwt, pageSize, pageNumber));
+
+        // Assert
+        assertEquals("Service error", exception.getMessage());
     }
 
     @Test

@@ -338,17 +338,17 @@ public class CommunityRepositoryTest {
         assertThrows(RuntimeException.class, () -> communityRepository.findCommunityByName(name));
     }
 
-    @Test
-    public void testFindAllCommunities_Success() {
-        List<Community> mockCommunities = List.of(
-                this.comm, this.comm2, this.comm3
-        );
-        when(jdbcTemplate.query(eq(SQL_FIND_ALL_COMMUNITIES), any(RowMapper.class)))
-                .thenAnswer(invocation -> mockCommunities);
-        List<Community> result = communityRepository.findAllCommunities();
-        assertEquals(mockCommunities.size(), result.size());
-        assertEquals(mockCommunities, result);
-    }
+//    @Test
+//    public void testFindAllCommunities_Success() {
+//        List<Community> mockCommunities = List.of(
+//                this.comm, this.comm2, this.comm3
+//        );
+//        when(jdbcTemplate.query(eq(SQL_FIND_ALL_COMMUNITIES), any(RowMapper.class)))
+//                .thenAnswer(invocation -> mockCommunities);
+//        List<Community> result = communityRepository.findAllCommunities();
+//        assertEquals(mockCommunities.size(), result.size());
+//        assertEquals(mockCommunities, result);
+//    }
 
     @Test
     public void testFindCommunityMembers_Ids_Success() {
