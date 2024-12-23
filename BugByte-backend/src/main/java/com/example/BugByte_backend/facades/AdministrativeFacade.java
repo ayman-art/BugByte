@@ -202,12 +202,14 @@ public class AdministrativeFacade {
     public boolean createCommunity(Map<String,Object> map){
         try {
             String token = (String) map.get("jwt");
+            Claims claims = AuthenticationService.parseToken(token);
+            long adminId = Long.parseLong(claims.getId());
             boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
-            System.out.println(isAdmin);
             if (!isAdmin) throw new Exception("user is not an admin");
+            System.out.println(isAdmin);
             CommunityAdapter communityAdapter = new CommunityAdapter();
             map.remove("jwt");
-            map.put("admin_id" , Long.parseLong(authenticationService.getUserNameFromJwt(token)));
+            map.put("admin_id" , adminId);
             Long id = communityService.createCommunity(communityAdapter.fromMap(map));
             return  true;
         }catch (Exception e){
