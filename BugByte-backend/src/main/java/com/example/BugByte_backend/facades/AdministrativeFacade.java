@@ -207,26 +207,29 @@ public class AdministrativeFacade {
             if (!isAdmin) throw new Exception("user is not an admin");
             CommunityAdapter communityAdapter = new CommunityAdapter();
             map.remove("jwt");
-            map.put("admin_id" , Long.parseLong(authenticationService.getUserNameFromJwt(token)));
+            map.put("admin_id" , authenticationService.getIdFromJwt(token));
             Long id = communityService.createCommunity(communityAdapter.fromMap(map));
             return  true;
         }catch (Exception e){
             return false;
         }
     }
-    public boolean deleteCommunity(Map<String,Object> map)
-    {
+    public boolean deleteCommunity(Map<String, Object> map) {
         try {
             String token = (String) map.get("jwt");
             boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
-            if (!isAdmin) throw new Exception("user is not an admin");
-            return communityService.deleteCommunity(Long.parseLong((String) map.get("communityId")));
+            if (!isAdmin) {
+                throw new IllegalArgumentException("User is not an admin.");
+            }
+            Long communityId = Long.parseLong(map.get("communityId").toString());
+            return communityService.deleteCommunity(communityId);
         } catch (IllegalArgumentException e) {
-            return false;
+            throw new IllegalArgumentException("Invalid community ID or JWT.");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unexpected error while deleting the community.", e);
         }
     }
+
     public boolean editCommunity(Map<String,Object> map)
     {
         try {

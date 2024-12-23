@@ -106,3 +106,23 @@ export const LeaveCommunity = async(token: string, name: string)=>{
   return data;
 
 }
+
+export const deleteCommunity = async (
+  token: string,
+  communityId:number
+): Promise<string> => {
+  const response = await fetch(API_URLS.DELETE_COMMUNITY, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ "jwt": token , "communityId":communityId }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete community");
+  }
+
+  return response.text();
+};

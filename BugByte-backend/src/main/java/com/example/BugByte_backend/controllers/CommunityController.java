@@ -46,18 +46,21 @@ public class CommunityController {
         }
     }
     @PostMapping("/deleteCommunity")
-    public ResponseEntity<?> deleteCommunity(@RequestBody Map<String, Object> communityData) {
+    public ResponseEntity<String> deleteCommunity(@RequestBody Map<String, Object> communityData) {
         try {
-            if (administrativeFacade.deleteCommunity(communityData)) {
-                return new ResponseEntity<>("Community deleted Successfully", HttpStatus.OK);
+            boolean result = administrativeFacade.deleteCommunity(communityData);
+            if (result) {
+                return ResponseEntity.ok("Community deleted successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error deleting community.");
             }
-            else {
-                return new ResponseEntity<>("error deleting community", HttpStatus.BAD_REQUEST);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
     @PostMapping("/editCommunity")
     public ResponseEntity<?> editCommunity(@RequestBody Map<String, Object> communityData) {
         try {

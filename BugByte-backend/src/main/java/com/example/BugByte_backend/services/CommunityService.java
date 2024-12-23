@@ -107,10 +107,10 @@ public class CommunityService {
 //            }
 
             boolean res = communityRepository.deleteCommunityById(communityId);
-            if (res) {
-                Community community = communityRepository.findCommunityById(communityId);
-                searchingFilteringCommunityService.deleteCommunity(community);
-            }
+//            if (res) {
+//                Community community = communityRepository.findCommunityById(communityId);
+//                searchingFilteringCommunityService.deleteCommunity(community);
+//            }
 
             return res;
         } catch (Exception e) {

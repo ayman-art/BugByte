@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS question_tag (
     tag_id BIGINT NOT NULL,
     PRIMARY KEY (question_id, tag_id),
     FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES tag(id)
+    FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS community_tag (
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS community_tag (
     tag_id BIGINT NOT NULL,
     PRIMARY KEY (community_id, tag_id),
     FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES tag(id)
+    FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS moderators (
