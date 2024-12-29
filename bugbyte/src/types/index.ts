@@ -25,7 +25,7 @@ export  interface IQuestion {
     answerId: string;
     questionId: string;
     opName: string;
-    postedOn: string; // ISO date format as string
+    postedOn: string;
     upVotes: number;
     mdContent: string;
     isDownVoted: boolean;
@@ -33,6 +33,7 @@ export  interface IQuestion {
     downVotes: number;
     isVerified: boolean;
     enabledVerify: boolean;
+    canVerify: boolean;
   }
 
   export interface IReply {
