@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaReply, FaCheckCircle } from 'react-icons/fa';
 import {
@@ -53,6 +53,9 @@ const Answer: React.FC<AnswerProps> = ({
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
   const token = localStorage.getItem('authToken');
+
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin;
 
   const handleUpvoteAnswer = async () => {
     if (voteStatus === 'upvoted') {
@@ -118,11 +121,6 @@ const Answer: React.FC<AnswerProps> = ({
     console.log('Post edited:', postDetails);
     setIsEditModalOpen(false);
   };
-
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin;
-  // console.log(loggedInUsername, opName);
-
 
   return (
     <div className={`answer-container ${isVerified ? 'verified' : ''}`}>
