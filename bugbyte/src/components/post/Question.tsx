@@ -129,6 +129,7 @@ const Question: React.FC<QuestionProps> = ({
           </p>
           <section className="question-body">
             <MDXEditor
+              key={mdContent}
               markdown={mdContent}
               readOnly
               plugins={[
