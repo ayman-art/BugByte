@@ -31,14 +31,14 @@ const Answer: React.FC<AnswerProps> = ({
   answerId,
   questionId,
   opName,
-  postedOn, // ISO date format as string
+  postedOn,
   upVotes,
   mdContent,
   isDownVoted,
   isUpVoted,
   downVotes,
-  isVerified = false,  // default to false if not provided
-  enabledVerify = true, // prop for enabling/disabling verify button
+  isVerified,
+  enabledVerify,
   onDelete,
   onVerify,
   onReplyOnAnswer,
@@ -59,19 +59,16 @@ const Answer: React.FC<AnswerProps> = ({
       await removeUpvoteAnswer(answerId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
       setVoteStatus('neutral');
-      console.log('FROM upvoted to neutral');
     } else if (voteStatus === 'downvoted') {
       await removeDownvoteAnswer(answerId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
       await upvoteAnswer(answerId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
-      setVoteStatus('upvoted');
       console.log('FROM downvoted to upvoted');
     } else {
       await upvoteAnswer(answerId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
-      console.log('FROM neutral to upvoted');
     }
   };
 
@@ -80,25 +77,19 @@ const Answer: React.FC<AnswerProps> = ({
       await removeDownvoteAnswer(answerId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
       setVoteStatus('neutral');
-      console.log('FROM downvoted to neutral');
     } else if (voteStatus === 'upvoted') {
       await removeUpvoteAnswer(answerId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
       await downvoteAnswer(answerId, token!);
       setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
-      console.log('FROM upvoted to downvoted');
     } else {
       await downvoteAnswer(answerId, token!);
       setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
-      console.log('FROM neutral to downvoted');
     }
   };
 
-  const handleNavigateToProfile = () => {
-    navigate(`/Profile/${opName}`);
-  };
 
   const handleReplySave = async (postDetails: { content: string }) => {
 
@@ -139,7 +130,7 @@ const Answer: React.FC<AnswerProps> = ({
         <header className="answer-header">
           <p className="op-name">
             Answered by:{' '}
-            <span onClick={handleNavigateToProfile} className="op-link">
+            <span onClick={() => {navigate(`/Profile/${opName}`)}} className="op-link">
               {opName}
             </span>
             {isVerified && (
