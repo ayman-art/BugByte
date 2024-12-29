@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.CommunityRepository;
+import com.example.BugByte_backend.repositories.TagsRepository;
 import com.example.BugByte_backend.services.CommunityService;
 import com.example.BugByte_backend.services.SearchingFilteringCommunityService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,9 @@ public class CommunityServiceTest {
     @Mock
     private SearchingFilteringCommunityService searchingFilteringCommunityService;
 
+    @Mock
+    TagsRepository tagsRepositoryMock;
+
     @InjectMocks
     private CommunityService communityService;
 
@@ -42,7 +46,10 @@ public class CommunityServiceTest {
 
     @Test
     public void testCreateCommunity() {
+        List<String> tags = new ArrayList<>();
         when(communityRepository.insertCommunity("Test Community", 100L)).thenReturn(1L);
+        when(tagsRepositoryMock.insertTags(tags)).thenReturn(1);
+        when(communityRepository.updateCommunityDescription(community.getId() , "")).thenReturn(true);
         Long communityId = communityService.createCommunity(community);
 
         assertEquals(1L, communityId);
