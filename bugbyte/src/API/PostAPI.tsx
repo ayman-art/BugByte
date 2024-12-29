@@ -161,8 +161,9 @@ export const getQuestion = async (
           opName: data.answerOp || '',
           isDownVoted: data.answerIsDownVoted,
           isUpVoted: data.answerIsUpVoted,
-            isVerified: false,
-            enabledVerify: true,
+          isVerified: false,
+          enabledVerify: true,
+          canVerify: false,
         };
       }
   
@@ -189,7 +190,7 @@ export const getAnswer = async (answerId: string, token: string): Promise<any> =
         }
 
         const data = await response.json();
-        return data.answerId;
+        return data;
     } catch (error) {
         console.error('Error getting answer:', error);
         throw error;
@@ -606,6 +607,7 @@ export const getAnswersFromQuestion = async (
             isUpVoted: answer.isUpVoted,
             isVerified: false,
             enabledVerify: true,
+            canVerify: false,
         }));
     } catch (error) {
         console.error('Error getting answers:', error);
