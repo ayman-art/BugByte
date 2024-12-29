@@ -48,38 +48,36 @@ const Question: React.FC<QuestionProps> = ({
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  const token = localStorage.getItem('authToken');
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
-  
-  const token = localStorage.getItem('authToken');
 
- 
-    // Use useEffect to update the state when props change
-    useEffect(() => {
-      setCurrentUpvotes(upVotes);
-      setCurrentDownvotes(downVotes);
-      setVoteStatus(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
-    }, [questionId]); // Add questionId to dependencies
-  
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin;
+
+  useEffect(() => {
+    setCurrentUpvotes(upVotes);
+    setCurrentDownvotes(downVotes);
+    setVoteStatus(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
+  }, [questionId]);
+
 
   const handleUpvoteQuestion = async () => {
     if (voteStatus === 'upvoted') {
       await removeUpvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
       setVoteStatus('neutral');
-      console.log('FROM upvoted to neutral');
     } else if (voteStatus === 'downvoted') {
       await removeDownvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
       await upvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
-      console.log('FROM downvoted to upvoted');
     } else {
       await upvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
-      console.log('FROM neutral to upvoted');
     }
   };
 
@@ -88,19 +86,16 @@ const Question: React.FC<QuestionProps> = ({
       await removeDownvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
       setVoteStatus('neutral');
-      console.log('FROM downvoted to neutral');
     } else if (voteStatus === 'upvoted') {
       await removeUpvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
       await downvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
-      console.log('FROM upvoted to downvoted');
     } else {
       await downvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
-      console.log('FROM neutral to downvoted');
     }
   };
 
@@ -131,13 +126,11 @@ const Question: React.FC<QuestionProps> = ({
   };
 
   const handleEditSave = (postDetails: { content: string }) => {
-    console.log('Post edited:', postDetails);
+    // later
     setIsEditModalOpen(false);
   };
 
 
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin;
 
   return (
     <div className="question-container">
