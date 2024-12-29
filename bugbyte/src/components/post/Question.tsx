@@ -55,21 +55,21 @@ const Question: React.FC<QuestionProps> = ({
 
  
 
-  const handleUpvoteQuestion = () => {
+  const handleUpvoteQuestion = async () => {
     if (voteStatus === 'upvoted') {
-      removeUpvoteQuestion(questionId, token!);
+      await removeUpvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
       setVoteStatus('neutral');
       console.log('FROM upvoted to neutral');
     } else if (voteStatus === 'downvoted') {
-      removeDownvoteQuestion(questionId, token!);
+      await removeDownvoteQuestion(questionId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
-      upvoteQuestion(questionId, token!);
+      await upvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
       console.log('FROM downvoted to upvoted');
     } else {
-      upvoteQuestion(questionId, token!);
+      await upvoteQuestion(questionId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
       console.log('FROM neutral to upvoted');
