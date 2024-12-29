@@ -57,42 +57,42 @@ const Answer: React.FC<AnswerProps> = ({
   const isAdmin = localStorage.getItem('is_admin') === 'true';
   const token = localStorage.getItem('authToken');
 
-  const handleUpvoteAnswer = () => {
+  const handleUpvoteAnswer = async () => {
     if (voteStatus === 'upvoted') {
-      removeUpvoteAnswer(answerId, token!);
+      await removeUpvoteAnswer(answerId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
       setVoteStatus('neutral');
       console.log('FROM upvoted to neutral');
     } else if (voteStatus === 'downvoted') {
-      removeDownvoteAnswer(answerId, token!);
+      await removeDownvoteAnswer(answerId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
-      upvoteAnswer(answerId, token!);
+      await upvoteAnswer(answerId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
       console.log('FROM downvoted to upvoted');
     } else {
-      upvoteAnswer(answerId, token!);
+      await upvoteAnswer(answerId, token!);
       setCurrentUpvotes(currentUpvotes + 1);
       setVoteStatus('upvoted');
       console.log('FROM neutral to upvoted');
     }
   };
 
-  const handleDownvoteAnswer = () => {
+  const handleDownvoteAnswer = async () => {
     if (voteStatus === 'downvoted') {
-      removeDownvoteAnswer(answerId, token!);
+      await removeDownvoteAnswer(answerId, token!);
       setCurrentDownvotes(currentDownvotes - 1);
       setVoteStatus('neutral');
       console.log('FROM downvoted to neutral');
     } else if (voteStatus === 'upvoted') {
-      removeUpvoteAnswer(answerId, token!);
+      await removeUpvoteAnswer(answerId, token!);
       setCurrentUpvotes(currentUpvotes - 1);
-      downvoteAnswer(answerId, token!);
+      await downvoteAnswer(answerId, token!);
       setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
       console.log('FROM upvoted to downvoted');
     } else {
-      downvoteAnswer(answerId, token!);
+      await downvoteAnswer(answerId, token!);
       setCurrentDownvotes(currentDownvotes + 1);
       setVoteStatus('downvoted');
       console.log('FROM neutral to downvoted');
