@@ -38,12 +38,11 @@ const Answer: React.FC<AnswerProps> = ({
   isUpVoted,
   downVotes,
   isVerified = false,  // default to false if not provided
-  enabledVerify = true, // prop for enabling/disabling verify button
+  enabledVerify = false, // prop for enabling/disabling verify button
   onDelete,
   onVerify,
   onReplyOnAnswer,
 }) => {
-  console.log("isUpvoted:", isUpVoted)
   const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downVotes);
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
@@ -131,8 +130,7 @@ const Answer: React.FC<AnswerProps> = ({
 
   const canEdit = loggedInUsername === opName;
   const canDelete = loggedInUsername === opName || isAdmin;
-  console.log('isAdmin:', isAdmin);
-  console.log(loggedInUsername, opName);
+  // console.log(loggedInUsername, opName);
 
 
   return (

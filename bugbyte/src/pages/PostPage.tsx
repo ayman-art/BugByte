@@ -24,7 +24,7 @@ const PostPage: React.FC = () => {
   const [hasNextAnswers, setHasNextAnswers] = useState(true);
   const [hasNextReplies, setHasNextReplies] = useState<Map<string, boolean>>(new Map());
   const [questionLoading, setQuestionLoading] = useState(true);
-  const [verificationDone, setVerificationDone] = useState(false);
+  const [verifiedAnswerId, setVerifiedAnswerId] = useState<string | null>(null);
 
   const pageSize = 3;
   const token = localStorage.getItem('authToken');
@@ -40,12 +40,15 @@ const PostPage: React.FC = () => {
           return;
         }
         setQuestion(fetchedQuestion[0]);
-        
+        let currentVerifiedAnswerId: string | null = null;
         const initialAnswers = [];
-        if (fetchedQuestion[1]) {
+        if (fetchedQuestion[1]) { // If there is a verified answer
           initialAnswers.push({ ...fetchedQuestion[1], isVerified: true, enabledVerify: false });
+          console.log("Fetched", fetchedQuestion[1]);
+          console.log("Setting verifiedAnswerId to:", fetchedQuestion[1].answerId); // Add this debug log
+          currentVerifiedAnswerId = fetchedQuestion[1].answerId;
+          setVerifiedAnswerId(currentVerifiedAnswerId);
         }
-      
         const fetchedAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
         console.log(fetchedAnswers.length, pageSize, fetchedQuestion[1]);
       
@@ -63,11 +66,12 @@ const PostPage: React.FC = () => {
         const processedAnswers = nonDuplicates.map((answer) => ({
           ...answer,
           isVerified: false,
-          enabledVerify: !fetchedQuestion[1],
+          enabledVerify: (currentVerifiedAnswerId === null)
         }));
       
         // Combine initial answers with fetched answers
         setAnswers([...initialAnswers, ...processedAnswers]);
+        console.log("answers", answers)
         setHasNextAnswers(hasNext);
       
         // Fetch replies for each answer
@@ -100,26 +104,45 @@ const PostPage: React.FC = () => {
       
   }, [postId]);
 
+  useEffect(() => {
+    console.log("verifiedAnswerId changed to:", verifiedAnswerId); // Add this debug log
+    if (!verifiedAnswerId) {
+      return;
+    }
+    setAnswers((prev) => {
+      console.log("Current answers:", prev); // Add this debug log
+      const updatedAnswers = prev.map((answer) => {
+        if (answer.answerId === verifiedAnswerId) {
+          return { ...answer, verified: true, enabledVerify: false };
+        } else {
+          return { ...answer, verified: false, enabledVerify: false };
+        }
+      });
+      
+      console.log("Updated answers:", updatedAnswers); // Add this debug log
+      updatedAnswers.forEach((answer) => 
+        console.log("ennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnable verify", answer.enabledVerify)
+      );
+      
+      return updatedAnswers;
+    });
+  }, [verifiedAnswerId]);
   const fetchMoreAnswers = async () => {
     const newAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
     let addedAnswers = newAnswers.slice(0, pageSize);
     const hasNext = newAnswers.length > pageSize;
     
-
-    const hasVerifiedAnswer = answers.some((answer) => answer.isVerified);
-    if (hasVerifiedAnswer) {
-      const verifiedAnswer = answers.find((answer) => answer.isVerified);
+    if (verifiedAnswerId) {
       // Filter out the verified answer from fetched answers to prevent duplication
        addedAnswers = addedAnswers.filter(
-        (answer) => answer.answerId !== verifiedAnswer?.answerId
+        (answer) => answer.answerId !== verifiedAnswerId
       );
     }
-    const enableVerify = !hasVerifiedAnswer;
 
     addedAnswers.forEach((answer) => ({
       ...answer,
       isVerified: false,
-      enabledVerify: enableVerify
+      enabledVerify: !verifiedAnswerId
     }));
 
     const nextReplies = new Map<string, boolean>();
@@ -237,6 +260,7 @@ const PostPage: React.FC = () => {
   const onVerify = async (answerId: string) => {
 
     await verifyAnswer(answerId, token!);
+    setVerifiedAnswerId(answerId);
     setAnswers((prev) =>
       prev.map((answer) => {
         if (answer.answerId === answerId) {
