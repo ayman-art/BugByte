@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaReply } from 'react-icons/fa';
-import { IQuestion } from '../../types/index'
+import { IAnswer, IQuestion } from '../../types/index'
 import { MDXEditor, 
   headingsPlugin,
   listsPlugin,
@@ -19,10 +19,11 @@ import { MDXEditor,
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
-import { downvoteQuestion, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
+import { downvoteQuestion, postAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
   onDelete: (questionId: string) => void;
+  onReply: (answer: IAnswer) => void;
 }
 const Question: React.FC<QuestionProps> = ({
   questionId,
@@ -37,7 +38,8 @@ const Question: React.FC<QuestionProps> = ({
   postedOn,
   communityName,
   communityId,
-  onDelete
+  onDelete,
+  onReply
   
 }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
@@ -99,9 +101,22 @@ const Question: React.FC<QuestionProps> = ({
     navigate(`/Profile/${opName}`);
   };
 
-  const handleReplySave = (postDetails: { content: string }) => {
+  const handleReplySave = async (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
-    // Add functionality to save reply here
+    const answerId = await postAnswer(postDetails.content, questionId, token!);
+    onReply({
+      answerId,
+      questionId,
+      opName: loggedInUsername,
+      postedOn: new Date().toLocaleString(),
+      upVotes: 0,
+      mdContent: postDetails.content,
+      isDownVoted: false,
+      isUpVoted: false,
+      downVotes: 0,
+      isVerified: false,
+      enabledVerify: false,
+    });
   };
 
   const handleEditSave = (postDetails: { content: string }) => {

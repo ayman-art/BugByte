@@ -169,6 +169,10 @@ const PostPage: React.FC = () => {
       return newHasNextReplies;
     });
   };
+
+  const onAnswerQuestion = (answer: IAnswer): void => {
+    setAnswers((prev) => [...prev, answer]);
+  }
   
   const onDelteQuestion = async (questionId: string) => {
     await deleteQuestion(questionId, token!);
@@ -233,7 +237,7 @@ const PostPage: React.FC = () => {
 
   return (
     <div className="post-page">
-      <Question {...question} onDelete={onDelteQuestion} />
+      <Question {...question} onDelete={onDelteQuestion} onReply = {onAnswerQuestion} />
       <div className="answers-section">
         {answers.map((answer) => (
           <div key={answer.answerId} className="answer-container">
