@@ -139,6 +139,7 @@ export const getQuestion = async (
       }
   
       const data = await response.json();
+      console.log(data);
       const tags = data.tags || []; // Handle null tags
   
       // Construct the question object
