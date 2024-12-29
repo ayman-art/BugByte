@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaReply } from 'react-icons/fa';
 import { IAnswer, IQuestion } from '../../types/index'
@@ -54,6 +54,13 @@ const Question: React.FC<QuestionProps> = ({
   const token = localStorage.getItem('authToken');
 
  
+    // Use useEffect to update the state when props change
+    useEffect(() => {
+      setCurrentUpvotes(upVotes);
+      setCurrentDownvotes(downVotes);
+      setVoteStatus(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
+    }, [questionId]); // Add questionId to dependencies
+  
 
   const handleUpvoteQuestion = async () => {
     if (voteStatus === 'upvoted') {
