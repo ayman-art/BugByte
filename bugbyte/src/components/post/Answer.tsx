@@ -62,9 +62,9 @@ const Answer: React.FC<AnswerProps> = ({
     if (voteStatus === 'upvoted') {
       await handleUpvoteFromUpvoted();
     } else if (voteStatus === 'downvoted') {
-      handleUpvoteFromDownvoted();
+      await handleUpvoteFromDownvoted();
     } else {
-      handleUpvoteFromNeutral();
+      await handleUpvoteFromNeutral();
     }
   };
 
@@ -79,7 +79,7 @@ const Answer: React.FC<AnswerProps> = ({
     setCurrentDownvotes(currentDownvotes - 1);
     await upvoteAnswer(answerId, token!);
     setCurrentUpvotes(currentUpvotes + 1);
-    console.log('FROM downvoted to upvoted');
+    setVoteStatus('upvoted');
   }
 
   const handleUpvoteFromNeutral = async () => {
@@ -92,21 +92,33 @@ const Answer: React.FC<AnswerProps> = ({
 
   const handleDownvoteAnswer = async () => {
     if (voteStatus === 'downvoted') {
-      await removeDownvoteAnswer(answerId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
-      setVoteStatus('neutral');
+      await handleDownvoteFromDownvoted();
     } else if (voteStatus === 'upvoted') {
-      await removeUpvoteAnswer(answerId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
-      await downvoteAnswer(answerId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
-      setVoteStatus('downvoted');
+      await handleDownvoteFromUpvoted();
     } else {
-      await downvoteAnswer(answerId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
-      setVoteStatus('downvoted');
+      await handleDownvoteFromNeutral();
     }
   };
+
+  const handleDownvoteFromDownvoted = async () => {
+    await removeDownvoteAnswer(answerId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    setVoteStatus('neutral');
+  }
+
+  const handleDownvoteFromUpvoted = async () => {
+    await removeUpvoteAnswer(answerId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    await downvoteAnswer(answerId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  }
+
+  const handleDownvoteFromNeutral = async () => {
+    await downvoteAnswer(answerId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  }
 
 
   const handleReplySave = async (postDetails: { content: string }) => {
