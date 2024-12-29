@@ -23,12 +23,21 @@ const PostPage: React.FC = () => {
   const [replies, setReplies] = useState<Map<string, IReply[]>>(new Map());
   const [hasNextAnswers, setHasNextAnswers] = useState(true);
   const [hasNextReplies, setHasNextReplies] = useState<Map<string, boolean>>(new Map());
+  const [questionLoading, setQuestionLoading] = useState(true);
+
   const pageSize = 3;
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
+    let fetchedQuestion: [IQuestion, IAnswer | null] | null;
       const fetchQuestion = async () => {
-        const fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
+        try {
+         fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
+        } catch (error) {
+          console.error(error);
+          setQuestionLoading(false);
+          return;
+        }
         setQuestion(fetchedQuestion[0]);
         
         const initialAnswers = [];
@@ -83,6 +92,7 @@ const PostPage: React.FC = () => {
       };
       
       fetchQuestion();
+      
       
   }, [postId]);
 
@@ -183,7 +193,10 @@ const PostPage: React.FC = () => {
   };
 
   if (!question) {
-    return <p>Question not found.</p>;
+    return <>
+    {questionLoading && <div>Loading...</div>}
+    {!questionLoading && <div>Question not found</div>}
+    </>;
   }
 
   const onDeleteReply = async (replyId: string, answerId: string) => {

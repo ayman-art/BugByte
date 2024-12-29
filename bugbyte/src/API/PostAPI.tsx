@@ -134,8 +134,8 @@ export const getQuestion = async (
       });
   
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to get question');
+        const errorData = await response.text();
+        throw new Error(errorData || 'Failed to get question');
       }
   
       const data = await response.json();
