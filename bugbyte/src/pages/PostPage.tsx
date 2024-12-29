@@ -171,7 +171,7 @@ const PostPage: React.FC = () => {
   };
 
   const onAnswerQuestion = (answer: IAnswer): void => {
-    setAnswers((prev) => [...prev, answer]);
+    setAnswers((prev) => [answer, ...prev]);
   }
   
   const onDelteQuestion = async (questionId: string) => {
