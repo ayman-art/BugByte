@@ -110,6 +110,13 @@ const Question: React.FC<QuestionProps> = ({
 
   const handleReplySave = async (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
+    if (!token || !loggedInUsername) {
+      alert('No auth token found. Please log in.');
+      return;
+    } else if (!postDetails.content || postDetails.content.trim() === '') {
+      alert('Answer content cannot be empty.');
+      return;
+    }
     const answerId = await postAnswer(postDetails.content, questionId, token!);
     onReply({
       answerId,
