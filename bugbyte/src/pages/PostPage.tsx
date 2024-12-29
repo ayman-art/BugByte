@@ -30,6 +30,7 @@ const PostPage: React.FC = () => {
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
+    setVerifiedAnswerId(null);
     let fetchedQuestion: [IQuestion, IAnswer | null] | null;
       const fetchQuestion = async () => {
         try {
