@@ -7,17 +7,10 @@ import Reply from '../components/post/Reply';
 import '../styles/PostPage.css';
 import { deleteAnswer, deleteQuestion, deleteReply, getAnswersFromQuestion, getQuestion, getRepliesFromAnswer, verifyAnswer } from '../API/PostAPI';
 import { IQuestion, IAnswer, IReply } from '../types/index';
-interface QuestionProps  extends IQuestion {
-  onDelete: (questionId: string) => void;
-}
-
-
-
 
 
 const PostPage: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
-
   const [question, setQuestion] = useState<IQuestion | null>(null);
   const [answers, setAnswers] = useState<IAnswer[]>([]);
   const [replies, setReplies] = useState<Map<string, IReply[]>>(new Map());
@@ -46,7 +39,7 @@ const PostPage: React.FC = () => {
         const [question, verifiedAnswer] = fetchedQuestion;
         setQuestion(question);
         const initialAnswers = [];
-        if (verifiedAnswer) { // If there is a verified answer
+        if (verifiedAnswer) {
           initialAnswers.push(verifiedAnswer);
           setVerifiedAnswerId(verifiedAnswer.answerId);
         }
@@ -89,18 +82,14 @@ const PostPage: React.FC = () => {
     
 
     const nextReplies = new Map<string, boolean>();
-      
-    // Loop over each answer to fetch its replies
     for (const answer of addedAnswers) {
       const fetchedReplies = await getRepliesFromAnswer(answer.answerId, token!, 0, pageSize + 1);
-  
-      // Check if there are more replies beyond the current page
       const hasMoreReplies = fetchedReplies.length > pageSize;
       nextReplies.set(answer.answerId, hasMoreReplies);
   
       setReplies((prev) => {
         const newReplies = new Map(prev);
-        newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize)); // Store replies for this answer
+        newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize));
         return newReplies;
       });
     }
@@ -113,26 +102,17 @@ const PostPage: React.FC = () => {
   
 
   const fetchMoreReplies = async (answerId: string) => {
-    // Get the current replies for the specific answerId
     const currentReplies = replies.get(answerId) || [];
-  
-    // Fetch the next set of replies for the given answerId
     const newReplies = await getRepliesFromAnswer(answerId, token!, currentReplies.length, pageSize + 1);
-  
-    // Add only up to pageSize replies to avoid excess
     const addedReplies = newReplies.slice(0, pageSize);
-  
-    // Check if there are more replies beyond the current page
     const hasNext = newReplies.length > pageSize;
   
-    // Update the replies state to include the new replies
     setReplies((prev) => {
       const newRepliesMap = new Map(prev);
       newRepliesMap.set(answerId, [...currentReplies, ...addedReplies]);
       return newRepliesMap;
     });
   
-    // Update the hasNextReplies state to keep track of whether there are more replies
     setHasNextReplies((prev) => {
       const newHasNextReplies = new Map(prev);
       newHasNextReplies.set(answerId, hasNext);
@@ -141,7 +121,7 @@ const PostPage: React.FC = () => {
   };
 
   const onAnswerQuestion = (answer: IAnswer): void => {
-    setAnswers((prev) => [{...answer, enabledVerify: true}, ...prev])
+    setAnswers((prev) => [answer, ...prev]);
   }
 
   const onReplyonAnswer = (reply: IReply): void => {
@@ -184,36 +164,19 @@ const PostPage: React.FC = () => {
   }
 
   const onDeleteReply = async (replyId: string, answerId: string) => {
-    // Delete the reply from the API
     await deleteReply(replyId, token!);
 
-    // Update the replies state to remove the deleted reply
     setReplies((prev) => {
       const newReplies = new Map(prev);
-      console.log("NEW",newReplies);
-      console.log("answerId",answerId)
       const currentReplies = newReplies.get(answerId) || [];
-      console.log("D",currentReplies)
       newReplies.set(answerId, currentReplies.filter((reply) => reply.replyId !== replyId));
       return newReplies;
-    }
-    );
+    });
   }
 
   const onVerify = async (answerId: string) => {
-
     await verifyAnswer(answerId, token!);
     setVerifiedAnswerId(answerId);
-    setAnswers((prev) =>
-      prev.map((answer) => {
-        if (answer.answerId === answerId) {
-          return { ...answer, verified: true, enabledVerify: false };
-        } else {
-          return { ...answer, verified: false, enabledVerify: false };
-        }
-        return answer;
-      })
-    );
   };
 
   return (
@@ -248,199 +211,5 @@ const PostPage: React.FC = () => {
   );
 };
 
-// Mock Data (unchanged)
-const questionsEx: QuestionProps[] = [
-  {
-    postId: '1',
-    title: 'TITLEEEE',
-    questionText: `
-      # h1 Heading 8-)
-      ## h2 Heading
-      ### h3 Heading
-      #### h4 Heading
-      ##### h5 Heading
-      ###### h6 Heading
 
-      ## Horizontal Rules
-      ![Minion](https://octodex.github.com/images/minion.png)
-    `,
-    tags: ['React', 'JavaScript', 'Frontend'],
-    upvotes: 10,
-    downvotes: 2,
-    opName: 'Ayman Algamal',
-    date: '2024-12-07',
-    communityId: '123',
-    communityName: 'React Community',
-  },
-  {
-    postId: '2',
-    title: 'TITLEEEE',
-    questionText: 'Here We should display the MD file with all of its content.',
-    tags: ['State Management', 'React', 'Hooks'],
-    upvotes: 15,
-    downvotes: 3,
-    opName: 'Jane Smith',
-    date: '2024-12-06',
-    communityId: '456',
-    communityName: 'React Developers',
-  },
-];
-
-const answersEx: AnswerProps[] = [
-  {
-    id: '1',
-    postId: '1',
-    text: 'React is a JavaScript library for building user interfaces.',
-    upvotes: 5,
-    downvotes: 1,
-    opName: 'JohnDoe',
-    date: '2024-12-07',
-  },
-  {
-    id: '2',
-    postId: '1',
-    text: 'It uses a virtual DOM to efficiently update the UI.',
-    upvotes: 3,
-    downvotes: 0,
-    opName: 'Ayman Algamal',
-    date: '2024-12-07',
-  },
-  {
-    id: '3',
-    postId: '1',
-    text: 'It usesss a virtual DOM to efficiently update the UI.',
-    upvotes: 3,
-    downvotes: 0,
-    opName: 'Ayman Algamal',
-    date: '2024-12-07',
-  },
-  {
-    id: '4',
-    postId: '1',
-    text: 'It usesssssss a virtual DOM to efficiently update the UI.',
-    upvotes: 3,
-    downvotes: 0,
-    opName: 'Ayman Algamal',
-    date: '2024-12-07',
-  },
-  {
-    id: '5',
-    postId: '2',
-    text: 'It usesss a virtual DOM to efficiently update the UI to ans2.',
-    upvotes: 3,
-    downvotes: 0,
-    opName: 'Ayman Algamal',
-    date: '2024-12-07',
-  },
-  {
-    id: '6',
-    postId: '2',
-    text: 'It usesssssss a virtual DOM to efficiently update the UI to ans2.',
-    upvotes: 3,
-    downvotes: 0,
-    opName: 'Ayman Algamal',
-    date: '2024-12-07',
-  },
-  {
-    id: '7',
-    postId: '2',
-    text: 'It usesss a virtual DOM to efficiently update the UI to ans4.',
-    upvotes: 3,
-    downvotes: 0,
-    opName: 'Ayman Algamal',
-    date: '2024-12-07',
-  },
-  {
-    id: '8',
-    postId: '2',
-    text: 'It usesssssss a virtual DOM to efficiently update the UI to ans4.',
-    upvotes: 3,
-    downvotes: 0,
-    opName: 'Ayman Algamal',
-    date: '2024-12-07',
-  },
-];
-
-const repliesEx: { [key: string]: ReplyProps[] } =
-  {
-    "1": [
-      {
-        id: '1',
-        answerId: '1',
-        text: 'React is a JavaScript library for building user interfaces.',
-        upvotes: 5,
-        downvotes: 1,
-        opName: 'JohnDoe',
-        date: '2024-12-07',
-      },
-      {
-        id: '2',
-        answerId: '1',
-        text: 'It uses a virtual DOM to efficiently update the UI.',
-        upvotes: 3,
-        downvotes: 0,
-        opName: 'Ayman Algamal',
-        date: '2024-12-07',
-      },
-     
-    ],
-    "2": [
-      {
-        id: '5',
-        answerId: '2',
-        text: 'It usesss a virtual DOM to efficiently update the UI to ans2.',
-        upvotes: 3,
-        downvotes: 0,
-        opName: 'Ayman Algamal',
-        date: '2024-12-07',
-      },
-      {
-        id: '6',
-        answerId: '2',
-        text: 'It usesssssss a virtual DOM to efficiently update the UI to ans2.',
-        upvotes: 3,
-        downvotes: 0,
-        opName: 'Ayman Algamal',
-        date: '2024-12-07',
-      },
-      {
-        id: '8',
-        answerId: '2',
-        text: 'It usesssssss a virtual DOM to efficiently update the UI to ans4.',
-        upvotes: 3,
-        downvotes: 0,
-        opName: 'Ayman Algamal',
-        date: '2024-12-07',
-      },
-    ],
-    "4": [
-      {
-        id: '7',
-        answerId: '4',
-        text: 'It usesss a virtual DOM to efficiently update the UI to ans4.',
-        upvotes: 3,
-        downvotes: 0,
-        opName: 'Ayman Algamal',
-        date: '2024-12-07',
-      },
-      {
-        id: '8',
-        answerId: '4',
-        text: 'It usesssssss a virtual DOM to efficiently update the UI to ans4.',
-        upvotes: 3,
-        downvotes: 0,
-        opName: 'Ayman Algamal',
-        date: '2024-12-07',
-      },
-      {
-        id: '8',
-        answerId: '4',
-        text: 'It usesssssss a virtual DOM to efficiently update the UI to ans4.',
-        upvotes: 3,
-        downvotes: 0,
-        opName: 'Ayman Algamal',
-        date: '2024-12-07',
-      },
-    ]
-  };
 export default PostPage;
