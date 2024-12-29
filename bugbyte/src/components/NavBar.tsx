@@ -62,35 +62,48 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   };
 
   const handleSavePost = async (postDetails: PostDetails) => {
-    // Close modal and navigate to the newly created post
     try {
       const token = localStorage.getItem('authToken');
       if (!token) {
-        console.error('No auth token found');
+        alert('No auth token found. Please log in.');
         return;
       }
-
+  
+      // Validation
+      const errors = [];
+      if (!postDetails.title || postDetails.title.trim() === '') {
+        errors.push('Title cannot be empty.');
+      }
+      if (!postDetails.content || postDetails.content.trim() === '') {
+        errors.push('Body cannot be empty.');
+      }
       if (!postDetails.communityId) {
-        console.error('Community ID is required');
+        errors.push('Community ID is required.');
+      }
+  
+      if (errors.length > 0) {
+        alert(errors.join('\n'));
         return;
       }
-
+  
+      // Save the post
       const id = await postQuestion(
         postDetails.content,
-        postDetails.title || '',
+        postDetails.title,
         postDetails.tags || [],
         postDetails.communityId,
         token
       );
-
+  
       navigate(`/Posts/${id}`);
     } catch (error) {
       console.error('Error saving post:', error);
+      alert('An error occurred while saving the post. Please try again.');
+    } finally {
+      setShowModal(false);
     }
-    setShowModal(false);
-    
   };
-
+  
   const handleUpdateProfilePicture = async (url: string) => {
     try {
       const token = localStorage.getItem('authToken');
