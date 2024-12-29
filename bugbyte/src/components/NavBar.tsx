@@ -63,6 +63,30 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
 
   const handleSavePost = async (postDetails: PostDetails) => {
     // Close modal and navigate to the newly created post
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('No auth token found');
+        return;
+      }
+
+      if (!postDetails.communityId) {
+        console.error('Community ID is required');
+        return;
+      }
+
+      const id = await postQuestion(
+        postDetails.content,
+        postDetails.title || '',
+        postDetails.tags || [],
+        postDetails.communityId,
+        token
+      );
+
+      navigate(`/Posts/${id}`);
+    } catch (error) {
+      console.error('Error saving post:', error);
+    }
     setShowModal(false);
     
   };

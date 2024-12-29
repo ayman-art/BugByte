@@ -103,32 +103,8 @@ const PostModal: React.FC<PostModalProps> = ({
     if (type === 'full') {
       postDetails.communityId = selectedCommunity;
     }
-    try {
-          const token = localStorage.getItem('authToken');
-          if (!token) {
-            console.error('No auth token found');
-            return;
-          }
     
-          if (!postDetails.communityId) {
-            console.error('Community ID is required');
-            return;
-          }
-    
-          const id = await postQuestion(
-            postDetails.content,
-            postDetails.title || '',
-            postDetails.tags || [],
-            postDetails.communityId,
-            token
-          );
-    
-          navigate(`/Posts/${id}`);
-        } catch (error) {
-          console.error('Error saving post:', error);
-          // Optionally, show an error message to the user
-        }
-    //onSave(postDetails);
+    onSave(postDetails);
     clearPost();
     onClose();
   };
