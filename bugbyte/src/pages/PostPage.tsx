@@ -176,6 +176,16 @@ const PostPage: React.FC = () => {
   const onAnswerQuestion = (answer: IAnswer): void => {
     setAnswers((prev) => [answer, ...prev]);
   }
+
+  const onReplyonAnswer = (reply: IReply): void => {
+    const answerId = reply.answerId;
+    setReplies((prev) => {
+      const newReplies = new Map(prev);
+      const currentReplies = newReplies.get(answerId) || [];
+      newReplies.set(answerId, [reply, ...currentReplies]);
+      return newReplies;
+    });
+  }
   
   const onDelteQuestion = async (questionId: string) => {
     await deleteQuestion(questionId, token!);
@@ -244,7 +254,7 @@ const PostPage: React.FC = () => {
       <div className="answers-section">
         {answers.map((answer) => (
           <div key={answer.answerId} className="answer-container">
-            <Answer {...answer} onDelete={onDeleteAnswer} onVerify={onVerify} />
+            <Answer {...answer} onDelete={onDeleteAnswer} onVerify={onVerify} onReplyOnAnswer={onReplyonAnswer} />
             <div className="replies-section">
               {(replies.get(answer.answerId) || []).map((reply) => (
                 <div key={reply.replyId} className="reply-container">

@@ -19,12 +19,13 @@ import {
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
-import { IAnswer } from '../../types';
-import { downvoteAnswer, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
+import { IAnswer, IReply } from '../../types';
+import { downvoteAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
 
 interface AnswerProps extends IAnswer {
   onDelete: (answerId: string) => void;
   onVerify: (answerId: string) => void;
+  onReplyOnAnswer: (reply: IReply) => void;
 }
 const Answer: React.FC<AnswerProps> = ({
   answerId,
@@ -40,6 +41,7 @@ const Answer: React.FC<AnswerProps> = ({
   enabledVerify = true, // prop for enabling/disabling verify button
   onDelete,
   onVerify,
+  onReplyOnAnswer,
 }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downVotes);
@@ -100,8 +102,17 @@ const Answer: React.FC<AnswerProps> = ({
     navigate(`/Profile/${opName}`);
   };
 
-  const handleReplySave = (postDetails: { content: string }) => {
-    console.log('Reply posted:', postDetails);
+  const handleReplySave = async (postDetails: { content: string }) => {
+    console.log('Reply saved:', postDetails);
+    const replyId = await postReply(postDetails.content, answerId, token!);
+    onReplyOnAnswer({
+      replyId,
+      answerId,
+      opName: loggedInUsername,
+      postedOn: new Date().toLocaleString('en-US'),
+      mdContent: postDetails.content,
+    });
+
     setIsReplyModalOpen(false);
   };
 
