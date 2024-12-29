@@ -61,11 +61,7 @@ const PostPage: React.FC = () => {
         );
       
         // Mark other answers as not verified
-        const processedAnswers = nonDuplicates.map((answer) => ({
-          ...answer,
-          isVerified: false,
-          enabledVerify: (verifiedAnswerId === null)
-        }));
+        const processedAnswers = nonDuplicates;
       
         // Combine initial answers with fetched answers
         setAnswers([...initialAnswers, ...processedAnswers]);
@@ -127,24 +123,9 @@ const PostPage: React.FC = () => {
   // }, [verifiedAnswerId]);
   const fetchMoreAnswers = async () => {
     const newAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
-    let addedAnswers = newAnswers.slice(0, pageSize);
+    const addedAnswers = newAnswers.slice(0, pageSize);
     const hasNext = newAnswers.length > pageSize;
     
-    if (verifiedAnswerId) {
-      // Filter out the verified answer from fetched answers to prevent duplication
-
-       addedAnswers = addedAnswers.filter(
-        (answer) => answer.answerId !== verifiedAnswerId
-      );
-    }
-
-    console.log("bnnnnnnnnnnnnnnnnnnmot hna", verifiedAnswerId, verifiedAnswerId === null)
-
-    addedAnswers.forEach((answer) => ({
-      ...answer,
-      isVerified: false,
-      enabledVerify: (verifiedAnswerId === null)
-    }));
 
     const nextReplies = new Map<string, boolean>();
       
