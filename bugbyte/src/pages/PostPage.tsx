@@ -31,8 +31,10 @@ const PostPage: React.FC = () => {
 
   useEffect(() => {
     setVerifiedAnswerId(null);
-    let fetchedQuestion: [IQuestion, IAnswer | null] | null;
-      const fetchQuestion = async () => {
+
+    const fetchQuestion = async () => {
+
+        let fetchedQuestion: [IQuestion, IAnswer | null] | null;
         try {
          fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
         } catch (error) {
@@ -40,57 +42,38 @@ const PostPage: React.FC = () => {
           setQuestionLoading(false);
           return;
         }
-        setQuestion(fetchedQuestion[0]);
+
+        const [question, verifiedAnswer] = fetchedQuestion;
+        setQuestion(question);
         const initialAnswers = [];
-        if (fetchedQuestion[1]) { // If there is a verified answer
-          initialAnswers.push({ ...fetchedQuestion[1], isVerified: true, enabledVerify: false });
-          console.log("Fetched", fetchedQuestion[1]);
-          console.log("Setting verifiedAnswerId to:", fetchedQuestion[1].answerId); // Add this debug log
-          setVerifiedAnswerId(fetchedQuestion[1].answerId)
+        if (verifiedAnswer) { // If there is a verified answer
+          initialAnswers.push(verifiedAnswer);
+          setVerifiedAnswerId(verifiedAnswer.answerId);
         }
+
         const fetchedAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
-        console.log(fetchedAnswers.length, pageSize, fetchedQuestion[1]);
-      
         const hasNext = fetchedAnswers.length > pageSize;
-        if (hasNext) {
+        if (hasNext)
           fetchedAnswers.pop();
-        }
-      
-        // Filter out the verified answer from fetched answers to prevent duplication
         const nonDuplicates = fetchedAnswers.filter(
-          (answer) => !fetchedQuestion[1] || answer.answerId !== fetchedQuestion[1].answerId
+          (answer) => answer.answerId !== verifiedAnswer?.answerId
         );
-      
-        // Mark other answers as not verified
-        const processedAnswers = nonDuplicates;
-      
-        // Combine initial answers with fetched answers
-        setAnswers([...initialAnswers, ...processedAnswers]);
-        console.log("answers", answers)
+        setAnswers([...initialAnswers, ...nonDuplicates]);
         setHasNextAnswers(hasNext);
       
-        // Fetch replies for each answer
         const nextReplies = new Map<string, boolean>();
-      
-        // Loop over each answer to fetch its replies
-        for (const answer of processedAnswers) {
+        for (const answer of [...initialAnswers, ...nonDuplicates]) {
           const fetchedReplies = await getRepliesFromAnswer(answer.answerId, token!, 0, pageSize + 1);
-      
-          // Check if there are more replies beyond the current page
           const hasMoreReplies = fetchedReplies.length > pageSize;
           nextReplies.set(answer.answerId, hasMoreReplies);
-      
           setReplies((prev) => {
             const newReplies = new Map(prev);
             newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize)); // Store replies for this answer
             return newReplies;
           });
         }
-      
-        console.log("HW",replies)
         setHasNextReplies(nextReplies);
 
-        
         setQuestionLoading(false);
       };
       
@@ -99,29 +82,6 @@ const PostPage: React.FC = () => {
       
   }, [postId]);
 
-  // useEffect(() => {
-  //   console.log("verifiedAnswerId changed to:", verifiedAnswerId); // Add this debug log
-  //   if (!verifiedAnswerId) {
-  //     return;
-  //   }
-  //   setAnswers((prev) => {
-  //     console.log("Current answers:", prev); // Add this debug log
-  //     const updatedAnswers = prev.map((answer) => {
-  //       if (answer.answerId === verifiedAnswerId) {
-  //         return { ...answer, verified: true, enabledVerify: false };
-  //       } else {
-  //         return { ...answer, verified: false, enabledVerify: false };
-  //       }
-  //     });
-      
-  //     console.log("Updated answers:", updatedAnswers); // Add this debug log
-  //     updatedAnswers.forEach((answer) => 
-  //       console.log("ennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnable verify", answer.enabledVerify)
-  //     );
-      
-  //     return updatedAnswers;
-  //   });
-  // }, [verifiedAnswerId]);
   const fetchMoreAnswers = async () => {
     const newAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
     const addedAnswers = newAnswers.slice(0, pageSize);
