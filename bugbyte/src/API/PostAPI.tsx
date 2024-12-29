@@ -159,8 +159,8 @@ export const getQuestion = async (
           downVotes: data.answerDownVotes || 0,
           postedOn: data.answerPostedOn || '',
           opName: data.answerOp || '',
-          isDownVoted: data.answerIsUpvoted,
-          isUpVoted: data.answerIsDownvoted,
+          isDownVoted: data.answerIsDownVoted,
+          isUpVoted: data.answerIsUpVoted,
             isVerified: false,
             enabledVerify: true,
         };
