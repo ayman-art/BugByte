@@ -56,7 +56,7 @@ const PostModal: React.FC<PostModalProps> = ({
   type = 'full',
   initialData
 }) => {
-  const [markdown, setMarkdown] = useState(`
+  const [markdown, setMarkdown] = useState(initialData?.content || `
       Title!
       ---
       content
@@ -64,7 +64,6 @@ const PostModal: React.FC<PostModalProps> = ({
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState<string>('');
   const [selectedCommunity, setSelectedCommunity] = useState<number>(initialData?.communityId!);
-  const [postContent, setPostContent] = useState<string>(initialData?.content || '');
   const [postTitle, setPostTitle] = useState<string>(initialData?.title || '');
  const navigate = useNavigate();
   
@@ -89,7 +88,11 @@ const PostModal: React.FC<PostModalProps> = ({
     setTagInput('');
     setTags(initialData?.tags || []);
     setSelectedCommunity(initialData?.communityId!);
-    setPostContent(initialData?.content || '');
+    setMarkdown(initialData?.content || `
+      Title!
+      ---
+      content
+      `);
     setPostTitle(initialData?.title || '');
   }
 
