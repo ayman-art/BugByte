@@ -38,7 +38,7 @@ const Answer: React.FC<AnswerProps> = ({
   isUpVoted,
   downVotes,
   isVerified = false,  // default to false if not provided
-  enabledVerify = false, // prop for enabling/disabling verify button
+  enabledVerify = true, // prop for enabling/disabling verify button
   onDelete,
   onVerify,
   onReplyOnAnswer,

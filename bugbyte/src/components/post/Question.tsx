@@ -129,7 +129,7 @@ const Question: React.FC<QuestionProps> = ({
       isUpVoted: false,
       downVotes: 0,
       isVerified: false,
-      enabledVerify: false,
+      enabledVerify: true
     });
   };
 

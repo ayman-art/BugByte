@@ -40,14 +40,12 @@ const PostPage: React.FC = () => {
           return;
         }
         setQuestion(fetchedQuestion[0]);
-        let currentVerifiedAnswerId: string | null = null;
         const initialAnswers = [];
         if (fetchedQuestion[1]) { // If there is a verified answer
           initialAnswers.push({ ...fetchedQuestion[1], isVerified: true, enabledVerify: false });
           console.log("Fetched", fetchedQuestion[1]);
           console.log("Setting verifiedAnswerId to:", fetchedQuestion[1].answerId); // Add this debug log
-          currentVerifiedAnswerId = fetchedQuestion[1].answerId;
-          setVerifiedAnswerId(currentVerifiedAnswerId);
+          setVerifiedAnswerId(fetchedQuestion[1].answerId)
         }
         const fetchedAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
         console.log(fetchedAnswers.length, pageSize, fetchedQuestion[1]);
@@ -66,7 +64,7 @@ const PostPage: React.FC = () => {
         const processedAnswers = nonDuplicates.map((answer) => ({
           ...answer,
           isVerified: false,
-          enabledVerify: (currentVerifiedAnswerId === null)
+          enabledVerify: (verifiedAnswerId === null)
         }));
       
         // Combine initial answers with fetched answers
@@ -104,29 +102,29 @@ const PostPage: React.FC = () => {
       
   }, [postId]);
 
-  useEffect(() => {
-    console.log("verifiedAnswerId changed to:", verifiedAnswerId); // Add this debug log
-    if (!verifiedAnswerId) {
-      return;
-    }
-    setAnswers((prev) => {
-      console.log("Current answers:", prev); // Add this debug log
-      const updatedAnswers = prev.map((answer) => {
-        if (answer.answerId === verifiedAnswerId) {
-          return { ...answer, verified: true, enabledVerify: false };
-        } else {
-          return { ...answer, verified: false, enabledVerify: false };
-        }
-      });
+  // useEffect(() => {
+  //   console.log("verifiedAnswerId changed to:", verifiedAnswerId); // Add this debug log
+  //   if (!verifiedAnswerId) {
+  //     return;
+  //   }
+  //   setAnswers((prev) => {
+  //     console.log("Current answers:", prev); // Add this debug log
+  //     const updatedAnswers = prev.map((answer) => {
+  //       if (answer.answerId === verifiedAnswerId) {
+  //         return { ...answer, verified: true, enabledVerify: false };
+  //       } else {
+  //         return { ...answer, verified: false, enabledVerify: false };
+  //       }
+  //     });
       
-      console.log("Updated answers:", updatedAnswers); // Add this debug log
-      updatedAnswers.forEach((answer) => 
-        console.log("ennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnable verify", answer.enabledVerify)
-      );
+  //     console.log("Updated answers:", updatedAnswers); // Add this debug log
+  //     updatedAnswers.forEach((answer) => 
+  //       console.log("ennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnable verify", answer.enabledVerify)
+  //     );
       
-      return updatedAnswers;
-    });
-  }, [verifiedAnswerId]);
+  //     return updatedAnswers;
+  //   });
+  // }, [verifiedAnswerId]);
   const fetchMoreAnswers = async () => {
     const newAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
     let addedAnswers = newAnswers.slice(0, pageSize);
@@ -134,15 +132,18 @@ const PostPage: React.FC = () => {
     
     if (verifiedAnswerId) {
       // Filter out the verified answer from fetched answers to prevent duplication
+
        addedAnswers = addedAnswers.filter(
         (answer) => answer.answerId !== verifiedAnswerId
       );
     }
 
+    console.log("bnnnnnnnnnnnnnnnnnnmot hna", verifiedAnswerId, verifiedAnswerId === null)
+
     addedAnswers.forEach((answer) => ({
       ...answer,
       isVerified: false,
-      enabledVerify: !verifiedAnswerId
+      enabledVerify: (verifiedAnswerId === null)
     }));
 
     const nextReplies = new Map<string, boolean>();
@@ -198,7 +199,7 @@ const PostPage: React.FC = () => {
   };
 
   const onAnswerQuestion = (answer: IAnswer): void => {
-    setAnswers((prev) => [answer, ...prev]);
+    setAnswers((prev) => [{...answer, enabledVerify: true}, ...prev])
   }
 
   const onReplyonAnswer = (reply: IReply): void => {
@@ -279,7 +280,8 @@ const PostPage: React.FC = () => {
       <div className="answers-section">
         {answers.map((answer) => (
           <div key={answer.answerId} className="answer-container">
-            <Answer {...answer} onDelete={onDeleteAnswer} onVerify={onVerify} onReplyOnAnswer={onReplyonAnswer} />
+            <Answer {...answer} enabledVerify = {verifiedAnswerId === null} isVerified = {verifiedAnswerId == answer.answerId}
+             onDelete={onDeleteAnswer} onVerify={onVerify} onReplyOnAnswer={onReplyonAnswer} />
             <div className="replies-section">
               {(replies.get(answer.answerId) || []).map((reply) => (
                 <div key={reply.replyId} className="reply-container">
