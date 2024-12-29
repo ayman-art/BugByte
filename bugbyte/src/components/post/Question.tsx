@@ -108,7 +108,7 @@ const Question: React.FC<QuestionProps> = ({
       answerId,
       questionId,
       opName: loggedInUsername,
-      postedOn: new Date().toLocaleString(),
+      postedOn: new Date().toLocaleString('en-US'),
       upVotes: 0,
       mdContent: postDetails.content,
       isDownVoted: false,
