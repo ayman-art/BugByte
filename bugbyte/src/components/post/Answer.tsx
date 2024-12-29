@@ -43,6 +43,7 @@ const Answer: React.FC<AnswerProps> = ({
   onVerify,
   onReplyOnAnswer,
 }) => {
+  console.log("isUpvoted:", isUpVoted)
   const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downVotes);
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
@@ -177,14 +178,14 @@ const Answer: React.FC<AnswerProps> = ({
 
         <footer className="answer-footer">
           <div className="answer-votes">
-            <span className="votes-count">{currentUpvotes}</span>
+          <span className="votes-count">{currentUpvotes} </span>
             <button
               onClick={handleUpvoteAnswer}
               className={`vote-button ${voteStatus === 'upvoted' ? 'active' : ''} vote-button-up`}
             >
               ↑
             </button>
-            <span className="votes-count">{currentDownvotes}</span>
+            <span className="votes-count">{currentDownvotes} </span>
             <button
               onClick={handleDownvoteAnswer}
               className={`vote-button ${voteStatus === 'downvoted' ? 'active' : ''} vote-button-down`}
