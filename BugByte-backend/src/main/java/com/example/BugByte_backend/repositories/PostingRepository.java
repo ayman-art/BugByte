@@ -367,11 +367,11 @@ public class PostingRepository implements IPostingRepository{
     public Boolean downVoteAnswer(Long answerId, Integer value , String userName) throws Exception {
         if (answerId == null)
             throw new NullPointerException("answer id or value is null");
-        Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE,
                 new Object[]{ userName, answerId }, Integer.class);
         if(value == 1) {
             if (count == 1)
-                throw new Exception("user already up voted this answer");
+                throw new Exception("user already down voted this answer");
             if (is_UpVoted(userName , answerId)) {
                 jdbcTemplate.update(SQL_UPDATE_UP_VOTES_ANSWERS,  -1, answerId);
             }
