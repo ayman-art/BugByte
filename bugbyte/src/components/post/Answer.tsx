@@ -60,21 +60,35 @@ const Answer: React.FC<AnswerProps> = ({
 
   const handleUpvoteAnswer = async () => {
     if (voteStatus === 'upvoted') {
-      await removeUpvoteAnswer(answerId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
-      setVoteStatus('neutral');
+      await handleUpvoteFromUpvoted();
     } else if (voteStatus === 'downvoted') {
-      await removeDownvoteAnswer(answerId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
-      await upvoteAnswer(answerId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
-      console.log('FROM downvoted to upvoted');
+      handleUpvoteFromDownvoted();
     } else {
-      await upvoteAnswer(answerId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
-      setVoteStatus('upvoted');
+      handleUpvoteFromNeutral();
     }
   };
+
+  const handleUpvoteFromUpvoted = async () => {
+    await removeUpvoteAnswer(answerId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    setVoteStatus('neutral');
+  }
+
+  const handleUpvoteFromDownvoted = async () => {
+    await removeDownvoteAnswer(answerId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    await upvoteAnswer(answerId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    console.log('FROM downvoted to upvoted');
+  }
+
+  const handleUpvoteFromNeutral = async () => {
+    await upvoteAnswer(answerId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  }
+
+
 
   const handleDownvoteAnswer = async () => {
     if (voteStatus === 'downvoted') {
