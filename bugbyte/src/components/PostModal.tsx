@@ -49,6 +49,10 @@ interface PostModalProps {
   initialData?: PostDetails;
 }
 
+const defaultContent = `Title!
+---
+content`;
+
 const PostModal: React.FC<PostModalProps> = ({ 
   isOpen, 
   onClose, 
@@ -56,11 +60,7 @@ const PostModal: React.FC<PostModalProps> = ({
   type = 'full',
   initialData
 }) => {
-  const [markdown, setMarkdown] = useState(initialData?.content || `
-      Title!
-      ---
-      content
-      `);
+  const [markdown, setMarkdown] = useState(initialData?.content || defaultContent);
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState<string>('');
   const [selectedCommunity, setSelectedCommunity] = useState<number>(initialData?.communityId!);
@@ -88,11 +88,7 @@ const PostModal: React.FC<PostModalProps> = ({
     setTagInput('');
     setTags(initialData?.tags || []);
     setSelectedCommunity(initialData?.communityId!);
-    setMarkdown(initialData?.content || `
-      Title!
-      ---
-      content
-      `);
+    setMarkdown(initialData?.content || defaultContent);
     setPostTitle(initialData?.title || '');
   }
 
