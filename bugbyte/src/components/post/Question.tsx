@@ -211,7 +211,7 @@ const Question: React.FC<QuestionProps> = ({
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: mdContent }}
+        initialData={{ content: mdContent, title, tags }}
         type="no-community"
       />
     </div>
