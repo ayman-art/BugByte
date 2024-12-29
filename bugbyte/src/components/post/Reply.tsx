@@ -78,7 +78,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
           />
         </section>
 
-        <p className="reply-date">on {postedOn}</p>
+        <p className="reply-date">on {new Date(postedOn).toLocaleString('en-US')}</p>
 
         <footer className="reply-footer"> 
           {/* Action buttons */}
