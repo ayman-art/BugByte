@@ -49,8 +49,6 @@ const Answer: React.FC<AnswerProps> = ({
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [verified, setVerified] = useState(isVerified);
-  const [enableVerifyState, setEnableVerify] = useState(enabledVerify); // State for enabling/disabling verify button
   const navigate = useNavigate();
 
   const loggedInUsername = localStorage.getItem('name') || '';
@@ -104,6 +102,15 @@ const Answer: React.FC<AnswerProps> = ({
   };
 
   const handleReplySave = async (postDetails: { content: string }) => {
+
+    if (!token) {
+      alert('No auth token found. Please log in.');
+      return;
+    } else if (!postDetails.content || postDetails.content.trim() === '') {
+      alert('Reply content cannot be empty.');
+      return;
+    }
+
     console.log('Reply saved:', postDetails);
     const replyId = await postReply(postDetails.content, answerId, token!);
     onReplyOnAnswer({
@@ -127,17 +134,9 @@ const Answer: React.FC<AnswerProps> = ({
   console.log('isAdmin:', isAdmin);
   console.log(loggedInUsername, opName);
 
-  // Verify the answer
-  const handleVerify = () => {
-    setVerified(true);
-    onVerify(answerId);
-  };
-  useEffect(() => {
-    setEnableVerify(enabledVerify);
-  }, [enabledVerify]);
 
   return (
-    <div className={`answer-container ${verified ? 'verified' : ''}`}>
+    <div className={`answer-container ${isVerified ? 'verified' : ''}`}>
       <div className="answer-content">
         <header className="answer-header">
           <p className="op-name">
@@ -145,7 +144,7 @@ const Answer: React.FC<AnswerProps> = ({
             <span onClick={handleNavigateToProfile} className="op-link">
               {opName}
             </span>
-            {verified && (
+            {isVerified && (
               <span className="verified-badge" title="Verified">
                 <FaCheckCircle />
               </span>
@@ -213,10 +212,10 @@ const Answer: React.FC<AnswerProps> = ({
               </button>
             )}
 
-            {canEdit &&  enableVerifyState && (
+            {canEdit &&  enabledVerify && (
               <button
                 className="action-button verify-button"
-                onClick={handleVerify}
+                onClick={()=>onVerify(answerId)}
               >
                 Verify
               </button>

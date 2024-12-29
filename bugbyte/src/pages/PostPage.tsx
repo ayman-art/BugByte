@@ -24,6 +24,7 @@ const PostPage: React.FC = () => {
   const [hasNextAnswers, setHasNextAnswers] = useState(true);
   const [hasNextReplies, setHasNextReplies] = useState<Map<string, boolean>>(new Map());
   const [questionLoading, setQuestionLoading] = useState(true);
+  const [verificationDone, setVerificationDone] = useState(false);
 
   const pageSize = 3;
   const token = localStorage.getItem('authToken');
