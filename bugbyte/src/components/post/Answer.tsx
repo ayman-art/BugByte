@@ -39,6 +39,7 @@ const Answer: React.FC<AnswerProps> = ({
   downVotes,
   isVerified,
   enabledVerify,
+  canVerify,
   onDelete,
   onVerify,
   onReplyOnAnswer,
@@ -199,7 +200,7 @@ const Answer: React.FC<AnswerProps> = ({
               </button>
             )}
 
-            {canEdit &&  enabledVerify && (
+            {canVerify &&  enabledVerify && (
               <button
                 className="action-button verify-button"
                 onClick={()=>onVerify(answerId)}

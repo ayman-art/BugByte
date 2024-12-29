@@ -21,6 +21,7 @@ const PostPage: React.FC = () => {
 
   const pageSize = 3;
   const token = localStorage.getItem('authToken');
+  const loggedInUsername = localStorage.getItem('name') || '';
 
   useEffect(() => {
     setVerifiedAnswerId(null);
@@ -186,6 +187,7 @@ const PostPage: React.FC = () => {
         {answers.map((answer) => (
           <div key={answer.answerId} className="answer-container">
             <Answer {...answer} enabledVerify = {verifiedAnswerId === null} isVerified = {verifiedAnswerId == answer.answerId}
+            canVerify = {question.opName === loggedInUsername}
              onDelete={onDeleteAnswer} onVerify={onVerify} onReplyOnAnswer={onReplyonAnswer} />
             <div className="replies-section">
               {(replies.get(answer.answerId) || []).map((reply) => (
