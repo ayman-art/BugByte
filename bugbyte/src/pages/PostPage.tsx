@@ -89,6 +89,9 @@ const PostPage: React.FC = () => {
       
         console.log("HW",replies)
         setHasNextReplies(nextReplies);
+
+        
+        setQuestionLoading(false);
       };
       
       fetchQuestion();
