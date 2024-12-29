@@ -104,9 +104,6 @@ const Question: React.FC<QuestionProps> = ({
     }
   };
 
-  const handleNavigateToProfile = () => {
-    navigate(`/Profile/${opName}`);
-  };
 
   const handleReplySave = async (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
@@ -148,11 +145,11 @@ const Question: React.FC<QuestionProps> = ({
         <header className="question-header">
           <h2 className="question-title">{title}</h2>
           <p className="community-tag">
-            <span className="tag tag-community">c/{communityName}</span>
+            <span className="tag tag-community" onClick={() =>{navigate(`/communities/${communityId}`)}}>c/{communityName}</span>
           </p>
           <p className="op-name">
             Asked by:{' '}
-            <span onClick={handleNavigateToProfile} className="op-link">
+            <span onClick={() => {navigate(`/Profile/${opName}`)}} className="op-link">
               {opName}
             </span>
           </p>
