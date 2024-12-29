@@ -161,7 +161,7 @@ const Answer: React.FC<AnswerProps> = ({
           />
         </section>
 
-        <p className="answer-date">on {new Date(postedOn).toLocaleString('en-US')}</p>
+        <p className="post-date">on {new Date(postedOn).toLocaleString('en-US')}</p>
 
         <footer className="answer-footer">
           <div className="answer-votes">

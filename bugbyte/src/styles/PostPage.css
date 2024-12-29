@@ -35,12 +35,12 @@ body {
   margin-bottom: 20px;
 }
 
-.op-name, .question-date {
+.op-name, .post-date {
   font-size: 14px;
   color: #333;
 }
 
-.question-date {
+.post-date {
   color: #2e904d;
 }
 
