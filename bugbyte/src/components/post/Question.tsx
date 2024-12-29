@@ -149,7 +149,7 @@ const Question: React.FC<QuestionProps> = ({
           </section>
         </header>
 
-        <p className="question-date">on {postedOn}</p>
+        <p className="question-date">on {new Date(postedOn).toLocaleString()}</p>
 
         <footer className="question-footer">
           <div className="question-tags">
