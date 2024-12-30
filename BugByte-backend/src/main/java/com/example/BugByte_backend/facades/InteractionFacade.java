@@ -7,8 +7,11 @@ import com.example.BugByte_backend.Adapters.ReplyAdapter;
 import com.example.BugByte_backend.models.Answer;
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.models.Reply;
+import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.services.AuthenticationService;
+import com.example.BugByte_backend.services.NotificationService.NotificationProducer;
 import com.example.BugByte_backend.services.PostingService;
+import com.example.BugByte_backend.services.UserService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,9 +25,10 @@ import java.util.Map;
 public class InteractionFacade {
     @Autowired
     PostingService postingService;
-
     @Autowired
     AuthenticationService authenticationService;
+    @Autowired
+    NotificationProducer notifier;
     public Map<String , Object> postQuestion(Map<String , Object> postData) throws Exception {
         try {
             Question question = new Question();
@@ -56,6 +60,7 @@ public class InteractionFacade {
             long answerId = postingService.postAnswer(answer);
             Map<String , Object> answerData = new HashMap<>();
             answerData.put("answerId" , answerId);
+            notifier.sendAnswerNotification(answer);
             return answerData;
         }
         catch (Exception e){
@@ -73,6 +78,7 @@ public class InteractionFacade {
             long replyId = postingService.postReply(reply);
             Map<String , Object> replyData = new HashMap<>();
             replyData.put("replyId" , replyId);
+            notifier.sendReplyNotification(reply);
             return replyData;
         }
         catch (Exception e){
