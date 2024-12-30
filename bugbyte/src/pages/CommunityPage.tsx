@@ -33,7 +33,7 @@ const CommunityPage: React.FC = () => {
       const jwt = localStorage.getItem("authToken");
       const data = await getCommunityPosts(
         jwt!,
-        community?.id!,
+        parseInt(communityId!),
         limit,
         page * limit
       );
