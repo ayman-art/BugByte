@@ -37,14 +37,13 @@ public class NotificationService {
         String[] jsons = getCachedNotificationsStrings(id);
         ObjectMapper objectMapper = new ObjectMapper();
 
-        List<Notification> notifications = Arrays.stream(jsons).map(string -> {
+        return Arrays.stream(jsons).map(string -> {
             try {
                 return objectMapper.readValue(string, Notification.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }).toList();
-        return notifications;
     }
 
     private String[] getCachedNotificationsStrings(Long userId){
@@ -65,6 +64,8 @@ public class NotificationService {
         String key = "notifications:" + userId;
         redisTemplate.delete(key);
     }
+
+
 
 
 }
