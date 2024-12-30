@@ -27,6 +27,7 @@ interface ReplyProps extends IReply{
 
 const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdContent, onDelete }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [mdContentState, setMdContentState] = useState(mdContent);
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
@@ -39,6 +40,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
 
   const handleEditSave = async (postDetails: { content: string }) => {
     await editReply(replyId, postDetails.content, token!);
+    setMdContentState(postDetails.content);
     setIsEditModalOpen(false);
   }
 
@@ -55,7 +57,8 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
         {/* Use MDXEditor for markdown reply content */}
         <section className="reply-body">
           <MDXEditor
-            markdown={mdContent}
+            key={mdContentState}
+            markdown={mdContentState}
             readOnly
             plugins={[
               headingsPlugin(),
@@ -99,7 +102,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: mdContent }}
+        initialData={{ content: mdContentState }}
         type="md-only"
       />
     </div>
