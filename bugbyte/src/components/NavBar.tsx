@@ -14,46 +14,50 @@ interface NavbarProps {
   onLogout: () => void;
 }
 
-
 const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications , setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const webSocketService = new WebSocketService(API_URLS.SOCKET_CONNECTION);
-    useEffect(() => {
-      const initNotifications = async()=>{
-        try{
-          const notifications: Notification[] = await fetchNotifications();
-          setNotifications(notifications);
-          const id = parseInt(localStorage.getItem("id")!);
-          
-          webSocketService.connect(onConnect, onError, id);
-        }catch(e){
-          console.error(e)
-        }
-      }
-  
-      const onConnect = () => {
-        console.log('Connected to WebSocket');
+
+  useEffect(() => {
+    const initNotifications = async () => {
+      try {
+        const fetchedNotifications: Notification[] = await fetchNotifications();
+        setNotifications(fetchedNotifications.reverse());
+        setUnreadCount(fetchedNotifications.length); // Set initial unread count
         const id = parseInt(localStorage.getItem("id")!);
-        webSocketService.subscribe(`/topic/notifications/${id}`, (message) => {
-          console.log(JSON.parse(message.body));
-          setNotifications((prev) => [...prev, JSON.parse(message.body)])
-        });
-        
+        webSocketService.connect(onConnect, onError, id);
+      } catch (e) {
+        console.error(e);
       }
-      const onError = (error: string) => {
-        console.error('WebSocket error:', error);
-      };
-      initNotifications();
-      return () => {
-        webSocketService.disconnect();
-      };
-    }, []);
+    };
+
+    const onConnect = () => {
+      console.log('Connected to WebSocket');
+      const id = parseInt(localStorage.getItem("id")!);
+      webSocketService.subscribe(`/topic/notifications/${id}`, (message) => {
+        const newNotification = JSON.parse(message.body);
+        setNotifications((prev) => [newNotification, ...prev]);
+        setUnreadCount((prev) => prev + 1); // Increment unread count
+      });
+    };
+
+    const onError = (error: string) => {
+      console.error('WebSocket error:', error);
+    };
+
+    initNotifications();
+    return () => {
+      webSocketService.disconnect();
+    };
+  }, []);
 
   const toggleNotifications = () => {
     setShowNotifications((prev) => !prev);
+    setUnreadCount(0); // Reset unread count when dropdown is opened
   };
 
   const visitProfile = () => {
@@ -63,6 +67,16 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
 
   const goToSearch = () => {
     navigate('/Search');
+  };
+
+  const formatDate = (date: string) => {
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+    }).format(new Date(date));
   };
 
   return (
@@ -87,12 +101,17 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
 
         {/* Notifications Dropdown */}
         <div style={styles.notificationsContainer}>
-          <img
-            src={notificationsIconPath}
-            alt="Notifications"
-            style={styles.notificationsIcon}
-            onClick={toggleNotifications}
-          />
+          <div style={styles.notificationBadgeContainer}>
+            <img
+              src={notificationsIconPath}
+              alt="Notifications"
+              style={styles.notificationsIcon}
+              onClick={toggleNotifications}
+            />
+            {unreadCount > 0 && (
+              <span style={styles.notificationBadge}>{unreadCount}</span>
+            )}
+          </div>
           {showNotifications && (
             <div style={styles.notificationsDropdown}>
               {notifications.length > 0 ? (
@@ -101,7 +120,9 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                     <a href={notification.link} style={styles.notificationLink}>
                       <p style={styles.notificationMessage}>{notification.message}</p>
                     </a>
-                    <span style={styles.notificationDatetime}>{notification.date}</span>
+                    <span style={styles.notificationDatetime}>
+                      {formatDate(notification.date)}
+                    </span>
                   </div>
                 ))
               ) : (
@@ -123,7 +144,11 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       </div>
 
       {/* Modal for Adding Post */}
-      <PostModal isOpen={showModal} onClose={() => setShowModal(false)} onSave={() => setShowModal(false)} />
+      <PostModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSave={() => setShowModal(false)}
+      />
     </nav>
   );
 };
@@ -167,10 +192,28 @@ const styles: Record<string, React.CSSProperties> = {
     position: 'relative',
     marginRight: '10px',
   },
+  notificationBadgeContainer: {
+    position: 'relative',
+  },
   notificationsIcon: {
     height: '40px',
     width: '40px',
     cursor: 'pointer',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: '0',
+    right: '-5px',
+    backgroundColor: '#ff4757',
+    color: 'white',
+    borderRadius: '50%',
+    width: '20px',
+    height: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '0.8rem',
+    fontWeight: 'bold',
   },
   notificationsDropdown: {
     position: 'absolute',
@@ -244,4 +287,3 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export default Navbar;
-
