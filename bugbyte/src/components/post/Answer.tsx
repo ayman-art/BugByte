@@ -259,7 +259,7 @@ const Answer: React.FC<AnswerProps> = ({
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: mdContent }}
+        initialData={{ content: markdownState }}
         type="md-only"
       />
     </div>
