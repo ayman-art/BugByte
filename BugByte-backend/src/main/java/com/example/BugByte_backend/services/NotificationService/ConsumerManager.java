@@ -3,6 +3,7 @@ package com.example.BugByte_backend.services.NotificationService;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,8 +42,14 @@ public class ConsumerManager {
                         // Optionally forward this message to the connected WebSocket session
                     });
                 }
+            } catch (WakeupException e) {
+                // Expected during consumer shutdown, handle gracefully
+                System.out.println("Consumer for userId " + userId + " is shutting down.");
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                stopConsumer(userId);
+                System.out.println("Consumer for userId " + userId + " closed.");
             }
         });
     }
