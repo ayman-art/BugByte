@@ -19,7 +19,7 @@ import { MDXEditor,
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
-import { downvoteQuestion, postAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
+import { downvoteQuestion, editQuestion, postAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
   onDelete: (questionId: string) => void;
@@ -125,7 +125,7 @@ const Question: React.FC<QuestionProps> = ({
     setCurrentDownvotes(currentDownvotes + 1);
     setVoteStatus('downvoted');
   };
-  
+
 
   const handleReplySave = async (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
@@ -153,8 +153,8 @@ const Question: React.FC<QuestionProps> = ({
     });
   };
 
-  const handleEditSave = (postDetails: { content: string }) => {
-    // later
+  const handleEditSave = async (postDetails: { content: string, title: string, tags: string[] }) => {
+    await editQuestion(questionId, postDetails.title, postDetails.content, postDetails.tags, token!);
     setIsEditModalOpen(false);
   };
 
