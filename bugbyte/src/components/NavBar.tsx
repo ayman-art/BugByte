@@ -1,30 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logoPath from '../assets/bugbyteLogo.svg';
 import profilePath from '../assets/user-profile.svg';
 import searchIconPath from '../assets/search.png';
 import notificationsIconPath from '../assets/notifications.png';
 import PostModal from './PostModal';
+import { Notification } from '../pages/TestPage';
+import WebSocketService from '../API/socketService';
+import { API_URLS } from "../API/ApiUrls";
+import { fetchNotifications } from '../API/NotificationAPI';
 
 interface NavbarProps {
   onLogout: () => void;
 }
 
-interface Notification {
-  message: string;
-  link: string;
-  datetime: string;
-}
 
 const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications] = useState<Notification[]>([
-    { message: 'New comment on your post', link: '/post/1', datetime: '2024-12-29 10:30 AM' },
-    { message: 'New follower: John Doe', link: '/profile/john', datetime: '2024-12-28 4:45 PM' },
-    { message: 'Your post was liked by Jane', link: '/post/2', datetime: '2024-12-28 3:15 PM' },
-  ]);
+  const [notifications , setNotifications] = useState<Notification[]>([]);
+  const webSocketService = new WebSocketService(API_URLS.SOCKET_CONNECTION);
+    useEffect(() => {
+      const initNotifications = async()=>{
+        try{
+          const notifications: Notification[] = await fetchNotifications();
+          setNotifications(notifications);
+          const id = parseInt(localStorage.getItem("id")!);
+          
+          webSocketService.connect(onConnect, onError, id);
+        }catch(e){
+          console.error(e)
+        }
+      }
+  
+      const onConnect = () => {
+        console.log('Connected to WebSocket');
+        const id = parseInt(localStorage.getItem("id")!);
+        webSocketService.subscribe(`/topic/notifications/${id}`, (message) => {
+          console.log(JSON.parse(message.body));
+          setNotifications((prev) => [...prev, JSON.parse(message.body)])
+        });
+        
+      }
+      const onError = (error: string) => {
+        console.error('WebSocket error:', error);
+      };
+      initNotifications();
+      return () => {
+        webSocketService.disconnect();
+      };
+    }, []);
 
   const toggleNotifications = () => {
     setShowNotifications((prev) => !prev);
@@ -75,7 +101,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
                     <a href={notification.link} style={styles.notificationLink}>
                       <p style={styles.notificationMessage}>{notification.message}</p>
                     </a>
-                    <span style={styles.notificationDatetime}>{notification.datetime}</span>
+                    <span style={styles.notificationDatetime}>{notification.date}</span>
                   </div>
                 ))
               ) : (

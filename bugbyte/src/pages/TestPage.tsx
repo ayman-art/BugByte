@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Client, IMessage } from "@stomp/stompjs";
 import WebSocketService from '../API/socketService';
 import { fetchNotifications } from "../API/NotificationAPI";
+import { API_URLS } from "../API/ApiUrls";
 
 
-interface Notification {
-  date: string;
+export interface Notification {
   message: string;
   link:string;
+  date: string;
 }
 
 interface NotificationConsumerProps {
@@ -16,7 +16,7 @@ interface NotificationConsumerProps {
 
 const NotificationConsumer: React.FC<NotificationConsumerProps> = ({ userId }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const webSocketService = new WebSocketService("ws://localhost:8080/ws");
+  const webSocketService = new WebSocketService(API_URLS.SOCKET_CONNECTION);
 
   useEffect(() => {
     const initNotifications = async()=>{

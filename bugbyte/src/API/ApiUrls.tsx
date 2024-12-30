@@ -40,5 +40,6 @@ export const API_URLS = {
   USER_POSTS: `${API_BASE_URL}/posts/questions/userQuestions`,
   ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`,
   LEAVE_COMMUNITY: `${API_BASE_URL}/communities/leaveCommunity`,
-  FETCH_NOTIFICATIONS: `${API_BASE_URL}/notifications/fetch-notifications`
+  FETCH_NOTIFICATIONS: `${API_BASE_URL}/notifications/fetch-notifications`,
+  SOCKET_CONNECTION: `ws://localhost:8080/ws`
 };
