@@ -130,7 +130,8 @@ const PostModal: React.FC<PostModalProps> = ({
           
           <div className="editorContainer">
             <MDXEditor
-                        markdown={markdown}
+                        key={initialData?.content || defaultContent}
+                        markdown={initialData?.content || defaultContent}
                         onChange={setMarkdown}
                         plugins={[
                             headingsPlugin(),
