@@ -316,9 +316,9 @@ public class AdministrativeFacade {
         try {
             String token = (String) req.get("jwt");
             long userId = authenticationService.getIdFromJwt(token);
-            return communityService.joinCommunity( Long.valueOf((Integer)req.get("communityId"))
+            return communityService.joinCommunity( Long.valueOf((String) req.get("communityId"))
                     ,userId);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }
