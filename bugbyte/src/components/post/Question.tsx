@@ -65,40 +65,67 @@ const Question: React.FC<QuestionProps> = ({
 
   const handleUpvoteQuestion = async () => {
     if (voteStatus === 'upvoted') {
-      await removeUpvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
-      setVoteStatus('neutral');
+      await handleUpvoteFromUpvoted();
     } else if (voteStatus === 'downvoted') {
-      await removeDownvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
-      await upvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
-      setVoteStatus('upvoted');
+      await handleUpvoteFromDownvoted();
     } else {
-      await upvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
-      setVoteStatus('upvoted');
+      await handleUpvoteFromNeutral();
     }
   };
+
+  const handleUpvoteFromUpvoted = async () => {
+    await removeUpvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    setVoteStatus('neutral');
+  };
+
+  const handleUpvoteFromDownvoted = async () => {
+    await removeDownvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    await upvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  };
+
+  const handleUpvoteFromNeutral = async () => {
+    await upvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  };
+
+
 
   const handleDownvoteQuestion = async () => {
     if (voteStatus === 'downvoted') {
-      await removeDownvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
-      setVoteStatus('neutral');
+      await handleDownvoteFromDownvoted();
     } else if (voteStatus === 'upvoted') {
-      await removeUpvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
-      await downvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
-      setVoteStatus('downvoted');
-    } else {
-      await downvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
-      setVoteStatus('downvoted');
+      await handleDownvoteFromUpvoted();
+    }
+    else {
+      await handleDownvoteFromNeutral();
     }
   };
 
+  const handleDownvoteFromDownvoted = async () => {
+    await removeDownvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    setVoteStatus('neutral');
+  };
+
+  const handleDownvoteFromUpvoted = async () => {
+    await removeUpvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    await downvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  };
+
+  const handleDownvoteFromNeutral = async () => {
+    await downvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  };
+  
 
   const handleReplySave = async (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
