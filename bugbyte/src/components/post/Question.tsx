@@ -156,6 +156,7 @@ const Question: React.FC<QuestionProps> = ({
 
   const handleEditSave = async (postDetails: { content: string, title: string, tags: string[] }) => {
     await editQuestion(questionId, postDetails.title, postDetails.content, postDetails.tags, token!);
+    console.log('Question edited:', postDetails);
     setMarkdownState(postDetails.content);
     setIsEditModalOpen(false);
   };
