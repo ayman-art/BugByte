@@ -39,5 +39,6 @@ export const API_URLS = {
   COMMUNITY_POSTS: `${API_BASE_URL}/posts/questions/communityQuestions`,
   USER_POSTS: `${API_BASE_URL}/posts/questions/userQuestions`,
   ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`,
-  LEAVE_COMMUNITY: `${API_BASE_URL}/communities/leaveCommunity`
+  LEAVE_COMMUNITY: `${API_BASE_URL}/communities/leaveCommunity`,
+  FETCH_NOTIFICATIONS: `${API_BASE_URL}/notifications/fetch-notifications`
 };

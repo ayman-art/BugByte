@@ -38,6 +38,7 @@ public class ConsumerManager {
                     consumer.poll(Duration.ofMillis(100)).forEach(record -> {
                         // Process the message
                         System.out.println("Received message: " + record.value());
+                        notificationService.cacheNotification(Long.valueOf(userId), record.value());
                         notificationService.notifyUser(record.value(), Long.valueOf(userId));
                         // Optionally forward this message to the connected WebSocket session
                     });
