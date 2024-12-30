@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +40,7 @@ public class CommunityServiceTest {
     @BeforeEach
     public void setUp() {
         community = new Community();
+        community.setTags(new ArrayList<>());
         community.setId(1L);
         community.setName("Test Community");
         community.setAdminId(100L);
@@ -46,16 +48,28 @@ public class CommunityServiceTest {
 
     @Test
     public void testCreateCommunity() {
-        List<String> tags = new ArrayList<>();
+        // Arrange
+        Community community = new Community();
+        community.setName("Test Community");
+        community.setAdminId(100L);
+        community.setDescription(""); // or a valid description if testing this logic
+        community.setTags(Collections.emptyList());
+
         when(communityRepository.insertCommunity("Test Community", 100L)).thenReturn(1L);
-        when(tagsRepositoryMock.insertTags(tags)).thenReturn(1);
-        when(communityRepository.updateCommunityDescription(community.getId() , "")).thenReturn(true);
+        when(tagsRepositoryMock.bulkAddTagsToCommunity(1L, Collections.emptyList())).thenReturn(1);
+        when(searchingFilteringCommunityService.saveCommunity(community)).thenReturn(community);
+
+        // Act
         Long communityId = communityService.createCommunity(community);
 
+        // Assert
         assertEquals(1L, communityId);
         verify(communityRepository, times(1)).insertCommunity("Test Community", 100L);
+        verify(communityRepository, times(1)).updateCommunityDescription(1L, "");
         verify(searchingFilteringCommunityService, times(1)).saveCommunity(community);
+        verify(tagsRepositoryMock, times(0)).bulkAddTagsToCommunity(anyLong(), anyList());
     }
+
 
     @Test
     public void testUpdateCommunity() {
