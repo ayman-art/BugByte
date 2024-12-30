@@ -134,11 +134,12 @@ export const getQuestion = async (
       });
   
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to get question');
+        const errorData = await response.text();
+        throw new Error(errorData || 'Failed to get question');
       }
   
       const data = await response.json();
+      console.log(data);
       const tags = data.tags || []; // Handle null tags
   
       // Construct the question object
@@ -158,10 +159,11 @@ export const getQuestion = async (
           downVotes: data.answerDownVotes || 0,
           postedOn: data.answerPostedOn || '',
           opName: data.answerOp || '',
-          isDownVoted: false,
-          isUpVoted: false,
-            isVerified: false,
-            enabledVerify: true,
+          isDownVoted: data.answerIsDownVoted,
+          isUpVoted: data.answerIsUpVoted,
+          isVerified: false,
+          enabledVerify: true,
+          canVerify: false,
         };
       }
   
@@ -188,7 +190,7 @@ export const getAnswer = async (answerId: string, token: string): Promise<any> =
         }
 
         const data = await response.json();
-        return data.answerId;
+        return data;
     } catch (error) {
         console.error('Error getting answer:', error);
         throw error;
@@ -601,10 +603,11 @@ export const getAnswersFromQuestion = async (
             downVotes: answer.downVotes,
             postedOn: answer.postedOn,
             opName: answer.opName,
-            isDownVoted: false,
-            isUpVoted: false,
+            isDownVoted: answer.isDownVoted,
+            isUpVoted: answer.isUpVoted,
             isVerified: false,
             enabledVerify: true,
+            canVerify: false,
         }));
     } catch (error) {
         console.error('Error getting answers:', error);
