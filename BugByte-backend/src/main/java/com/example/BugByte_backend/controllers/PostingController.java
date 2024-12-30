@@ -83,7 +83,7 @@ public class PostingController {
     public ResponseEntity<?> updateQuestion(@RequestHeader("Authorization") String token, @RequestParam("questionId") Long questionId, @RequestBody Map<String, Object> question) {
         token = token.replace("Bearer ", "");
         question.put("jwt", token);
-        question.put("questionId", Integer.valueOf(questionId.toString()));
+        question.put("postId", Integer.valueOf(questionId.toString()));
         try {
             return new ResponseEntity<>(interactionFacade.editPost(question), HttpStatus.OK);
         } catch (Exception e) {
