@@ -65,7 +65,7 @@ const PostModal: React.FC<PostModalProps> = ({
   const [tagInput, setTagInput] = useState<string>('');
   const [selectedCommunity, setSelectedCommunity] = useState<number>(initialData?.communityId!);
   const [postTitle, setPostTitle] = useState<string>(initialData?.title || '');
- const navigate = useNavigate();
+  const navigate = useNavigate();
   
   const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
   const handleAddTag = () => {
