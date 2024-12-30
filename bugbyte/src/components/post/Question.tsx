@@ -47,6 +47,7 @@ const Question: React.FC<QuestionProps> = ({
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [markdownState, setMarkdownState] = useState(mdContent);
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
@@ -155,6 +156,7 @@ const Question: React.FC<QuestionProps> = ({
 
   const handleEditSave = async (postDetails: { content: string, title: string, tags: string[] }) => {
     await editQuestion(questionId, postDetails.title, postDetails.content, postDetails.tags, token!);
+    setMarkdownState(postDetails.content);
     setIsEditModalOpen(false);
   };
 
@@ -176,8 +178,8 @@ const Question: React.FC<QuestionProps> = ({
           </p>
           <section className="question-body">
             <MDXEditor
-              key={mdContent}
-              markdown={mdContent}
+              key={markdownState}
+              markdown={markdownState}
               readOnly
               plugins={[
                 headingsPlugin(),
