@@ -6,6 +6,7 @@ import searchIconPath from "../assets/search.png"
 import profilePath from "../assets/user-profile.svg";
 import { Link, useNavigate } from "react-router-dom";
 import { API_URLS } from "../API/ApiUrls";
+import validatePostDetails from '../utils/validateQuestion';
 
 interface NavbarProps {
   onLogout: () => void;
@@ -61,6 +62,8 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     navigate(`/Profile/${username}`);
   };
 
+  
+  
   const handleSavePost = async (postDetails: PostDetails) => {
     try {
       const token = localStorage.getItem('authToken');
@@ -69,24 +72,12 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
         return;
       }
   
-      // Validation
-      const errors = [];
-      if (!postDetails.title || postDetails.title.trim() === '') {
-        errors.push('Title cannot be empty.');
-      }
-      if (!postDetails.content || postDetails.content.trim() === '') {
-        errors.push('Body cannot be empty.');
-      }
-      if (!postDetails.communityId) {
-        errors.push('Community ID is required.');
-      }
-  
-      if (errors.length > 0) {
-        alert(errors.join('\n'));
+      const validation = validatePostDetails(postDetails);
+      if (!validation.isValid) {
+        alert(validation.errors.join('\n'));
         return;
       }
   
-      // Save the post
       const id = await postQuestion(
         postDetails.content,
         postDetails.title,
@@ -103,7 +94,6 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       setShowModal(false);
     }
   };
-  
   const handleUpdateProfilePicture = async (url: string) => {
     try {
       const token = localStorage.getItem('authToken');
