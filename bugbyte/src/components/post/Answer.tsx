@@ -20,7 +20,7 @@ import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import { IAnswer, IReply } from '../../types';
-import { downvoteAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
+import { downvoteAnswer, editAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
 
 interface AnswerProps extends IAnswer {
   onDelete: (answerId: string) => void;
@@ -144,8 +144,8 @@ const Answer: React.FC<AnswerProps> = ({
     setIsReplyModalOpen(false);
   };
 
-  const handleEditSave = (postDetails: { content: string }) => {
-    console.log('Post edited:', postDetails);
+  const handleEditSave = async (postDetails: { content: string }) => { 
+    await editAnswer(answerId, postDetails.content, token!);
     setIsEditModalOpen(false);
   };
 

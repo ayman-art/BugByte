@@ -19,6 +19,7 @@ import '@mdxeditor/editor/style.css';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import PostModal from '../PostModal';
 import { IReply } from '../../types';
+import { editReply } from '../../API/PostAPI';
 
 interface ReplyProps extends IReply{
   onDelete: (replyId: string, answerId: string) => void;
@@ -27,6 +28,8 @@ interface ReplyProps extends IReply{
 const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdContent, onDelete }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  const token = localStorage.getItem('authToken');
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
   const canEdit = loggedInUsername === opName;
@@ -34,8 +37,8 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
 
 
 
-  const handleEditSave = (postDetails: { content: string }) => {
-    console.log(postDetails);
+  const handleEditSave = async (postDetails: { content: string }) => {
+    await editReply(replyId, postDetails.content, token!);
     setIsEditModalOpen(false);
   }
 
