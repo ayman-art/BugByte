@@ -49,6 +49,7 @@ const Answer: React.FC<AnswerProps> = ({
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [markdownState, setMarkdownState] = useState(mdContent);
   const navigate = useNavigate();
 
   const loggedInUsername = localStorage.getItem('name') || '';
@@ -146,6 +147,7 @@ const Answer: React.FC<AnswerProps> = ({
 
   const handleEditSave = async (postDetails: { content: string }) => { 
     await editAnswer(answerId, postDetails.content, token!);
+    setMarkdownState(postDetails.content);
     setIsEditModalOpen(false);
   };
 
@@ -168,7 +170,8 @@ const Answer: React.FC<AnswerProps> = ({
 
         <section className="answer-body">
           <MDXEditor
-            markdown={mdContent}
+            key={markdownState}
+            markdown={markdownState}
             readOnly
             plugins={[
               headingsPlugin(),
