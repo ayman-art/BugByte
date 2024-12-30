@@ -61,7 +61,12 @@ public class NotificationProducer {
             System.out.println("Log: failed notification!"+ e.getMessage());
         }
     }
-    public void sendFollowNotification(User user){
+    public void sendFollowNotification(String follower, String username){
+        User user = userService.getUser(username);
+        Long id = user.getId();
+        String message = follower + " has followed your profile!";
+        String link = "/Profile/"+follower;
+        sendNotification(message, id, link);
 
     }
 }
