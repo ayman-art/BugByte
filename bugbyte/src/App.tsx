@@ -19,6 +19,7 @@ import PostPage from "./pages/PostPage";
 import HomePage from "./pages/HomePage";
 import CommunityListingPage from "./pages/CommunityListPage";
 import CommunitySearchPage from "./pages/CommunitySearchPage";
+import JoinedCommunitiesPage from "./pages/JoinedCommunititesPage";
 
 const isLoggedIn = false;
 
@@ -97,32 +98,48 @@ const App: React.FC = () => {
               }
             />
             <Route
-                path="communities/:communityId"
-                element={
-                  <Layout onLogout={handleLogout}>
-                    <CommunityPage />
-                  </Layout>
-                }
+              path="communities/:communityId"
+              element={
+                <Layout onLogout={handleLogout}>
+                  <CommunityPage />
+                </Layout>
+              }
             />
             <Route
               path="/communities"
               element={
                 <Layout onLogout={handleLogout}>
-                  <CommunityListingPage/>
+                  <CommunityListingPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/joined-communities"
+              element={
+                <Layout onLogout={handleLogout}>
+                  <JoinedCommunitiesPage />
                 </Layout>
               }
             />
             {/*<Route path="/Home" element={<Layout onLogout={handleLogout}><HomePage /></Layout>} />*/}
             <Route path="/SignUp" element={<Navigate to="/" />} />
             <Route path="/LogIn" element={<Navigate to="/" />} />
-            <Route path="/Posts/:postId" 
+            <Route
+              path="/Posts/:postId"
               element={
                 <Layout onLogout={handleLogout}>
                   <PostPage />
                 </Layout>
               }
             />
-            <Route path="/search-community" element={<Layout onLogout={handleLogout}><CommunitySearchPage/></Layout>}/>
+            <Route
+              path="/search-community"
+              element={
+                <Layout onLogout={handleLogout}>
+                  <CommunitySearchPage />
+                </Layout>
+              }
+            />
             <Route
               path="/Search"
               element={
@@ -142,7 +159,6 @@ const App: React.FC = () => {
             <Route path="/LogIn" element={<Login onLogin={handleLogin} />} />
           </>
         )}
-        
       </Routes>
     </BrowserRouter>
   );
