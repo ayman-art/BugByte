@@ -40,6 +40,13 @@ export const API_URLS = {
   USER_POSTS: `${API_BASE_URL}/posts/questions/userQuestions`,
   ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`,
   LEAVE_COMMUNITY: `${API_BASE_URL}/communities/leaveCommunity`,
+  SET_MODERATOR:`${API_BASE_URL}/communities/setModerator`,
+  REMOVE_MODERATOR:`${API_BASE_URL}/communities/removeModerator`,
+  DELETE_COMMUNITY:`${API_BASE_URL}/communities/deleteCommunity`,
+  REMOVE_MEMBER:`${API_BASE_URL}/communities/removeMember`,
+  IS_MODERATOR:`${API_BASE_URL}/communities/isModerator`,
+  IS_MODERATOR_BY_NAME:`${API_BASE_URL}/communities/isModeratorByName`,
+  IS_ADMIN:`${API_BASE_URL}/users/isAdmin`,
   FETCH_NOTIFICATIONS: `${API_BASE_URL}/notifications/fetch-notifications`,
   SOCKET_CONNECTION: `ws://localhost:8080/ws`
 };
