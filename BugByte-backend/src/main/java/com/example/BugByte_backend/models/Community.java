@@ -59,15 +59,4 @@ public class Community {
         this.id = 0L;
     }
 
-    @Override
-    public String toString() {
-        return "Community{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", adminId=" + adminId +
-                ", creationDate=" + creationDate +
-                ", tags=" + tags +
-                '}';
-    }
 }

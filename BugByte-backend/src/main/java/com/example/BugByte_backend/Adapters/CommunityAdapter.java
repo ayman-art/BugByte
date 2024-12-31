@@ -25,9 +25,6 @@ public class CommunityAdapter {
         }
 
     public Community fromMap(Map<String, Object> map) {
-            if(map==null)
-                throw new NullPointerException("null map");
-
         Community comm = new Community((String) map.get("name")
                 ,(Long) map.get("admin_id"));
         if(map.containsKey("description")) comm.setDescription((String)map.get("description"));

@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.OngoingStubbing;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 class CommunityControllerTest {
@@ -91,7 +89,7 @@ class CommunityControllerTest {
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Community deleted successfully.", response.getBody());
+        assertEquals("Community deleted Successfully", response.getBody());
     }
 
     @Test
@@ -110,48 +108,40 @@ class CommunityControllerTest {
     @Test
     void testSetModerator_Success() {
         // Arrange
-        Long communityId = 1L;
-        String moderatorName = "JohnDoe";
-        String token = "sample-token";
-        when(administrativeFacade.setModerator(eq(communityId), eq(moderatorName), eq(token))).thenReturn(true);
+        when(administrativeFacade.setModerator(any())).thenReturn(true);
 
         // Act
-        ResponseEntity<?> response = communityController.setModerator(communityId, moderatorName, "Bearer " + token);
+        ResponseEntity<?> response = communityController.setModerator(Map.of("communityId", "1", "userId", "2"));
 
         // Assert
-        assertEquals("User is now a Moderator", response.getBody());
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("User is Moderator now", response.getBody());
     }
 
     @Test
     void testRemoveModerator_Success() {
-        Long communityId = 1L;
-        String moderatorName = "JohnDoe";
-        String token = "sample-token";
         // Arrange
-        when(administrativeFacade.removeModerator(eq(communityId), eq(moderatorName), eq(token))).thenReturn(true);
+        when(administrativeFacade.removeModerator(any())).thenReturn(true);
 
         // Act
-        ResponseEntity<?> response = communityController.removeModerator(communityId, moderatorName, token);
+        ResponseEntity<?> response = communityController.removeModerator(Map.of("communityId", "1", "userId", "2"));
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Moderator removed successfully", response.getBody());
+        assertEquals("moderator removed Successfully", response.getBody());
     }
 
     @Test
     void testRemoveMember_Success() {
-        Long communityId = 1L;
-        String moderatorName = "JohnDoe";
-        String token = "sample-token";
         // Arrange
-        when(administrativeFacade.removeMember(eq(communityId), eq(moderatorName), eq(token))).thenReturn(true);
+        when(administrativeFacade.removeMember(any())).thenReturn(true);
 
         // Act
-        ResponseEntity<?> response = communityController.removeMember(communityId , moderatorName , "Bearer " + token);
+        ResponseEntity<?> response = communityController.removeMember(Map.of("communityId", "1", "userId", "3"));
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Member removed successfully", response.getBody());
+        assertEquals("member removed Successfully", response.getBody());
     }
 
     @Test
@@ -192,13 +182,14 @@ class CommunityControllerTest {
         String token = "Bearer invalidToken";
         Integer pageNumber = 1;
         Integer pageSize = 10;
-        when(administrativeFacade.getAllCommunities(eq(token), eq(pageSize), eq(pageNumber))).thenThrow(new RuntimeException("unauthorized"));
+        when(administrativeFacade.getAllCommunities(any(), any(), any())).thenThrow(new RuntimeException("unauthorized"));
 
         // Act
         ResponseEntity<?> response = communityController.getAllCommunities(token, pageNumber, pageSize);
 
         // Assert
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(401, response.getStatusCodeValue());
+        assertEquals(Map.of("message", "unauthorized"), response.getBody());
     }
     @Test
     void testLeaveCommunity_Success() {
@@ -230,6 +221,20 @@ class CommunityControllerTest {
         assertEquals("unauthorized", response.getBody());
     }
 
+    @Test
+    void testJoinCommunity_Success() {
+        // Arrange
+        String token = "Bearer testToken";
+        Map<String, Object> communityData = Map.of("communityName", "Test Community");
+        when(administrativeFacade.joinCommunity(any())).thenReturn(true);
+
+        // Act
+        ResponseEntity<?> response = communityController.joinCommunity(token, communityData);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("user joined Successfully", response.getBody());
+    }
 
     @Test
     void testJoinCommunity_Failure() {
@@ -287,7 +292,7 @@ class CommunityControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Error deleting community.", response.getBody());
+        assertEquals("error deleting community", response.getBody());
     }
 
     @Test
@@ -307,53 +312,43 @@ class CommunityControllerTest {
     @Test
     void testSetModerator_Error() {
         // Arrange
-        Long communityId = 1L;
-        String moderatorName = "testUser";
-        String token = "sample-token";
-        when(administrativeFacade.setModerator(eq(communityId), eq(moderatorName), eq(token))).thenReturn(false);
+        Map<String, Object> moderatorData = Map.of("communityName", "Test Community", "userName", "testUser");
+        when(administrativeFacade.setModerator(any())).thenReturn(false);
 
         // Act
-        ResponseEntity<?> response = communityController.setModerator(communityId, moderatorName, "Bearer " + token);
+        ResponseEntity<?> response = communityController.setModerator(moderatorData);
 
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Error adding moderator", response.getBody());
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("error adding moderator", response.getBody());
     }
 
     @Test
     void testRemoveModerator_Error() {
-        Long communityId = 1L;
-        String moderatorName = "testUser";
-        String token = "sample-token";
         // Arrange
         Map<String, Object> moderatorData = Map.of("communityName", "Test Community", "userName", "testUser");
-        when(administrativeFacade.removeModerator(any() , any() , any())).thenReturn(false);
+        when(administrativeFacade.removeModerator(any())).thenReturn(false);
 
         // Act
-        ResponseEntity<?> response = communityController.removeModerator(communityId , moderatorName
-        , "Bearer " + token);
+        ResponseEntity<?> response = communityController.removeModerator(moderatorData);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Error removing moderator", response.getBody());
+        assertEquals("error removing moderator", response.getBody());
     }
 
     @Test
     void testRemoveMember_Error() {
-        Long communityId = 1L;
-        String memberName = "testUser";
-        String token = "sample-token";
         // Arrange
         Map<String, Object> memberData = Map.of("communityName", "Test Community", "userName", "testUser");
-        when(administrativeFacade.removeMember(any() , any() , any())).thenReturn(false);
+        when(administrativeFacade.removeMember(any())).thenReturn(false);
 
         // Act
-        ResponseEntity<?> response = communityController.removeMember(communityId , memberName ,
-                "Bearer " + token);
+        ResponseEntity<?> response = communityController.removeMember(memberData);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Error removing member", response.getBody());
+        assertEquals("error removing member", response.getBody());
     }
 
     @Test
@@ -395,7 +390,7 @@ class CommunityControllerTest {
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Error deleting community.", response.getBody());
+        assertEquals("error deleting community", response.getBody());
     }
 
     @Test
@@ -414,56 +409,44 @@ class CommunityControllerTest {
 
     @Test
     void testSetModerator_Error5() {
-        Long communityId = 1L;
-        String moderatorName = "testUser";
-        String token = "sample-token";
         // Arrange
         Map<String, Object> moderatorData = Map.of("communityName", "Test Community", "userName", "testUser");
-        when(administrativeFacade.setModerator(any() , any() , any())).thenReturn(false);
+        when(administrativeFacade.setModerator(any())).thenReturn(false);
 
         // Act
-        ResponseEntity<?> response = communityController.setModerator(communityId , moderatorName
-        , "Bearer " + token);
+        ResponseEntity<?> response = communityController.setModerator(moderatorData);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Error adding moderator", response.getBody());
+        assertEquals("error adding moderator", response.getBody());
     }
 
     @Test
     void testRemoveModerator_Error1() {
-        Long communityId = 1L;
-        String moderatorName = "testUser";
-        String token = "sample-token";
         // Arrange
         Map<String, Object> moderatorData = Map.of("communityName", "Test Community", "userName", "testUser");
-        when(administrativeFacade.removeModerator(any() , any() , any())).thenReturn(false);
+        when(administrativeFacade.removeModerator(any())).thenReturn(false);
 
         // Act
-        ResponseEntity<?> response = communityController.removeModerator(communityId , moderatorName
-        , "Bearer " + token);
+        ResponseEntity<?> response = communityController.removeModerator(moderatorData);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Error removing moderator", response.getBody());
+        assertEquals("error removing moderator", response.getBody());
     }
 
     @Test
     void testRemoveMember_Error4() {
-        Long communityId = 1L;
-        String moderatorName = "testUser";
-        String token = "sample-token";
         // Arrange
         Map<String, Object> memberData = Map.of("communityName", "Test Community", "userName", "testUser");
-        when(administrativeFacade.removeMember(any() , any() , any())).thenReturn(false);
+        when(administrativeFacade.removeMember(any())).thenReturn(false);
 
         // Act
-        ResponseEntity<?> response = communityController.removeMember(communityId , moderatorName
-        , "Bearer " + token);
+        ResponseEntity<?> response = communityController.removeMember(memberData);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("Error removing member", response.getBody());
+        assertEquals("error removing member", response.getBody());
     }
 
     @Test

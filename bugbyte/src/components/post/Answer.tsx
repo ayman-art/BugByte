@@ -49,34 +49,14 @@ const Answer: React.FC<AnswerProps> = ({
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [verified, setVerified] = useState(isVerified);
-  const [enableVerifyState, setEnableVerify] = useState(enabledVerify); // State for enabling/disabling verify button
-  const [isUserModerator, setIsUserModerator] = useState(false); // New state for moderator status
-
-
   const navigate = useNavigate();
 
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
   const token = localStorage.getItem('authToken');
 
-   // Fetch moderator status
-    useEffect(() => {
-      const fetchModeratorStatus = async () => {
-        if (token) {
-          try {
-            const result = await isModerator(token, communityId);
-            setIsUserModerator(result);
-          } catch (error) {
-            console.error('Failed to fetch moderator status:', error);
-          }
-        }
-      };
-
-      fetchModeratorStatus();
-    }, [token, communityId]);
-
- 
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin;
 
   const handleUpvoteAnswer = async () => {
     if (voteStatus === 'upvoted') {
@@ -168,21 +148,6 @@ const Answer: React.FC<AnswerProps> = ({
     console.log('Post edited:', postDetails);
     setIsEditModalOpen(false);
   };
-
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin || isUserModerator;
-  console.log('isAdmin:', isAdmin);
-  console.log(loggedInUsername, opName);
-
-  // Verify the answer
-  const handleVerify = () => {
-    setVerified(true);
-    onVerify(answerId);
-  };
-  useEffect(() => {
-    setEnableVerify(enabledVerify);
-  }, [enabledVerify]);
-
 
   return (
     <div className={`answer-container ${isVerified ? 'verified' : ''}`}>
