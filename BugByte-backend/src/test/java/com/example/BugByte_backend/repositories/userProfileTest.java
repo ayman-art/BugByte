@@ -694,6 +694,59 @@ class UserProfileRepositoryTest {
         });
     }
 
+    @Test
+    void testGetReputationValidUser() {
+        // Arrange
+        String userName = "validUser";
+        Integer expectedReputation = 42;
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
+                .thenReturn(expectedReputation);
+
+        // Act
+        Integer actualReputation = repository.getReputation(userName);
+
+        // Assert
+        assertEquals(expectedReputation, actualReputation);
+        verify(jdbcTemplate, times(1)).queryForObject(anyString(), any(Object[].class), eq(Integer.class));
+    }
+
+    @Test
+    void testGetReputationNullUsername() {
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->
+                repository.getReputation(null));
+        assertEquals("Username cannot be null", exception.getMessage());
+    }
+
+    @Test
+    void testGetReputationUserNotFound() {
+        // Arrange
+        String userName = "nonExistentUser";
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
+                .thenReturn(null);
+
+        // Act
+        Integer actualReputation = repository.getReputation(userName);
+
+        // Assert
+        assertEquals(0, actualReputation);
+        verify(jdbcTemplate, times(1)).queryForObject(anyString(), any(Object[].class), eq(Integer.class));
+    }
+
+    @Test
+    void testGetReputationDatabaseError() {
+        // Arrange
+        String userName = "errorUser";
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
+                .thenThrow(new RuntimeException("Database error"));
+
+        // Act & Assert
+        Exception exception = assertThrows(NullPointerException.class, () ->
+                repository.getReputation(userName));
+        assertEquals("Cannot get the reputation", exception.getMessage());
+    }
+
+
 }
 
 class FollowerTest {

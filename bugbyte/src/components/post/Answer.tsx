@@ -21,6 +21,7 @@ import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import { IAnswer, IReply } from '../../types';
 import { downvoteAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
+import { isModerator } from '../../API/ModeratorApi';
 
 interface AnswerProps extends IAnswer {
   onDelete: (answerId: string) => void;
@@ -49,16 +50,33 @@ const Answer: React.FC<AnswerProps> = ({
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [verified, setVerified] = useState(isVerified);
+  const [enableVerifyState, setEnableVerify] = useState(enabledVerify); // State for enabling/disabling verify button
+  const [isUserModerator, setIsUserModerator] = useState(false); // New state for moderator status
+
   const navigate = useNavigate();
 
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
   const token = localStorage.getItem('authToken');
 
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin;
+  //  // Fetch moderator status
+  //   useEffect(() => {
+  //     const fetchModeratorStatus = async () => {
+  //       if (token) {
+  //         try {
+  //           const result = await isModerator(token, communityId);
+  //           setIsUserModerator(result);
+  //         } catch (error) {
+  //           console.error('Failed to fetch moderator status:', error);
+  //         }
+  //       }
+  //     };
 
-  const handleUpvoteAnswer = async () => {
+  //     fetchModeratorStatus();
+  //   }, [token, communityId]);
+
+  const handleUpvoteAnswer = async() => {
     if (voteStatus === 'upvoted') {
       await handleUpvoteFromUpvoted();
     } else if (voteStatus === 'downvoted') {
@@ -148,6 +166,11 @@ const Answer: React.FC<AnswerProps> = ({
     console.log('Post edited:', postDetails);
     setIsEditModalOpen(false);
   };
+
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin || isUserModerator;
+  console.log('isAdmin:', isAdmin);
+  console.log(loggedInUsername, opName);
 
   return (
     <div className={`answer-container ${isVerified ? 'verified' : ''}`}>
