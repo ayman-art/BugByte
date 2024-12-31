@@ -54,7 +54,7 @@ public class RecommendationSystemRepository {
             """;
     private static final String SQL_GET_RECOMMENDED_COMMUNITIES = """
             (
-                SELECT c.id, c.name, c.description
+                SELECT c.*
                 FROM communities c
                 JOIN community_members cm ON c.id = cm.community_id
                 WHERE cm.member_id IN (
@@ -71,7 +71,7 @@ public class RecommendationSystemRepository {
             )
             UNION
             (
-                SELECT c.id, c.name, c.description
+                SELECT c.*
                 FROM communities c
                 LEFT JOIN (
                     SELECT community_id, COUNT(*) AS engagement_score

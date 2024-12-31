@@ -60,6 +60,19 @@ public class RecommendationSystemService {
             updateFeedForUser(user.getId(), question);
     }
 
+    public List<Community> getCommunityRecommendations(String token) {
+        Long userId = getUserIdFromToken(token);
+
+        if (userId == null)
+            throw new IllegalArgumentException("User id can't be null!");
+
+        List<Community> communities = recommendationSystemRepository.generateRecommendedCommunitiesForUser(userId);
+        for (Community community : communities)
+            community.setTags(tagsRepository.findTagsByCommunity(community.getId()));
+
+        return communities;
+    }
+
     private void updateFeedForUser(Long userId, Question question) {
         String cacheKey = "feed:" + userId;
 
