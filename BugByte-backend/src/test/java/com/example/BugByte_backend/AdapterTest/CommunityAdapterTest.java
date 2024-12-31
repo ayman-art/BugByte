@@ -6,23 +6,29 @@ import com.example.BugByte_backend.models.Community;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
 import static graphql.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CommunityAdapterTest {
     private final CommunityAdapter communityAdapter = new CommunityAdapter();
 
     @Test
     public void testToMap() {
+        ArrayList<String> tags = new ArrayList<String>();
+        tags.add("tags");
         Community community = Community.builder()
                 .name("TechForum")
                 .adminId(1L)
                 .description("A forum for tech enthusiasts.")
                 .creationDate(new Date(2024, 12, 14, 10, 0))
                 .id(2L)
+                .tags(tags)
                 .build();
 
         Map<String, Object> communityMap = communityAdapter.toMap(community);
@@ -30,6 +36,10 @@ public class CommunityAdapterTest {
         assertEquals("TechForum", communityMap.get("name"));
         assertEquals("A forum for tech enthusiasts.", communityMap.get("description"));
 
+    }
+    @Test
+    public void testToMapNullCommunity() {
+        assertThrows(NullPointerException.class, () -> communityAdapter.toMap(null));
     }
     @Test
     public void testFromMap() {
@@ -46,50 +56,9 @@ public class CommunityAdapterTest {
         assertEquals(1L, community.getAdminId());
         assertEquals("A forum for tech enthusiasts.", community.getDescription());
     }
-
-//    @Test
-//    public void testToJson() throws JsonProcessingException {
-//        Community community = Community.builder()
-//                .id(2L)
-//                .name("Community2")
-//                .adminId(null)
-//                .description(null)
-//                .creationDate(new Date())
-//                .build();
-//
-//        String communityString = communityAdapter.toJson(community);
-//
-//        String expected = "{\"id\":2,\"name\":\"Community2\",\"adminId\":null," +
-//                "\"description\":null,\"creationDate\":\"" + community.getCreationDate().toString()+ "\"}";
-//
-//        assertEquals(expected, communityString);
-//    }
-
-
-//    @Test
-//    public void testToJsonWithNullFields() throws JsonProcessingException {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        Date creationDate = new Date();
-//
-//        Community community = Community.builder()
-//                .id(2L)
-//                .name("Community2")
-//                .adminId(null)
-//                .description(null)
-//                .creationDate(creationDate)
-//                .build();
-//
-//        String json = communityAdapter.toJson(community);
-//
-//        Map<String, Object> jsonMap = objectMapper.readValue(json, Map.class);
-//
-//        assertEquals("Community2", jsonMap.get("name"));
-//        assertNull(jsonMap.get("adminId")); // Null field handling
-//        assertNull(jsonMap.get("description"));
-//        assertEquals(creationDate.toLocaleString(), jsonMap.get("creationDate"));
-//        assertEquals(2L, jsonMap.get("id"));
-//    }
-
-
+    @Test
+    public void NullMap_testFromMap() {
+        assertThrows(NullPointerException.class, () -> communityAdapter.fromMap(null));
+    }
 
 }

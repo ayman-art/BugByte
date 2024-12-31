@@ -29,15 +29,38 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
   const navigate = useNavigate();
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin;
+  const [isUserModerator, setIsUserModerator] = useState(false); // New state for moderator status
+ // Fetch moderator status
+  useEffect(() => {
+    const fetchModeratorStatus = async () => {
+      if (token) {
+        try {
+          const result = await isModerator(token, communityId);
+          setIsUserModerator(result);
+        } catch (error) {
+          console.error('Failed to fetch moderator status:', error);
+        }
+      }
+    };
 
+
+    fetchModeratorStatus();
+  }, [token, communityId]);
 
 
   const handleEditSave = (postDetails: { content: string }) => {
     console.log(postDetails);
     setIsEditModalOpen(false);
   }
+
+  // Navigate to the user's profile
+  const handleNavigateToProfile = () => {
+    navigate(`/Profile/${opName}`);
+  };
+
+  // Check if the logged-in user is the post owner
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin || isUserModerator; // Admin can delete as well
 
 
   return (

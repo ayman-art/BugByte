@@ -24,6 +24,7 @@ const PostPage: React.FC = () => {
   const loggedInUsername = localStorage.getItem('name') || '';
 
   useEffect(() => {
+
     setVerifiedAnswerId(null);
 
     const fetchQuestion = async () => {
@@ -46,12 +47,15 @@ const PostPage: React.FC = () => {
         }
 
         const fetchedAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
+
         const hasNext = fetchedAnswers.length > pageSize;
         if (hasNext)
           fetchedAnswers.pop();
+
         const nonDuplicates = fetchedAnswers.filter(
           (answer) => answer.answerId !== verifiedAnswer?.answerId
         );
+
         setAnswers([...initialAnswers, ...nonDuplicates]);
         setHasNextAnswers(hasNext);
       
@@ -66,28 +70,29 @@ const PostPage: React.FC = () => {
             return newReplies;
           });
         }
+
         setHasNextReplies(nextReplies);
 
         setQuestionLoading(false);
       };
-      
+
       fetchQuestion();
-      
-      
+
   }, [postId]);
 
   const fetchMoreAnswers = async () => {
     const newAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
     const addedAnswers = newAnswers.slice(0, pageSize);
     const hasNext = newAnswers.length > pageSize;
-    
+
 
     const nextReplies = new Map<string, boolean>();
+
     for (const answer of addedAnswers) {
       const fetchedReplies = await getRepliesFromAnswer(answer.answerId, token!, 0, pageSize + 1);
       const hasMoreReplies = fetchedReplies.length > pageSize;
       nextReplies.set(answer.answerId, hasMoreReplies);
-  
+
       setReplies((prev) => {
         const newReplies = new Map(prev);
         newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize));
@@ -96,14 +101,15 @@ const PostPage: React.FC = () => {
     }
 
 
-  
+
     setAnswers((prev) => [...prev, ...addedAnswers]);
     setHasNextAnswers(hasNext);
   };
-  
+
 
   const fetchMoreReplies = async (answerId: string) => {
     const currentReplies = replies.get(answerId) || [];
+
     const newReplies = await getRepliesFromAnswer(answerId, token!, currentReplies.length, pageSize + 1);
     const addedReplies = newReplies.slice(0, pageSize);
     const hasNext = newReplies.length > pageSize;
@@ -113,13 +119,14 @@ const PostPage: React.FC = () => {
       newRepliesMap.set(answerId, [...currentReplies, ...addedReplies]);
       return newRepliesMap;
     });
-  
+
     setHasNextReplies((prev) => {
       const newHasNextReplies = new Map(prev);
       newHasNextReplies.set(answerId, hasNext);
       return newHasNextReplies;
     });
   };
+
 
   const onAnswerQuestion = (answer: IAnswer): void => {
     setAnswers((prev) => [answer, ...prev]);
@@ -212,6 +219,7 @@ const PostPage: React.FC = () => {
     </div>
   );
 };
+
 
 
 export default PostPage;
