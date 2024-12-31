@@ -2,14 +2,12 @@ package com.example.BugByte_backend.facades;
 
 import com.example.BugByte_backend.Adapters.CommunityAdapter;
 import com.example.BugByte_backend.Adapters.UserAdapter;
-import com.example.BugByte_backend.controllers.GoogleAuthController;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.services.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import io.jsonwebtoken.Claims;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -343,5 +341,19 @@ public class AdministrativeFacade {
         Claims claim = AuthenticationService.parseToken(jwt);
         Long id = Long.parseLong(claim.getId());
         return communityService.leaveCommunity(communityName,id);
+    }
+
+    public List<Map<String, Object>> getCommunityMembers(String jwt, long communityId) {
+        List<User> users = communityService.getCommunityMembers(communityId);
+
+        UserAdapter adapter = new UserAdapter();
+        List <Map<String, Object>> usersMap = users.stream().map(adapter::toMap).toList();
+        for (Map<String, Object> admin : usersMap) {
+            admin.remove("password");
+            admin.remove("email");
+            admin.remove("id");
+        }
+
+        return usersMap;
     }
 }

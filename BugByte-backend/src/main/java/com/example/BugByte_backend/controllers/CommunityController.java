@@ -2,6 +2,7 @@ package com.example.BugByte_backend.controllers;
 
 import com.example.BugByte_backend.facades.AdministrativeFacade;
 import com.example.BugByte_backend.models.Community;
+import com.sun.net.httpserver.HttpsServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -160,6 +161,18 @@ public class CommunityController {
         token = token.replace("Bearer ", "");
         try {
             return new ResponseEntity<>(administrativeFacade.leaveCommunity(token , communityName), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("/community-members")
+    public ResponseEntity<?> getCommunityMembers(@RequestHeader("Authorization") String token,
+                                                 @RequestParam long communityId) {
+        try {
+            String jwt = token.replace("Bearer ", "");
+            List<Map<String, Object>> users = administrativeFacade.getCommunityMembers(jwt, communityId);
+            return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }

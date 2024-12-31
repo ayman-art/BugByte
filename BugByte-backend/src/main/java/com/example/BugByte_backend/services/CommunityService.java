@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Scope("singleton")
@@ -155,13 +153,10 @@ public class CommunityService {
         }
     }
 
-    public List<User> getCommunityUsers(Long communityId) {
-        try {
-            return communityRepository.getCommunityMembers(communityId);
-        } catch (Exception e) {
-            throw e;
-        }
+    public List<User> getCommunityMembers(Long communityId) {
+        return communityRepository.getCommunityMembers(communityId);
     }
+
     public List<Community> getAllCommunities(int pageSize ,int pageNumber ) {
         try {
             List<Community> communities = communityRepository.findAllCommunities(pageSize,pageNumber);
