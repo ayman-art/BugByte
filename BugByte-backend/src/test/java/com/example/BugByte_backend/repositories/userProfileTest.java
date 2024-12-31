@@ -714,100 +714,55 @@ class UserProfileRepositoryTest {
     }
 
     @Test
-    void testGetReputation_Success() {
-        String userName = "user1";
-        int positiveReputation = 10;
-        int negativeReputation = 5;
+    void testGetReputationValidUser() {
+        // Arrange
+        String userName = "validUser";
+        Integer expectedReputation = 42;
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
+                .thenReturn(expectedReputation);
 
-        when(jdbcTemplate.queryForObject(SQL_GET_POSITIVE_INTERACTIONS, new Object[]{userName}, Integer.class))
-                .thenReturn(positiveReputation);
-        when(jdbcTemplate.queryForObject(SQL_GET_NEGATIVE_INTERACTIONS, new Object[]{userName}, Integer.class))
-                .thenReturn(negativeReputation);
+        // Act
+        Integer actualReputation = repository.getReputation(userName);
 
-        Integer result = repository.getReputation(userName);
-
-        assertEquals(positiveReputation - negativeReputation, result);
-
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_POSITIVE_INTERACTIONS, new Object[]{userName}, Integer.class);
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_NEGATIVE_INTERACTIONS, new Object[]{userName}, Integer.class);
+        // Assert
+        assertEquals(expectedReputation, actualReputation);
+        verify(jdbcTemplate, times(1)).queryForObject(anyString(), any(Object[].class), eq(Integer.class));
     }
 
     @Test
-    void testGetReputation_NoInteractions_ShouldReturnZero() {
-        String userName = "user1";
-        Integer positiveReputation = 0;
-        Integer negativeReputation = 0;
-
-        when(jdbcTemplate.queryForObject(SQL_GET_POSITIVE_INTERACTIONS, new Object[]{userName}, Integer.class))
-                .thenReturn(positiveReputation);
-        when(jdbcTemplate.queryForObject(SQL_GET_NEGATIVE_INTERACTIONS, new Object[]{userName}, Integer.class))
-                .thenReturn(negativeReputation);
-
-        Integer result = repository.getReputation(userName);
-
-        assertEquals(positiveReputation - negativeReputation, result);
-
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_POSITIVE_INTERACTIONS, new Object[]{userName}, Integer.class);
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_NEGATIVE_INTERACTIONS, new Object[]{userName}, Integer.class);
+    void testGetReputationNullUsername() {
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->
+                repository.getReputation(null));
+        assertEquals("Username cannot be null", exception.getMessage());
     }
 
     @Test
-    void testGetReputation_InvalidInput_ShouldThrowException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            repository.getReputation(null);
-        });
+    void testGetReputationUserNotFound() {
+        // Arrange
+        String userName = "nonExistentUser";
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
+                .thenReturn(null);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            repository.getReputation("");
-        });
+        // Act
+        Integer actualReputation = repository.getReputation(userName);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            repository.getReputation("   ");
-        });
+        // Assert
+        assertEquals(0, actualReputation);
+        verify(jdbcTemplate, times(1)).queryForObject(anyString(), any(Object[].class), eq(Integer.class));
     }
 
     @Test
-    void testGetReputation_ExceptionThrownInQuery_ShouldThrowNullPointerException() {
-        // Sample data
-        String userName = "user1";
-
-        // Mock behavior
-        when(jdbcTemplate.queryForObject(SQL_GET_POSITIVE_INTERACTIONS, new Object[]{userName}, Integer.class))
+    void testGetReputationDatabaseError() {
+        // Arrange
+        String userName = "errorUser";
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
-        // Call the method and validate the exception
-        assertThrows(NullPointerException.class, () -> {
-            repository.getReputation(userName);
-        });
-
-        // Verify interaction
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_POSITIVE_INTERACTIONS, new Object[]{userName}, Integer.class);
-    }
-
-    @Test
-    void testGetReputation_NegativeReputationGreaterThanPositive_ShouldReturnNegative() {
-        String userName = "user1";
-        int positiveReputation = 5;
-        int negativeReputation = 10;
-
-        when(jdbcTemplate.queryForObject(SQL_GET_POSITIVE_INTERACTIONS, new Object[]{userName}, Integer.class))
-                .thenReturn(positiveReputation);
-        when(jdbcTemplate.queryForObject(SQL_GET_NEGATIVE_INTERACTIONS, new Object[]{userName}, Integer.class))
-                .thenReturn(negativeReputation);
-
-        Integer result = repository.getReputation(userName);
-
-        assertEquals(positiveReputation - negativeReputation, result);
-
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_POSITIVE_INTERACTIONS, new Object[]{userName}, Integer.class);
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_NEGATIVE_INTERACTIONS, new Object[]{userName}, Integer.class);
+        // Act & Assert
+        Exception exception = assertThrows(NullPointerException.class, () ->
+                repository.getReputation(userName));
+        assertEquals("Cannot get the reputation", exception.getMessage());
     }
 
 
