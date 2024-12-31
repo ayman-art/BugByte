@@ -5,7 +5,7 @@ import {
   getCommunityPosts,
   joinCommunity,
   LeaveCommunity,
-  deleteCommunity
+  deleteCommunity,
 } from "../API/CommunityAPI";
 import { useParams } from "react-router-dom";
 import PostListing, { Post } from "../components/PostListing";
@@ -35,7 +35,12 @@ const CommunityPage: React.FC = () => {
     setLoading(true);
     try {
       const jwt = localStorage.getItem("authToken");
-      const data = await getCommunityPosts(jwt!, community?.id!, limit, page * limit);
+      const data = await getCommunityPosts(
+        jwt!,
+        parseInt(communityId!),
+        limit,
+        page * limit
+      );
       const posts: Post[] = data.map(
         (item: {
           questionId: string;
@@ -95,15 +100,23 @@ const CommunityPage: React.FC = () => {
         const data: Community = await getCommunity(jwt, parseInt(communityId!));
         setCommunity(data);
 
-        const joinedCommunities = JSON.parse(localStorage.getItem("joinedCommunities") || "[]");
-        setJoined(joinedCommunities.some((joinedCommunity: { id: number }) => joinedCommunity.id === data.id));
+        const joinedCommunities = JSON.parse(
+          localStorage.getItem("joinedCommunities") || "[]"
+        );
+        setJoined(
+          joinedCommunities.some(
+            (joinedCommunity: { id: number }) => joinedCommunity.id === data.id
+          )
+        );
 
         const isAdmin = localStorage.getItem("is_admin") === "true";
         setIsAdmin(isAdmin);
 
         await fetchPosts();
       } catch (err: any) {
-        setError(err.message || "An error occurred while fetching community data.");
+        setError(
+          err.message || "An error occurred while fetching community data."
+        );
       } finally {
         setLoading(false);
       }
@@ -130,7 +143,9 @@ const CommunityPage: React.FC = () => {
   };
 
   const handleDeleteCommunity = async () => {
-    const confirmed = window.confirm(`Are you sure that you want to delete the community "${community?.name}"?`);
+    const confirmed = window.confirm(
+      `Are you sure that you want to delete the community "${community?.name}"?`
+    );
     if (!confirmed) return;
 
     try {
@@ -213,9 +228,14 @@ const CommunityPage: React.FC = () => {
             <h1>{community.name}</h1>
             {isAdmin && (
               <div style={styles.dropdown}>
-                <button style={styles.dropdownButton} onClick={toggleDropdown}>Options</button>
+                <button style={styles.dropdownButton} onClick={toggleDropdown}>
+                  Options
+                </button>
                 <div style={styles.dropdownContent}>
-                  <div style={styles.dropdownItem} onClick={handleDeleteCommunity}>
+                  <div
+                    style={styles.dropdownItem}
+                    onClick={handleDeleteCommunity}
+                  >
                     Delete Community
                   </div>
                 </div>
@@ -224,13 +244,25 @@ const CommunityPage: React.FC = () => {
           </div>
           <p>{community.description}</p>
           {!joined ? (
-            <button style={styles.button} onClick={handleJoinClick}>Join Community</button>
+            <button style={styles.button} onClick={handleJoinClick}>
+              Join Community
+            </button>
           ) : (
-            <button style={{ ...styles.button, backgroundColor: "#d32f2f" }} onClick={handleLeaveClick}>Leave Community</button>
+            <button
+              style={{ ...styles.button, backgroundColor: "#d32f2f" }}
+              onClick={handleLeaveClick}
+            >
+              Leave Community
+            </button>
           )}
         </div>
       )}
-      <PostListing posts={postList} fetchPosts={fetchPosts} loading={loading} hasMore={hasMore} />
+      <PostListing
+        posts={postList}
+        fetchPosts={fetchPosts}
+        loading={loading}
+        hasMore={hasMore}
+      />
     </div>
   );
 };

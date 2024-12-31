@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import profilePath from '../assets/user-profile.svg';
-import TextPopUp from '../components/BioPopup'
-import { followUser, getProfile, getUserPosts, makeAdmin, unfollowUser, updateBio, updateProfilePicture } from '../API/ProfileAPI';
-import { useNavigate, useParams } from 'react-router-dom';
-import PostListing, { Post } from '../components/PostListing';
+import React, { useEffect, useState } from "react";
+import profilePath from "../assets/user-profile.svg";
+import TextPopUp from "../components/BioPopup";
+import {
+  followUser,
+  getProfile,
+  getUserPosts,
+  makeAdmin,
+  unfollowUser,
+  updateBio,
+  updateProfilePicture,
+} from "../API/ProfileAPI";
+import { useNavigate, useParams } from "react-router-dom";
+import PostListing, { Post } from "../components/PostListing";
 interface UserProfile {
   username: string;
   reputation: number;
@@ -21,55 +29,67 @@ interface UserProfile {
 // }
 
 const Profile: React.FC = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const visitFollowers = () => {
-    navigate(`/Profile/${userName}/Followers`)
-  }
+    navigate(`/Profile/${userName}/Followers`);
+  };
   const visitFollowings = () => {
-    navigate(`/Profile/${userName}/Followings`)
-  }
-  
-  const {userName} = useParams<{ userName: string }>();
+    navigate(`/Profile/${userName}/Followings`);
+  };
+
+  const { userName } = useParams<{ userName: string }>();
   const [profileLoading, setProfileLoading] = useState<boolean>(true);
   const [postsLoading, setPostsLoading] = useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isProfilePicPopupOpen, setIsProfilePicPopupOpen] = useState(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const loggedInUsername = localStorage.getItem('name') || '';
-  const isAdmin = localStorage.getItem('is_admin') === 'true';
+  const loggedInUsername = localStorage.getItem("name") || "";
+  const isAdmin = localStorage.getItem("is_admin") === "true";
   const limit = 5;
   const [page, setPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState(true); // If more posts are available
-  const [postList, setPostList]= useState<Post[]>([]);
-  
+  const [postList, setPostList] = useState<Post[]>([]);
 
   const handleButtonClick = () => {
     setIsPopupOpen(true);
   };
-  const fetchPosts = async ()=>{
+  const fetchPosts = async () => {
     setPostsLoading(true);
-    try{
-      const jwt = localStorage.getItem('authToken');
-      const data = await getUserPosts( jwt!, limit, page*limit, userName!);
-      const posts: Post[] = data.map(((item: { questionId: any; title: any; opName: any; mdContent: any; upVotes: any; communityId: any; downVotes: any; tags: any; })  => ({
-        id: item.questionId,
-        title: item.title,
-        creatorUserName: item.opName,
-        mdContent: item.mdContent,
-        upVotes: item.upVotes,
-        downVotes: item.downVotes,
-        communityId: item.communityId,
-        tags: item.tags
-      })));
-      console.log(posts)
-      if(posts.length=== 0){
+    try {
+      const jwt = localStorage.getItem("authToken");
+      const data = await getUserPosts(jwt!, limit, page * limit, userName!);
+      const posts: Post[] = data.map(
+        (item: {
+          questionId: any;
+          title: any;
+          opName: any;
+          mdContent: any;
+          upVotes: any;
+          communityId: any;
+          communityName: any;
+          downVotes: any;
+          tags: any;
+        }) => ({
+          id: item.questionId,
+          title: item.title,
+          creatorUserName: item.opName,
+          mdContent: item.mdContent,
+          upVotes: item.upVotes,
+          downVotes: item.downVotes,
+          communityId: item.communityId,
+          communityName: item.communityName,
+          tags: item.tags,
+        })
+      );
+      console.log(posts);
+      if (posts.length === 0) {
         setHasMore(false);
-      }else{
-        console.log("...")
+      } else {
+        console.log("...");
         setPostList((prevPosts) => [...prevPosts, ...posts]); // Append new posts
         setPage((prevPage) => prevPage + 1); // Increment page
       }
@@ -78,17 +98,16 @@ const Profile: React.FC = () => {
     } finally {
       setPostsLoading(false);
     }
-    
-    }
+  };
   const handlePopupSubmit = (newText: string) => {
     // PUT request HERE
     let newUserProfile = userProfile;
-    try{
-      const token = localStorage.getItem('authToken')
-      updateBio(newText, token!)
+    try {
+      const token = localStorage.getItem("authToken");
+      updateBio(newText, token!);
       newUserProfile!.bio = newText;
       setUserProfile(newUserProfile);
-    }catch ( e){
+    } catch (e) {
       setError("Failed to update bio");
     }
   };
@@ -98,55 +117,56 @@ const Profile: React.FC = () => {
       setIsProfilePicPopupOpen(true);
     }
   };
-  
+
   // Upload profile picture
   const handleProfilePictureUpload = async () => {
     if (!selectedFile) return;
 
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem("authToken");
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append("file", selectedFile);
 
       const updatedProfilePic = await updateProfilePicture(formData, token!);
-      
-      setUserProfile((prevProfile) => 
-        prevProfile ? { 
-          ...prevProfile, 
-          profile_picture: updatedProfilePic 
-        } : null
+
+      setUserProfile((prevProfile) =>
+        prevProfile
+          ? {
+              ...prevProfile,
+              profile_picture: updatedProfilePic,
+            }
+          : null
       );
-      
+
       setIsProfilePicPopupOpen(false);
       setSelectedFile(null);
     } catch (error) {
-      console.error('Error uploading profile picture:', error);
+      console.error("Error uploading profile picture:", error);
       setError("Failed to upload profile picture");
     }
   };
   const handlePopupClose = () => {
     setIsPopupOpen(false);
   };
-  
+
   // Fetch profile data
   useEffect(() => {
     async function fetchProfile(): Promise<void> {
       try {
-        const token = localStorage.getItem('authToken')
-        const data = await getProfile(userName!, token!)
+        const token = localStorage.getItem("authToken");
+        const data = await getProfile(userName!, token!);
         setUserProfile({
-          username: data['userName'],
-          reputation: data['reputation'],
-          followers: data['followersCount'],
-          following: data['followingsCount'],
-          bio: data['bio'],
-          is_admin: data['isAdmin'],
-          is_following: data['is_following'],
-          profile_picture: data['picture']
+          username: data["userName"],
+          reputation: data["reputation"],
+          followers: data["followersCount"],
+          following: data["followingsCount"],
+          bio: data["bio"],
+          is_admin: data["isAdmin"],
+          is_following: data["is_following"],
+          profile_picture: data["picture"],
         });
-        
       } catch (error) {
-        console.error('Error fetching user profile:', error);
+        console.error("Error fetching user profile:", error);
       } finally {
         setProfileLoading(false);
       }
@@ -154,169 +174,184 @@ const Profile: React.FC = () => {
 
     fetchProfile();
   }, [userName]);
-  const handleFollow= async () => {
+  const handleFollow = async () => {
     try {
-      const token = localStorage.getItem('authToken')
-      await followUser(userName!, token!)
-      setUserProfile((prevProfile) => 
-        prevProfile ? { 
-          ...prevProfile, 
-          is_following: true, 
-          followers: prevProfile.followers + 1 
-        } : null
+      const token = localStorage.getItem("authToken");
+      await followUser(userName!, token!);
+      setUserProfile((prevProfile) =>
+        prevProfile
+          ? {
+              ...prevProfile,
+              is_following: true,
+              followers: prevProfile.followers + 1,
+            }
+          : null
       );
     } catch (error) {
-      console.error('Error following user:', error);
+      console.error("Error following user:", error);
     }
-  }
-  const handleUnfollow= async() =>{
+  };
+  const handleUnfollow = async () => {
     try {
-      const token = localStorage.getItem('authToken')
-      await unfollowUser(userName!, token!)
-      setUserProfile((prevProfile) => 
-        prevProfile ? { 
-          ...prevProfile, 
-          is_following: false, 
-          followers: prevProfile.followers - 1 
-        } : null
+      const token = localStorage.getItem("authToken");
+      await unfollowUser(userName!, token!);
+      setUserProfile((prevProfile) =>
+        prevProfile
+          ? {
+              ...prevProfile,
+              is_following: false,
+              followers: prevProfile.followers - 1,
+            }
+          : null
       );
     } catch (error) {
-      console.error('Error following user:', error);
+      console.error("Error following user:", error);
     }
-  }
-  const handleAdminize= async () => {
+  };
+  const handleAdminize = async () => {
     try {
-      const token = localStorage.getItem('authToken')
-      await makeAdmin(userName!, token!)
-      setUserProfile((prevProfile) => 
-        prevProfile ? { 
-          ...prevProfile, 
-          is_admin: true, 
-        } : null
+      const token = localStorage.getItem("authToken");
+      await makeAdmin(userName!, token!);
+      setUserProfile((prevProfile) =>
+        prevProfile
+          ? {
+              ...prevProfile,
+              is_admin: true,
+            }
+          : null
       );
-      localStorage.setItem("is_admin",'true')
+      localStorage.setItem("is_admin", "true");
     } catch (error) {
-      console.error('Error following user:', error);
+      console.error("Error following user:", error);
     }
-  }
+  };
 
   if (profileLoading) {
-    return <div style={{ textAlign: 'center', marginTop: '20px' }}>Loading profile...</div>;
+    return (
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        Loading profile...
+      </div>
+    );
   }
 
   if (!userProfile) {
-    return <div style={{ textAlign: 'center', marginTop: '20px', color: 'red' }}>Error loading profile. Please try again later.</div>;
+    return (
+      <div style={{ textAlign: "center", marginTop: "20px", color: "red" }}>
+        Error loading profile. Please try again later.
+      </div>
+    );
   }
 
   const styles = {
     errorMessge: {
-      color: 'red',
-      fontSize: '12px', 
-      marginTop: '10px', 
-      textAlign: 'center' as 'center', 
+      color: "red",
+      fontSize: "12px",
+      marginTop: "10px",
+      textAlign: "center" as "center",
     },
     container: {
-      margin: '0 auto',
-      padding: '20px',
-      backgroundColor: '#f5f5f5',
-      borderRadius: '10px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      fontFamily: 'Arial, sans-serif',
+      margin: "0 auto",
+      padding: "20px",
+      backgroundColor: "#f5f5f5",
+      borderRadius: "10px",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      fontFamily: "Arial, sans-serif",
     },
     header: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '20px',
-      marginBottom: '20px',
-      justifyContent: 'space-between', // Add space between the profile info and the buttons
+      display: "flex",
+      alignItems: "center",
+      gap: "20px",
+      marginBottom: "20px",
+      justifyContent: "space-between", // Add space between the profile info and the buttons
     },
     profilePicture: {
-      width: '100px',
-      height: '100px',
-      borderRadius: '50%',
-      border: '2px solid #ddd',
+      width: "100px",
+      height: "100px",
+      borderRadius: "50%",
+      border: "2px solid #ddd",
     },
     profileInfo: {
       margin: 0,
     },
     followStats: {
-      display: 'flex',
-      gap: '20px',
-      fontSize: '14px',
-      color: '#555',
-      cursor:'pointer'
+      display: "flex",
+      gap: "20px",
+      fontSize: "14px",
+      color: "#555",
+      cursor: "pointer",
     },
     bio: {
-      marginBottom: '20px',
-      padding: '10px',
-      backgroundColor: '#eaeaea',
-      borderRadius: '8px',
+      marginBottom: "20px",
+      padding: "10px",
+      backgroundColor: "#eaeaea",
+      borderRadius: "8px",
     },
     posts: {
-      marginTop: '20px',
+      marginTop: "20px",
     },
     post: {
-      backgroundColor: '#fff',
-      padding: '10px',
-      marginBottom: '10px',
-      border: '1px solid #ddd',
-      borderRadius: '8px',
+      backgroundColor: "#fff",
+      padding: "10px",
+      marginBottom: "10px",
+      border: "1px solid #ddd",
+      borderRadius: "8px",
     },
     openButton: {
-      padding: '8px 12px',
-      fontSize: '14px',
-      borderRadius: '5px',
-      border: 'none',
-      cursor: 'pointer',
+      padding: "8px 12px",
+      fontSize: "14px",
+      borderRadius: "5px",
+      border: "none",
+      cursor: "pointer",
     },
     editButton: {
-      backgroundColor: '#ADD8E6', // Light blue
-      color: '#333',
-      display: 'flex',
-      alignItems: 'center',
-      fontSize: '14px',
-      fontWeight: 'bold',
+      backgroundColor: "#ADD8E6", // Light blue
+      color: "#333",
+      display: "flex",
+      alignItems: "center",
+      fontSize: "14px",
+      fontWeight: "bold",
     },
     postTitle: {
-      margin: '0 0 5px 0',
-      fontSize: '16px',
+      margin: "0 0 5px 0",
+      fontSize: "16px",
     },
     postContent: {
       margin: 0,
-      fontSize: '14px',
-      color: '#555',
+      fontSize: "14px",
+      color: "#555",
     },
     button: {
-      padding: '8px 12px',
-      border: 'none',
-      borderRadius: '5px',
-      cursor: 'pointer',
+      padding: "8px 12px",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer",
     },
     followButton: {
-      backgroundColor: '#4caf50',
-      color: 'white',
+      backgroundColor: "#4caf50",
+      color: "white",
     },
     adminButton: {
-      backgroundColor: '#f44336',
-      color: 'white',
+      backgroundColor: "#f44336",
+      color: "white",
     },
   };
 
   return (
-      <div style={styles.container}>
-        {/* Profile Header */}
-        <div style={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }} >
+    <div style={styles.container}>
+      {/* Profile Header */}
+      <div style={styles.header}>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
           {/* Profile Picture with Click to Upload */}
-          <div style={{ position: 'relative', cursor: 'pointer' }}>
-          {loggedInUsername === userName && (
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleFileSelect}
-              style={{ display: 'none' }} 
-              id="profile-pic-upload"
-            />)}
+          <div style={{ position: "relative", cursor: "pointer" }}>
+            {loggedInUsername === userName && (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                style={{ display: "none" }}
+                id="profile-pic-upload"
+              />
+            )}
             <label htmlFor="profile-pic-upload">
               <img
                 src={userProfile?.profile_picture || profilePath}
@@ -324,15 +359,17 @@ const Profile: React.FC = () => {
                 style={styles.profilePicture}
               />
               {loggedInUsername === userName && (
-                <div style={{
-                  position: 'absolute', 
-                  bottom: 0, 
-                  right: 0, 
-                  backgroundColor: 'rgba(0,0,0,0.5)', 
-                  color: 'white', 
-                  padding: '2px 5px', 
-                  borderRadius: '50%'
-                }}>
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    color: "white",
+                    padding: "2px 5px",
+                    borderRadius: "50%",
+                  }}
+                >
                   📷
                 </div>
               )}
@@ -341,44 +378,48 @@ const Profile: React.FC = () => {
 
           {/* Profile Picture Upload Popup */}
           {isProfilePicPopupOpen && (
-            <div style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 1000
-            }}>
-              <div style={{
-                backgroundColor: 'white',
-                padding: '20px',
-                borderRadius: '10px',
-                textAlign: 'center'
-              }}>
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(0,0,0,0.5)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 1000,
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "white",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  textAlign: "center",
+                }}
+              >
                 <h3>Upload Profile Picture</h3>
                 {selectedFile && (
-                  <img 
-                    src={URL.createObjectURL(selectedFile)} 
-                    alt="Selected" 
-                    style={{ 
-                      maxWidth: '200px', 
-                      maxHeight: '200px', 
-                      marginBottom: '10px' 
-                    }} 
+                  <img
+                    src={URL.createObjectURL(selectedFile)}
+                    alt="Selected"
+                    style={{
+                      maxWidth: "200px",
+                      maxHeight: "200px",
+                      marginBottom: "10px",
+                    }}
                   />
                 )}
                 <div>
-                  <button onClick={handleProfilePictureUpload}>
-                    Upload
-                  </button>
-                  <button onClick={() => {
-                    setIsProfilePicPopupOpen(false);
-                    setSelectedFile(null);
-                  }}>
+                  <button onClick={handleProfilePictureUpload}>Upload</button>
+                  <button
+                    onClick={() => {
+                      setIsProfilePicPopupOpen(false);
+                      setSelectedFile(null);
+                    }}
+                  >
                     Cancel
                   </button>
                 </div>
@@ -389,60 +430,85 @@ const Profile: React.FC = () => {
             <h1>{userProfile.username}</h1>
             <p>Reputation: {userProfile.reputation}</p>
             <div style={styles.followStats}>
-              <li onClick={visitFollowers}>Followers: {userProfile.followers}</li>
-              <li onClick={visitFollowings}>Following: {userProfile.following}</li>
+              <li onClick={visitFollowers}>
+                Followers: {userProfile.followers}
+              </li>
+              <li onClick={visitFollowings}>
+                Following: {userProfile.following}
+              </li>
             </div>
           </div>
         </div>
         {/* Buttons */}
-        <div style={{ display: 'flex', gap: '10px' }}>
-        {userProfile.username !== loggedInUsername && (
-              userProfile.is_following ? (
-                <button style={{ ...styles.button, ...styles.followButton }} onClick={handleUnfollow}>
-                  Unfollow
-                </button>
-              ) : (
-                <button style={{ ...styles.button, ...styles.followButton }} onClick={handleFollow}>
-                  Follow
-                </button>
-              )
-            )}
-            {isAdmin && !userProfile.is_admin && (
-              <button style={{ ...styles.button, ...styles.adminButton }} onClick={handleAdminize}>Make Admin</button>
-            )}
-          </div>
-        </div>
-
-        {/* Bio Section */}
-          <div style={styles.bio}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3>About:</h3>
-              {userProfile.username === loggedInUsername && (<button onClick={handleButtonClick} style={{ ...styles.openButton, ...styles.editButton }}>
-                <span style={{ marginRight: '8px' }}>✏️</span> Edit
-              </button>)}
-          </div>
-          <p>{userProfile.bio || 'No bio available.'}</p>
-          {isPopupOpen && (
-            <TextPopUp 
-              initialText={userProfile.bio}
-              onSubmit={handlePopupSubmit}
-              onClose={handlePopupClose}
-            />
+        <div style={{ display: "flex", gap: "10px" }}>
+          {userProfile.username !== loggedInUsername &&
+            (userProfile.is_following ? (
+              <button
+                style={{ ...styles.button, ...styles.followButton }}
+                onClick={handleUnfollow}
+              >
+                Unfollow
+              </button>
+            ) : (
+              <button
+                style={{ ...styles.button, ...styles.followButton }}
+                onClick={handleFollow}
+              >
+                Follow
+              </button>
+            ))}
+          {isAdmin && !userProfile.is_admin && (
+            <button
+              style={{ ...styles.button, ...styles.adminButton }}
+              onClick={handleAdminize}
+            >
+              Make Admin
+            </button>
           )}
-          {error && <div style={styles.errorMessge }>{error}</div>}
-        </div>
-
-        {/* Top Posts Section */}
-        <div style={styles.posts}>
-          <h3>Top Posts:</h3>
-            <PostListing
-              posts={postList}
-              fetchPosts={fetchPosts}
-              loading={postsLoading}
-              hasMore={hasMore}
-            />
         </div>
       </div>
+
+      {/* Bio Section */}
+      <div style={styles.bio}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <h3>About:</h3>
+          {userProfile.username === loggedInUsername && (
+            <button
+              onClick={handleButtonClick}
+              style={{ ...styles.openButton, ...styles.editButton }}
+            >
+              <span style={{ marginRight: "8px" }}>✏️</span> Edit
+            </button>
+          )}
+        </div>
+        <p>{userProfile.bio || "No bio available."}</p>
+        {isPopupOpen && (
+          <TextPopUp
+            initialText={userProfile.bio}
+            onSubmit={handlePopupSubmit}
+            onClose={handlePopupClose}
+          />
+        )}
+        {error && <div style={styles.errorMessge}>{error}</div>}
+      </div>
+
+      {/* Top Posts Section */}
+      <div style={styles.posts}>
+        <h3>Top Posts:</h3>
+        <PostListing
+          posts={postList}
+          fetchPosts={fetchPosts}
+          loading={postsLoading}
+          hasMore={hasMore}
+        />
+      </div>
+    </div>
   );
 };
 

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import logoPath from '../assets/bugbyteLogo.svg';
-import profilePath from '../assets/user-profile.svg';
-import searchIconPath from '../assets/search.png';
+import React, { useEffect, useState } from "react";
+import logoPath from "../assets/bugbyteLogo.svg";
+import PostModal from "./PostModal";
+import searchIconPath from "../assets/search.png";
+import profilePath from "../assets/user-profile.svg";
+import { Link, useNavigate } from "react-router-dom";
 import notificationsIconPath from '../assets/notifications.png';
-import PostModal from './PostModal';
 import { Notification } from '../pages/TestPage';
 import WebSocketService from '../API/socketService';
 import { API_URLS } from "../API/ApiUrls";
@@ -91,18 +91,18 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   
   const handleSavePost = async (postDetails: PostDetails) => {
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem("authToken");
       if (!token) {
-        alert('No auth token found. Please log in.');
+        alert("No auth token found. Please log in.");
         return;
       }
-  
+
       const validation = validatePostDetails(postDetails);
       if (!validation.isValid) {
-        alert(validation.errors.join('\n'));
+        alert(validation.errors.join("\n"));
         return;
       }
-  
+
       const id = await postQuestion(
         postDetails.content,
         postDetails.title!,
@@ -110,48 +110,21 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
         postDetails.communityId!,
         token
       );
-  
+
       navigate(`/Posts/${id}`);
     } catch (error) {
-      console.error('Error saving post:', error);
-      alert('An error occurred while saving the post. Please try again.');
+      console.error("Error saving post:", error);
+      alert("An error occurred while saving the post. Please try again.");
     } finally {
       setShowModal(false);
     }
   };
-  // const handleUpdateProfilePicture = async (url: string) => {
-  //   try {
-  //     const token = localStorage.getItem('authToken');
-  //     if (!token) {
-  //       console.error('No auth token found');
-  //       return;
-  //     }
-
-  //     const response = await fetch(API_URLS.UPDATE_PROFILE_PICTURE, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Authorization': `Bearer ${token}`,
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify({ url })
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Updating Profile Picture failed');
-  //     }
-
-  //     // Update local state with new profile picture
-  //     setProfilePicFetched(url);
-  //   } catch (error) {
-  //     console.error('Error updating profile picture:', error);
-  //   }
-  // }
   
 
   return (
     <nav style={styles.navbar}>
       {/* Logo and Brand Name */}
-      <div style={styles.logoContainer} onClick={() => navigate('/')}>
+      <div style={styles.logoContainer} onClick={() => navigate("/")}>
         <img src={logoPath} alt="Logo" style={styles.logo} />
         <span style={styles.brandName}>BugByte</span>
       </div>
@@ -233,9 +206,9 @@ const styles: Record<string, React.CSSProperties> = {
     height: '80px',
   },
   logoContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    cursor: 'pointer',
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
   },
   logo: {
     height: '80px',
