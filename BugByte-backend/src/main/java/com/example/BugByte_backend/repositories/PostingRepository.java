@@ -166,6 +166,7 @@ public class PostingRepository implements IPostingRepository{
     private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
 
+
     @Autowired
     private JdbcTemplate jdbcTemplate ;
 
@@ -285,6 +286,7 @@ public class PostingRepository implements IPostingRepository{
             throw new NullPointerException("question id or value is null");
         Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
                 new Object[]{ userName, questionId }, Integer.class);
+        count = (count == null) ? 1 : count;
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already up voted this question");
@@ -313,6 +315,7 @@ public class PostingRepository implements IPostingRepository{
 
         Integer count = jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE,
                 new Object[]{ userName, questionId }, Integer.class);
+        count = (count == null) ? 1 : count;
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already down voted this question");
