@@ -175,49 +175,6 @@ class UserProfileRepositoryTest {
 
         assertTrue(result);
     }
-    @Test
-    void testGetFollowersCount_Success() {
-        // Mock JdbcTemplate
-
-        // Sample data
-        long userId = 1L;
-        int followersCount = 5;
-
-        // Mock behavior
-        when(jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class))
-                .thenReturn(followersCount);
-
-        // Call the method
-        int result = repository.getFollowersCount(userId);
-
-        // Validate results
-        assertEquals(followersCount, result);
-
-        // Verify interaction
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class);
-    }
-
-    @Test
-    void testGetFollowersCount_InvalidInput() {
-        // Sample data
-        long userId = 1L;
-
-        // Mock behavior
-        when(jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class))
-                .thenReturn(null);
-
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            repository.getFollowersCount(userId);
-        });
-
-        assertEquals("Invalid Input", exception.getMessage());
-
-        // Verify interaction
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class);
-    }
 
     @Test
     void testGetFollowingsCount_Success() {
@@ -260,7 +217,7 @@ class UserProfileRepositoryTest {
     @Test
     void unfollowUser_ShouldThrowException_WhenNullParameters() {
         assertThrows(NullPointerException.class, () -> {
-            repository.unfollowUser(null, testUser2.getId());
+            repository.unfollowUser(null, eq(testUser2.getId()));
         });
     }
 

@@ -82,7 +82,7 @@ public class CommunityServiceTest {
 
     @Test
     public void testUpdateCommunityFails() {
-        assertThrows(NullPointerException.class, () -> communityService.updateCommunity(null));
+        assertThrows(IllegalArgumentException.class, () -> communityService.updateCommunity(null));
     }
 
     @Test

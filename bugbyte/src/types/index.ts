@@ -5,7 +5,7 @@ export interface User {
 }
 
 export  interface IQuestion {
-    questionId: string;
+    questionId: number;
     upVotes: number;
     mdContent: string;
     isDownVoted: boolean;
@@ -16,14 +16,14 @@ export  interface IQuestion {
     opName: string;
     postedOn: string;
     communityName: string;
-    communityId: string;
+    communityId: number;
     isUpvoted: boolean;
     isDownvoted: boolean;
   }
 
   export interface IAnswer {
-    answerId: string;
-    questionId: string;
+    answerId: number;
+    questionId: number;
     opName: string;
     postedOn: string;
     upVotes: number;

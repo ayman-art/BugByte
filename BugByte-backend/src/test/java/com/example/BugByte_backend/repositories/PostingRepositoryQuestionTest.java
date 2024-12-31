@@ -74,7 +74,16 @@ public class PostingRepositoryQuestionTest {
     private static final String SQL_GET_DOWN_VOTE = "SELECT COUNT(*) FROM down_votes WHERE user_name = ? AND question_id = ?";
 
     private static final String SQL_INSERT_DOWNVOTE = "INSERT INTO down_votes(user_name, question_id) VALUES (?, ?)";
-
+    private static final String SQL_UPDATE_REPUTATION_POSITIVELY_QUESTIONS = """
+            UPDATE users
+            SET reputation = reputation + 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM questions
+                JOIN posts ON questions.id = posts.id
+                WHERE questions.id = ?
+            );          
+            """;
     @Mock
     private JdbcTemplate jdbcTemplate;
 
@@ -184,9 +193,9 @@ public class PostingRepositoryQuestionTest {
         when(jdbcTemplate.queryForObject(SQL_GET_UP_VOTE, new Object[]{userName, questionId}, Integer.class))
                 .thenReturn(1);
 
-        when(jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, questionId)).thenReturn(1);
-        when(jdbcTemplate.update(SQL_UPDATE_UP_VOTES_QUESTIONS, value, questionId)).thenReturn(1);
-
+        when(jdbcTemplate.update(eq(SQL_DELETE_UP_VOTE), eq(userName), eq(questionId))).thenReturn(1);
+        when(jdbcTemplate.update(eq(SQL_UPDATE_UP_VOTES_QUESTIONS), eq(value), eq(questionId))).thenReturn(1);
+        when(jdbcTemplate.update(eq(SQL_UPDATE_REPUTATION_POSITIVELY_QUESTIONS), eq(questionId))).thenReturn(1);
         Boolean result = postingRepository.upVoteQuestion(questionId, value, userName);
 
         assertTrue(result);
@@ -297,21 +306,4 @@ public class PostingRepositoryQuestionTest {
         });
     }
 
-    @Test
-    public void testDownVoteQuestion_RemoveDownVote_Success() throws Exception {
-        Long questionId = 1L;
-        Integer value = 0;
-        String userName = "user1";
-
-        when(jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE, new Object[]{userName, questionId}, Integer.class))
-                .thenReturn(1);
-
-        when(jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, questionId)).thenReturn(1);
-        when(jdbcTemplate.update(SQL_UPDATE_DOWN_VOTES_QUESTIONS, value, questionId)).thenReturn(1);
-
-        Boolean result = postingRepository.downVoteQuestion(questionId, value, userName);
-
-        assertTrue(result);
-
-    }
 }

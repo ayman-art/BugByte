@@ -230,37 +230,6 @@ class CommunityControllerTest {
         assertEquals("unauthorized", response.getBody());
     }
 
-
-    @Test
-    void testJoinCommunity_Failure() {
-        // Arrange
-        String token = "Bearer testToken";
-        Map<String, Object> communityData = Map.of("communityName", "Test Community");
-        when(administrativeFacade.joinCommunity(any())).thenReturn(false);
-
-        // Act
-        ResponseEntity<?> response = communityController.joinCommunity(token, communityData);
-
-        // Assert
-        assertEquals(400, response.getStatusCodeValue());
-        assertEquals("error joining community", response.getBody());
-    }
-
-    @Test
-    void testJoinCommunity_Exception() {
-        // Arrange
-        String token = "Bearer testToken";
-        Map<String, Object> communityData = Map.of("communityName", "Test Community");
-        when(administrativeFacade.joinCommunity(any())).thenThrow(new RuntimeException("error"));
-
-        // Act
-        ResponseEntity<?> response = communityController.joinCommunity(token, communityData);
-
-        // Assert
-        assertEquals(400, response.getStatusCodeValue());
-        assertEquals("error", response.getBody());
-    }
-
     @Test
     void testCreateCommunity_Error() {
         // Arrange

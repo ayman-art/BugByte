@@ -167,6 +167,62 @@ public class PostingRepositoryPostTest {
     private static final String SQL_DELETE_ANSWERS_BY_QUESTION_ID = "DELETE FROM answers WHERE question_id = ?;";
     private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
+    private static final String SQL_UPDATE_REPUTATION_POSITIVELY_QUESTIONS = """
+            UPDATE users
+            SET reputation = reputation + 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM questions
+                JOIN posts ON questions.id = posts.id
+                WHERE questions.id = ?
+            );          
+            """;
+
+    private static final String SQL_UPDATE_REPUTATION_NEGATIVELY_QUESTIONS = """
+            UPDATE users
+            SET reputation = reputation - 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM questions
+                JOIN posts ON questions.id = posts.id
+                WHERE questions.id = ?
+            );
+            """;
+
+    private static final String SQL_UPDATE_REPUTATION_POSITIVELY_ANSWERS = """
+            UPDATE users
+            SET reputation = reputation + 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM answers
+                JOIN posts ON answers.id = posts.id
+                WHERE answers.id = ?
+            );
+            """;
+
+
+    private static final String SQL_UPDATE_REPUTATION_NEGATIVELY_ANSWERS = """
+            UPDATE users
+            SET reputation = reputation - 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM answers
+                JOIN posts ON answers.id = posts.id
+                WHERE answers.id = ?
+            );          
+            """;
+
+    private static final String SQL_UPDATE_REPUTATION_VERIFIED_ANSWER = """
+            UPDATE users
+            SET reputation = reputation + 10
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM answers
+                JOIN posts ON answers.id = posts.id
+                WHERE answers.id = ?
+            );
+            """;
+
     @Mock
     private JdbcTemplate jdbcTemplate;
 
@@ -284,6 +340,7 @@ public class PostingRepositoryPostTest {
         Long questionId = 1L;
 
         when(jdbcTemplate.update(eq(SQL_VERIFY_ANSWER), eq(answerId), eq(questionId))).thenReturn(1);
+        when(jdbcTemplate.update(eq(SQL_UPDATE_REPUTATION_VERIFIED_ANSWER), eq(answerId))).thenReturn(1);
 
         Boolean result = postingRepository.verifyAnswer(answerId, questionId);
 

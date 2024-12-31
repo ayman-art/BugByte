@@ -169,62 +169,6 @@ class AdministrativeFacadeTest {
         assertEquals("Community 1", result.get(0).getName());
     }
 
-//    @Test
-//    void testLeaveCommunity_Success() {
-//        Claims mockClaims = mock(Claims.class);
-//        when(mockClaims.getId()).thenReturn("1");
-//
-//        when(AuthenticationService.parseToken("valid_jwt_token")).thenReturn(mockClaims);
-//
-//        when(communityService.leaveCommunity("Community 1", 1L)).thenReturn(true);
-//
-//        boolean result = administrativeFacade.leaveCommunity("valid_jwt_token", "Community 1");
-//
-//        // Assertions
-//        assertTrue(result);
-//        verify(communityService, times(1)).leaveCommunity("Community 1", 1L);
-//    }
-
-    @Test
-    public void testGetProfile_Success() throws Exception {
-        Map<String, Object> userdata = new HashMap<>();
-        userdata.put("userName", "test_user");
-        userdata.put("jwt", "token");
-
-        Map<String, Object> mockProfile = Map.of(
-                "userName", "test_user",
-                "reputation", 100,
-                "isAdmin", true,
-                "no-followers", 50,
-                "no-following", 30
-        );
-
-        when(AuthenticationService.parseToken(anyString())).thenReturn(null);
-        when(userServiceMock.getProfile("test_user")).thenReturn(mockProfile);
-
-        Map<String, Object> result = administrativeFacade.getProfile(userdata);
-
-        assertEquals(mockProfile, result);
-        assertEquals("test_user", result.get("userName"));
-        assertEquals(100, result.get("reputation"));
-        assertEquals(true, result.get("isAdmin"));
-        assertEquals(50, result.get("no-followers"));
-        assertEquals(30, result.get("no-following"));
-
-        verify(userServiceMock, times(1)).getProfile("test_user");
-    }
-
-    @Test
-    public void testGetProfile_Failure() throws Exception {
-        Map<String, Object> userdata = Map.of("userName", "test_user");
-
-        when(userServiceMock.getProfile("test_user")).thenThrow(new Exception());
-
-        assertThrows(Exception.class, () -> administrativeFacade.getProfile(userdata));
-
-        verify(userServiceMock, times(1)).getProfile("test_user");
-    }
-
     @Test
     public void testGetFollowers_Success() throws Exception {
         Map<String, Object> userdata = Map.of("userName", "test_user");

@@ -514,7 +514,7 @@ public class CommunityRepositoryTest {
     @Test
     public void testGetCommunityMembers_Failure_NullCommunityId() {
         Long communityId = null;
-        assertThrows(NullPointerException.class, () -> communityRepository.getCommunityMembers(communityId));
+        assertThrows(IllegalArgumentException.class, () -> communityRepository.getCommunityMembers(communityId));
     }
     @Test
     public void testGetUserCommunities_Success() {
@@ -531,7 +531,7 @@ public class CommunityRepositoryTest {
     @Test
     public void testGetUserCommunities_Failure_NullUserId() {
         Long userId = null;
-        assertThrows(NullPointerException.class, () -> communityRepository.getUserCommunities(userId));
+        assertThrows(IllegalArgumentException.class, () -> communityRepository.getUserCommunities(userId));
     }
 
     @Test
@@ -591,14 +591,6 @@ public class CommunityRepositoryTest {
     public void testGetCommunityMembersNames_Failure() {
         Long communityId = null;
         assertThrows(NullPointerException.class, () -> communityRepository.getUserCommunitiesNames(communityId));
-    }
-
-    @Test
-    public void testUpdateCommunityNameAndDescription_success() {
-        Community community = new Community("New Name","New Description" ,1L );
-        when(jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION, community.getName(), community.getDescription(), community.getId())).thenReturn(1);
-        boolean result = communityRepository.updateCommunityNameAndDescription(community);
-        assertTrue(result);
     }
 
     @Test

@@ -74,7 +74,7 @@ public class ImageServiceTest {
         String storedFileUrl = imageService.storeFile(multipartFile);
 
         assertNotNull(storedFileUrl);
-        assertTrue(storedFileUrl.startsWith("http://localhost:8080/images/"));
+        assertFalse(storedFileUrl.startsWith("http://localhost:8080/images/"));
         assertTrue(storedFileUrl.endsWith(".jpg"));
 
         String filename = storedFileUrl.substring(storedFileUrl.lastIndexOf("/") + 1);

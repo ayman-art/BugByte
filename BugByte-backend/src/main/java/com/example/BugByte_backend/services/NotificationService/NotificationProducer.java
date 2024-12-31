@@ -54,7 +54,7 @@ public class NotificationProducer {
             User op = userService.getUser(opUserName);
             Long opId = op.getId();
             String replyOpUserName = reply.getCreatorUserName();
-            String message = replyOpUserName + " has replied to your question!";
+            String message = replyOpUserName + " has replied to your answer!";
             String link = "/posts/"+q.getId();
             sendNotification(message, opId, link);
         }catch (Exception e){
