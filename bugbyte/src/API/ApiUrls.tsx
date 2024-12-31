@@ -41,7 +41,7 @@ export const API_URLS = {
   ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`,
   LEAVE_COMMUNITY: `${API_BASE_URL}/communities/leaveCommunity`,
   SET_MODERATOR:`${API_BASE_URL}/communities/setModerator`,
-  REMOVE_MODERATOR:`${API_BASE_URL}/communities/getCommunity`,
+  REMOVE_MODERATOR:`${API_BASE_URL}/communities/removeModerator`,
   DELETE_COMMUNITY:`${API_BASE_URL}/communities/deleteCommunity`,
   REMOVE_MEMBER:`${API_BASE_URL}/communities/removeMember`,
   IS_MODERATOR:`${API_BASE_URL}/communities/isModerator`,
