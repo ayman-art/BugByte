@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -33,8 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class PostingControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
     @Mock
     private InteractionFacade interactionFacade;
 
@@ -167,29 +166,45 @@ class PostingControllerTest {
 
     @Test
     void getQuestionSuccess() throws Exception {
-        String token = "Bearer validToken"; // Replace with a valid token
-        Long questionId = 1L;
+        // Arrange
+        String token = "Bearer testToken";
+        Long questionId = 123L;
+        Map<String, Object> request = new HashMap<>();
+        request.put("jwt", token.replace("Bearer ", ""));
+        request.put("questionId", questionId.intValue());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/questions")
-                        .header("Authorization", token)
-                        .param("questionId", questionId.toString())
-                        .contentType("application/json"))
-                .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$.status").value("OK"))
-                .andExpect((ResultMatcher) jsonPath("$.data").isNotEmpty()); // Adjust as needed for the response structure
+        Map<String, Object> expectedResponse = Map.of(
+                "questionId", "123",
+                "mdContent", "Test content",
+                "title", "Test title",
+                "tags", new String[]{"tag1", "tag2"}
+        );
+        when(interactionFacade.getQuestion(request)).thenReturn(expectedResponse);
+
+        // Act
+        ResponseEntity<?> result = postingController.getQuestion(token, questionId);
+
+        // Assert
+        verify(interactionFacade, times(1)).getQuestion(request);
+        assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
     @Test
     void getQuestionFailure() throws Exception {
-        String token = "Bearer invalidToken"; // Invalid token
-        Long questionId = 1L;
+        // Arrange
+        String token = "Bearer testToken";
+        Long questionId = 123L;
+        Map<String, Object> request = new HashMap<>();
+        request.put("jwt", token.replace("Bearer ", ""));
+        request.put("questionId", questionId.intValue());
+        when(interactionFacade.getQuestion(request)).thenThrow(new Exception("Test exception"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/questions")
-                        .header("Authorization", token)
-                        .param("questionId", questionId.toString())
-                        .contentType("application/json"))
-                .andExpect(status().isUnauthorized())
-                .andExpect((ResultMatcher) jsonPath("$.message").value("Unauthorized"));
+        // Act
+        ResponseEntity<?> result = postingController.getQuestion(token, questionId);
+
+        // Assert
+        verify(interactionFacade, times(1)).getQuestion(request);
+        assertEquals(HttpStatus.UNAUTHORIZED, result.getStatusCode());
     }
 
     @Test
@@ -199,7 +214,7 @@ class PostingControllerTest {
         Long questionId = 123L;
         Map<String, Object> request = new HashMap<>();
         request.put("jwt", token.replace("Bearer ", ""));
-        request.put("questionId", questionId);
+        request.put("questionId", questionId.intValue());
         when(interactionFacade.getQuestion(request)).thenThrow(new Exception("Test exception"));
 
         // Act
@@ -218,7 +233,7 @@ class PostingControllerTest {
         Long answerId = 123L;
         Map<String, Object> request = new HashMap<>();
         request.put("jwt", token.replace("Bearer ", ""));
-        request.put("answerId", answerId);
+        request.put("answerId", answerId.intValue());
         Map<String, Object> expectedResponse = Map.of(
                 "answerId", "123",
                 "mdContent", "Test content",
@@ -243,7 +258,7 @@ class PostingControllerTest {
         Long answerId = 123L;
         Map<String, Object> request = new HashMap<>();
         request.put("jwt", token.replace("Bearer ", ""));
-        request.put("answerId", answerId);
+        request.put("answerId", answerId.intValue());
         when(interactionFacade.getAnswer(request)).thenThrow(new Exception("Test exception"));
 
         // Act
@@ -262,11 +277,11 @@ class PostingControllerTest {
         Long replyId = 123L;
         Map<String, Object> request = new HashMap<>();
         request.put("jwt", token.replace("Bearer ", ""));
-        request.put("replyId", replyId);
+        request.put("replyId", replyId.intValue());
         Map<String, Object> expectedResponse = Map.of(
-                "replyId", "123",
+                "replyId", "123L",
                 "mdContent", "Test content",
-                "answerId", "123"
+                "answerId", "123L"
         );
         when(interactionFacade.getReply(request)).thenReturn(expectedResponse);
 
@@ -286,7 +301,7 @@ class PostingControllerTest {
         Long replyId = 123L;
         Map<String, Object> request = new HashMap<>();
         request.put("jwt", token.replace("Bearer ", ""));
-        request.put("replyId", replyId);
+        request.put("replyId", replyId.intValue());
         when(interactionFacade.getReply(request)).thenThrow(new Exception("Test exception"));
 
         // Act
@@ -307,7 +322,7 @@ class PostingControllerTest {
         int limit = 10;
         Map<String, Object> request = new HashMap<>();
         request.put("jwt", token.replace("Bearer ", ""));
-        request.put("questionId", questionId);
+        request.put("questionId", questionId.intValue());
         request.put("offset", offset);
         request.put("limit", limit);
 
