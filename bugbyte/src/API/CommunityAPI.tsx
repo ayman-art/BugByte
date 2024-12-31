@@ -146,3 +146,18 @@ export const createCommunity = async (
     throw error;
   }
 };
+
+export const fetchCommunityMembers = async (communityId: string) => {
+  const token = localStorage.getItem("authToken");
+  const response = await fetch(`${API_URLS.COMMUNTIY_MEMBERS}/${communityId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch community members");
+  }
+
+  return await response.json();
+};

@@ -5,9 +5,8 @@ import {
   joinCommunity,
   LeaveCommunity,
 } from "../API/CommunityAPI";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import PostListing, { Post } from "../components/PostListing";
-import { Question } from "../Models/Question";
 
 export interface Community {
   id: number;
@@ -26,6 +25,7 @@ const CommunityPage: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [postList, setPostList] = useState<Post[]>([]);
   const [hasMore, setHasMore] = useState(true); // If more posts are available
+  const navigate = useNavigate();
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -141,6 +141,10 @@ const CommunityPage: React.FC = () => {
     }
   };
 
+  const handleViewMembers = () => {
+    navigate(`/community-members/${communityId}`);
+  };
+
   const styles: { [key: string]: React.CSSProperties } = {
     container: {
       padding: "20px",
@@ -193,6 +197,15 @@ const CommunityPage: React.FC = () => {
       marginTop: "20px",
       float: "right",
     },
+    viewMembersButton: {
+      marginTop: "10px",
+      padding: "8px 16px",
+      backgroundColor: "#007BFF",
+      color: "#fff",
+      border: "none",
+      borderRadius: "4px",
+      cursor: "pointer",
+    },
   };
 
   if (loading) return <div style={styles.loading}>Loading...</div>;
@@ -212,6 +225,13 @@ const CommunityPage: React.FC = () => {
               <span style={styles.label}>Created on:</span>{" "}
               {new Date(community.creationDate).toLocaleDateString()}
             </p>
+
+            <button
+              onClick={handleViewMembers}
+              style={styles.viewMembersButton}
+            >
+              View Members
+            </button>
           </div>
 
           {/* Join or Leave Button */}

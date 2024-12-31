@@ -20,6 +20,7 @@ import HomePage from "./pages/HomePage";
 import CommunityListingPage from "./pages/CommunityListPage";
 import CommunitySearchPage from "./pages/CommunitySearchPage";
 import JoinedCommunitiesPage from "./pages/JoinedCommunititesPage";
+import CommunityMembersPage from "./pages/CommunityMembersPage";
 
 const isLoggedIn = false;
 
@@ -102,6 +103,14 @@ const App: React.FC = () => {
               element={
                 <Layout onLogout={handleLogout}>
                   <CommunityPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="/community-members/:communityId"
+              element={
+                <Layout onLogout={handleLogout}>
+                  <CommunityMembersPage />
                 </Layout>
               }
             />

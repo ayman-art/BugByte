@@ -166,14 +166,15 @@ public class CommunityController {
         }
     }
 
-    @GetMapping("/community-members")
+    @GetMapping("/community-members/{communityId}")
     public ResponseEntity<?> getCommunityMembers(@RequestHeader("Authorization") String token,
-                                                 @RequestParam long communityId) {
+                                                 @PathVariable long communityId) {
         try {
             String jwt = token.replace("Bearer ", "");
             List<Map<String, Object>> users = administrativeFacade.getCommunityMembers(jwt, communityId);
             return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
