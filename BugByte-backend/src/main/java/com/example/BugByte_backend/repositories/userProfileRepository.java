@@ -28,7 +28,7 @@ public class userProfileRepository {
                 WHERE f.follower_id = ?;
             """;
     private static final String SQL_GET_FOLLOWERS_COUNT = """
-                SELECT COUNT(* )
+                SELECT COUNT(*)
                 FROM followers f
                 JOIN users u ON f.follower_id = u.id
                 WHERE f.followed_id = ?;
@@ -52,6 +52,25 @@ public class userProfileRepository {
                 SET bio = ?
                 WHERE id = ?;
             """;
+
+    private static final String SQL_GET_POSITIVE_INTERACTIONS = """
+                SELECT
+                    COUNT(*)
+                FROM
+                    posts p JOIN upvotes uv ON p.id = uv.post_id
+                WHERE
+                    op_name = ?
+            """;
+
+    private static final String SQL_GET_NEGATIVE_INTERACTIONS = """
+                SELECT
+                    COUNT(*)
+                FROM
+                    posts p JOIN downvotes dv ON p.id = dv.post_id
+                WHERE
+                    op_name = ?
+            """;
+
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -126,6 +145,34 @@ public class userProfileRepository {
             throw new RuntimeException("Invalid Input");
 
         return count;
+    }
+
+    public Integer getReputation(String userName) {
+        if (userName == null || userName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+
+        try {
+            Integer positiveReputation = jdbcTemplate.queryForObject(
+                    SQL_GET_POSITIVE_INTERACTIONS,
+                    new Object[]{ userName },
+                    Integer.class
+            );
+
+            Integer negativeReputation = jdbcTemplate.queryForObject(
+                    SQL_GET_NEGATIVE_INTERACTIONS,
+                    new Object[]{ userName },
+                    Integer.class
+            );
+
+            Integer rep = positiveReputation - negativeReputation;
+
+            System.out.println("Reputation is : " + rep);
+            return  rep != null ? rep : 0;
+
+        } catch (Exception e) {
+            throw new NullPointerException("Cannot get the reputation");
+        }
     }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> User.builder()
