@@ -103,6 +103,21 @@ public class CommunityController {
             return false;
         }
     }
+    @RequestMapping(method =RequestMethod.GET , value = "/isModeratorByName/{communityId}/{username}")
+    public boolean isModeratorByName(@RequestHeader("Authorization") String token ,@PathVariable Long communityId ,
+                                     @PathVariable String userName) {
+        token = token.replace("Bearer ", "");
+        try {
+            if(administrativeFacade.isModeratorByName(token , communityId , userName)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
     @PostMapping("/removeModerator")
     public ResponseEntity<?> removeModerator(@RequestBody Map<String, Object> moderatorData) {
         try {

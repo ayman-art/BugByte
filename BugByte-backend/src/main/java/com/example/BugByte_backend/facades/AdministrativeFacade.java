@@ -294,6 +294,19 @@ public class AdministrativeFacade {
             return false;
         }
     }
+    public boolean isModeratorByName(String jwt , Long communityId , String userName)
+    {
+        try {
+            boolean isAdmin = authenticationService.getIsAdminFromJwt(jwt);
+            if (!isAdmin) throw new Exception("user is not an admin");
+
+            return moderatorService.isModeratorByName(userName,communityId);
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
     public boolean removeMember(Map<String,Object>req)
     {
         try {

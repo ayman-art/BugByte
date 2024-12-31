@@ -19,6 +19,11 @@ public class ModeratorRepository implements IModeratorRepository{
                 WHERE id = ? AND community_id = ?;
             """;
     private static final String SQL_IS_MODERATOR = "SELECT COUNT(*) FROM moderators WHERE id = ? AND community_id = ?";
+    private static final String SQL_IS_MODERATOR_BY_NAME =
+            "SELECT COUNT(*) " +
+                    "FROM moderators m " +
+                    "JOIN users u ON m.user_id = u.id " +
+                    "WHERE u.user_name = ? AND m.community_id = ?";
 
 
     @Autowired
@@ -57,6 +62,15 @@ public class ModeratorRepository implements IModeratorRepository{
             throw new NullPointerException("member Id or community Id is null");
         }
         int count = jdbcTemplate.queryForObject(SQL_IS_MODERATOR, Integer.class, userId, communityId);
+        return count==1;
+
+    }
+    public boolean isModeratorByName(String userName, Long communityId)
+    {
+        if (userName == null || communityId == null) {
+            throw new NullPointerException("member Id or community Id is null");
+        }
+        int count = jdbcTemplate.queryForObject(SQL_IS_MODERATOR_BY_NAME, Integer.class, userName, communityId);
         return count==1;
 
     }

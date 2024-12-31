@@ -42,4 +42,11 @@ public class ModeratorService {
             return false;
         }
     }
+    public boolean isModeratorByName(String userName, Long communityId) {
+        try {
+            return modRepo.isModeratorByName(userName, communityId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
