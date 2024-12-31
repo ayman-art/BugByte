@@ -20,7 +20,8 @@ import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import { IAnswer, IReply } from '../../types';
-import { downvoteAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
+import { downvoteAnswer, editAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
+import validatePostDetails from '../../utils/validateQuestion';
 import { isModerator } from '../../API/ModeratorApi';
 
 interface AnswerProps extends IAnswer {
@@ -50,8 +51,7 @@ const Answer: React.FC<AnswerProps> = ({
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [verified, setVerified] = useState(isVerified);
-  const [enableVerifyState, setEnableVerify] = useState(enabledVerify); // State for enabling/disabling verify button
+  const [markdownState, setMarkdownState] = useState(mdContent);
   const [isUserModerator, setIsUserModerator] = useState(false); // New state for moderator status
 
   const navigate = useNavigate();
@@ -162,8 +162,13 @@ const Answer: React.FC<AnswerProps> = ({
     setIsReplyModalOpen(false);
   };
 
-  const handleEditSave = (postDetails: { content: string }) => {
-    console.log('Post edited:', postDetails);
+  const handleEditSave = async (postDetails: { content: string }) => { 
+    if (postDetails.content.trim() === '') {
+      alert('Answer content cannot be empty.');
+      return;
+    }
+    await editAnswer(answerId, postDetails.content, token!);
+    setMarkdownState(postDetails.content);
     setIsEditModalOpen(false);
   };
 
@@ -191,7 +196,8 @@ const Answer: React.FC<AnswerProps> = ({
 
         <section className="answer-body">
           <MDXEditor
-            markdown={mdContent}
+            key={markdownState}
+            markdown={markdownState}
             readOnly
             plugins={[
               headingsPlugin(),
@@ -279,7 +285,7 @@ const Answer: React.FC<AnswerProps> = ({
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: mdContent }}
+        initialData={{ content: markdownState }}
         type="md-only"
       />
     </div>

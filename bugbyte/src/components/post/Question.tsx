@@ -21,7 +21,7 @@ import {
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
-import { downvoteQuestion, postAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
+import { downvoteQuestion, editQuestion, postAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
   onDelete: (questionId: string) => void;
@@ -186,6 +186,7 @@ const handleRemoveMember = async () => {
     setVoteStatus('downvoted');
   };
 
+
   const handleReplySave = async (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
     if (!token || !loggedInUsername) {
@@ -212,8 +213,14 @@ const handleRemoveMember = async () => {
     });
   };
 
-  const handleEditSave = (postDetails: { content: string }) => {
-    // later
+  const handleEditSave = async (postDetails: { content: string, title: string, tags: string[] }) => {
+    if (!postDetails.content.trim() || !postDetails.title.trim()) {
+      alert('Title and content cannot be empty.');
+      return;
+    }
+    await editQuestion(questionId, postDetails.title, postDetails.content, postDetails.tags, token!);
+    console.log('Question edited:', postDetails);
+    setMarkdownState(postDetails.content);
     setIsEditModalOpen(false);
   };
 
@@ -253,8 +260,8 @@ const handleRemoveMember = async () => {
           </p>
           <section className="question-body">
             <MDXEditor
-              key={mdContent}
-              markdown={mdContent}
+              key={markdownState}
+              markdown={markdownState}
               readOnly
               plugins={[
                 headingsPlugin(),
@@ -353,7 +360,7 @@ const handleRemoveMember = async () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: mdContent, title, tags }}
+        initialData={{ content: markdownState, title, tags }}
         type="no-community"
       />
     </div>

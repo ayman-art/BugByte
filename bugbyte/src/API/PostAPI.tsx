@@ -230,6 +230,7 @@ export const editQuestion = async (questionId: string, title: string, mdContent:
         },
         body: JSON.stringify({ title, mdContent, tags }),
         });
+        console.log('body', JSON.stringify({title, mdContent, tags}));
 
         if (!response.ok) {
         const errorData = await response.json();
