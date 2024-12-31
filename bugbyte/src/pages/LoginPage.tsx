@@ -85,7 +85,6 @@ const Login: React.FC<loginProps> = ({onLogin}) => {
       const { jwt, isAdmin } = data;
       if (jwt) {
         localStorage.setItem('authToken', jwt);
-       // localStorage.setItem('isAdmin')
         saveData(jwt)
         onLogin()
         navigate('/');
