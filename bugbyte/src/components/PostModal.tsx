@@ -49,6 +49,10 @@ interface PostModalProps {
   initialData?: PostDetails;
 }
 
+const defaultContent = `Title!
+---
+content`;
+
 const PostModal: React.FC<PostModalProps> = ({ 
   isOpen, 
   onClose, 
@@ -56,17 +60,12 @@ const PostModal: React.FC<PostModalProps> = ({
   type = 'full',
   initialData
 }) => {
-  const [markdown, setMarkdown] = useState(`
-      Title!
-      ---
-      content
-      `);
+  const [markdown, setMarkdown] = useState(initialData?.content || defaultContent);
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState<string>('');
   const [selectedCommunity, setSelectedCommunity] = useState<number>(initialData?.communityId!);
-  const [postContent, setPostContent] = useState<string>(initialData?.content || '');
   const [postTitle, setPostTitle] = useState<string>(initialData?.title || '');
- const navigate = useNavigate();
+  const navigate = useNavigate();
   
   const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
   const handleAddTag = () => {
@@ -89,7 +88,7 @@ const PostModal: React.FC<PostModalProps> = ({
     setTagInput('');
     setTags(initialData?.tags || []);
     setSelectedCommunity(initialData?.communityId!);
-    setPostContent(initialData?.content || '');
+    setMarkdown(initialData?.content || defaultContent);
     setPostTitle(initialData?.title || '');
   }
 
@@ -104,32 +103,8 @@ const PostModal: React.FC<PostModalProps> = ({
     if (type === 'full') {
       postDetails.communityId = selectedCommunity;
     }
-    try {
-          const token = localStorage.getItem('authToken');
-          if (!token) {
-            console.error('No auth token found');
-            return;
-          }
     
-          if (!postDetails.communityId) {
-            console.error('Community ID is required');
-            return;
-          }
-    
-          const id = await postQuestion(
-            postDetails.content,
-            postDetails.title || '',
-            postDetails.tags || [],
-            postDetails.communityId,
-            token
-          );
-    
-          navigate(`/Posts/${id}`);
-        } catch (error) {
-          console.error('Error saving post:', error);
-          // Optionally, show an error message to the user
-        }
-    //onSave(postDetails);
+    onSave(postDetails);
     clearPost();
     onClose();
   };

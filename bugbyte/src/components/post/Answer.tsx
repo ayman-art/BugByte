@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaReply, FaCheckCircle } from 'react-icons/fa';
 import {
@@ -19,27 +19,30 @@ import {
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
-import { IAnswer } from '../../types';
-import { downvoteAnswer, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
+import { IAnswer, IReply } from '../../types';
+import { downvoteAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
 
 interface AnswerProps extends IAnswer {
   onDelete: (answerId: string) => void;
   onVerify: (answerId: string) => void;
+  onReplyOnAnswer: (reply: IReply) => void;
 }
 const Answer: React.FC<AnswerProps> = ({
   answerId,
   questionId,
   opName,
-  postedOn, // ISO date format as string
+  postedOn,
   upVotes,
   mdContent,
   isDownVoted,
   isUpVoted,
   downVotes,
-  isVerified = false,  // default to false if not provided
-  enabledVerify = true, // prop for enabling/disabling verify button
+  isVerified,
+  enabledVerify,
+  canVerify,
   onDelete,
   onVerify,
+  onReplyOnAnswer,
 }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downVotes);
@@ -49,6 +52,7 @@ const Answer: React.FC<AnswerProps> = ({
   const [verified, setVerified] = useState(isVerified);
   const [enableVerifyState, setEnableVerify] = useState(enabledVerify); // State for enabling/disabling verify button
   const [isUserModerator, setIsUserModerator] = useState(false); // New state for moderator status
+
 
   const navigate = useNavigate();
 
@@ -72,54 +76,91 @@ const Answer: React.FC<AnswerProps> = ({
       fetchModeratorStatus();
     }, [token, communityId]);
 
-  const handleUpvoteAnswer = () => {
+ 
+
+  const handleUpvoteAnswer = async () => {
     if (voteStatus === 'upvoted') {
-      removeUpvoteAnswer(answerId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
-      setVoteStatus('neutral');
-      console.log('FROM upvoted to neutral');
+      await handleUpvoteFromUpvoted();
     } else if (voteStatus === 'downvoted') {
-      removeDownvoteAnswer(answerId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
-      upvoteAnswer(answerId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
-      setVoteStatus('upvoted');
-      console.log('FROM downvoted to upvoted');
+      await handleUpvoteFromDownvoted();
     } else {
-      upvoteAnswer(answerId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
-      setVoteStatus('upvoted');
-      console.log('FROM neutral to upvoted');
+      await handleUpvoteFromNeutral();
     }
   };
 
-  const handleDownvoteAnswer = () => {
+  const handleUpvoteFromUpvoted = async () => {
+    await removeUpvoteAnswer(answerId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    setVoteStatus('neutral');
+  }
+
+  const handleUpvoteFromDownvoted = async () => {
+    await removeDownvoteAnswer(answerId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    await upvoteAnswer(answerId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  }
+
+  const handleUpvoteFromNeutral = async () => {
+    await upvoteAnswer(answerId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  }
+
+
+
+  const handleDownvoteAnswer = async () => {
     if (voteStatus === 'downvoted') {
-      removeDownvoteAnswer(answerId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
-      setVoteStatus('neutral');
-      console.log('FROM downvoted to neutral');
+      await handleDownvoteFromDownvoted();
     } else if (voteStatus === 'upvoted') {
-      removeUpvoteAnswer(answerId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
-      downvoteAnswer(answerId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
-      setVoteStatus('downvoted');
-      console.log('FROM upvoted to downvoted');
+      await handleDownvoteFromUpvoted();
     } else {
-      downvoteAnswer(answerId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
-      setVoteStatus('downvoted');
-      console.log('FROM neutral to downvoted');
+      await handleDownvoteFromNeutral();
     }
   };
 
-  const handleNavigateToProfile = () => {
-    navigate(`/Profile/${opName}`);
-  };
+  const handleDownvoteFromDownvoted = async () => {
+    await removeDownvoteAnswer(answerId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    setVoteStatus('neutral');
+  }
 
-  const handleReplySave = (postDetails: { content: string }) => {
-    console.log('Reply posted:', postDetails);
+  const handleDownvoteFromUpvoted = async () => {
+    await removeUpvoteAnswer(answerId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    await downvoteAnswer(answerId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  }
+
+  const handleDownvoteFromNeutral = async () => {
+    await downvoteAnswer(answerId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  }
+
+
+  const handleReplySave = async (postDetails: { content: string }) => {
+
+    if (!token) {
+      alert('No auth token found. Please log in.');
+      return;
+    } else if (!postDetails.content || postDetails.content.trim() === '') {
+      alert('Reply content cannot be empty.');
+      return;
+    }
+
+    console.log('Reply saved:', postDetails);
+    const replyId = await postReply(postDetails.content, answerId, token!);
+    onReplyOnAnswer({
+      replyId,
+      answerId,
+      opName: loggedInUsername,
+      postedOn: new Date().toLocaleString('en-US'),
+      mdContent: postDetails.content,
+    });
+
     setIsReplyModalOpen(false);
   };
 
@@ -142,16 +183,17 @@ const Answer: React.FC<AnswerProps> = ({
     setEnableVerify(enabledVerify);
   }, [enabledVerify]);
 
+
   return (
-    <div className={`answer-container ${verified ? 'verified' : ''}`}>
+    <div className={`answer-container ${isVerified ? 'verified' : ''}`}>
       <div className="answer-content">
         <header className="answer-header">
           <p className="op-name">
             Answered by:{' '}
-            <span onClick={handleNavigateToProfile} className="op-link">
+            <span onClick={() => {navigate(`/Profile/${opName}`)}} className="op-link">
               {opName}
             </span>
-            {verified && (
+            {isVerified && (
               <span className="verified-badge" title="Verified">
                 <FaCheckCircle />
               </span>
@@ -180,18 +222,18 @@ const Answer: React.FC<AnswerProps> = ({
           />
         </section>
 
-        <p className="answer-date">on {postedOn}</p>
+        <p className="post-date">on {new Date(postedOn).toLocaleString('en-US')}</p>
 
         <footer className="answer-footer">
           <div className="answer-votes">
-            <span className="votes-count">{currentUpvotes}</span>
+          <span className="votes-count">{currentUpvotes} </span>
             <button
               onClick={handleUpvoteAnswer}
               className={`vote-button ${voteStatus === 'upvoted' ? 'active' : ''} vote-button-up`}
             >
               ↑
             </button>
-            <span className="votes-count">{currentDownvotes}</span>
+            <span className="votes-count">{currentDownvotes} </span>
             <button
               onClick={handleDownvoteAnswer}
               className={`vote-button ${voteStatus === 'downvoted' ? 'active' : ''} vote-button-down`}
@@ -219,10 +261,10 @@ const Answer: React.FC<AnswerProps> = ({
               </button>
             )}
 
-            {canEdit &&  enableVerifyState && (
+            {canVerify &&  enabledVerify && (
               <button
                 className="action-button verify-button"
-                onClick={handleVerify}
+                onClick={()=>onVerify(answerId)}
               >
                 Verify
               </button>

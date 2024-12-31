@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing icons for Edit and Delete buttons
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { MDXEditor, 
   headingsPlugin,
   listsPlugin,
@@ -26,7 +26,6 @@ interface ReplyProps extends IReply{
 
 const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdContent, onDelete }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  
   const navigate = useNavigate();
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
@@ -43,6 +42,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
         }
       }
     };
+
 
     fetchModeratorStatus();
   }, [token, communityId]);
@@ -62,12 +62,13 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
   const canEdit = loggedInUsername === opName;
   const canDelete = loggedInUsername === opName || isAdmin || isUserModerator; // Admin can delete as well
 
+
   return (
     <div className="reply-container">
       <div className="reply-content">
         <header className="reply-header">
           <p className="op-name">
-            Replied by: <span className="op-link" onClick={handleNavigateToProfile}>{opName}</span>
+            Replied by: <span className="op-link" onClick={() => {navigate(`/Profile/${opName}`)}}>{opName}</span>
           </p>
         </header>
 
@@ -93,7 +94,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
           />
         </section>
 
-        <p className="reply-date">on {postedOn}</p>
+        <p className="post-date">on {new Date(postedOn).toLocaleString('en-US')}</p>
 
         <footer className="reply-footer"> 
           {/* Action buttons */}

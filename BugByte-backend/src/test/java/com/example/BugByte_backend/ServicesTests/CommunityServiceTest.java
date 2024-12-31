@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +33,8 @@ public class CommunityServiceTest {
 
     @Mock
     private TagsRepository tagsRepository;
+    TagsRepository tagsRepositoryMock;
+
     @InjectMocks
     private CommunityService communityService;
 
@@ -40,6 +43,7 @@ public class CommunityServiceTest {
     @BeforeEach
     public void setUp() {
         community = new Community();
+        community.setTags(new ArrayList<>());
         community.setId(1L);
         community.setName("Test Community");
         community.setAdminId(100L);
