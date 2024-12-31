@@ -251,7 +251,7 @@ const handleRemoveMember = async () => {
             </button>
 
             {/* Dropdown Menu */}
-          {isAdmin && !isAuthorAdmin &&(
+          {isAdmin||setIsUserModerator && !isAuthorAdmin &&(
             <button className="action-button more-button" onClick={toggleDropdown}>
               <FaEllipsisV />
             </button>
@@ -260,10 +260,10 @@ const handleRemoveMember = async () => {
 
           {isDropdownOpen && !isAuthorAdmin && (
             <div ref={dropdownRef} className="dropdown-menu show">
-              {!isAuthorModerator ? (
+              {!isAuthorModerator && isAdmin ? (
                 <button onClick={handleSetModerator}>Set Moderator</button>
               ) : null}
-              {isAuthorModerator ? (
+              {isAuthorModerator && isAdmin ? (
                 <button onClick={handleRemoveModerator}>Remove Moderator</button>
               ) : null}
               <button onClick={handleRemoveMember}>Remove Member</button>
