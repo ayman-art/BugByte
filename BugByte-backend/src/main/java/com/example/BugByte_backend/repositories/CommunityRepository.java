@@ -319,7 +319,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if (communityId == null)
             throw new NullPointerException("communityId is null");
 
-        System.out.println(communityId);
         return jdbcTemplate.query(SQL_FIND_MODERATORS_BY_COMMUNITY, new Long[]{communityId}, userRowMapper);
     }
 
