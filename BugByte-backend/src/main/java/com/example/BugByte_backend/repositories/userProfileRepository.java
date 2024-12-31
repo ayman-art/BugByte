@@ -148,8 +148,8 @@ public class userProfileRepository {
     }
 
     public Integer getReputation(String userName) {
-        if (userName == null || userName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be null or empty");
+        if (userName == null) {
+            throw new IllegalArgumentException("Username cannot be null");
         }
 
         try {
