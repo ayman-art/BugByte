@@ -174,8 +174,7 @@ public class PostingRepository implements IPostingRepository{
                 FROM questions
                 JOIN posts ON questions.id = posts.id
                 WHERE questions.id = ?
-            );
-                        
+            );          
             """;
 
     private static final String SQL_UPDATE_REPUTATION_NEGATIVELY_QUESTIONS = """
@@ -187,7 +186,6 @@ public class PostingRepository implements IPostingRepository{
                 JOIN posts ON questions.id = posts.id
                 WHERE questions.id = ?
             );
-                        
             """;
 
     private static final String SQL_UPDATE_REPUTATION_POSITIVELY_ANSWERS = """
@@ -210,8 +208,7 @@ public class PostingRepository implements IPostingRepository{
                 FROM answers
                 JOIN posts ON answers.id = posts.id
                 WHERE answers.id = ?
-            );
-                        
+            );          
             """;
 
     private static final String SQL_UPDATE_REPUTATION_VERIFIED_ANSWER = """
@@ -223,7 +220,6 @@ public class PostingRepository implements IPostingRepository{
                 JOIN posts ON answers.id = posts.id
                 WHERE answers.id = ?
             );
-                        
             """;
 
 
@@ -392,6 +388,7 @@ public class PostingRepository implements IPostingRepository{
         int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_QUESTIONS ,value ,questionId);
 
         int users_rows = jdbcTemplate.update(SQL_UPDATE_REPUTATION_NEGATIVELY_QUESTIONS, questionId);
+
         if (rows == 0 || users_rows == 0)
             throw new RuntimeException("Invalid input");
         return true;
@@ -419,7 +416,7 @@ public class PostingRepository implements IPostingRepository{
             jdbcTemplate.update(SQL_DELETE_UP_VOTE, userName, answerId);
         }
 
-        int rows = jdbcTemplate.update(SQL_UPDATE_UP_VOTES_ANSWERS ,value ,answerId);
+        int rows = jdbcTemplate.update(SQL_UPDATE_UP_VOTES_ANSWERS, value, answerId);
         int users_rows = jdbcTemplate.update(SQL_UPDATE_REPUTATION_POSITIVELY_ANSWERS, answerId);
 
         if (rows == 0 || users_rows == 0)
@@ -450,7 +447,7 @@ public class PostingRepository implements IPostingRepository{
             jdbcTemplate.update(SQL_DELETE_DOWN_VOTE, userName, answerId);
         }
 
-        int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS ,value ,answerId);
+        int rows = jdbcTemplate.update( SQL_UPDATE_DOWN_VOTES_ANSWERS, value, answerId);
         int users_rows = jdbcTemplate.update(SQL_UPDATE_REPUTATION_NEGATIVELY_ANSWERS, answerId);
 
         if (rows == 0 || users_rows == 0)

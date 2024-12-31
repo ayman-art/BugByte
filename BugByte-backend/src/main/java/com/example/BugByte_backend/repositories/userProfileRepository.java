@@ -52,7 +52,7 @@ public class userProfileRepository {
                 SET bio = ?
                 WHERE id = ?;
             """;
-    
+
     private static final String SQL_GET_REPUTATION = """
             Select
                 reputation
