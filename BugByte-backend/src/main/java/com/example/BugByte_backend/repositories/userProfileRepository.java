@@ -52,25 +52,14 @@ public class userProfileRepository {
                 SET bio = ?
                 WHERE id = ?;
             """;
-
-    private static final String SQL_GET_POSITIVE_INTERACTIONS = """
-                SELECT
-                    COUNT(*)
-                FROM
-                    posts p JOIN upvotes uv ON p.id = uv.post_id
-                WHERE
-                    op_name = ?
+    
+    private static final String SQL_GET_REPUTATION = """
+            Select
+                reputation
+            FROM users
+            WHERE
+            user_name = ?
             """;
-
-    private static final String SQL_GET_NEGATIVE_INTERACTIONS = """
-                SELECT
-                    COUNT(*)
-                FROM
-                    posts p JOIN downvotes dv ON p.id = dv.post_id
-                WHERE
-                    op_name = ?
-            """;
-
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -153,19 +142,11 @@ public class userProfileRepository {
         }
 
         try {
-            Integer positiveReputation = jdbcTemplate.queryForObject(
-                    SQL_GET_POSITIVE_INTERACTIONS,
+            Integer rep = jdbcTemplate.queryForObject(
+                    SQL_GET_REPUTATION,
                     new Object[]{ userName },
                     Integer.class
             );
-
-            Integer negativeReputation = jdbcTemplate.queryForObject(
-                    SQL_GET_NEGATIVE_INTERACTIONS,
-                    new Object[]{ userName },
-                    Integer.class
-            );
-
-            Integer rep = positiveReputation - negativeReputation;
 
             System.out.println("Reputation is : " + rep);
             return  rep != null ? rep : 0;
