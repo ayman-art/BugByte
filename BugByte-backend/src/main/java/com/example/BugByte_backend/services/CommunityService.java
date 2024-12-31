@@ -25,25 +25,6 @@ public class CommunityService {
     @Autowired
     private TagsRepository tagsRepository;
 
-//    private final LinkedHashMap<String, Community> communityPool =
-//            new LinkedHashMap<>(poolCapacity, 0.75f, true) {
-//                protected boolean removeEldestEntry(Map.Entry<String, Community> eldest) {
-//                    return this.size() > CommunityService.this.poolCapacity;
-//                }
-//            };
-//
-//    private void cacheCommunity(Community community) {
-//        this.communityPool.put(community.getName(), community);
-//    }
-
-//    private Community getCachedCommunity(String communityName) {
-//        Community community = this.communityPool.get(communityName);
-//        if (community == null) {
-//            throw new IllegalArgumentException("Community not cached: " + communityName);
-//        }
-//        return community;
-//    }
-
     private boolean persistCommunity(Community community) {
         try {
             return communityRepository.updateCommunityNameAndDescription(community);
@@ -52,30 +33,6 @@ public class CommunityService {
             return false;
         }
     }
-
-//    public Community getCommunity(String name) {
-//        try {
-//            return getCachedCommunity(name);
-//        } catch (IllegalArgumentException e) {
-//            System.out.println("Cache miss for community: " + name);
-//            return fetchCommunityFromDatabase(name);
-//        }
-//    }
-
-//    private Community fetchCommunityFromDatabase(String name) {
-//        try {
-//            Community community = communityRepository.findCommunityByName(name);
-//            if (community != null) {
-//                cacheCommunity(community);
-//                return community;
-//            } else {
-//                throw new IllegalArgumentException("Community not found in database: " + name);
-//            }
-//        } catch (Exception e) {
-//            System.out.println("Error fetching community from database: " + e.getMessage());
-//            throw e;
-//        }
-//    }
 
     public Long createCommunity(Community inCommunity) {
         try {
@@ -105,10 +62,10 @@ public class CommunityService {
 //            }
 
             boolean res = communityRepository.deleteCommunityById(communityId);
-            if (res) {
-                Community community = communityRepository.findCommunityById(communityId);
-                searchingFilteringCommunityService.deleteCommunity(community);
-            }
+//            if (res) {
+//                Community community = communityRepository.findCommunityById(communityId);
+//                searchingFilteringCommunityService.deleteCommunity(community);
+//            }
 
             return res;
         } catch (Exception e) {
@@ -117,15 +74,6 @@ public class CommunityService {
         }
     }
 
-//    private String removeFromCache(Long communityId) {
-//        for (Map.Entry<String, Community> entry : communityPool.entrySet()) {
-//            if (entry.getValue().getId().equals(communityId)) {
-//                communityPool.remove(entry.getKey());
-//                return entry.getKey();
-//            }
-//        }
-//        return null;
-//    }
 
     public boolean updateCommunity(Community updatedCommunity) {
         if (updatedCommunity == null)
@@ -170,29 +118,11 @@ public class CommunityService {
             throw e;
         }
     }
-
-//    public List<String> getCommunityMembersNames(Long communityId) {
-//        try {
-//            return communityRepository.getCommunityMembersNames(communityId);
-//        } catch (Exception e) {
-//            throw e;
-//        }
-//    }
-//
-//    public List<String> getUserCommunitiesNames(Long userId) {
-//        try {
-//            return communityRepository.getUserCommunitiesNames(userId);
-//        } catch (Exception e) {
-//            throw e;
-//        }
-//    }
-
-
     public Community getCommunityById(Long communityId) {
         try {
             System.out.println(communityId);
             Community community = communityRepository.findCommunityById(communityId);
-
+System.out.println(community.toString());
             community.setTags(tagsRepository.findTagsByCommunity(communityId));
             return community;
         } catch (IllegalArgumentException e) {
@@ -203,12 +133,14 @@ public class CommunityService {
     public boolean updateCommunityDescription(Long id, String description) {
         try {
             return communityRepository.updateCommunityDescription(id,description);
-        } catch (IllegalArgumentException e) {
-            throw  e;
+        } catch (Exception e) {
+            return false;
         }
     }
     public boolean deleteMember(Long communityId , String Username)
     {
+        System.out.println(communityId + "  "+ Username +"from service");
+
         return  communityRepository.deleteMemberByUsername(communityId,Username);
     }
     public boolean joinCommunity(Long communityId , Long userId)
@@ -229,4 +161,76 @@ public class CommunityService {
     {
         return communityRepository.leaveCommunity(communityName,memberId);
     }
+    //    private String removeFromCache(Long communityId) {
+//        for (Map.Entry<String, Community> entry : communityPool.entrySet()) {
+//            if (entry.getValue().getId().equals(communityId)) {
+//                communityPool.remove(entry.getKey());
+//                return entry.getKey();
+//            }
+//        }
+//        return null;
+//    }
+    //    public List<String> getCommunityMembersNames(Long communityId) {
+//        try {
+//            return communityRepository.getCommunityMembersNames(communityId);
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
+//
+//    public List<String> getUserCommunitiesNames(Long userId) {
+//        try {
+//            return communityRepository.getUserCommunitiesNames(userId);
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
+    //    public Community getCommunity(String name) {
+//        try {
+//            return getCachedCommunity(name);
+//        } catch (IllegalArgumentException e) {
+//            System.out.println("Cache miss for community: " + name);
+//            return fetchCommunityFromDatabase(name);
+//        }
+//    }
+
+//    private Community fetchCommunityFromDatabase(String name) {
+//        try {
+//            Community community = communityRepository.findCommunityByName(name);
+//            if (community != null) {
+//                cacheCommunity(community);
+//                return community;
+//            } else {
+//                throw new IllegalArgumentException("Community not found in database: " + name);
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Error fetching community from database: " + e.getMessage());
+//            throw e;
+//        }
+//    }
+//    private final LinkedHashMap<String, Community> communityPool =
+//            new LinkedHashMap<>(poolCapacity, 0.75f, true) {
+//                protected boolean removeEldestEntry(Map.Entry<String, Community> eldest) {
+//                    return this.size() > CommunityService.this.poolCapacity;
+//                }
+//            };
+//
+//    private void cacheCommunity(Community community) {
+//        this.communityPool.put(community.getName(), community);
+//    }
+
+//    private Community getCachedCommunity(String communityName) {
+//        Community community = this.communityPool.get(communityName);
+//        if (community == null) {
+//            throw new IllegalArgumentException("Community not cached: " + communityName);
+//        }
+//        return community;
+//    }
+//    public List<User> getCommunityUsers(Long communityId) {
+//        try {
+//            return communityRepository.getCommunityMembers(communityId);
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
 }
