@@ -135,6 +135,8 @@ System.out.println(community.toString());
     }
     public boolean deleteMember(Long communityId , String Username)
     {
+        System.out.println(communityId + "  "+ Username +"from service");
+
         return  communityRepository.deleteMemberByUsername(communityId,Username);
     }
     public boolean joinCommunity(Long communityId , Long userId)

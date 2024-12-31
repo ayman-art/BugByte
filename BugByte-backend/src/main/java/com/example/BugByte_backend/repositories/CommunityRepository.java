@@ -248,6 +248,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 
     @Override
     public boolean deleteMemberById(Long memberId, Long communityId) {
+        System.out.println(communityId + "  "+ memberId);
         if(memberId==null || communityId==null)
             throw new NullPointerException("memberId or communityId is null");
         int rows = jdbcTemplate.update(SQL_DELETE_MEMBER_BY_ID, memberId, communityId);
@@ -340,6 +341,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     public boolean deleteMemberByUsername(Long communityId , String Username)
     {
         Long userId = userRepositoryImp.getIdByUserName(Username);
+        System.out.println(userId + "  "+ Username);
         return  deleteMemberById(userId , communityId);
     }
 

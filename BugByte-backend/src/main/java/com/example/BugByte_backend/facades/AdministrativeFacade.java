@@ -256,27 +256,23 @@ public class AdministrativeFacade {
         userService.updatePicture(id, url);
     }
 
-    public boolean setModerator(Map<String , Object>req) {
+    public boolean setModerator(Long communityId,String moderatorName,String  token) {
         try {
-            String token = (String) req.get("jwt");
             boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
             if (!isAdmin) throw new Exception("user is not an admin");
-        return moderatorService.setModerator((String) req.get("moderatorName"),
-                Long.parseLong((String) req.get("communityId")));
+        return moderatorService.setModerator(moderatorName, communityId);
         } catch (Exception e)
         {
             return false;
         }
     }
 
-    public boolean removeModerator(Map<String , Object>req)
+    public boolean removeModerator(Long communityId, String moderatorName,String token)
     {
         try {
-            String token = (String) req.get("jwt");
             boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
             if (!isAdmin) throw new Exception("user is not an admin");
-            return moderatorService.removeModerator((String) req.get("moderatorName"),
-                    Long.parseLong((String) req.get("communityId")));
+            return moderatorService.removeModerator(moderatorName , communityId);
         }
         catch (Exception e)
         {
@@ -307,14 +303,12 @@ public class AdministrativeFacade {
             return false;
         }
     }
-    public boolean removeMember(Map<String,Object>req)
+    public boolean removeMember(Long communityId, String memberName,String token)
     {
         try {
-            String token = (String) req.get("jwt");
             boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
             if (!isAdmin) throw new Exception("user is not an admin");
-            return communityService.deleteMember(Long.parseLong((String) req.get("communityId"))
-                    ,(String)req.get("user_name"));
+            return communityService.deleteMember(communityId ,memberName);
         } catch (IllegalArgumentException e) {
             return false;
         } catch (Exception e) {

@@ -88,7 +88,7 @@ const handleSetModerator = async () => {
 
 const handleRemoveModerator = async () => {
   try {
-    await removeModerator(token, opName, communityId);
+    await removeModerator(token, communityId, opName);
     console.log('Removing moderator');
   } catch (error) {
     console.error('Error removing moderator:', error);
@@ -97,7 +97,7 @@ const handleRemoveModerator = async () => {
 
 const handleRemoveMember = async () => {
   try {
-    await removeMember(token, opName, communityId);
+    await removeMember(token, communityId, opName);
     console.log('Removing member');
   } catch (error) {
     console.error('Error removing member:', error);
