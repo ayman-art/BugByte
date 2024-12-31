@@ -161,3 +161,11 @@ export const fetchCommunityMembers = async (communityId: string) => {
 
   return await response.json();
 };
+
+export const updateCommunity = async (
+  jwt: string,
+  communityId: number,
+  updatedData: any
+) => {
+  return updatedData;
+};

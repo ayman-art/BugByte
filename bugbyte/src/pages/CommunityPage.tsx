@@ -4,15 +4,25 @@ import {
   getCommunityPosts,
   joinCommunity,
   LeaveCommunity,
+  updateCommunity,
 } from "../API/CommunityAPI";
 import { useNavigate, useParams } from "react-router-dom";
 import PostListing, { Post } from "../components/PostListing";
+import CommunityModal from "../components/CommunityModal";
 
 export interface Community {
   id: number;
   name: string;
+  adminId: number;
   description: string;
   creationDate: string;
+  tags: string[];
+}
+
+interface CommunityDetails {
+  name: string;
+  description?: string;
+  tags?: string[];
 }
 
 const CommunityPage: React.FC = () => {
@@ -26,6 +36,9 @@ const CommunityPage: React.FC = () => {
   const [postList, setPostList] = useState<Post[]>([]);
   const [hasMore, setHasMore] = useState(true); // If more posts are available
   const navigate = useNavigate();
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const userId = localStorage.getItem("id");
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -118,6 +131,10 @@ const CommunityPage: React.FC = () => {
     fetchCommunityData();
   }, [communityId]);
 
+  console.log("=================================");
+  console.log(userId);
+  console.log(community?.adminId);
+  console.log("=================================");
   const handleJoinClick = async () => {
     // Add the community to the joined list
     //const joinedCommunities = JSON.parse(localStorage.getItem('joinedCommunities') || '[]');
@@ -143,6 +160,25 @@ const CommunityPage: React.FC = () => {
 
   const handleViewMembers = () => {
     navigate(`/community-members/${communityId}`);
+  };
+
+  const handleEditSave = async (updatedData: CommunityDetails) => {
+    try {
+      const jwt = localStorage.getItem("authToken");
+      if (!jwt) throw new Error("User is not authenticated");
+
+      const updatedCommunity = await updateCommunity(
+        jwt,
+        community?.id!,
+        updatedData
+      );
+      setCommunity(updatedCommunity); // Update local state
+      setShowEditModal(false); // Close modal
+      alert("Community updated successfully!");
+    } catch (err: any) {
+      console.error(err.message || "Failed to update community");
+      alert("An error occurred while updating the community.");
+    }
   };
 
   const styles: { [key: string]: React.CSSProperties } = {
@@ -232,6 +268,40 @@ const CommunityPage: React.FC = () => {
             >
               View Members
             </button>
+          </div>
+
+          <div style={{ padding: "20px" }}>
+            {community && (
+              <>
+                {userId === String(community.adminId) && (
+                  <button
+                    style={{
+                      margin: "10px",
+                      padding: "10px",
+                      backgroundColor: "#4CAF50",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                    }}
+                    onClick={() => setShowEditModal(true)}
+                  >
+                    Edit Community
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* Edit Modal */}
+            <CommunityModal
+              isOpen={showEditModal}
+              onClose={() => setShowEditModal(false)}
+              onSave={handleEditSave}
+              initialData={{
+                name: community?.name || "",
+                description: community?.description || "",
+                tags: community?.tags,
+              }}
+            />
           </div>
 
           {/* Join or Leave Button */}
