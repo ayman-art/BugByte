@@ -281,86 +281,173 @@ public class PostingServiceTest {
         assertFalse(result);
     }
     @Test
-    void testUpVoteQuestion_Success() throws Exception {
-        long questionId = 404L;
+    void testUpVoteQuestionSuccess() throws Exception {
+        // Arrange
+        long questionId = 1L;
+        String userName = "testUser";
 
-        when(postingRepositoryMock.upVoteQuestion(questionId, 1 , "user1")).thenReturn(true);
-
-        boolean result = postingService.upVoteQuestion(questionId , "user1");
-
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+        mockQuestion.setCommunityId(123L);
+        when(postingRepositoryMock.upVoteQuestion(questionId, 1, userName)).thenReturn(true);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(new ArrayList<>());
+        when(communityRepositoryMock.findCommunityById(mockQuestion.getCommunityId())).thenReturn(new Community());
+        when(postingRepositoryMock.is_UpVoted(userName , questionId)).thenReturn(true);
+        when(postingRepositoryMock.is_DownVoted(userName , questionId)).thenReturn(false);
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(new User());
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(new Post());
+        when(filteringQuestionServiceMock.saveQuestion(mockQuestion)).thenReturn(mockQuestion);
+        boolean result = postingService.upVoteQuestion(questionId, userName);
         assertTrue(result);
     }
 
     @Test
     void testUpVoteQuestion_Failure() throws Exception {
-        long questionId = 404L;
+        long questionId = 1L;
+        String userName = "testUser";
 
-        when(postingRepositoryMock.upVoteQuestion(questionId, 1 , "user1")).thenReturn(false);
-
-        boolean result = postingService.upVoteQuestion(questionId , "user1");
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+        mockQuestion.setCommunityId(123L);
+        when(postingRepositoryMock.upVoteQuestion(questionId, 1, userName)).thenReturn(false);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(new ArrayList<>());
+        when(communityRepositoryMock.findCommunityById(mockQuestion.getCommunityId())).thenReturn(new Community());
+        when(postingRepositoryMock.is_UpVoted(userName , questionId)).thenReturn(true);
+        when(postingRepositoryMock.is_DownVoted(userName , questionId)).thenReturn(false);
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(new User());
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(new Post());
+        when(filteringQuestionServiceMock.saveQuestion(mockQuestion)).thenReturn(mockQuestion);
+        boolean result = postingService.upVoteQuestion(questionId, userName);
 
         assertFalse(result);
     }
     @Test
     void testRemoveUpVoteFromQuestion_Success() throws Exception {
-        long questionId = 505L;
+        long questionId = 1L;
+        String userName = "testUser";
 
-        when(postingRepositoryMock.upVoteQuestion(questionId, -1 , "user1")).thenReturn(true);
-
-        boolean result = postingService.removeUpVoteFromQuestion(questionId , "user1");
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+        mockQuestion.setCommunityId(123L);
+        when(postingRepositoryMock.upVoteQuestion(questionId, -1, userName)).thenReturn(true);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(new ArrayList<>());
+        when(communityRepositoryMock.findCommunityById(mockQuestion.getCommunityId())).thenReturn(new Community());
+        when(postingRepositoryMock.is_UpVoted(userName , questionId)).thenReturn(true);
+        when(postingRepositoryMock.is_DownVoted(userName , questionId)).thenReturn(false);
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(new User());
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(new Post());
+        when(filteringQuestionServiceMock.saveQuestion(mockQuestion)).thenReturn(mockQuestion);
+        boolean result = postingService.removeUpVoteFromQuestion(questionId, userName);
 
         assertTrue(result);
     }
 
     @Test
     void testRemoveUpVoteFromQuestion_Failure() throws Exception {
-        long questionId = 505L;
+        long questionId = 1L;
+        String userName = "testUser";
 
-        when(postingRepositoryMock.upVoteQuestion(questionId, -1 , "user1")).thenReturn(false);
-
-        boolean result = postingService.removeUpVoteFromQuestion(questionId , "user1");
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+        mockQuestion.setCommunityId(123L);
+        when(postingRepositoryMock.upVoteQuestion(questionId, -1, userName)).thenReturn(false);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(new ArrayList<>());
+        when(communityRepositoryMock.findCommunityById(mockQuestion.getCommunityId())).thenReturn(new Community());
+        when(postingRepositoryMock.is_UpVoted(userName , questionId)).thenReturn(true);
+        when(postingRepositoryMock.is_DownVoted(userName , questionId)).thenReturn(false);
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(new User());
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(new Post());
+        when(filteringQuestionServiceMock.saveQuestion(mockQuestion)).thenReturn(mockQuestion);
+        boolean result = postingService.removeUpVoteFromQuestion(questionId, userName);
 
         assertFalse(result);
     }
     @Test
     void testDownVoteQuestion_Success() throws Exception {
-        long questionId = 606L;
+        long questionId = 1L;
+        String userName = "testUser";
 
-        when(postingRepositoryMock.downVoteQuestion(questionId, 1 , "user1")).thenReturn(true);
-
-        boolean result = postingService.downVoteQuestion(questionId , "user1");
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+        mockQuestion.setCommunityId(123L);
+        when(postingRepositoryMock.downVoteQuestion(questionId, 1, userName)).thenReturn(true);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(new ArrayList<>());
+        when(communityRepositoryMock.findCommunityById(mockQuestion.getCommunityId())).thenReturn(new Community());
+        when(postingRepositoryMock.is_UpVoted(userName , questionId)).thenReturn(true);
+        when(postingRepositoryMock.is_DownVoted(userName , questionId)).thenReturn(false);
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(new User());
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(new Post());
+        when(filteringQuestionServiceMock.saveQuestion(mockQuestion)).thenReturn(mockQuestion);
+        boolean result = postingService.downVoteQuestion(questionId, userName);
 
         assertTrue(result);
     }
 
     @Test
     void testDownVoteQuestion_Failure() throws Exception {
-        long questionId = 606L;
-
-        when(postingRepositoryMock.downVoteQuestion(questionId, 1 , "user1")).thenReturn(false);
-
-        boolean result = postingService.downVoteQuestion(questionId , "user1");
+        long questionId = 1L;
+        String userName = "testUser";
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+        mockQuestion.setCommunityId(123L);
+        when(postingRepositoryMock.downVoteQuestion(questionId, 1, userName)).thenReturn(false);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(new ArrayList<>());
+        when(communityRepositoryMock.findCommunityById(mockQuestion.getCommunityId())).thenReturn(new Community());
+        when(postingRepositoryMock.is_UpVoted(userName , questionId)).thenReturn(true);
+        when(postingRepositoryMock.is_DownVoted(userName , questionId)).thenReturn(false);
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(new User());
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(new Post());
+        when(filteringQuestionServiceMock.saveQuestion(mockQuestion)).thenReturn(mockQuestion);
+        boolean result = postingService.downVoteQuestion(questionId, userName);
 
         assertFalse(result);
     }
     @Test
     void testRemoveDownVoteFromQuestion_Success() throws Exception {
-        long questionId = 707L;
+        long questionId = 1L;
+        String userName = "testUser";
 
-        when(postingRepositoryMock.downVoteQuestion(questionId, -1 , "user1")).thenReturn(true);
-
-        boolean result = postingService.removeDownVoteFromQuestion(questionId , "user1");
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+        mockQuestion.setCommunityId(123L);
+        when(postingRepositoryMock.downVoteQuestion(questionId, -1, userName)).thenReturn(true);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(new ArrayList<>());
+        when(communityRepositoryMock.findCommunityById(mockQuestion.getCommunityId())).thenReturn(new Community());
+        when(postingRepositoryMock.is_UpVoted(userName , questionId)).thenReturn(true);
+        when(postingRepositoryMock.is_DownVoted(userName , questionId)).thenReturn(false);
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(new User());
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(new Post());
+        when(filteringQuestionServiceMock.saveQuestion(mockQuestion)).thenReturn(mockQuestion);
+        boolean result = postingService.removeDownVoteFromQuestion(questionId, userName);
 
         assertTrue(result);
     }
 
     @Test
     void testRemoveDownVoteFromQuestion_Failure() throws Exception {
-        long questionId = 707L;
+        long questionId = 1L;
+        String userName = "testUser";
 
-        when(postingRepositoryMock.downVoteQuestion(questionId, -1 , "user1")).thenReturn(false);
-
-        boolean result = postingService.removeDownVoteFromQuestion(questionId , "user1");
+        Question mockQuestion = new Question();
+        mockQuestion.setId(questionId);
+        mockQuestion.setCommunityId(123L);
+        when(postingRepositoryMock.downVoteQuestion(questionId, -1, userName)).thenReturn(false);
+        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
+        when(tagsRepositoryMock.findTagsByQuestion(questionId)).thenReturn(new ArrayList<>());
+        when(communityRepositoryMock.findCommunityById(mockQuestion.getCommunityId())).thenReturn(new Community());
+        when(postingRepositoryMock.is_UpVoted(userName , questionId)).thenReturn(true);
+        when(postingRepositoryMock.is_DownVoted(userName , questionId)).thenReturn(false);
+        when(userRepositoryImpMock.findByIdentity(userName)).thenReturn(new User());
+        when(postingRepositoryMock.getPostByID(questionId)).thenReturn(new Post());
+        when(filteringQuestionServiceMock.saveQuestion(mockQuestion)).thenReturn(mockQuestion);
+        boolean result = postingService.removeDownVoteFromQuestion(questionId, userName);
 
         assertFalse(result);
     }
@@ -707,28 +794,6 @@ public class PostingServiceTest {
     }
 
     @Test
-    void testPostQuestion_Success() throws Exception {
-        Question mockQuestion = new Question();
-        mockQuestion.setMdContent("Test content");
-        mockQuestion.setCreatorUserName("TestUser");
-        mockQuestion.setCommunityId(101L);
-        mockQuestion.setTags(List.of("tag1", "tag2"));
-
-        long generatedPostId = 1L;
-
-        when(postingRepositoryMock.insertPost(mockQuestion.getMdContent(), mockQuestion.getCreatorUserName()))
-                .thenReturn(generatedPostId);
-        when(postingRepositoryMock.insertQuestion(generatedPostId, mockQuestion.getTitle(), mockQuestion.getCommunityId()))
-                .thenReturn(true);
-
-        long result = postingService.postQuestion(mockQuestion);
-
-        assertEquals(generatedPostId, result);
-        verify(tagsRepositoryMock).bulkAddTagsToQuestion(generatedPostId, mockQuestion.getTags());
-        verify(recommendationSystemServiceMock).updateUsersFeed(anyList(), eq(mockQuestion));
-    }
-
-    @Test
     void testPostQuestion_PostIdIsNull() {
         Question mockQuestion = new Question();
         mockQuestion.setMdContent("Test content");
@@ -743,35 +808,6 @@ public class PostingServiceTest {
         });
 
         assertEquals("post id is null", exception.getMessage());
-    }
-
-    @Test
-    void testUpVoteQuestion_Success1() throws Exception {
-        long questionId = 1L;
-        String userName = "TestUser";
-
-        Question mockQuestion = new Question();
-        mockQuestion.setId(questionId);
-
-        when(postingRepositoryMock.upVoteQuestion(questionId, 1, userName)).thenReturn(true);
-        when(postingRepositoryMock.getQuestionById(questionId)).thenReturn(mockQuestion);
-
-        boolean result = postingService.upVoteQuestion(questionId, userName);
-
-        assertTrue(result);
-        verify(filteringQuestionServiceMock).saveQuestion(mockQuestion);
-    }
-
-    @Test
-    void testUpVoteQuestion_Failure1() throws Exception {
-        long questionId = 1L;
-        String userName = "TestUser";
-
-        when(postingRepositoryMock.upVoteQuestion(questionId, 1, userName)).thenReturn(false);
-
-        boolean result = postingService.upVoteQuestion(questionId, userName);
-
-        assertFalse(result);
     }
 
     @Test

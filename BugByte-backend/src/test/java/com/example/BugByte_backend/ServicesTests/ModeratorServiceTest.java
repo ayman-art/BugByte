@@ -70,13 +70,15 @@ class ModeratorServiceTest {
         Long userId = 100L;
 
         when(userRepositoryImp.getIdByUserName(userName)).thenReturn(userId);
+        when(modRepo.removeModerator(userId , communityId)).thenReturn(false);
 
         // Act & Assert
         // This test demonstrates the current bug in removeModerator method
-        moderatorService.removeModerator(userName, communityId);
+        boolean res = moderatorService.removeModerator(userName, communityId);
 
+        assertFalse(res);
         // Verify that makeModerator is incorrectly called instead of removeModerator
-        verify(modRepo).makeModerator(userId, communityId);
+        verify(modRepo).removeModerator(userId, communityId);
     }
 
     @Test
