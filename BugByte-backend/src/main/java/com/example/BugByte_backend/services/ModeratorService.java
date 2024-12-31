@@ -30,7 +30,21 @@ public class ModeratorService {
     public boolean removeModerator(String userName, Long communityId) {
         try {
             Long userId = userRepositoryImp.getIdByUserName(userName);
-            return modRepo.makeModerator(userId, communityId);
+            return modRepo.removeModerator(userId, communityId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    public boolean isModerator(Long userId, Long communityId) {
+        try {
+            return modRepo.isModerator(userId, communityId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    public boolean isModeratorByName(String userName, Long communityId) {
+        try {
+            return modRepo.isModeratorByName(userName, communityId);
         } catch (Exception e) {
             return false;
         }

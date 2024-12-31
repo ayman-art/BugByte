@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash, FaReply } from 'react-icons/fa';
-import { IAnswer, IQuestion } from '../../types/index'
-import { MDXEditor, 
+import { FaEdit, FaTrash, FaReply, FaEllipsisV } from 'react-icons/fa';
+import { IAnswer, IQuestion } from '../../types/index';
+import { isModerator,isModeratorByName ,isAdminByName, removeModerator ,removeMember,  setModerator } from '../../API/ModeratorApi';
+import {
+  MDXEditor,
   headingsPlugin,
   listsPlugin,
   quotePlugin,
@@ -25,6 +27,7 @@ interface QuestionProps extends IQuestion {
   onDelete: (questionId: string) => void;
   onReply: (answer: IAnswer) => void;
 }
+
 const Question: React.FC<QuestionProps> = ({
   questionId,
   upVotes,
@@ -47,23 +50,79 @@ const Question: React.FC<QuestionProps> = ({
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [markdownState, setMarkdownState] = useState(mdContent);
+  const [isUserModerator, setIsUserModerator] = useState(false);
+   const [isAuthorModerator, setIsAuthorModerator] = useState(false);
+   const [isAuthorAdmin, setIsAuthorAdmin] = useState(false);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
 
   const token = localStorage.getItem('authToken');
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
+  
 
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin;
+ useEffect(() => {
+   const fetchModeratorStatus = async () => {
+     if (token) {
+       try {
+         const result = await isModerator(token, communityId);
+         setIsUserModerator(result);
+         const result2 = await isModeratorByName(token, communityId, opName);
+         setIsAuthorModerator(result2);
+         const result3 = await isAdminByName(token , opName);
+         setIsAuthorAdmin(result3);
+       } catch (error) {
+         console.error('Failed to fetch moderator status:', error);
+       }
+     }
+   };
 
-  useEffect(() => {
-    setCurrentUpvotes(upVotes);
-    setCurrentDownvotes(downVotes);
-    setVoteStatus(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
-  }, [questionId]);
+   fetchModeratorStatus();
+ }, [token, communityId, opName]);
+ useEffect(() => {
+  setCurrentUpvotes(upVotes);
+  setCurrentDownvotes(downVotes);
+  setVoteStatus(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
+}, [questionId]);
+const handleSetModerator = async () => {
+  try {
+    await setModerator(token!, opName, communityId);
+    setIsAuthorModerator(true);
+        setIsDropdownOpen(false);
+
+    console.log('Setting as moderator');
+  } catch (error) {
+    console.error('Error setting as moderator:', error);
+  }
+};
+
+const handleRemoveModerator = async () => {
+  try {
+    await removeModerator(token!, communityId, opName);
+    setIsAuthorModerator(false);
+    setIsDropdownOpen(false);
+    console.log('Removing moderator');
+  } catch (error) {
+    console.error('Error removing moderator:', error);
+  }
+};
+
+const handleRemoveMember = async () => {
+  try {
+    await removeMember(token!, communityId, opName);
+      setIsDropdownOpen(false);
+    console.log('Removing member');
+  } catch (error) {
+    console.error('Error removing member:', error);
+  }
+};
 
 
+
+  // Voting Functions
   const handleUpvoteQuestion = async () => {
     if (voteStatus === 'upvoted') {
       await handleUpvoteFromUpvoted();
@@ -165,7 +224,25 @@ const Question: React.FC<QuestionProps> = ({
     setIsEditModalOpen(false);
   };
 
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin || isUserModerator;
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen(prev => !prev);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && !event.target!.closest('.question-actions')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="question-container">
@@ -199,8 +276,7 @@ const Question: React.FC<QuestionProps> = ({
                 linkDialogPlugin(),
                 thematicBreakPlugin(),
                 markdownShortcutPlugin(),
-              ]}
-            />
+              ]}            />
           </section>
         </header>
 
@@ -240,27 +316,46 @@ const Question: React.FC<QuestionProps> = ({
             )}
 
             {canDelete && (
-              <button className="action-button delete-button" onClick={() =>onDelete(questionId)}>
+              <button className="action-button delete-button" onClick={() => onDelete(questionId)}>
                 <FaTrash />
               </button>
             )}
 
             <button className="action-button reply-button" onClick={() => setIsReplyModalOpen(true)}>
-              <FaReply /> {/* Reply icon */}
+              <FaReply />
             </button>
+
+            {/* Dropdown Menu */}
+          {(isAdmin||isUserModerator) && !isAuthorAdmin &&(
+            <button className="action-button more-button" onClick={toggleDropdown}>
+              <FaEllipsisV />
+            </button>
+          )}
+
+
+          {isDropdownOpen && !isAuthorAdmin && (
+            <div ref={dropdownRef} className="dropdown-menu show">
+              {!isAuthorModerator && isAdmin ? (
+                <button onClick={handleSetModerator}>Set Moderator</button>
+              ) : null}
+              {isAuthorModerator && isAdmin ? (
+                <button onClick={handleRemoveModerator}>Remove Moderator</button>
+              ) : null}
+              <button onClick={handleRemoveMember}>Remove Member</button>
+            </div>
+          )}
+
           </div>
         </footer>
       </div>
 
-      {/* Reply Modal */}
       <PostModal
         isOpen={isReplyModalOpen}
         onClose={() => setIsReplyModalOpen(false)}
         onSave={handleReplySave}
         type="md-only"
       />
-      
-      {/* Edit Modal */}
+
       <PostModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

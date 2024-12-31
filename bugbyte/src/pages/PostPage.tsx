@@ -70,7 +70,7 @@ const PostPage: React.FC = () => {
 
         setQuestionLoading(false);
       };
-      
+
       fetchQuestion();
       
       
@@ -80,14 +80,14 @@ const PostPage: React.FC = () => {
     const newAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
     const addedAnswers = newAnswers.slice(0, pageSize);
     const hasNext = newAnswers.length > pageSize;
-    
+
 
     const nextReplies = new Map<string, boolean>();
     for (const answer of addedAnswers) {
       const fetchedReplies = await getRepliesFromAnswer(answer.answerId, token!, 0, pageSize + 1);
       const hasMoreReplies = fetchedReplies.length > pageSize;
       nextReplies.set(answer.answerId, hasMoreReplies);
-  
+
       setReplies((prev) => {
         const newReplies = new Map(prev);
         newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize));
@@ -96,11 +96,11 @@ const PostPage: React.FC = () => {
     }
 
 
-  
+
     setAnswers((prev) => [...prev, ...addedAnswers]);
     setHasNextAnswers(hasNext);
   };
-  
+
 
   const fetchMoreReplies = async (answerId: string) => {
     const currentReplies = replies.get(answerId) || [];

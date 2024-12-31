@@ -22,6 +22,7 @@ import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils
 import { IAnswer, IReply } from '../../types';
 import { downvoteAnswer, editAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
 import validatePostDetails from '../../utils/validateQuestion';
+import { isModerator } from '../../API/ModeratorApi';
 
 interface AnswerProps extends IAnswer {
   onDelete: (answerId: string) => void;
@@ -51,16 +52,31 @@ const Answer: React.FC<AnswerProps> = ({
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [markdownState, setMarkdownState] = useState(mdContent);
+  const [isUserModerator, setIsUserModerator] = useState(false); // New state for moderator status
+
   const navigate = useNavigate();
 
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
   const token = localStorage.getItem('authToken');
 
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin;
+  //  // Fetch moderator status
+  //   useEffect(() => {
+  //     const fetchModeratorStatus = async () => {
+  //       if (token) {
+  //         try {
+  //           const result = await isModerator(token, communityId);
+  //           setIsUserModerator(result);
+  //         } catch (error) {
+  //           console.error('Failed to fetch moderator status:', error);
+  //         }
+  //       }
+  //     };
 
-  const handleUpvoteAnswer = async () => {
+  //     fetchModeratorStatus();
+  //   }, [token, communityId]);
+
+  const handleUpvoteAnswer = async() => {
     if (voteStatus === 'upvoted') {
       await handleUpvoteFromUpvoted();
     } else if (voteStatus === 'downvoted') {
@@ -155,6 +171,11 @@ const Answer: React.FC<AnswerProps> = ({
     setMarkdownState(postDetails.content);
     setIsEditModalOpen(false);
   };
+
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin || isUserModerator;
+  console.log('isAdmin:', isAdmin);
+  console.log(loggedInUsername, opName);
 
   return (
     <div className={`answer-container ${isVerified ? 'verified' : ''}`}>

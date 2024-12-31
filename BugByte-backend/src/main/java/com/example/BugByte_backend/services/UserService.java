@@ -56,7 +56,7 @@ public class UserService {
         return user;
     }
 
-    private User getUser(String userName) {
+    public User getUser(String userName) {
         try {
             return this.getCachedUser(userName);
         } catch (Exception e) {
