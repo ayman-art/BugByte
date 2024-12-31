@@ -42,7 +42,7 @@ class AdministrativeFacadeTest {
         MockitoAnnotations.openMocks(this);
         requestData = new HashMap<>();
         requestData.put("jwt", "valid_jwt_token");
-        requestData.put("communityId", "1");
+        requestData.put("communityId", 1L);
         requestData.put("moderatorName", "test_moderator");
     }
 
@@ -51,7 +51,8 @@ class AdministrativeFacadeTest {
         when(authenticationService.getIsAdminFromJwt("valid_jwt_token")).thenReturn(true);
         when(moderatorService.setModerator("test_moderator", 1L)).thenReturn(true);
 
-        boolean result = administrativeFacade.setModerator(requestData);
+        boolean result = administrativeFacade.setModerator((Long) requestData.get("communityId"), (String) requestData.get("moderatorName"),
+                (String) requestData.get("jwt"));
 
         assertTrue(result);
         verify(moderatorService, times(1)).setModerator("test_moderator", 1L);
@@ -61,7 +62,8 @@ class AdministrativeFacadeTest {
     void testSetModerator_Failure_NotAdmin() {
         when(authenticationService.getIsAdminFromJwt("valid_jwt_token")).thenReturn(false);
 
-        boolean result = administrativeFacade.setModerator(requestData);
+        boolean result = administrativeFacade.setModerator((Long) requestData.get("communityId"), (String) requestData.get("moderatorName"),
+                (String) requestData.get("jwt"));
 
         assertFalse(result);
         verify(moderatorService, never()).setModerator(anyString(), anyLong());
@@ -72,7 +74,8 @@ class AdministrativeFacadeTest {
         when(authenticationService.getIsAdminFromJwt("valid_jwt_token")).thenReturn(true);
         when(moderatorService.removeModerator("test_moderator", 1L)).thenReturn(true);
 
-        boolean result = administrativeFacade.removeModerator(requestData);
+        boolean result = administrativeFacade.removeModerator((Long) requestData.get("communityId"), (String) requestData.get("moderatorName"),
+                (String) requestData.get("jwt"));
 
         assertTrue(result);
         verify(moderatorService, times(1)).removeModerator("test_moderator", 1L);
@@ -82,7 +85,8 @@ class AdministrativeFacadeTest {
     void testRemoveModerator_Failure_NotAdmin() {
         when(authenticationService.getIsAdminFromJwt("valid_jwt_token")).thenReturn(false);
 
-        boolean result = administrativeFacade.removeModerator(requestData);
+        boolean result = administrativeFacade.removeModerator((Long) requestData.get("communityId"), (String) requestData.get("moderatorName"),
+                (String) requestData.get("jwt"));
 
         assertFalse(result);
         verify(moderatorService, never()).removeModerator(anyString(), anyLong());
@@ -101,7 +105,8 @@ class AdministrativeFacadeTest {
     void testRemoveMember_Failure_NotAdmin() {
         when(authenticationService.getIsAdminFromJwt("valid_jwt_token")).thenReturn(false);
 
-        assertThrows(RuntimeException.class ,()-> administrativeFacade.removeMember(requestData));
+        assertThrows(RuntimeException.class ,()-> administrativeFacade.removeMember((Long) requestData.get("communityId"), (String) requestData.get("moderatorName"),
+                (String) requestData.get("jwt")));
     }
 
 //    @Test
