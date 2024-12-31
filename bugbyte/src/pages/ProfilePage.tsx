@@ -429,7 +429,7 @@ const Profile: React.FC = () => {
             </div>
           )}
           <div>
-            <h1 style={{ color: isAdmin ? "red" : "inherit" }}>
+            <h1 style={{ color: userProfile.is_admin ? "red" : "black" }}>
               {userProfile.username}
             </h1>
             <p>Reputation: {userProfile.reputation}</p>
