@@ -310,8 +310,11 @@ public class AdministrativeFacade {
             if (!isAdmin) throw new Exception("user is not an admin");
             return communityService.deleteMember(communityId ,memberName);
         } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return false;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
+
             throw new RuntimeException(e);
         }
     }

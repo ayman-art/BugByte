@@ -104,7 +104,8 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private UserRepositoryImp userRepositoryImp = new UserRepositoryImp();
+    @Autowired
+    private UserRepositoryImp userRepositoryImp;
 
     @Override
     public Long insertCommunity(String name, Long adminId) {
@@ -166,7 +167,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     @Override
     public Community findCommunityById(Long id) {
         if( id == null) {
-            System.out.println("id is null");
             throw new NullPointerException("id is Null");
         }
         Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, communityRowMapper,id);
@@ -235,7 +235,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         boolean i = deleteCommunityMembers(communityId);
        // removeCommunityModerators(communityId);
         int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_BY_ID, communityId);
-        System.out.println(communityId+"comm"+rows+"rows");
         return rows == 1;
     }
 
@@ -248,7 +247,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 
     @Override
     public boolean deleteMemberById(Long memberId, Long communityId) {
-        System.out.println(communityId + "  "+ memberId);
         if(memberId==null || communityId==null)
             throw new NullPointerException("memberId or communityId is null");
         int rows = jdbcTemplate.update(SQL_DELETE_MEMBER_BY_ID, memberId, communityId);
@@ -341,7 +339,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     public boolean deleteMemberByUsername(Long communityId , String Username)
     {
         Long userId = userRepositoryImp.getIdByUserName(Username);
-        System.out.println(userId + "  "+ Username);
         return  deleteMemberById(userId , communityId);
     }
 
@@ -349,7 +346,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         if (communityId == null) {
             throw new NullPointerException("communityId is null");
         }
-        System.out.println(communityId);
         List<User> moderators = jdbcTemplate.query(SQL_FIND_MODERATORS_BY_COMMUNITY, new Long[]{communityId},new UserRowMapper());
         return moderators;
     }

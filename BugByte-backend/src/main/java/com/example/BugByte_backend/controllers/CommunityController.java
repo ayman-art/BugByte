@@ -26,10 +26,8 @@ public class CommunityController {
         );
         try {
             Community response = administrativeFacade.getCommunityInfo(userdata);
-            System.out.println(response.toString());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
@@ -81,10 +79,6 @@ public class CommunityController {
             @PathVariable Long communityId,
             @PathVariable String moderatorName,
             @RequestHeader("Authorization") String token) {
-        System.out.println("Community ID: " + communityId);
-        System.out.println("Moderator Name: " + moderatorName);
-        System.out.println("Token: " + token);
-
         try {
             token = token.replace("Bearer ", "");
             boolean isModeratorSet = administrativeFacade.setModerator(communityId, moderatorName, token);
@@ -134,9 +128,7 @@ public class CommunityController {
             @PathVariable Long communityId,
             @PathVariable String moderatorName,
             @RequestHeader("Authorization") String token) {
-        System.out.println("Community ID: " + communityId);
-        System.out.println("Moderator Name: " + moderatorName);
-        System.out.println("Token: " + token);
+
         try {
             // Remove the "Bearer " prefix from the token
             token = token.replace("Bearer ", "");
@@ -159,9 +151,7 @@ public class CommunityController {
             @PathVariable Long communityId,
             @PathVariable String memberName,
             @RequestHeader("Authorization") String token) {
-        System.out.println("Community ID: " + communityId);
-        System.out.println("Moderator Name: " + memberName);
-        System.out.println("Token: " + token);
+
         try {
             token = token.replace("Bearer ", "");
 

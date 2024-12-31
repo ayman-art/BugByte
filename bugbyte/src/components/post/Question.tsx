@@ -80,6 +80,9 @@ const Question: React.FC<QuestionProps> = ({
 const handleSetModerator = async () => {
   try {
     await setModerator(token, opName, communityId);
+    setIsAuthorModerator(true);
+        setIsDropdownOpen(false);
+
     console.log('Setting as moderator');
   } catch (error) {
     console.error('Error setting as moderator:', error);
@@ -89,6 +92,8 @@ const handleSetModerator = async () => {
 const handleRemoveModerator = async () => {
   try {
     await removeModerator(token, communityId, opName);
+    setIsAuthorModerator(false);
+    setIsDropdownOpen(false);
     console.log('Removing moderator');
   } catch (error) {
     console.error('Error removing moderator:', error);
@@ -98,6 +103,7 @@ const handleRemoveModerator = async () => {
 const handleRemoveMember = async () => {
   try {
     await removeMember(token, communityId, opName);
+      setIsDropdownOpen(false);
     console.log('Removing member');
   } catch (error) {
     console.error('Error removing member:', error);
