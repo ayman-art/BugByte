@@ -22,7 +22,7 @@ public class ModeratorRepository implements IModeratorRepository{
     private static final String SQL_IS_MODERATOR_BY_NAME =
             "SELECT COUNT(*) " +
                     "FROM moderators m " +
-                    "JOIN users u ON m.user_id = u.id " +
+                    "JOIN users u ON m.id = u.id " +
                     "WHERE u.user_name = ? AND m.community_id = ?";
 
 
