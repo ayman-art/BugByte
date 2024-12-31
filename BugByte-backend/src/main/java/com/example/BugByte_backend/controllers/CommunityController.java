@@ -103,7 +103,7 @@ public class CommunityController {
             return false;
         }
     }
-    @RequestMapping(method =RequestMethod.GET , value = "/isModeratorByName/{communityId}/{username}")
+    @RequestMapping(method =RequestMethod.GET , value = "/isModeratorByName/{communityId}/{userName}")
     public boolean isModeratorByName(@RequestHeader("Authorization") String token ,@PathVariable Long communityId ,
                                      @PathVariable String userName) {
         token = token.replace("Bearer ", "");

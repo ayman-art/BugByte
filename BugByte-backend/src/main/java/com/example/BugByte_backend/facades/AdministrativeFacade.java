@@ -371,4 +371,16 @@ public class AdministrativeFacade {
         Long id = Long.parseLong(claim.getId());
         return communityService.leaveCommunity(communityName,id);
     }
+    public boolean isAdmin (String jwt ,String username)
+    {
+        try {
+            boolean isAdmin = authenticationService.getIsAdminFromJwt(jwt);
+            if (!isAdmin) throw new Exception("user is not an admin");
+            return userService.getUser(username).getIsAdmin();
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 }

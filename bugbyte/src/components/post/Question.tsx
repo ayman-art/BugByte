@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaReply, FaEllipsisV } from 'react-icons/fa';
 import { IQuestion } from '../../types/index';
-import { isModerator , removeModerator ,removeMember,  setModerator } from '../../API/ModeratorApi';
+import { isModerator,isModeratorByName ,isAdminByName, removeModerator ,removeMember,  setModerator } from '../../API/ModeratorApi';
 import {
   MDXEditor,
   headingsPlugin,
@@ -47,6 +47,9 @@ const Question: React.FC<QuestionProps> = ({
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isUserModerator, setIsUserModerator] = useState(false);
+   const [isAuthorModerator, setIsAuthorModerator] = useState(false);
+   const [isAuthorAdmin, setIsAuthorAdmin] = useState(false);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -55,21 +58,24 @@ const Question: React.FC<QuestionProps> = ({
   const isAdmin = localStorage.getItem('is_admin') === 'true';
   const token = localStorage.getItem('authToken');
 
-  // Fetch moderator status
-  useEffect(() => {
-    const fetchModeratorStatus = async () => {
-      if (token) {
-        try {
-          const result = await isModerator(token, communityId);
-          setIsUserModerator(result);
-        } catch (error) {
-          console.error('Failed to fetch moderator status:', error);
-        }
-      }
-    };
+ useEffect(() => {
+   const fetchModeratorStatus = async () => {
+     if (token) {
+       try {
+         const result = await isModerator(token, communityId);
+         setIsUserModerator(result);
+         const result2 = await isModeratorByName(token, communityId, opName);
+         setIsAuthorModerator(result2);
+         const result3 = await isAdminByName(token , opName);
+         setIsAuthorAdmin(result3);
+       } catch (error) {
+         console.error('Failed to fetch moderator status:', error);
+       }
+     }
+   };
 
-    fetchModeratorStatus();
-  }, [token, communityId]);
+   fetchModeratorStatus();
+ }, [token, communityId, opName]);
 
 const handleSetModerator = async () => {
   try {
@@ -239,19 +245,19 @@ const handleRemoveMember = async () => {
             </button>
 
             {/* Dropdown Menu */}
-          {isAdmin && (
+          {isAdmin && !isAuthorAdmin &&(
             <button className="action-button more-button" onClick={toggleDropdown}>
               <FaEllipsisV />
             </button>
           )}
 
 
-          {isDropdownOpen && (
+          {isDropdownOpen && !isAuthorAdmin && (
             <div ref={dropdownRef} className="dropdown-menu show">
-              {!isUserModerator ? (
+              {!isAuthorModerator ? (
                 <button onClick={handleSetModerator}>Set Moderator</button>
               ) : null}
-              {isUserModerator ? (
+              {isAuthorModerator ? (
                 <button onClick={handleRemoveModerator}>Remove Moderator</button>
               ) : null}
               <button onClick={handleRemoveMember}>Remove Member</button>
