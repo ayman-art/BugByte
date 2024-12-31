@@ -85,7 +85,8 @@ public class RecommendationSystemRepository {
                 )
                 ORDER BY e.engagement_score DESC
                 LIMIT 10
-            );
+            )
+            ORDER BY RAND();
             """;
     private static final Long GENERAL_COMMUNITY = 1L;
 
