@@ -39,6 +39,10 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
 
 
   const handleEditSave = async (postDetails: { content: string }) => {
+    if (!postDetails.content.trim()) {
+      alert('Content cannot be empty');
+      return;
+    }
     await editReply(replyId, postDetails.content, token!);
     setMdContentState(postDetails.content);
     setIsEditModalOpen(false);
