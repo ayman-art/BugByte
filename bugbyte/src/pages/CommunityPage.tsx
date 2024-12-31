@@ -167,12 +167,18 @@ const CommunityPage: React.FC = () => {
       const jwt = localStorage.getItem("authToken");
       if (!jwt) throw new Error("User is not authenticated");
 
-      const updatedCommunity = await updateCommunity(
-        jwt,
-        community?.id!,
-        updatedData
-      );
-      setCommunity(updatedCommunity); // Update local state
+      await updateCommunity(jwt, community?.id!, updatedData);
+
+      setCommunity((prevCommunity) => {
+        if (!prevCommunity) return null;
+        return {
+          ...prevCommunity,
+          name: updatedData.name,
+          description: updatedData.description!,
+          tags: updatedData.tags!,
+        };
+      });
+
       setShowEditModal(false); // Close modal
       alert("Community updated successfully!");
     } catch (err: any) {
@@ -268,40 +274,40 @@ const CommunityPage: React.FC = () => {
             >
               View Members
             </button>
-          </div>
 
-          <div style={{ padding: "20px" }}>
-            {community && (
-              <>
-                {userId === String(community.adminId) && (
-                  <button
-                    style={{
-                      margin: "10px",
-                      padding: "10px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "5px",
-                    }}
-                    onClick={() => setShowEditModal(true)}
-                  >
-                    Edit Community
-                  </button>
-                )}
-              </>
-            )}
+            <div style={{ padding: "20px" }}>
+              {community && (
+                <>
+                  {userId === String(community.adminId) && (
+                    <button
+                      style={{
+                        margin: "10px",
+                        padding: "10px",
+                        backgroundColor: "#4CAF50",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "5px",
+                      }}
+                      onClick={() => setShowEditModal(true)}
+                    >
+                      Edit Community
+                    </button>
+                  )}
+                </>
+              )}
 
-            {/* Edit Modal */}
-            <CommunityModal
-              isOpen={showEditModal}
-              onClose={() => setShowEditModal(false)}
-              onSave={handleEditSave}
-              initialData={{
-                name: community?.name || "",
-                description: community?.description || "",
-                tags: community?.tags,
-              }}
-            />
+              {/* Edit Modal */}
+              <CommunityModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onSave={handleEditSave}
+                initialData={{
+                  name: community?.name || "",
+                  description: community?.description || "",
+                  tags: community?.tags,
+                }}
+              />
+            </div>
           </div>
 
           {/* Join or Leave Button */}

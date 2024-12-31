@@ -41,4 +41,5 @@ export const API_URLS = {
   ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`,
   LEAVE_COMMUNITY: `${API_BASE_URL}/communities/leaveCommunity`,
   COMMUNTIY_MEMBERS: `${API_BASE_URL}/communities/community-members`,
+  UPDATE_COMMUNITY: `${API_BASE_URL}/communities/update-community`,
 };

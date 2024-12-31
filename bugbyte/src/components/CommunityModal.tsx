@@ -51,24 +51,31 @@ const CommunityModal: React.FC<CommunityModalProps> = ({
       tags,
     };
 
-    try {
-      const jwt = localStorage.getItem("authToken");
-      const response = await createCommunity(
-        communityDetails.name,
-        communityDetails.description || "",
-        communityDetails.tags || [],
-        jwt!
-      );
+    if (!initialData) {
+      try {
+        const jwt = localStorage.getItem("authToken");
+        const response = await createCommunity(
+          communityDetails.name,
+          communityDetails.description || "",
+          communityDetails.tags || [],
+          jwt!
+        );
 
-      alert("Community Created Successfully!");
+        alert("Community Created Successfully!");
 
-      onSave(response);
+        onSave(response);
+        clearForm();
+        setError("");
+        onClose();
+      } catch (error) {
+        console.error("Error creating community:", error);
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } else {
+      onSave(communityDetails);
       clearForm();
       setError("");
       onClose();
-    } catch (error) {
-      console.error("Error creating community:", error);
-      setError("An unexpected error occurred. Please try again.");
     }
   };
 
