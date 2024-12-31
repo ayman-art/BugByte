@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaReply } from 'react-icons/fa';
-import { IQuestion } from '../../types/index'
+import { IAnswer, IQuestion } from '../../types/index'
 import { MDXEditor, 
   headingsPlugin,
   listsPlugin,
@@ -19,10 +19,11 @@ import { MDXEditor,
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
-import { downvoteQuestion, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
+import { downvoteQuestion, postAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
   onDelete: (questionId: string) => void;
+  onReply: (answer: IAnswer) => void;
 }
 const Question: React.FC<QuestionProps> = ({
   questionId,
@@ -37,7 +38,8 @@ const Question: React.FC<QuestionProps> = ({
   postedOn,
   communityName,
   communityId,
-  onDelete
+  onDelete,
+  onReply
   
 }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
@@ -46,72 +48,117 @@ const Question: React.FC<QuestionProps> = ({
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  const token = localStorage.getItem('authToken');
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
-  
-  const token = localStorage.getItem('authToken');
 
- 
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin;
 
-  const handleUpvoteQuestion = () => {
+  useEffect(() => {
+    setCurrentUpvotes(upVotes);
+    setCurrentDownvotes(downVotes);
+    setVoteStatus(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
+  }, [questionId]);
+
+
+  const handleUpvoteQuestion = async () => {
     if (voteStatus === 'upvoted') {
-      removeUpvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
-      setVoteStatus('neutral');
-      console.log('FROM upvoted to neutral');
+      await handleUpvoteFromUpvoted();
     } else if (voteStatus === 'downvoted') {
-      removeDownvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
-      upvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
-      setVoteStatus('upvoted');
-      console.log('FROM downvoted to upvoted');
+      await handleUpvoteFromDownvoted();
     } else {
-      upvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
-      setVoteStatus('upvoted');
-      console.log('FROM neutral to upvoted');
+      await handleUpvoteFromNeutral();
     }
   };
 
-  const handleDownvoteQuestion = () => {
+  const handleUpvoteFromUpvoted = async () => {
+    await removeUpvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    setVoteStatus('neutral');
+  };
+
+  const handleUpvoteFromDownvoted = async () => {
+    await removeDownvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    await upvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  };
+
+  const handleUpvoteFromNeutral = async () => {
+    await upvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  };
+
+
+
+  const handleDownvoteQuestion = async () => {
     if (voteStatus === 'downvoted') {
-      removeDownvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
-      setVoteStatus('neutral');
-      console.log('FROM downvoted to neutral');
+      await handleDownvoteFromDownvoted();
     } else if (voteStatus === 'upvoted') {
-      removeUpvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
-      downvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
-      setVoteStatus('downvoted');
-      console.log('FROM upvoted to downvoted');
-    } else {
-      downvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
-      setVoteStatus('downvoted');
-      console.log('FROM neutral to downvoted');
+      await handleDownvoteFromUpvoted();
+    }
+    else {
+      await handleDownvoteFromNeutral();
     }
   };
 
-  const handleNavigateToProfile = () => {
-    navigate(`/Profile/${opName}`);
+  const handleDownvoteFromDownvoted = async () => {
+    await removeDownvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    setVoteStatus('neutral');
   };
 
-  const handleReplySave = (postDetails: { content: string }) => {
+  const handleDownvoteFromUpvoted = async () => {
+    await removeUpvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    await downvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  };
+
+  const handleDownvoteFromNeutral = async () => {
+    await downvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  };
+  
+
+  const handleReplySave = async (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
-    // Add functionality to save reply here
+    if (!token || !loggedInUsername) {
+      alert('No auth token found. Please log in.');
+      return;
+    } else if (!postDetails.content || postDetails.content.trim() === '') {
+      alert('Answer content cannot be empty.');
+      return;
+    }
+    const answerId = await postAnswer(postDetails.content, questionId, token!);
+    onReply({
+      answerId,
+      questionId,
+      opName: loggedInUsername,
+      postedOn: new Date().toLocaleString('en-US'),
+      upVotes: 0,
+      mdContent: postDetails.content,
+      isDownVoted: false,
+      isUpVoted: false,
+      downVotes: 0,
+      canVerify: false,
+      isVerified: false,
+      enabledVerify: true
+    });
   };
 
   const handleEditSave = (postDetails: { content: string }) => {
-    console.log('Post edited:', postDetails);
+    // later
     setIsEditModalOpen(false);
   };
 
 
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin;
 
   return (
     <div className="question-container">
@@ -119,16 +166,17 @@ const Question: React.FC<QuestionProps> = ({
         <header className="question-header">
           <h2 className="question-title">{title}</h2>
           <p className="community-tag">
-            <span className="tag tag-community">c/{communityName}</span>
+            <span className="tag tag-community" onClick={() =>{navigate(`/communities/${communityId}`)}}>c/{communityName}</span>
           </p>
           <p className="op-name">
             Asked by:{' '}
-            <span onClick={handleNavigateToProfile} className="op-link">
+            <span onClick={() => {navigate(`/Profile/${opName}`)}} className="op-link">
               {opName}
             </span>
           </p>
           <section className="question-body">
             <MDXEditor
+              key={mdContent}
               markdown={mdContent}
               readOnly
               plugins={[
@@ -149,7 +197,7 @@ const Question: React.FC<QuestionProps> = ({
           </section>
         </header>
 
-        <p className="question-date">on {postedOn}</p>
+        <p className="post-date">on {new Date(postedOn).toLocaleString('en-US')}</p>
 
         <footer className="question-footer">
           <div className="question-tags">
@@ -210,7 +258,7 @@ const Question: React.FC<QuestionProps> = ({
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: mdContent }}
+        initialData={{ content: mdContent, title, tags }}
         type="no-community"
       />
     </div>

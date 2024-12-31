@@ -9,6 +9,7 @@ import com.example.BugByte_backend.models.Answer;
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.models.Reply;
 import com.example.BugByte_backend.services.AuthenticationService;
+import com.example.BugByte_backend.services.NotificationService.NotificationProducer;
 import com.example.BugByte_backend.services.PostingService;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,9 @@ public class InteractionFacadeTest {
 
     @Mock
     AuthenticationService authenticationService;
+
+    @Mock
+    NotificationProducer notifier;
 
     @BeforeEach
     public void setUp() {
@@ -70,26 +74,27 @@ public class InteractionFacadeTest {
 
     }
     @Test
-    void testPostAnswerSuccess() throws Exception {
+    public void testPostAnswer_Success() throws Exception {
         // Arrange
         Map<String, Object> postData = new HashMap<>();
-        postData.put("jwt", "valid_jwt_token");
-        postData.put("questionId", 1);
-        postData.put("mdContent", "This is the answer content");
+        postData.put("jwt", "validToken");
+        postData.put("questionId", 123);
+        postData.put("mdContent", "Sample answer content");
 
-        String mockUserName = "testUser";
-        long mockAnswerId = 12345L;
+        String expectedUserName = "user1";
+        long expectedAnswerId = 200L;
 
-        // Mock the behavior of dependencies
-        when(authenticationService.getUserNameFromJwt("valid_jwt_token")).thenReturn(mockUserName);
-        when(postingService.postAnswer(any(Answer.class))).thenReturn(mockAnswerId);
+        when(authenticationService.getUserNameFromJwt("validToken")).thenReturn(expectedUserName);
+        when(postingService.postAnswer(any(Answer.class))).thenReturn(expectedAnswerId);
+        doNothing().when(notifier).sendAnswerNotification(any(Answer.class));
 
         // Act
         Map<String, Object> result = interactionFacade.postAnswer(postData);
 
         // Assert
         assertNotNull(result);
-        assertEquals(mockAnswerId, result.get("answerId"));
+        assertEquals(expectedAnswerId, result.get("answerId"));
+
     }
 
     @Test
@@ -110,6 +115,29 @@ public class InteractionFacadeTest {
 
         // Assert exception message
         assertEquals(exceptionMessage, exception.getMessage());
+    }
+    @Test
+    public void testPostQuestion_Success() throws Exception {
+        // Arrange
+        Map<String, Object> postData = new HashMap<>();
+        postData.put("jwt", "validToken");
+        postData.put("communityId", 123);
+        postData.put("mdContent", "Sample content");
+        postData.put("title", "Sample title");
+        postData.put("tags", List.of("tag1", "tag2"));
+
+        String expectedUserName = "user1";
+        long expectedQuestionId = 100L;
+
+        when(authenticationService.getUserNameFromJwt("validToken")).thenReturn(expectedUserName);
+        when(postingService.postQuestion(any(Question.class))).thenReturn(expectedQuestionId);
+
+        // Act
+        Map<String, Object> result = interactionFacade.postQuestion(postData);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(expectedQuestionId, result.get("questionId"));
     }
     @Test
     void testPostReplySuccess() throws Exception {
@@ -633,6 +661,62 @@ public class InteractionFacadeTest {
 
         // Assert exception message
         assertEquals(exceptionMessage, exception.getMessage());
+    }
+    @Test
+    public void testUpVoteAnswer_Success() throws Exception {
+        // Arrange
+        Map<String, Object> postData = new HashMap<>();
+        postData.put("jwt", "validToken");
+        postData.put("answerId", 123);
+
+        String expectedUserName = "user1";
+        Long expectedAnswerId = 123L;
+
+        when(authenticationService.getUserNameFromJwt("validToken")).thenReturn(expectedUserName);
+        when(postingService.upVoteAnswer(expectedAnswerId, expectedUserName)).thenReturn(true);
+
+        // Act
+        boolean result = interactionFacade.upVoteAnswer(postData);
+
+        // Assert
+        assertTrue(result);
+    }
+
+    @Test
+    public void testUpVoteAnswer_InvalidToken() {
+        // Arrange
+        Map<String, Object> postData = new HashMap<>();
+        postData.put("jwt", "invalidToken");
+        postData.put("answerId", 123);
+
+        when(authenticationService.getUserNameFromJwt("invalidToken")).thenThrow(new RuntimeException("Invalid token"));
+
+        // Act & Assert
+        Exception exception = assertThrows(Exception.class, () -> {
+            interactionFacade.upVoteAnswer(postData);
+        });
+
+    }
+
+    @Test
+    public void testUpVoteAnswer_PostingServiceThrowsException() throws Exception {
+        // Arrange
+        Map<String, Object> postData = new HashMap<>();
+        postData.put("jwt", "validToken");
+        postData.put("answerId", 123);
+
+        String expectedUserName = "user1";
+        Long expectedAnswerId = 123L;
+
+        when(authenticationService.getUserNameFromJwt("validToken")).thenReturn(expectedUserName);
+        when(postingService.upVoteAnswer(expectedAnswerId, expectedUserName)).thenThrow(new RuntimeException("Error upvoting answer"));
+
+        // Act & Assert
+        Exception exception = assertThrows(Exception.class, () -> {
+            interactionFacade.upVoteAnswer(postData);
+        });
+
+        assertEquals("Error upvoting answer", exception.getMessage());
     }
 }
 

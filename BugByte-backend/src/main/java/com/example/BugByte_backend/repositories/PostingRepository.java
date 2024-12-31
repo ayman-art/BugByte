@@ -166,7 +166,7 @@ public class PostingRepository implements IPostingRepository{
     private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
 
-    private static final String SQL_UPDATE_REPUTATION_POSITIVELY_QUESTIONS = """
+      private static final String SQL_UPDATE_REPUTATION_POSITIVELY_QUESTIONS = """
             UPDATE users
             SET reputation = reputation + 1
             WHERE user_name = (
@@ -221,8 +221,7 @@ public class PostingRepository implements IPostingRepository{
                 WHERE answers.id = ?
             );
             """;
-
-
+              
     @Autowired
     private JdbcTemplate jdbcTemplate ;
 
@@ -342,6 +341,7 @@ public class PostingRepository implements IPostingRepository{
             throw new NullPointerException("question id or value is null");
         Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
                 new Object[]{ userName, questionId }, Integer.class);
+        count = (count == null) ? 1 : count;
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already up voted this question");
@@ -371,6 +371,7 @@ public class PostingRepository implements IPostingRepository{
 
         Integer count = jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE,
                 new Object[]{ userName, questionId }, Integer.class);
+        count = (count == null) ? 1 : count;
         if(value == 1) {
             if (count == 1)
                 throw new Exception("user already down voted this question");
@@ -429,11 +430,11 @@ public class PostingRepository implements IPostingRepository{
     public Boolean downVoteAnswer(Long answerId, Integer value , String userName) throws Exception {
         if (answerId == null)
             throw new NullPointerException("answer id or value is null");
-        Integer count = jdbcTemplate.queryForObject(SQL_GET_UP_VOTE,
+        Integer count = jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE,
                 new Object[]{ userName, answerId }, Integer.class);
         if(value == 1) {
             if (count == 1)
-                throw new Exception("user already up voted this answer");
+                throw new Exception("user already down voted this answer");
             if (is_UpVoted(userName , answerId)) {
                 jdbcTemplate.update(SQL_UPDATE_UP_VOTES_ANSWERS,  -1, answerId);
             }
@@ -557,7 +558,7 @@ public class PostingRepository implements IPostingRepository{
                     .id(rs.getLong("id"))
                     .creatorUserName(rs.getString("op_name"))
                     .mdContent(rs.getString("md_content"))
-                    .postedOn(new Date(rs.getDate("posted_on").getTime()))
+                    .postedOn(new Date(rs.getTimestamp("posted_on").getTime()))
                     .title(rs.getString("title"))
                     .communityId(rs.getLong("community_id"))
                     .upVotes(rs.getLong("up_votes"))
@@ -571,7 +572,7 @@ public class PostingRepository implements IPostingRepository{
                     .id(rs.getLong("id"))
                     .creatorUserName(rs.getString("op_name"))
                     .mdContent(rs.getString("md_content"))
-                    .postedOn(new Date(rs.getDate("posted_on").getTime()))
+                    .postedOn(new Date(rs.getTimestamp("posted_on").getTime()))
                     .questionId(rs.getLong("question_id"))
                     .upVotes(rs.getLong("up_votes"))
                     .downVotes(rs.getLong("down_votes"))
@@ -583,7 +584,7 @@ public class PostingRepository implements IPostingRepository{
                     .id(rs.getLong("id"))
                     .creatorUserName(rs.getString("op_name"))
                     .mdContent(rs.getString("md_content"))
-                    .postedOn(new Date(rs.getDate("posted_on").getTime()))
+                    .postedOn(new Date(rs.getTimestamp("posted_on").getTime()))
                     .answerId(rs.getLong("answer_id"))
                     .build()
     );
@@ -592,6 +593,6 @@ public class PostingRepository implements IPostingRepository{
             rs.getLong("id"),
             rs.getString("op_name"),
             rs.getString("md_content"),
-            new Date(rs.getDate("posted_on").getTime())
+            new Date(rs.getTimestamp("posted_on").getTime())
     ));
 }

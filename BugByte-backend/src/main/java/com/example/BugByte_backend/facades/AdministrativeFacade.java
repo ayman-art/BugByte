@@ -6,6 +6,7 @@ import com.example.BugByte_backend.controllers.GoogleAuthController;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.services.*;
+import com.example.BugByte_backend.services.NotificationService.NotificationProducer;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import io.jsonwebtoken.Claims;
@@ -26,6 +27,9 @@ public class AdministrativeFacade {
 
     @Autowired
     private RegistrationService registrationService;
+
+    @Autowired
+    private NotificationProducer notifier;
 
     @Autowired
     CommunityService communityService;
@@ -124,6 +128,8 @@ public class AdministrativeFacade {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
+        String username = claim.getSubject();
+        notifier.sendFollowNotification(username, (String) userdata.get("userName"));
         return userService.followUser(id, (String) userdata.get("userName"));
     }
 
@@ -202,12 +208,14 @@ public class AdministrativeFacade {
     public boolean createCommunity(Map<String,Object> map){
         try {
             String token = (String) map.get("jwt");
+            Claims claims = AuthenticationService.parseToken(token);
+            long adminId = Long.parseLong(claims.getId());
             boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
-            System.out.println(isAdmin);
             if (!isAdmin) throw new Exception("user is not an admin");
+            System.out.println(isAdmin);
             CommunityAdapter communityAdapter = new CommunityAdapter();
             map.remove("jwt");
-            map.put("admin_id" , Long.parseLong(authenticationService.getUserNameFromJwt(token)));
+            map.put("admin_id" , adminId);
             Long id = communityService.createCommunity(communityAdapter.fromMap(map));
             return  true;
         }catch (Exception e){
