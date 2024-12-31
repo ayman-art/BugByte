@@ -46,6 +46,7 @@ export const API_URLS = {
   REMOVE_MEMBER:`${API_BASE_URL}/communities/removeMember`,
   IS_MODERATOR:`${API_BASE_URL}/communities/isModerator`,
   IS_MODERATOR_BY_NAME:`${API_BASE_URL}/communities/isModeratorByName`,
-  IS_ADMIN:`${API_BASE_URL}/users/isAdmin`
-
+  IS_ADMIN:`${API_BASE_URL}/users/isAdmin`,
+  FETCH_NOTIFICATIONS: `${API_BASE_URL}/notifications/fetch-notifications`,
+  SOCKET_CONNECTION: `ws://localhost:8080/ws`
 };

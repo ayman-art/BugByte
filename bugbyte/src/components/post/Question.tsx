@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrash, FaReply, FaEllipsisV } from 'react-icons/fa';
-import { IQuestion } from '../../types/index';
+import { IAnswer, IQuestion } from '../../types/index';
 import { isModerator,isModeratorByName ,isAdminByName, removeModerator ,removeMember,  setModerator } from '../../API/ModeratorApi';
 import {
   MDXEditor,
@@ -20,10 +20,12 @@ import {
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
-import { downvoteQuestion, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
+import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
+import { downvoteQuestion, postAnswer, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
   onDelete: (questionId: string) => void;
+  onReply: (answer: IAnswer) => void;
 }
 
 const Question: React.FC<QuestionProps> = ({
@@ -39,7 +41,9 @@ const Question: React.FC<QuestionProps> = ({
   postedOn,
   communityName,
   communityId,
-  onDelete
+  onDelete,
+  onReply
+  
 }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downVotes);
@@ -54,9 +58,11 @@ const Question: React.FC<QuestionProps> = ({
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+
+  const token = localStorage.getItem('authToken');
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
-  const token = localStorage.getItem('authToken');
+  
 
  useEffect(() => {
    const fetchModeratorStatus = async () => {
@@ -76,10 +82,14 @@ const Question: React.FC<QuestionProps> = ({
 
    fetchModeratorStatus();
  }, [token, communityId, opName]);
-
+ useEffect(() => {
+  setCurrentUpvotes(upVotes);
+  setCurrentDownvotes(downVotes);
+  setVoteStatus(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
+}, [questionId]);
 const handleSetModerator = async () => {
   try {
-    await setModerator(token, opName, communityId);
+    await setModerator(token!, opName, communityId);
     setIsAuthorModerator(true);
         setIsDropdownOpen(false);
 
@@ -91,7 +101,7 @@ const handleSetModerator = async () => {
 
 const handleRemoveModerator = async () => {
   try {
-    await removeModerator(token, communityId, opName);
+    await removeModerator(token!, communityId, opName);
     setIsAuthorModerator(false);
     setIsDropdownOpen(false);
     console.log('Removing moderator');
@@ -102,7 +112,7 @@ const handleRemoveModerator = async () => {
 
 const handleRemoveMember = async () => {
   try {
-    await removeMember(token, communityId, opName);
+    await removeMember(token!, communityId, opName);
       setIsDropdownOpen(false);
     console.log('Removing member');
   } catch (error) {
@@ -113,52 +123,97 @@ const handleRemoveMember = async () => {
 
 
   // Voting Functions
-  const handleUpvote = () => {
+  const handleUpvoteQuestion = async () => {
     if (voteStatus === 'upvoted') {
-      removeUpvoteQuestion(questionId, token!);
-      setCurrentUpvotes(prev => prev - 1);
-      setVoteStatus('neutral');
+      await handleUpvoteFromUpvoted();
     } else if (voteStatus === 'downvoted') {
-      removeDownvoteQuestion(questionId, token!);
-      setCurrentDownvotes(prev => prev - 1);
-      upvoteQuestion(questionId, token!);
-      setCurrentUpvotes(prev => prev + 1);
-      setVoteStatus('upvoted');
+      await handleUpvoteFromDownvoted();
     } else {
-      upvoteQuestion(questionId, token!);
-      setCurrentUpvotes(prev => prev + 1);
-      setVoteStatus('upvoted');
+      await handleUpvoteFromNeutral();
     }
   };
 
-  const handleDownvote = () => {
+  const handleUpvoteFromUpvoted = async () => {
+    await removeUpvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    setVoteStatus('neutral');
+  };
+
+  const handleUpvoteFromDownvoted = async () => {
+    await removeDownvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    await upvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  };
+
+  const handleUpvoteFromNeutral = async () => {
+    await upvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes + 1);
+    setVoteStatus('upvoted');
+  };
+
+
+
+  const handleDownvoteQuestion = async () => {
     if (voteStatus === 'downvoted') {
-      removeDownvoteQuestion(questionId, token!);
-      setCurrentDownvotes(prev => prev - 1);
-      setVoteStatus('neutral');
+      await handleDownvoteFromDownvoted();
     } else if (voteStatus === 'upvoted') {
-      removeUpvoteQuestion(questionId, token!);
-      setCurrentUpvotes(prev => prev - 1);
-      downvoteQuestion(questionId, token!);
-      setCurrentDownvotes(prev => prev + 1);
-      setVoteStatus('downvoted');
-    } else {
-      downvoteQuestion(questionId, token!);
-      setCurrentDownvotes(prev => prev + 1);
-      setVoteStatus('downvoted');
+      await handleDownvoteFromUpvoted();
+    }
+    else {
+      await handleDownvoteFromNeutral();
     }
   };
 
-  const handleNavigateToProfile = () => {
-    navigate(`/Profile/${opName}`);
+  const handleDownvoteFromDownvoted = async () => {
+    await removeDownvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes - 1);
+    setVoteStatus('neutral');
   };
 
-  const handleReplySave = (postDetails: { content: string }) => {
+  const handleDownvoteFromUpvoted = async () => {
+    await removeUpvoteQuestion(questionId, token!);
+    setCurrentUpvotes(currentUpvotes - 1);
+    await downvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  };
+
+  const handleDownvoteFromNeutral = async () => {
+    await downvoteQuestion(questionId, token!);
+    setCurrentDownvotes(currentDownvotes + 1);
+    setVoteStatus('downvoted');
+  };
+
+  const handleReplySave = async (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
+    if (!token || !loggedInUsername) {
+      alert('No auth token found. Please log in.');
+      return;
+    } else if (!postDetails.content || postDetails.content.trim() === '') {
+      alert('Answer content cannot be empty.');
+      return;
+    }
+    const answerId = await postAnswer(postDetails.content, questionId, token!);
+    onReply({
+      answerId,
+      questionId,
+      opName: loggedInUsername,
+      postedOn: new Date().toLocaleString('en-US'),
+      upVotes: 0,
+      mdContent: postDetails.content,
+      isDownVoted: false,
+      isUpVoted: false,
+      downVotes: 0,
+      canVerify: false,
+      isVerified: false,
+      enabledVerify: true
+    });
   };
 
   const handleEditSave = (postDetails: { content: string }) => {
-    console.log('Post edited:', postDetails);
+    // later
     setIsEditModalOpen(false);
   };
 
@@ -171,7 +226,7 @@ const handleRemoveMember = async () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && !event.target.closest('.question-actions')) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && !event.target!.closest('.question-actions')) {
         setIsDropdownOpen(false);
       }
     };
@@ -188,24 +243,37 @@ const handleRemoveMember = async () => {
         <header className="question-header">
           <h2 className="question-title">{title}</h2>
           <p className="community-tag">
-            <span className="tag tag-community">c/{communityName}</span>
+            <span className="tag tag-community" onClick={() =>{navigate(`/communities/${communityId}`)}}>c/{communityName}</span>
           </p>
           <p className="op-name">
             Asked by:{' '}
-            <span onClick={handleNavigateToProfile} className="op-link">
+            <span onClick={() => {navigate(`/Profile/${opName}`)}} className="op-link">
               {opName}
             </span>
           </p>
           <section className="question-body">
             <MDXEditor
+              key={mdContent}
               markdown={mdContent}
               readOnly
-              plugins={[headingsPlugin, listsPlugin, quotePlugin, linkPlugin, imagePlugin, tablePlugin, markdownShortcutPlugin, thematicBreakPlugin, linkDialogPlugin, codeBlockPlugin, sandpackPlugin, codeMirrorPlugin]}
-            />
+              plugins={[
+                headingsPlugin(),
+                listsPlugin(),
+                quotePlugin(),
+                linkPlugin(),
+                imagePlugin({ imageUploadHandler }),
+                tablePlugin(),
+                codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+                sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
+                codeMirrorPlugin(languages),
+                linkDialogPlugin(),
+                thematicBreakPlugin(),
+                markdownShortcutPlugin(),
+              ]}            />
           </section>
         </header>
 
-        <p className="question-date">on {postedOn}</p>
+        <p className="post-date">on {new Date(postedOn).toLocaleString('en-US')}</p>
 
         <footer className="question-footer">
           <div className="question-tags">
@@ -219,14 +287,14 @@ const handleRemoveMember = async () => {
           <div className="question-votes">
             <span className="votes-count">{currentUpvotes} </span>
             <button
-              onClick={handleUpvote}
+              onClick={handleUpvoteQuestion}
               className={`vote-button ${voteStatus === 'upvoted' ? 'active' : ''} vote-button-up`}
             >
               ↑
             </button>
             <span className="votes-count">{currentDownvotes} </span>
             <button
-              onClick={handleDownvote}
+              onClick={handleDownvoteQuestion}
               className={`vote-button ${voteStatus === 'downvoted' ? 'active' : ''} vote-button-down`}
             >
               ↓
@@ -251,7 +319,7 @@ const handleRemoveMember = async () => {
             </button>
 
             {/* Dropdown Menu */}
-          {isAdmin||setIsUserModerator && !isAuthorAdmin &&(
+          {(isAdmin||isUserModerator) && !isAuthorAdmin &&(
             <button className="action-button more-button" onClick={toggleDropdown}>
               <FaEllipsisV />
             </button>
@@ -285,7 +353,7 @@ const handleRemoveMember = async () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: mdContent }}
+        initialData={{ content: mdContent, title, tags }}
         type="no-community"
       />
     </div>
