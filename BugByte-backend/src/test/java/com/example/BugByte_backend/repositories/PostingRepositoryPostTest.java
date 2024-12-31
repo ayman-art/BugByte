@@ -248,23 +248,6 @@ public class PostingRepositoryPostTest {
         assertEquals("post id or md content is null", exception.getMessage());
     }
 
-//
-//    @Test
-//    public void testUpVoteQuestion_validInput() throws Exception {
-//        Long questionId = 1L;
-//        Integer value = 1;
-//        String userName = "user1";
-//
-//        when(jdbcTemplate.queryForObject(eq(SQL_GET_UP_VOTE), eq(new Object[]{userName, questionId}), eq(Integer.class)))
-//                .thenReturn(0);
-//
-//        // Mock update to return 1, indicating success
-//        when(jdbcTemplate.update(anyString(), any())).thenReturn(1);
-//
-//        Boolean result = postingRepository.upVoteQuestion(questionId, value, userName);
-//
-//        assertTrue(result);
-//    }
 
     @Test
     public void testUpVoteQuestion_nullInput() {
@@ -278,21 +261,6 @@ public class PostingRepositoryPostTest {
 
         assertEquals("question id or value is null", exception.getMessage());
     }
-//
-//    @Test
-//    public void testDownVoteQuestion_validInput() throws Exception {
-//        Long questionId = 1L;
-//        Integer value = 1;
-//        String userName = "user1";
-//
-//        when(jdbcTemplate.queryForObject(eq(SQL_GET_DOWN_VOTE), eq(new Object[]{userName, questionId}), eq(Integer.class)))
-//                .thenReturn(0);
-//        when(jdbcTemplate.update(anyString(), Optional.ofNullable(any()))).thenReturn(1);
-//
-//        Boolean result = postingRepository.downVoteQuestion(questionId, value, userName);
-//
-//        assertTrue(result);
-//    }
 
     @Test
     public void testDownVoteQuestion_userAlreadyDownVoted() throws Exception {
@@ -309,36 +277,6 @@ public class PostingRepositoryPostTest {
 
         assertEquals("user already down voted this question", exception.getMessage());
     }
-
-//    @Test
-//    public void testUpVoteAnswer_validInput() throws Exception {
-//        Long answerId = 1L;
-//        Integer value = 1;
-//        String userName = "user1";
-//
-//        when(jdbcTemplate.queryForObject(eq(SQL_GET_UP_VOTE), eq(new Object[]{userName, answerId}), eq(Integer.class)))
-//                .thenReturn(0);
-//        when(jdbcTemplate.update(anyString(), Optional.ofNullable(any()))).thenReturn(1);
-//
-//        Boolean result = postingRepository.upVoteAnswer(answerId, value, userName);
-//
-//        assertTrue(result);
-//    }
-
-//    @Test
-//    public void testDownVoteAnswer_validInput() throws Exception {
-//        Long answerId = 1L;
-//        Integer value = 1;
-//        String userName = "user1";
-//
-//        when(jdbcTemplate.queryForObject(eq(SQL_GET_DOWN_VOTE), eq(new Object[]{userName, answerId}), eq(Integer.class)))
-//                .thenReturn(0);
-//        when(jdbcTemplate.update(anyString(), Optional.ofNullable(any()))).thenReturn(1);
-//
-//        Boolean result = postingRepository.downVoteAnswer(answerId, value, userName);
-//
-//        assertTrue(result);
-//    }
 
     @Test
     public void testVerifyAnswer_validInput() {

@@ -19,6 +19,7 @@ import PostPage from "./pages/PostPage";
 import HomePage from "./pages/HomePage";
 import CommunityListingPage from "./pages/CommunityListPage";
 import CommunitySearchPage from "./pages/CommunitySearchPage";
+import NotificationConsumer from "./pages/TestPage";
 import JoinedCommunitiesPage from "./pages/JoinedCommunititesPage";
 import CommunityMembersPage from "./pages/CommunityMembersPage";
 
@@ -168,6 +169,7 @@ const App: React.FC = () => {
             <Route path="/LogIn" element={<Login onLogin={handleLogin} />} />
           </>
         )}
+        <Route path="/test" element={<NotificationConsumer userId={1} />} />
       </Routes>
     </BrowserRouter>
   );

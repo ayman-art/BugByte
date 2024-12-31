@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.repositories.CommunityRepository;
+import com.example.BugByte_backend.repositories.TagsRepository;
 import com.example.BugByte_backend.services.CommunityService;
 import com.example.BugByte_backend.services.SearchingFilteringCommunityService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +29,9 @@ public class CommunityServiceTest {
     @Mock
     private SearchingFilteringCommunityService searchingFilteringCommunityService;
 
+    @Mock
+    TagsRepository tagsRepositoryMock;
+
     @InjectMocks
     private CommunityService communityService;
 
@@ -35,6 +40,7 @@ public class CommunityServiceTest {
     @BeforeEach
     public void setUp() {
         community = new Community();
+        community.setTags(new ArrayList<>());
         community.setId(1L);
         community.setName("Test Community");
         community.setAdminId(100L);
@@ -42,13 +48,28 @@ public class CommunityServiceTest {
 
     @Test
     public void testCreateCommunity() {
+        // Arrange
+        Community community = new Community();
+        community.setName("Test Community");
+        community.setAdminId(100L);
+        community.setDescription(""); // or a valid description if testing this logic
+        community.setTags(Collections.emptyList());
+
         when(communityRepository.insertCommunity("Test Community", 100L)).thenReturn(1L);
+        when(tagsRepositoryMock.bulkAddTagsToCommunity(1L, Collections.emptyList())).thenReturn(1);
+        when(searchingFilteringCommunityService.saveCommunity(community)).thenReturn(community);
+
+        // Act
         Long communityId = communityService.createCommunity(community);
 
+        // Assert
         assertEquals(1L, communityId);
         verify(communityRepository, times(1)).insertCommunity("Test Community", 100L);
+        verify(communityRepository, times(1)).updateCommunityDescription(1L, "");
         verify(searchingFilteringCommunityService, times(1)).saveCommunity(community);
+        verify(tagsRepositoryMock, times(0)).bulkAddTagsToCommunity(anyLong(), anyList());
     }
+
 
     @Test
     public void testUpdateCommunity() {

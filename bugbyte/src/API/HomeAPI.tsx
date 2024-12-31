@@ -38,7 +38,7 @@ export const saveData = (token: string) => {
   localStorage.setItem("is_admin", decodedObj.is_admin);
   console.log(decodedObj.is_admin);
   localStorage.setItem("name", decodedObj.sub);
-  localStorage.setItem("id", decodedObj.id);
+  localStorage.setItem("id", decodedObj.jti);
 };
 
 function base64urlDecode(base64url: string) {

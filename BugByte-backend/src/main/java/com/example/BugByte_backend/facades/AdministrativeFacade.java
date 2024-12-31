@@ -5,6 +5,7 @@ import com.example.BugByte_backend.Adapters.UserAdapter;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.User;
 import com.example.BugByte_backend.services.*;
+import com.example.BugByte_backend.services.NotificationService.NotificationProducer;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import io.jsonwebtoken.Claims;
@@ -24,6 +25,9 @@ public class AdministrativeFacade {
 
     @Autowired
     private RegistrationService registrationService;
+
+    @Autowired
+    private NotificationProducer notifier;
 
     @Autowired
     CommunityService communityService;
@@ -122,6 +126,8 @@ public class AdministrativeFacade {
         String token = (String) userdata.get("jwt");
         Claims claim  = AuthenticationService.parseToken(token);
         long id = Long.parseLong(claim.getId());
+        String username = claim.getSubject();
+        notifier.sendFollowNotification(username, (String) userdata.get("userName"));
         return userService.followUser(id, (String) userdata.get("userName"));
     }
 
