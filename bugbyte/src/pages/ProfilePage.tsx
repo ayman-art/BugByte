@@ -429,7 +429,9 @@ const Profile: React.FC = () => {
             </div>
           )}
           <div>
-            <h1>{userProfile.username}</h1>
+            <h1 style={{ color: isAdmin ? "red" : "inherit" }}>
+              {userProfile.username}
+            </h1>
             <p>Reputation: {userProfile.reputation}</p>
             <div style={styles.followStats}>
               <li onClick={visitFollowers}>
