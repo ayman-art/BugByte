@@ -307,7 +307,8 @@ public class AdministrativeFacade {
     {
         try {
             boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
-            if (!isAdmin) throw new Exception("user is not an admin");
+            Long id = authenticationService.getIdFromJwt(token);
+            if (!isAdmin && !moderatorService.isModerator(id, communityId)) throw new Exception("user is not an admin");
             return communityService.deleteMember(communityId ,memberName);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
