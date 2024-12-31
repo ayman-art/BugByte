@@ -73,6 +73,7 @@ const Profile: React.FC = () => {
           communityName: any;
           downVotes: any;
           tags: any;
+          postedOn: Date;
         }) => ({
           id: item.questionId,
           title: item.title,
@@ -83,6 +84,7 @@ const Profile: React.FC = () => {
           communityId: item.communityId,
           communityName: item.communityName,
           tags: item.tags,
+          postedOn: item.postedOn,
         })
       );
       console.log(posts);
