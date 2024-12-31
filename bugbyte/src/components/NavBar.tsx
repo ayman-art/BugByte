@@ -78,6 +78,17 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       minute: 'numeric',
     }).format(new Date(date));
   };
+  interface PostDetails {
+    title?: string; 
+    content: string; 
+    community?: string; 
+    tags?: string[];
+    communityId?: number;
+  }
+
+  const handleSavePost = async (postDetails: PostDetails) => {
+    setShowModal(false);
+  };
 
   return (
     <nav style={styles.navbar}>
@@ -147,7 +158,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       <PostModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onSave={() => setShowModal(false)}
+        onSave={handleSavePost}
       />
     </nav>
   );
