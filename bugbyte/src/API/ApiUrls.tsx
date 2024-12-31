@@ -36,6 +36,7 @@ export const API_URLS = {
   SEARCH_FILTERED_COMMUNITIES: `${API_BASE_URL}/search/filterCommunity`,
   CREATE_COMMUNITY: `${API_BASE_URL}/communities/createCommunity`,
   GET_FEED: `${API_BASE_URL}/recommendation/feed`,
+  GET_RECOMMENDED_COMMUNITIES: `${API_BASE_URL}/recommendation/communities`,
   COMMUNITY_POSTS: `${API_BASE_URL}/posts/questions/communityQuestions`,
   USER_POSTS: `${API_BASE_URL}/posts/questions/userQuestions`,
   ALL_COMMUNITIES: `${API_BASE_URL}/communities/allCommunities`,
