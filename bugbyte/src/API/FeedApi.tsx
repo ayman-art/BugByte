@@ -1,24 +1,54 @@
-import { API_URLS } from './ApiUrls';
+import { API_URLS } from "./ApiUrls";
 
-export const getFeed = async (token:string, page:number=0, size:number=10) => {
+export const getFeed = async (
+  token: string,
+  page: number = 0,
+  size: number = 10
+) => {
   try {
     const response = await fetch(`${API_URLS.GET_FEED}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
     if (!response.ok) {
-      console.error('Error while getting feed', response.statusText);
+      console.error("Error while getting feed", response.statusText);
       return [];
     }
 
     const data = await response.json();
-    return data['feed'];
+    return data["feed"];
   } catch (error) {
-    console.error('Error fetching feed:', error);
+    console.error("Error fetching feed:", error);
+    return [];
+  }
+};
+
+export const fetchRecommendedCommunities = async (token: string) => {
+  try {
+    const response = await fetch(`${API_URLS.GET_RECOMMENDED_COMMUNITIES}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error(
+        "Error while getting recommended communities",
+        response.statusText
+      );
+      return [];
+    }
+
+    const data = await response.json();
+    return data["communities"];
+  } catch (error) {
+    console.error("Error fetching feed:", error);
     return [];
   }
 };

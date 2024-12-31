@@ -1,5 +1,6 @@
 package com.example.BugByte_backend.controllers;
 
+import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.services.RecommendationSystemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,16 @@ public class RecommendationSystemController {
         try {
             List<Question> feed = recommendationSystemService.generateFeedForUser(token, size);
             return new ResponseEntity<>(Map.of("feed", feed), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("/communities")
+    public ResponseEntity<?> getCommunities(@RequestHeader("Authorization") String token) {
+        try {
+            List<Community> communities = recommendationSystemService.getCommunityRecommendations(token);
+            return new ResponseEntity<>(Map.of("communities", communities), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }

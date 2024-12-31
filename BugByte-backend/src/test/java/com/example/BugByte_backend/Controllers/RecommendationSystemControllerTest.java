@@ -1,6 +1,7 @@
 package com.example.BugByte_backend.Controllers;
 
 import com.example.BugByte_backend.controllers.RecommendationSystemController;
+import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.Question;
 import com.example.BugByte_backend.services.RecommendationSystemService;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,6 +83,52 @@ public class RecommendationSystemControllerTest {
         ResponseEntity<?> response = recommendationSystemController.getFeed(token,page, size);
 
         verify(recommendationSystemService, times(1)).generateFeedForUser(token, size);
+        assert response.getStatusCode() == HttpStatus.UNAUTHORIZED;
+        assert Objects.equals(response.getBody(), "Unauthorized");
+    }
+
+    @Test
+    void testGetCommunities_Success() throws Exception {
+        String token = "valid-token";
+        List<String> tags = List.of("java", "python");
+        Community c1 = Community.builder()
+                .id(1L)
+                .name("Community 1")
+                .description("Description 1")
+                .adminId(2L)
+                .tags(tags)
+                .build();
+        Community c2 = Community.builder()
+                .id(2L)
+                .name("Community 2")
+                .description("Description 2")
+                .adminId(3L)
+                .tags(tags)
+                .build();
+        List<Community> mockCommunities = List.of(c1, c2);
+
+        when(recommendationSystemService.getCommunityRecommendations(token)).thenReturn(mockCommunities);
+
+        ResponseEntity<?> response = recommendationSystemController.getCommunities(token);
+
+        verify(recommendationSystemService, times(1)).getCommunityRecommendations(token);
+        assert response.getStatusCode() == HttpStatus.OK;
+        assert response.getBody() instanceof Map;
+        Map<?, ?> body = (Map<?, ?>) response.getBody();
+        assert body.get("communities").equals(mockCommunities);
+    }
+
+    @Test
+    void testGetCommunities_Unauthorized() throws Exception {
+        String token = "invalid-token";
+        int size = 5;
+        int page = 1;
+        when(recommendationSystemService.getCommunityRecommendations(token))
+                .thenThrow(new RuntimeException("Unauthorized"));
+
+        ResponseEntity<?> response = recommendationSystemController.getCommunities(token);
+
+        verify(recommendationSystemService, times(1)).getCommunityRecommendations(token);
         assert response.getStatusCode() == HttpStatus.UNAUTHORIZED;
         assert Objects.equals(response.getBody(), "Unauthorized");
     }
