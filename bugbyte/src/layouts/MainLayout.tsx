@@ -47,6 +47,9 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
               <li onClick={() => navigate("/")}>Home</li>
               <li onClick={visitProfile}>Profile</li>
               <li onClick={() => navigate("/communities")}>Communities</li>
+              <li onClick={() => navigate("/joined-communities")}>
+                Joined Communities
+              </li>
               {isAdmin && (
                 <li
                   onClick={() => setIsModalOpen(true)}

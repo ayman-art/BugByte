@@ -147,6 +147,49 @@ export const createCommunity = async (
   }
 };
 
+export const fetchCommunityMembers = async (communityId: string) => {
+  const token = localStorage.getItem("authToken");
+  const response = await fetch(`${API_URLS.COMMUNTIY_MEMBERS}/${communityId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch community members");
+  }
+
+  return await response.json();
+};
+
+export const updateCommunity = async (
+  jwt: string,
+  communityId: number,
+  updatedData: any
+) => {
+  const body = {
+    id: communityId,
+    name: updatedData.name,
+    description: updatedData.description,
+    tags: updatedData.tags,
+  };
+  console.log(JSON.stringify(body));
+  const response = await fetch(`${API_URLS.UPDATE_COMMUNITY}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch community members");
+  }
+
+  return updatedData;
+};
+
 export const deleteCommunity = async (
   token: string,
   communityId: number

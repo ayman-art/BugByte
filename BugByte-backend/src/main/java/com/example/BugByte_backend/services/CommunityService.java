@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Scope("singleton")
@@ -78,13 +76,16 @@ public class CommunityService {
 
 
     public boolean updateCommunity(Community updatedCommunity) {
-        if (updatedCommunity == null) {
-            throw new NullPointerException("updatedCommunity must not be null.");
-        }
+        if (updatedCommunity == null)
+            throw new IllegalArgumentException("updatedCommunity must not be null.");
+
         try {
-            //cacheCommunity(updatedCommunity);
             persistCommunity(updatedCommunity);
             searchingFilteringCommunityService.saveCommunity(updatedCommunity);
+
+            if (!updatedCommunity.getTags().isEmpty())
+                tagsRepository.bulkAddTagsToCommunity(updatedCommunity.getId(), updatedCommunity.getTags());
+
             return true;
         } catch (Exception e) {
             System.out.println("Error updating community: " + e.getMessage());
@@ -103,6 +104,9 @@ public class CommunityService {
         }
     }
 
+    public List<User> getCommunityMembers(Long communityId) {
+        return communityRepository.getCommunityMembers(communityId);
+    }
 
     public List<Community> getAllCommunities(int pageSize ,int pageNumber ) {
         try {

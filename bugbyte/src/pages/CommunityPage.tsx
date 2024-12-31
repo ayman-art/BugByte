@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   getCommunity,
   getCommunityPosts,
   joinCommunity,
   LeaveCommunity,
+  updateCommunity,
   deleteCommunity,
 } from "../API/CommunityAPI";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import PostListing, { Post } from "../components/PostListing";
+import CommunityModal from "../components/CommunityModal";
 
 export interface Community {
   id: number;
   name: string;
+  adminId: number;
   description: string;
   creationDate: string;
+  tags: string[];
+}
+
+interface CommunityDetails {
+  name: string;
+  description?: string;
+  tags?: string[];
 }
 
 const CommunityPage: React.FC = () => {
@@ -30,6 +39,9 @@ const CommunityPage: React.FC = () => {
   const [postList, setPostList] = useState<Post[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const userId = localStorage.getItem("id");
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -125,6 +137,10 @@ const CommunityPage: React.FC = () => {
     fetchCommunityData();
   }, [communityId]);
 
+  console.log("=================================");
+  console.log(userId);
+  console.log(community?.adminId);
+  console.log("=================================");
   const handleJoinClick = async () => {
     const token = localStorage.getItem("authToken");
 
@@ -142,6 +158,35 @@ const CommunityPage: React.FC = () => {
     }
   };
 
+  const handleViewMembers = () => {
+    navigate(`/community-members/${communityId}`);
+  };
+
+  const handleEditSave = async (updatedData: CommunityDetails) => {
+    try {
+      const jwt = localStorage.getItem("authToken");
+      if (!jwt) throw new Error("User is not authenticated");
+
+      await updateCommunity(jwt, community?.id!, updatedData);
+
+      setCommunity((prevCommunity) => {
+        if (!prevCommunity) return null;
+        return {
+          ...prevCommunity,
+          name: updatedData.name,
+          description: updatedData.description!,
+          tags: updatedData.tags!,
+        };
+      });
+
+      setShowEditModal(false); // Close modal
+      alert("Community updated successfully!");
+    } catch (err: any) {
+      console.error(err.message || "Failed to update community");
+      alert("An error occurred while updating the community.");
+    }
+  };
+
   const handleDeleteCommunity = async () => {
     const confirmed = window.confirm(
       `Are you sure that you want to delete the community "${community?.name}"?`
@@ -151,7 +196,7 @@ const CommunityPage: React.FC = () => {
     try {
       const token = localStorage.getItem("authToken");
       if (!community) return;
-      await deleteCommunity(token, community.id);
+      await deleteCommunity(token!, community.id);
       navigate("/communities");
       alert("Community deleted successfully");
     } catch (error) {
@@ -214,6 +259,15 @@ const CommunityPage: React.FC = () => {
       borderRadius: "5px",
       cursor: "pointer",
       marginTop: "20px",
+    },
+    viewMembersButton: {
+      marginTop: "10px",
+      padding: "8px 16px",
+      backgroundColor: "#007BFF",
+      color: "#fff",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer",
     },
   };
 
