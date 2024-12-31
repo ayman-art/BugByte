@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash, FaReply } from 'react-icons/fa';
-import { IQuestion } from '../../types/index'
-import { MDXEditor, 
+import { FaEdit, FaTrash, FaReply, FaEllipsisV } from 'react-icons/fa';
+import { IQuestion } from '../../types/index';
+import { isModerator , removeModerator ,removeMember,  setModerator } from '../../API/ModeratorApi';
+import {
+  MDXEditor,
   headingsPlugin,
   listsPlugin,
   quotePlugin,
@@ -18,12 +20,12 @@ import { MDXEditor,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import PostModal from '../PostModal';
-import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import { downvoteQuestion, removeDownvoteQuestion, removeUpvoteQuestion, upvoteQuestion } from '../../API/PostAPI';
 
 interface QuestionProps extends IQuestion {
   onDelete: (questionId: string) => void;
 }
+
 const Question: React.FC<QuestionProps> = ({
   questionId,
   upVotes,
@@ -38,60 +40,100 @@ const Question: React.FC<QuestionProps> = ({
   communityName,
   communityId,
   onDelete
-  
 }) => {
   const [currentUpvotes, setCurrentUpvotes] = useState(upVotes);
   const [currentDownvotes, setCurrentDownvotes] = useState(downVotes);
   const [voteStatus, setVoteStatus] = useState(isUpVoted ? 'upvoted' : isDownVoted ? 'downvoted' : 'neutral');
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isUserModerator, setIsUserModerator] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
-  
   const token = localStorage.getItem('authToken');
 
- 
+  // Fetch moderator status
+  useEffect(() => {
+    const fetchModeratorStatus = async () => {
+      if (token) {
+        try {
+          const result = await isModerator(token, communityId);
+          setIsUserModerator(result);
+        } catch (error) {
+          console.error('Failed to fetch moderator status:', error);
+        }
+      }
+    };
 
-  const handleUpvoteQuestion = () => {
+    fetchModeratorStatus();
+  }, [token, communityId]);
+
+const handleSetModerator = async () => {
+  try {
+    await setModerator(token, opName, communityId);
+    console.log('Setting as moderator');
+  } catch (error) {
+    console.error('Error setting as moderator:', error);
+  }
+};
+
+const handleRemoveModerator = async () => {
+  try {
+    await removeModerator(token, opName, communityId);
+    console.log('Removing moderator');
+  } catch (error) {
+    console.error('Error removing moderator:', error);
+  }
+};
+
+const handleRemoveMember = async () => {
+  try {
+    await removeMember(token, opName, communityId);
+    console.log('Removing member');
+  } catch (error) {
+    console.error('Error removing member:', error);
+  }
+};
+
+
+
+  // Voting Functions
+  const handleUpvote = () => {
     if (voteStatus === 'upvoted') {
       removeUpvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
+      setCurrentUpvotes(prev => prev - 1);
       setVoteStatus('neutral');
-      console.log('FROM upvoted to neutral');
     } else if (voteStatus === 'downvoted') {
       removeDownvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
+      setCurrentDownvotes(prev => prev - 1);
       upvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
+      setCurrentUpvotes(prev => prev + 1);
       setVoteStatus('upvoted');
-      console.log('FROM downvoted to upvoted');
     } else {
       upvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes + 1);
+      setCurrentUpvotes(prev => prev + 1);
       setVoteStatus('upvoted');
-      console.log('FROM neutral to upvoted');
     }
   };
 
-  const handleDownvoteQuestion = () => {
+  const handleDownvote = () => {
     if (voteStatus === 'downvoted') {
       removeDownvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes - 1);
+      setCurrentDownvotes(prev => prev - 1);
       setVoteStatus('neutral');
-      console.log('FROM downvoted to neutral');
     } else if (voteStatus === 'upvoted') {
       removeUpvoteQuestion(questionId, token!);
-      setCurrentUpvotes(currentUpvotes - 1);
+      setCurrentUpvotes(prev => prev - 1);
       downvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
+      setCurrentDownvotes(prev => prev + 1);
       setVoteStatus('downvoted');
-      console.log('FROM upvoted to downvoted');
     } else {
       downvoteQuestion(questionId, token!);
-      setCurrentDownvotes(currentDownvotes + 1);
+      setCurrentDownvotes(prev => prev + 1);
       setVoteStatus('downvoted');
-      console.log('FROM neutral to downvoted');
     }
   };
 
@@ -101,7 +143,6 @@ const Question: React.FC<QuestionProps> = ({
 
   const handleReplySave = (postDetails: { content: string }) => {
     console.log('Reply posted:', postDetails);
-    // Add functionality to save reply here
   };
 
   const handleEditSave = (postDetails: { content: string }) => {
@@ -109,9 +150,25 @@ const Question: React.FC<QuestionProps> = ({
     setIsEditModalOpen(false);
   };
 
-
   const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin;
+  const canDelete = loggedInUsername === opName || isAdmin || isUserModerator;
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(prev => !prev);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && !event.target.closest('.question-actions')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="question-container">
@@ -131,20 +188,7 @@ const Question: React.FC<QuestionProps> = ({
             <MDXEditor
               markdown={mdContent}
               readOnly
-              plugins={[
-                headingsPlugin(),
-                listsPlugin(),
-                quotePlugin(),
-                linkPlugin(),
-                imagePlugin({ imageUploadHandler }),
-                tablePlugin(),
-                codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
-                sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
-                codeMirrorPlugin(languages),
-                linkDialogPlugin(),
-                thematicBreakPlugin(),
-                markdownShortcutPlugin(),
-              ]}
+              plugins={[headingsPlugin, listsPlugin, quotePlugin, linkPlugin, imagePlugin, tablePlugin, markdownShortcutPlugin, thematicBreakPlugin, linkDialogPlugin, codeBlockPlugin, sandpackPlugin, codeMirrorPlugin]}
             />
           </section>
         </header>
@@ -163,14 +207,14 @@ const Question: React.FC<QuestionProps> = ({
           <div className="question-votes">
             <span className="votes-count">{currentUpvotes} </span>
             <button
-              onClick={handleUpvoteQuestion}
+              onClick={handleUpvote}
               className={`vote-button ${voteStatus === 'upvoted' ? 'active' : ''} vote-button-up`}
             >
               ↑
             </button>
             <span className="votes-count">{currentDownvotes} </span>
             <button
-              onClick={handleDownvoteQuestion}
+              onClick={handleDownvote}
               className={`vote-button ${voteStatus === 'downvoted' ? 'active' : ''} vote-button-down`}
             >
               ↓
@@ -185,27 +229,46 @@ const Question: React.FC<QuestionProps> = ({
             )}
 
             {canDelete && (
-              <button className="action-button delete-button" onClick={() =>onDelete(questionId)}>
+              <button className="action-button delete-button" onClick={() => onDelete(questionId)}>
                 <FaTrash />
               </button>
             )}
 
             <button className="action-button reply-button" onClick={() => setIsReplyModalOpen(true)}>
-              <FaReply /> {/* Reply icon */}
+              <FaReply />
             </button>
+
+            {/* Dropdown Menu */}
+          {isAdmin && (
+            <button className="action-button more-button" onClick={toggleDropdown}>
+              <FaEllipsisV />
+            </button>
+          )}
+
+
+          {isDropdownOpen && (
+            <div ref={dropdownRef} className="dropdown-menu show">
+              {!isUserModerator ? (
+                <button onClick={handleSetModerator}>Set Moderator</button>
+              ) : null}
+              {isUserModerator ? (
+                <button onClick={handleRemoveModerator}>Remove Moderator</button>
+              ) : null}
+              <button onClick={handleRemoveMember}>Remove Member</button>
+            </div>
+          )}
+
           </div>
         </footer>
       </div>
 
-      {/* Reply Modal */}
       <PostModal
         isOpen={isReplyModalOpen}
         onClose={() => setIsReplyModalOpen(false)}
         onSave={handleReplySave}
         type="md-only"
       />
-      
-      {/* Edit Modal */}
+
       <PostModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

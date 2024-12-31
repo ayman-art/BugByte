@@ -35,4 +35,11 @@ public class ModeratorService {
             return false;
         }
     }
+    public boolean isModerator(Long userId, Long communityId) {
+        try {
+            return modRepo.isModerator(userId, communityId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

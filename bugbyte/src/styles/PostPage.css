@@ -21,6 +21,7 @@ body {
   max-width: 1200px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 0 auto;
+  position: relative; /* Added relative positioning for dropdown */
 }
 
 .question-content {
@@ -161,6 +162,49 @@ body {
   text-decoration: underline;
 }
 
+/* Dropdown Button */
+.more-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+  transition: opacity 0.3s ease;
+}
+
+.more-button:hover {
+  opacity: 0.8;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 50px; /* Adjust top to align with the button */
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100; /* Ensure dropdown is on top */
+  display: none; /* Hidden by default */
+}
+
+.dropdown-menu.show {
+  display: block; /* Show dropdown when active */
+}
+
+.dropdown-menu button {
+  padding: 8px 12px;
+  width: 150px;
+  text-align: left;
+  border: none;
+  background-color: white;
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f0f0f0;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .question-container {
@@ -209,4 +253,8 @@ body {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: #0056b3;
 }

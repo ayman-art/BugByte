@@ -18,6 +18,7 @@ public class ModeratorRepository implements IModeratorRepository{
                 DELETE FROM moderators
                 WHERE id = ? AND community_id = ?;
             """;
+    private static final String SQL_IS_MODERATOR = "SELECT COUNT(*) FROM moderators WHERE id = ? AND community_id = ?";
 
 
     @Autowired
@@ -49,6 +50,15 @@ public class ModeratorRepository implements IModeratorRepository{
             throw new RuntimeException("Invalid input");
 
         return true;
+    }
+    public boolean isModerator(Long userId, Long communityId)
+    {
+        if (userId == null || communityId == null) {
+            throw new NullPointerException("member Id or community Id is null");
+        }
+        int count = jdbcTemplate.queryForObject(SQL_IS_MODERATOR, Integer.class, userId, communityId);
+        return count==1;
+
     }
 
 }

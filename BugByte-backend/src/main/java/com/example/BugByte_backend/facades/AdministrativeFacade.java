@@ -193,8 +193,10 @@ public class AdministrativeFacade {
     public Community getCommunityInfo(Map<String,Object> map) throws Exception {
         String token = (String) map.get("jwt");
         String userName = authenticationService.getUserNameFromJwt(token);
+        System.out.println("username ="+userName);
         if (userName == null) throw new Exception("userName is null");
         Community community = communityService.getCommunityById((Long)map.get("communityId"));
+        System.out.println("community "+community.toString());
         System.out.println(map.get("communityId"));
         CommunityAdapter communityAdapter = new CommunityAdapter();
         return community;//communityAdapter.toMap(community);
@@ -281,6 +283,17 @@ public class AdministrativeFacade {
             return false;
         }
     }
+    public boolean isModerator(String jwt , Long communityId)
+    {
+        try {
+            Long userId = authenticationService.getIdFromJwt(jwt);
+            return moderatorService.isModerator(userId,communityId);
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
     public boolean removeMember(Map<String,Object>req)
     {
         try {
@@ -300,7 +313,7 @@ public class AdministrativeFacade {
         String token = (String) req.get("jwt");
         boolean isAdmin = authenticationService.getIsAdminFromJwt(token);
         if (!isAdmin) throw new Exception("user is not an admin");
-        List<User> admins = communityService.getCommunityAdmins(Long.parseLong((String) req.get("communityId")));
+        List<User> admins = communityService.getCommunityAdmins(( (Long)req.get("communityId")));
         UserAdapter adapter = new UserAdapter();
         List <Map<String, Object>> adminsMap = admins.stream().map(adapter::toMap).toList();
         for (Map<String, Object> admin : adminsMap) {
@@ -316,7 +329,7 @@ public class AdministrativeFacade {
         try {
             String token = (String) req.get("jwt");
             long userId = authenticationService.getIdFromJwt(token);
-            return communityService.joinCommunity( Long.valueOf((String) req.get("communityId"))
+            return communityService.joinCommunity( (Long)req.get("communityId")
                     ,userId);
         } catch (Exception e) {
             return false;

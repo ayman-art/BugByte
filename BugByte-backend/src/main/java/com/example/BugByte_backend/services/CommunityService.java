@@ -118,7 +118,7 @@ public class CommunityService {
         try {
             System.out.println(communityId);
             Community community = communityRepository.findCommunityById(communityId);
-
+System.out.println(community.toString());
             community.setTags(tagsRepository.findTagsByCommunity(communityId));
             return community;
         } catch (IllegalArgumentException e) {

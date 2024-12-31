@@ -165,8 +165,10 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 
     @Override
     public Community findCommunityById(Long id) {
-        if( id == null)
+        if( id == null) {
+            System.out.println("id is null");
             throw new NullPointerException("id is Null");
+        }
         Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, communityRowMapper,id);
         if(com == null)
             throw new RuntimeException("No community with this id: " + id);
@@ -379,7 +381,6 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             .description(rs.getString("description"))
             .adminId(rs.getLong("admin_id"))
             .creationDate(rs.getDate("creation_date"))
-            .tags((List<String>) rs.getObject("tags"))
             .build()
     );
 

@@ -43,5 +43,7 @@ export const API_URLS = {
   SET_MODERATOR:`${API_BASE_URL}/communities/setModerator`,
   REMOVE_MODERATOR:`${API_BASE_URL}/communities/getCommunity`,
   DELETE_COMMUNITY:`${API_BASE_URL}/communities/deleteCommunity`,
-  REMOVE_MEMBER:`${API_BASE_URL}/communities/removeMember`
+  REMOVE_MEMBER:`${API_BASE_URL}/communities/removeMember`,
+  IS_MODERATOR:`${API_BASE_URL}/communities/isModerator`
+
 };

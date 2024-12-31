@@ -26,8 +26,10 @@ public class CommunityController {
         );
         try {
             Community response = administrativeFacade.getCommunityInfo(userdata);
+            System.out.println(response.toString());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
@@ -85,6 +87,20 @@ public class CommunityController {
             }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @RequestMapping(method =RequestMethod.GET , value = "/isModerator/{communityId}")
+    public boolean isModerator(@RequestHeader("Authorization") String token ,@PathVariable Long communityId ) {
+        token = token.replace("Bearer ", "");
+        try {
+            if(administrativeFacade.isModerator(token , communityId)) {
+               return true;
+            }
+            else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
         }
     }
     @PostMapping("/removeModerator")

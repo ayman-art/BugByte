@@ -83,7 +83,6 @@ export const removeModerator = async (token: string, moderatorName:string, commu
             "moderatorName":moderatorName
         }),
       });
-   });
 
   if (!response.ok) {
     throw new Error("Failed to remove moderator");
@@ -111,4 +110,22 @@ export const removeMember = async (token: string, communityId:number , user_name
   }
 
   return response.text();
+};
+export const isModerator = async (token: string, id: number) => {
+    console.log(id);
+    const response = await fetch(`${API_URLS.IS_MODERATOR}/${id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to Fetch isModerator');
+    }
+
+    const data = await response.json();
+    console.log('isModerator:', data);
+    return data;
 };

@@ -30,67 +30,67 @@ const PostPage: React.FC = () => {
       const fetchQuestion = async () => {
         const fetchedQuestion = await getQuestion(postId!, localStorage.getItem('authToken') || '');
         setQuestion(fetchedQuestion[0]);
-        
+
         const initialAnswers = [];
         if (fetchedQuestion[1]) {
           initialAnswers.push({ ...fetchedQuestion[1], isVerified: true, enabledVerify: false });
         }
-      
+
         const fetchedAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
         console.log(fetchedAnswers.length, pageSize, fetchedQuestion[1]);
-      
+
         const hasNext = fetchedAnswers.length > pageSize;
         if (hasNext) {
           fetchedAnswers.pop();
         }
-      
+
         // Filter out the verified answer from fetched answers to prevent duplication
         const nonDuplicates = fetchedAnswers.filter(
           (answer) => !fetchedQuestion[1] || answer.answerId !== fetchedQuestion[1].answerId
         );
-      
+
         // Mark other answers as not verified
         const processedAnswers = nonDuplicates.map((answer) => ({
           ...answer,
           isVerified: false,
           enabledVerify: !fetchedQuestion[1],
         }));
-      
+
         // Combine initial answers with fetched answers
         setAnswers([...initialAnswers, ...processedAnswers]);
         setHasNextAnswers(hasNext);
-      
+
         // Fetch replies for each answer
         const nextReplies = new Map<string, boolean>();
-      
+
         // Loop over each answer to fetch its replies
         for (const answer of processedAnswers) {
           const fetchedReplies = await getRepliesFromAnswer(answer.answerId, token!, 0, pageSize + 1);
-      
+
           // Check if there are more replies beyond the current page
           const hasMoreReplies = fetchedReplies.length > pageSize;
           nextReplies.set(answer.answerId, hasMoreReplies);
-      
+
           setReplies((prev) => {
             const newReplies = new Map(prev);
             newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize)); // Store replies for this answer
             return newReplies;
           });
         }
-      
+
         console.log("HW",replies)
         setHasNextReplies(nextReplies);
       };
-      
+
       fetchQuestion();
-      
+
   }, [postId]);
 
   const fetchMoreAnswers = async () => {
     const newAnswers = await getAnswersFromQuestion(postId!, token!, answers.length, pageSize + 1);
     let addedAnswers = newAnswers.slice(0, pageSize);
     const hasNext = newAnswers.length > pageSize;
-    
+
 
     const hasVerifiedAnswer = answers.some((answer) => answer.isVerified);
     if (hasVerifiedAnswer) {
@@ -109,15 +109,15 @@ const PostPage: React.FC = () => {
     }));
 
     const nextReplies = new Map<string, boolean>();
-      
+
     // Loop over each answer to fetch its replies
     for (const answer of addedAnswers) {
       const fetchedReplies = await getRepliesFromAnswer(answer.answerId, token!, 0, pageSize + 1);
-  
+
       // Check if there are more replies beyond the current page
       const hasMoreReplies = fetchedReplies.length > pageSize;
       nextReplies.set(answer.answerId, hasMoreReplies);
-  
+
       setReplies((prev) => {
         const newReplies = new Map(prev);
         newReplies.set(answer.answerId, fetchedReplies.slice(0, pageSize)); // Store replies for this answer
@@ -126,32 +126,32 @@ const PostPage: React.FC = () => {
     }
 
 
-  
+
     setAnswers((prev) => [...prev, ...addedAnswers]);
     setHasNextAnswers(hasNext);
   };
-  
+
 
   const fetchMoreReplies = async (answerId: string) => {
     // Get the current replies for the specific answerId
     const currentReplies = replies.get(answerId) || [];
-  
+
     // Fetch the next set of replies for the given answerId
     const newReplies = await getRepliesFromAnswer(answerId, token!, currentReplies.length, pageSize + 1);
-  
+
     // Add only up to pageSize replies to avoid excess
     const addedReplies = newReplies.slice(0, pageSize);
-  
+
     // Check if there are more replies beyond the current page
     const hasNext = newReplies.length > pageSize;
-  
+
     // Update the replies state to include the new replies
     setReplies((prev) => {
       const newRepliesMap = new Map(prev);
       newRepliesMap.set(answerId, [...currentReplies, ...addedReplies]);
       return newRepliesMap;
     });
-  
+
     // Update the hasNextReplies state to keep track of whether there are more replies
     setHasNextReplies((prev) => {
       const newHasNextReplies = new Map(prev);
@@ -159,7 +159,7 @@ const PostPage: React.FC = () => {
       return newHasNextReplies;
     });
   };
-  
+
   const onDelteQuestion = async (questionId: string) => {
     await deleteQuestion(questionId, token!);
     setQuestion(null)
@@ -383,7 +383,7 @@ const repliesEx: { [key: string]: ReplyProps[] } =
         opName: 'Ayman Algamal',
         date: '2024-12-07',
       },
-     
+
     ],
     "2": [
       {
