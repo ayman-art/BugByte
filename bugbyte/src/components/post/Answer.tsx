@@ -21,6 +21,7 @@ import PostModal from '../PostModal';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import { IAnswer, IReply } from '../../types';
 import { downvoteAnswer, editAnswer, postReply, removeDownvoteAnswer, removeUpvoteAnswer, upvoteAnswer } from '../../API/PostAPI';
+import validatePostDetails from '../../utils/validateQuestion';
 
 interface AnswerProps extends IAnswer {
   onDelete: (answerId: string) => void;
@@ -146,6 +147,10 @@ const Answer: React.FC<AnswerProps> = ({
   };
 
   const handleEditSave = async (postDetails: { content: string }) => { 
+    if (postDetails.content.trim() === '') {
+      alert('Answer content cannot be empty.');
+      return;
+    }
     await editAnswer(answerId, postDetails.content, token!);
     setMarkdownState(postDetails.content);
     setIsEditModalOpen(false);
