@@ -37,10 +37,10 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             """;
 
     private static final String SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION = """
-    UPDATE communities
-    SET name = ?, description = ?
-    WHERE community_id = ?;
-""";
+        UPDATE communities
+        SET name = ?, description = ?
+        WHERE id = ?;
+    """;
 
     private static final String SQL_FIND_BY_ID = "SELECT * FROM communities WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_NAME = "SELECT id FROM communities WHERE name = ?;";

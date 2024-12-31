@@ -128,13 +128,16 @@ public class CommunityService {
 //    }
 
     public boolean updateCommunity(Community updatedCommunity) {
-        if (updatedCommunity == null) {
+        if (updatedCommunity == null)
             throw new IllegalArgumentException("updatedCommunity must not be null.");
-        }
+
         try {
-            //cacheCommunity(updatedCommunity);
             persistCommunity(updatedCommunity);
             searchingFilteringCommunityService.saveCommunity(updatedCommunity);
+
+            if (!updatedCommunity.getTags().isEmpty())
+                tagsRepository.bulkAddTagsToCommunity(updatedCommunity.getId(), updatedCommunity.getTags());
+
             return true;
         } catch (Exception e) {
             System.out.println("Error updating community: " + e.getMessage());

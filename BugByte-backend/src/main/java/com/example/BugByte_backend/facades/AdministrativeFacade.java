@@ -356,4 +356,8 @@ public class AdministrativeFacade {
 
         return usersMap;
     }
+
+    public boolean updateCommunity(String jwt, Community community) {
+        return communityService.updateCommunity(community);
+    }
 }

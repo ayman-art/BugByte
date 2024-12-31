@@ -174,7 +174,17 @@ public class CommunityController {
             List<Map<String, Object>> users = administrativeFacade.getCommunityMembers(jwt, communityId);
             return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PutMapping("/update-community")
+    public ResponseEntity<?> updateCommunity(@RequestHeader("Authorization") String token,
+                                             @RequestBody Community community) {
+        try {
+            String jwt = token.replace("Bearer ", "");
+            return new ResponseEntity<>(administrativeFacade.updateCommunity(jwt, community), HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
