@@ -1,5 +1,6 @@
 package com.example.BugByte_backend.services.NotificationService;
 
+import lombok.Getter;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class SocketEventListener {
     private final ConsumerManager consumerManager;
+    @Getter
     private final ConcurrentHashMap<String, String> sessionUserMap = new ConcurrentHashMap<>(); // Maps sessionId to userId
 
     public SocketEventListener(ConsumerManager consumerManager) {
@@ -34,6 +36,8 @@ public class SocketEventListener {
         String sessionId = headerAccessor.getSessionId();
         assert sessionId != null;
         String userId = sessionUserMap.get(sessionId);
-        consumerManager.stopConsumer(userId); // Stop Kafka consumer
+        sessionUserMap.remove(sessionId);
+        if(userId!=null)
+            consumerManager.stopConsumer(userId); // Stop Kafka consumer
     }
 }

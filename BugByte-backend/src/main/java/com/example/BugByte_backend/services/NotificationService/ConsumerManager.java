@@ -1,5 +1,10 @@
 package com.example.BugByte_backend.services.NotificationService;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -17,8 +22,8 @@ import java.util.concurrent.Executors;
 
 @Service
 public class ConsumerManager {
-    private final ConcurrentHashMap<String, KafkaConsumer<String, String>> consumerMap = new ConcurrentHashMap<>();
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    public  ConcurrentHashMap<String, KafkaConsumer<String, String>> consumerMap = new ConcurrentHashMap<>();
+    public ExecutorService executorService = Executors.newCachedThreadPool();
     @Autowired
     NotificationService notificationService;
     public void startConsumer(String userId) {
@@ -36,15 +41,12 @@ public class ConsumerManager {
                 consumerMap.put(userId, consumer);
                 while (!Thread.currentThread().isInterrupted()) {
                     consumer.poll(Duration.ofMillis(100)).forEach(record -> {
-                        // Process the message
                         System.out.println("Received message: " + record.value());
                         notificationService.cacheNotification(Long.valueOf(userId), record.value());
                         notificationService.notifyUser(record.value(), Long.valueOf(userId));
-                        // Optionally forward this message to the connected WebSocket session
                     });
                 }
             } catch (WakeupException e) {
-                // Expected during consumer shutdown, handle gracefully
                 System.out.println("Consumer for userId " + userId + " is shutting down.");
             } catch (Exception e) {
                 e.printStackTrace();

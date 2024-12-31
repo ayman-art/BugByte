@@ -3,6 +3,8 @@ import com.example.BugByte_backend.models.Notification;
 import com.example.BugByte_backend.services.AuthenticationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -14,13 +16,14 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class NotificationService {
-
-    private final SimpMessagingTemplate messagingTemplate;
-
     @Autowired
+    private final SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    @Setter
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
+    @Setter
     AuthenticationService authenticationService;
 
     @Autowired
@@ -31,7 +34,7 @@ public class NotificationService {
     public void notifyUser(String notificationPayload, Long userId) {
         messagingTemplate.convertAndSend("/topic/notifications/"+userId, notificationPayload);
     }
-    public List<Notification> fetchNotifications(String token) throws Exception{
+    public List<Notification> fetchNotifications(String token) {
         String jwt = token.replace("Bearer ", "");
         Long id = authenticationService.getIdFromJwt(jwt);
         String[] jsons = getCachedNotificationsStrings(id);
