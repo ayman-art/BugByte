@@ -360,6 +360,8 @@ public class InteractionFacade {
                 questionMap.put("answerOp" , answer.getCreatorUserName());
                 questionMap.put("answerUpVotes" , answer.getUpVotes());
                 questionMap.put("answerDownVotes" , answer.getDownVotes());
+                questionMap.put("answerIsUpVoted" , postingService.isUpVoted(userName , answer.getId()));
+                questionMap.put("answerIsDownVoted" , postingService.isDownVoted(userName , answer.getId()));
                 questionMap.put("answerPostedOn" ,answer.getPostedOn());
             }
             try {

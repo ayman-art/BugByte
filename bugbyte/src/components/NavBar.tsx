@@ -9,6 +9,8 @@ import { Notification } from '../pages/TestPage';
 import WebSocketService from '../API/socketService';
 import { API_URLS } from "../API/ApiUrls";
 import { fetchNotifications } from '../API/NotificationAPI';
+import validatePostDetails from '../utils/validateQuestion';
+import { postQuestion } from '../API/PostAPI';
 
 interface NavbarProps {
   onLogout: () => void;
@@ -85,10 +87,66 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
     tags?: string[];
     communityId?: number;
   }
-
+  
+  
   const handleSavePost = async (postDetails: PostDetails) => {
-    setShowModal(false);
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        alert('No auth token found. Please log in.');
+        return;
+      }
+  
+      const validation = validatePostDetails(postDetails);
+      if (!validation.isValid) {
+        alert(validation.errors.join('\n'));
+        return;
+      }
+  
+      const id = await postQuestion(
+        postDetails.content,
+        postDetails.title!,
+        postDetails.tags || [],
+        postDetails.communityId!,
+        token
+      );
+  
+      navigate(`/Posts/${id}`);
+    } catch (error) {
+      console.error('Error saving post:', error);
+      alert('An error occurred while saving the post. Please try again.');
+    } finally {
+      setShowModal(false);
+    }
   };
+  // const handleUpdateProfilePicture = async (url: string) => {
+  //   try {
+  //     const token = localStorage.getItem('authToken');
+  //     if (!token) {
+  //       console.error('No auth token found');
+  //       return;
+  //     }
+
+  //     const response = await fetch(API_URLS.UPDATE_PROFILE_PICTURE, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify({ url })
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Updating Profile Picture failed');
+  //     }
+
+  //     // Update local state with new profile picture
+  //     setProfilePicFetched(url);
+  //   } catch (error) {
+  //     console.error('Error updating profile picture:', error);
+  //   }
+  // }
+  
 
   return (
     <nav style={styles.navbar}>
