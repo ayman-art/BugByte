@@ -63,7 +63,7 @@ const PostModal: React.FC<PostModalProps> = ({
   const [markdown, setMarkdown] = useState(initialData?.content || defaultContent);
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState<string>('');
-  const [selectedCommunity, setSelectedCommunity] = useState<number>(initialData?.communityId!);
+  const [selectedCommunity, setSelectedCommunity] = useState<number | null>(null);
   const [postTitle, setPostTitle] = useState<string>(initialData?.title || '');
   const navigate = useNavigate();
   
@@ -180,7 +180,7 @@ const PostModal: React.FC<PostModalProps> = ({
               onChange={(e) => setSelectedCommunity(parseInt(e.target.value))}
               className="dropdown"
             >
-              <option value="" disabled>
+              <option value="">
                 Choose a community
               </option>
               {joinedCommunities.map((community: { id: string; name: string }, index: number) => (
