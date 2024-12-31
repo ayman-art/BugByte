@@ -75,7 +75,7 @@ class AdministrativeFacadeCommunityTest {
         // Arrange
         Map<String, Object> map = new HashMap<>();
         map.put("jwt", "mock_jwt_token");
-        map.put("communityId", "invalid_id");
+        map.put("communityId", 0);
 
         when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
 
@@ -128,13 +128,14 @@ class AdministrativeFacadeCommunityTest {
         Map<String, Object> req = new HashMap<>();
         req.put("jwt", "mock_jwt_token");
         req.put("moderatorName", "moderator1");
-        req.put("communityId", "1");
+        req.put("communityId", 1L);
 
         when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
         when(moderatorService.removeModerator("moderator1", 1L)).thenReturn(true);
 
         // Act
-        boolean result = administrativeFacade.removeModerator(req);
+        boolean result = administrativeFacade.removeModerator((Long) req.get("communityId"), (String) req.get("moderatorName"),
+                (String) req.get("jwt"));
 
         // Assert
         assertTrue(result);
@@ -146,13 +147,14 @@ class AdministrativeFacadeCommunityTest {
         Map<String, Object> req = new HashMap<>();
         req.put("jwt", "mock_jwt_token");
         req.put("moderatorName", "moderator1");
-        req.put("communityId", "1");
+        req.put("communityId", 1L);
 
         when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
         when(moderatorService.removeModerator("moderator1", 1L)).thenThrow(new RuntimeException("Service error"));
 
         // Act
-        boolean result = administrativeFacade.removeModerator(req);
+        boolean result = administrativeFacade.removeModerator((Long) req.get("communityId"), (String) req.get("moderatorName"),
+                (String) req.get("jwt"));
 
         // Assert
         assertFalse(result);
@@ -162,14 +164,15 @@ class AdministrativeFacadeCommunityTest {
         // Arrange
         Map<String, Object> req = new HashMap<>();
         req.put("jwt", "mock_jwt_token");
-        req.put("communityId", "1");
+        req.put("communityId", 1L);
         req.put("user_name", "testUser");
 
         when(authenticationService.getIsAdminFromJwt("mock_jwt_token")).thenReturn(true);
         when(communityService.deleteMember(1L, "testUser")).thenReturn(true);
 
         // Act
-        boolean result = administrativeFacade.removeMember(req);
+        boolean result = administrativeFacade.removeMember((Long) req.get("communityId"), (String) req.get("user_name"),
+                (String) req.get("jwt"));
 
         // Assert
         assertTrue(result);
@@ -232,16 +235,16 @@ class AdministrativeFacadeCommunityTest {
         // Arrange
         Map<String, Object> req = new HashMap<>();
         req.put("jwt", "mock_jwt_token");
-        req.put("communityId", 1);
+        req.put("communityId", 1L);
 
         when(authenticationService.getIdFromJwt("mock_jwt_token")).thenReturn(123L);
         when(communityService.joinCommunity(1L, 123L)).thenThrow(new RuntimeException("Service error"));
 
         // Act
-        Exception exception = assertThrows(RuntimeException.class, () -> administrativeFacade.joinCommunity(req));
+       boolean res = administrativeFacade.joinCommunity(req);
 
         // Assert
-        assertEquals("Service error", exception.getMessage());
+        assertFalse(res);
     }
     @Test
     void testGetAllCommunitiesSuccess() throws Exception {
