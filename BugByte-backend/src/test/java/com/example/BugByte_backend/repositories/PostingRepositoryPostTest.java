@@ -167,6 +167,62 @@ public class PostingRepositoryPostTest {
     private static final String SQL_DELETE_ANSWERS_BY_QUESTION_ID = "DELETE FROM answers WHERE question_id = ?;";
     private static final String SQL_DELETE_REPLIES_BY_ANSWER_ID = "DELETE FROM replies WHERE answer_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
+    private static final String SQL_UPDATE_REPUTATION_POSITIVELY_QUESTIONS = """
+            UPDATE users
+            SET reputation = reputation + 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM questions
+                JOIN posts ON questions.id = posts.id
+                WHERE questions.id = ?
+            );          
+            """;
+
+    private static final String SQL_UPDATE_REPUTATION_NEGATIVELY_QUESTIONS = """
+            UPDATE users
+            SET reputation = reputation - 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM questions
+                JOIN posts ON questions.id = posts.id
+                WHERE questions.id = ?
+            );
+            """;
+
+    private static final String SQL_UPDATE_REPUTATION_POSITIVELY_ANSWERS = """
+            UPDATE users
+            SET reputation = reputation + 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM answers
+                JOIN posts ON answers.id = posts.id
+                WHERE answers.id = ?
+            );
+            """;
+
+
+    private static final String SQL_UPDATE_REPUTATION_NEGATIVELY_ANSWERS = """
+            UPDATE users
+            SET reputation = reputation - 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM answers
+                JOIN posts ON answers.id = posts.id
+                WHERE answers.id = ?
+            );          
+            """;
+
+    private static final String SQL_UPDATE_REPUTATION_VERIFIED_ANSWER = """
+            UPDATE users
+            SET reputation = reputation + 10
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM answers
+                JOIN posts ON answers.id = posts.id
+                WHERE answers.id = ?
+            );
+            """;
+
     @Mock
     private JdbcTemplate jdbcTemplate;
 
@@ -248,23 +304,6 @@ public class PostingRepositoryPostTest {
         assertEquals("post id or md content is null", exception.getMessage());
     }
 
-//
-//    @Test
-//    public void testUpVoteQuestion_validInput() throws Exception {
-//        Long questionId = 1L;
-//        Integer value = 1;
-//        String userName = "user1";
-//
-//        when(jdbcTemplate.queryForObject(eq(SQL_GET_UP_VOTE), eq(new Object[]{userName, questionId}), eq(Integer.class)))
-//                .thenReturn(0);
-//
-//        // Mock update to return 1, indicating success
-//        when(jdbcTemplate.update(anyString(), any())).thenReturn(1);
-//
-//        Boolean result = postingRepository.upVoteQuestion(questionId, value, userName);
-//
-//        assertTrue(result);
-//    }
 
     @Test
     public void testUpVoteQuestion_nullInput() {
@@ -278,21 +317,6 @@ public class PostingRepositoryPostTest {
 
         assertEquals("question id or value is null", exception.getMessage());
     }
-//
-//    @Test
-//    public void testDownVoteQuestion_validInput() throws Exception {
-//        Long questionId = 1L;
-//        Integer value = 1;
-//        String userName = "user1";
-//
-//        when(jdbcTemplate.queryForObject(eq(SQL_GET_DOWN_VOTE), eq(new Object[]{userName, questionId}), eq(Integer.class)))
-//                .thenReturn(0);
-//        when(jdbcTemplate.update(anyString(), Optional.ofNullable(any()))).thenReturn(1);
-//
-//        Boolean result = postingRepository.downVoteQuestion(questionId, value, userName);
-//
-//        assertTrue(result);
-//    }
 
     @Test
     public void testDownVoteQuestion_userAlreadyDownVoted() throws Exception {
@@ -310,42 +334,13 @@ public class PostingRepositoryPostTest {
         assertEquals("user already down voted this question", exception.getMessage());
     }
 
-//    @Test
-//    public void testUpVoteAnswer_validInput() throws Exception {
-//        Long answerId = 1L;
-//        Integer value = 1;
-//        String userName = "user1";
-//
-//        when(jdbcTemplate.queryForObject(eq(SQL_GET_UP_VOTE), eq(new Object[]{userName, answerId}), eq(Integer.class)))
-//                .thenReturn(0);
-//        when(jdbcTemplate.update(anyString(), Optional.ofNullable(any()))).thenReturn(1);
-//
-//        Boolean result = postingRepository.upVoteAnswer(answerId, value, userName);
-//
-//        assertTrue(result);
-//    }
-
-//    @Test
-//    public void testDownVoteAnswer_validInput() throws Exception {
-//        Long answerId = 1L;
-//        Integer value = 1;
-//        String userName = "user1";
-//
-//        when(jdbcTemplate.queryForObject(eq(SQL_GET_DOWN_VOTE), eq(new Object[]{userName, answerId}), eq(Integer.class)))
-//                .thenReturn(0);
-//        when(jdbcTemplate.update(anyString(), Optional.ofNullable(any()))).thenReturn(1);
-//
-//        Boolean result = postingRepository.downVoteAnswer(answerId, value, userName);
-//
-//        assertTrue(result);
-//    }
-
     @Test
     public void testVerifyAnswer_validInput() {
         Long answerId = 1L;
         Long questionId = 1L;
 
         when(jdbcTemplate.update(eq(SQL_VERIFY_ANSWER), eq(answerId), eq(questionId))).thenReturn(1);
+        when(jdbcTemplate.update(eq(SQL_UPDATE_REPUTATION_VERIFIED_ANSWER), eq(answerId))).thenReturn(1);
 
         Boolean result = postingRepository.verifyAnswer(answerId, questionId);
 

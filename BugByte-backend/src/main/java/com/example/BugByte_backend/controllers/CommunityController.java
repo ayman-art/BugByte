@@ -2,6 +2,7 @@ package com.example.BugByte_backend.controllers;
 
 import com.example.BugByte_backend.facades.AdministrativeFacade;
 import com.example.BugByte_backend.models.Community;
+import com.sun.net.httpserver.HttpsServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,18 +47,21 @@ public class CommunityController {
         }
     }
     @PostMapping("/deleteCommunity")
-    public ResponseEntity<?> deleteCommunity(@RequestBody Map<String, Object> communityData) {
+    public ResponseEntity<String> deleteCommunity(@RequestBody Map<String, Object> communityData) {
         try {
-            if (administrativeFacade.deleteCommunity(communityData)) {
-                return new ResponseEntity<>("Community deleted Successfully", HttpStatus.OK);
+            boolean result = administrativeFacade.deleteCommunity(communityData);
+            if (result) {
+                return ResponseEntity.ok("Community deleted successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error deleting community.");
             }
-            else {
-                return new ResponseEntity<>("error deleting community", HttpStatus.BAD_REQUEST);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
     @PostMapping("/editCommunity")
     public ResponseEntity<?> editCommunity(@RequestBody Map<String, Object> communityData) {
         try {
@@ -71,45 +75,99 @@ public class CommunityController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping("/setModerator")
-    public ResponseEntity<?> setModerator(@RequestBody Map<String, Object> moderatorData) {
+    @PostMapping("/setModerator/{communityId}/{moderatorName}")
+    public ResponseEntity<?> setModerator(
+            @PathVariable Long communityId,
+            @PathVariable String moderatorName,
+            @RequestHeader("Authorization") String token) {
         try {
-            if(administrativeFacade.setModerator(moderatorData)) {
-                return new ResponseEntity<>("User is Moderator now", HttpStatus.OK);
+            token = token.replace("Bearer ", "");
+            boolean isModeratorSet = administrativeFacade.setModerator(communityId, moderatorName, token);
+
+            if (isModeratorSet) {
+                return new ResponseEntity<>("User is now a Moderator", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Error adding moderator", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @RequestMapping(method =RequestMethod.GET , value = "/isModerator/{communityId}")
+    public boolean isModerator(@RequestHeader("Authorization") String token ,@PathVariable Long communityId ) {
+        token = token.replace("Bearer ", "");
+        try {
+            if(administrativeFacade.isModerator(token , communityId)) {
+               return true;
             }
             else {
-                return new ResponseEntity<>("error adding moderator", HttpStatus.BAD_REQUEST);
+                return false;
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return false;
         }
     }
-    @PostMapping("/removeModerator")
-    public ResponseEntity<?> removeModerator(@RequestBody Map<String, Object> moderatorData) {
+    @RequestMapping(method =RequestMethod.GET , value = "/isModeratorByName/{communityId}/{userName}")
+    public boolean isModeratorByName(@RequestHeader("Authorization") String token ,@PathVariable Long communityId ,
+                                     @PathVariable String userName) {
+
+        token = token.replace("Bearer ", "");
         try {
-            if(administrativeFacade.removeModerator(moderatorData)) {
-                return new ResponseEntity<>("moderator removed Successfully", HttpStatus.OK);
+            if(administrativeFacade.isModeratorByName(token , communityId , userName)) {
+                return true;
             }
-            else{
-                return new ResponseEntity<>("error removing moderator", HttpStatus.BAD_REQUEST);
+            else {
+                return false;
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return false;
         }
     }
-    @PostMapping("/removeMember")
-    public ResponseEntity<?> removeMember(@RequestBody Map<String, Object> memberData) {
+    @PostMapping("/removeModerator/{communityId}/{moderatorName}")
+    public ResponseEntity<?> removeModerator(
+            @PathVariable Long communityId,
+            @PathVariable String moderatorName,
+            @RequestHeader("Authorization") String token) {
+
         try {
-            if(administrativeFacade.removeMember(memberData)) {
-                return new ResponseEntity<>("member removed Successfully", HttpStatus.OK);
-            }
-            else{
-                return new ResponseEntity<>("error removing member", HttpStatus.BAD_REQUEST);
+            // Remove the "Bearer " prefix from the token
+            token = token.replace("Bearer ", "");
+
+            // Call the facade method with individual arguments
+            boolean isModeratorRemoved = administrativeFacade.removeModerator(communityId, moderatorName, token);
+
+            if (isModeratorRemoved) {
+                return new ResponseEntity<>("Moderator removed successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Error removing moderator", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("/removeMember/{communityId}/{memberName}")
+    public ResponseEntity<?> removeMember(
+            @PathVariable Long communityId,
+            @PathVariable String memberName,
+            @RequestHeader("Authorization") String token) {
+
+        try {
+            token = token.replace("Bearer ", "");
+
+            boolean isMemberRemoved = administrativeFacade.removeMember(communityId, memberName, token);
+
+            if (isMemberRemoved) {
+                return new ResponseEntity<>("Member removed successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Error removing member", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PostMapping("/getAdmins")
     public ResponseEntity<?> getAdmins(@RequestBody Map<String, Object> communityData) {
         try {
@@ -160,6 +218,29 @@ public class CommunityController {
         token = token.replace("Bearer ", "");
         try {
             return new ResponseEntity<>(administrativeFacade.leaveCommunity(token , communityName), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("/community-members/{communityId}")
+    public ResponseEntity<?> getCommunityMembers(@RequestHeader("Authorization") String token,
+                                                 @PathVariable long communityId) {
+        try {
+            String jwt = token.replace("Bearer ", "");
+            List<Map<String, Object>> users = administrativeFacade.getCommunityMembers(jwt, communityId);
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PutMapping("/update-community")
+    public ResponseEntity<?> updateCommunity(@RequestHeader("Authorization") String token,
+                                             @RequestBody Community community) {
+        try {
+            String jwt = token.replace("Bearer ", "");
+            return new ResponseEntity<>(administrativeFacade.updateCommunity(jwt, community), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }

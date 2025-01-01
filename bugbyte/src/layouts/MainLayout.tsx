@@ -1,18 +1,24 @@
 import React, { ReactNode, useState } from "react";
 import Navbar from "../components/NavBar";
 import { useNavigate } from "react-router-dom";
-import { createCommunity } from "../API/LayoutApi";
+import CommunityModal from "../components/CommunityModal";
 
 interface LayoutProps {
   children: ReactNode;
   onLogout: () => void;
 }
 
+interface CommunityDetails {
+  name: string;
+  description?: string;
+  tags?: string[];
+}
+
 const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [communityName, setCommunityName] = useState("");
-  const [description, setDescription] = useState("");
-  const [error, setError] = useState(""); // State for error handling
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleCreateCommunity = async (communityDetails: CommunityDetails) => {
+    console.log("Community Details:", communityDetails);
+  };
 
   const navigate = useNavigate();
   const visitProfile = () => {
@@ -23,38 +29,6 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
   const handleLogout = () => {
     onLogout();
     navigate("/");
-  };
-
-  const handleCreateCommunity = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!communityName.trim()) {
-      setError("Community name is required.");
-      return;
-    }
-
-    try {
-      const payload = { name: communityName, description };
-      console.log("Sending data to server:", payload);
-      const jwt = localStorage.getItem("authToken");
-      if (jwt != null) {
-        const response = await createCommunity(communityName, description, jwt);
-
-        if (response.ok) {
-          console.log("Community created successfully:", response.data);
-          alert("Community Created Successfully!");
-          setShowModal(false);
-          setCommunityName("");
-          setDescription("");
-          setError("");
-        } else {
-          setError("Failed to create community. Please try again.");
-        }
-      }
-    } catch (error: unknown) {
-      console.error("Error creating community:", error);
-      setError("Something went wrong. Please try again later.");
-    }
   };
 
   const isAdmin = localStorage.getItem("is_admin") === "true";
@@ -73,9 +47,12 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
               <li onClick={() => navigate("/")}>Home</li>
               <li onClick={visitProfile}>Profile</li>
               <li onClick={() => navigate("/communities")}>Communities</li>
+              <li onClick={() => navigate("/joined-communities")}>
+                Joined Communities
+              </li>
               {isAdmin && (
                 <li
-                  onClick={() => setShowModal(true)}
+                  onClick={() => setIsModalOpen(true)}
                   style={styles.createCommunityButton}
                 >
                   Create Community
@@ -89,47 +66,11 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
         <main style={styles.content}>{children}</main>
 
         {/* Modal for Creating Community */}
-        {showModal && (
-          <div style={styles.modalOverlay}>
-            <div style={styles.modal}>
-              <h2>Create Community</h2>
-              {error && <p style={{ color: "red" }}>{error}</p>}
-              <form onSubmit={handleCreateCommunity}>
-                <div style={styles.formGroup}>
-                  <label htmlFor="communityName">Community Name:</label>
-                  <input
-                    type="text"
-                    id="communityName"
-                    value={communityName}
-                    onChange={(e) => setCommunityName(e.target.value)}
-                    style={styles.input}
-                  />
-                </div>
-                <div style={styles.formGroup}>
-                  <label htmlFor="description">Description (Optional):</label>
-                  <textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    style={styles.textarea}
-                  />
-                </div>
-                <div style={styles.modalActions}>
-                  <button type="submit" style={styles.createButton}>
-                    Create
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    style={styles.cancelButton}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <CommunityModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleCreateCommunity}
+        />
       </div>
     </div>
   );
@@ -144,7 +85,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   main: {
     display: "flex",
     flex: 1,
-    padding: "0 10%",
+    padding: "0 1%",
     backgroundColor: "#f5f5f5",
   },
   sidebar: { width: "200px", padding: "10px", backgroundColor: "#f5f5f5" },

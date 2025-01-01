@@ -67,8 +67,23 @@ public class PostingRepositoryQuestionTest {
             """;
     private static final String SQL_DELETE_ANSWERS_BY_QUESTION_ID = "DELETE FROM answers WHERE question_id = ?;";
     private static final String SQL_DELETE_POST_BY_ID = "DELETE FROM posts WHERE id = ?;";
+    private static final String SQL_GET_UP_VOTE = "SELECT COUNT(*) FROM up_votes WHERE user_name = ? AND question_id = ?";
+    private static final String SQL_DELETE_DOWN_VOTE = "DELETE FROM down_votes WHERE user_name = ? AND question_id = ?";
+    private static final String SQL_INSERT_UPVOTE = "INSERT INTO up_votes(user_name, question_id) VALUES (?, ?)";
+    private static final String SQL_DELETE_UP_VOTE = "DELETE FROM up_votes WHERE user_name = ? AND question_id = ?";
+    private static final String SQL_GET_DOWN_VOTE = "SELECT COUNT(*) FROM down_votes WHERE user_name = ? AND question_id = ?";
 
-
+    private static final String SQL_INSERT_DOWNVOTE = "INSERT INTO down_votes(user_name, question_id) VALUES (?, ?)";
+    private static final String SQL_UPDATE_REPUTATION_POSITIVELY_QUESTIONS = """
+            UPDATE users
+            SET reputation = reputation + 1
+            WHERE user_name = (
+                SELECT posts.op_name
+                FROM questions
+                JOIN posts ON questions.id = posts.id
+                WHERE questions.id = ?
+            );          
+            """;
     @Mock
     private JdbcTemplate jdbcTemplate;
 
@@ -140,6 +155,51 @@ public class PostingRepositoryQuestionTest {
         }
         assertEquals(NullPointerException.class, exception.getClass());
         assertEquals("answer id is null", exception.getMessage());
+    }
+    @Test
+    public void testUpVoteQuestion_UserAlreadyUpVoted() {
+        Long questionId = 1L;
+        Integer value = 1;
+        String userName = "user1";
+
+        when(jdbcTemplate.queryForObject(SQL_GET_UP_VOTE, new Object[]{userName, questionId}, Integer.class))
+                .thenReturn(1);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            postingRepository.upVoteQuestion(questionId, value, userName);
+        });
+    }
+
+    @Test
+    public void testUpVoteQuestion_UserDidNotUpVoteBefore() {
+        Long questionId = 1L;
+        Integer value = 0;
+        String userName = "user1";
+
+        when(jdbcTemplate.queryForObject(SQL_GET_UP_VOTE, new Object[]{userName, questionId}, Integer.class))
+                .thenReturn(0);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            postingRepository.upVoteQuestion(questionId, value, userName);
+        });
+    }
+
+    @Test
+    public void testUpVoteQuestion_RemoveUpVote_Success() throws Exception {
+        Long questionId = 1L;
+        Integer value = 0;
+        String userName = "user1";
+
+        when(jdbcTemplate.queryForObject(SQL_GET_UP_VOTE, new Object[]{userName, questionId}, Integer.class))
+                .thenReturn(1);
+
+        when(jdbcTemplate.update(eq(SQL_DELETE_UP_VOTE), eq(userName), eq(questionId))).thenReturn(1);
+        when(jdbcTemplate.update(eq(SQL_UPDATE_UP_VOTES_QUESTIONS), eq(value), eq(questionId))).thenReturn(1);
+        when(jdbcTemplate.update(eq(SQL_UPDATE_REPUTATION_POSITIVELY_QUESTIONS), eq(questionId))).thenReturn(1);
+        Boolean result = postingRepository.upVoteQuestion(questionId, value, userName);
+
+        assertTrue(result);
+
     }
     @Test
     public void testGetQuestionsByUserName_validInput() {
@@ -216,4 +276,34 @@ public class PostingRepositoryQuestionTest {
         assertEquals(NullPointerException.class, exception.getClass());
         assertEquals("questionId is null", exception.getMessage());
     }
+    @Test
+    public void testDownVoteQuestion_UserAlreadyDownVoted() {
+        Long questionId = 1L;
+        Integer value = 1;
+        String userName = "user1";
+
+        when(jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE, new Object[]{userName, questionId}, Integer.class))
+                .thenReturn(1);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            postingRepository.downVoteQuestion(questionId, value, userName);
+        });
+
+        assertEquals("user already down voted this question", exception.getMessage());
+    }
+
+    @Test
+    public void testDownVoteQuestion_UserDidNotDownVoteBefore() {
+        Long questionId = 1L;
+        Integer value = 0;
+        String userName = "user1";
+
+        when(jdbcTemplate.queryForObject(SQL_GET_DOWN_VOTE, new Object[]{userName, questionId}, Integer.class))
+                .thenReturn(0);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            postingRepository.downVoteQuestion(questionId, value, userName);
+        });
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.BugByte_backend.repositories;
 
+import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.Question;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -51,7 +52,42 @@ public class RecommendationSystemRepository {
             )
             ORDER BY RAND();
             """;
-
+    private static final String SQL_GET_RECOMMENDED_COMMUNITIES = """
+            (
+                SELECT c.*
+                FROM communities c
+                JOIN community_members cm ON c.id = cm.community_id
+                WHERE cm.member_id IN (
+                    SELECT followed_id
+                    FROM followers
+                    WHERE follower_id = ?
+                )
+                AND c.id NOT IN (
+                    SELECT community_id
+                    FROM community_members
+                    WHERE member_id = ?
+                )
+                LIMIT 10
+            )
+            UNION
+            (
+                SELECT c.*
+                FROM communities c
+                LEFT JOIN (
+                    SELECT community_id, COUNT(*) AS engagement_score
+                    FROM community_members
+                    GROUP BY community_id
+                ) e ON c.id = e.community_id
+                WHERE c.id NOT IN (
+                    SELECT community_id
+                    FROM community_members
+                    WHERE member_id = ?
+                )
+                ORDER BY e.engagement_score DESC
+                LIMIT 10
+            )
+            ORDER BY RAND();
+            """;
     private static final Long GENERAL_COMMUNITY = 1L;
 
     @Autowired
@@ -59,11 +95,20 @@ public class RecommendationSystemRepository {
 
     public List<Question> generateFeedForUser(Long userId) {
         if (userId == null)
-            throw new NullPointerException("User id can't be null!");
+            throw new IllegalArgumentException("User id can't be null!");
 
         return jdbcTemplate.query(SQL_GET_RECOMMENDED_QUESTIONS,
                 new Object[] { userId, userId, GENERAL_COMMUNITY, GENERAL_COMMUNITY, userId },
                 questionRowMapper);
+    }
+
+    public List<Community> generateRecommendedCommunitiesForUser(Long userId) {
+        if (userId == null)
+            throw new IllegalArgumentException("User id can't be null!");
+
+        return jdbcTemplate.query(SQL_GET_RECOMMENDED_COMMUNITIES,
+                new Object[]{ userId, userId, userId },
+                communityRowMapper);
     }
 
     private final RowMapper<Question> questionRowMapper = ((rs, rowNum) ->
@@ -78,5 +123,14 @@ public class RecommendationSystemRepository {
                     .downVotes(rs.getLong("down_votes"))
                     .validatedAnswerId(rs.getLong("validated_answer_id"))
                     .build()
+    );
+
+    private final RowMapper<Community> communityRowMapper = ((rs, rowNum) -> Community.builder()
+            .id(rs.getLong("id"))
+            .name(rs.getString("name"))
+            .description(rs.getString("description"))
+            .adminId(rs.getLong("admin_id"))
+            .creationDate(rs.getDate("creation_date"))
+            .build()
     );
 }

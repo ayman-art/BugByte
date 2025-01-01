@@ -5,7 +5,7 @@ export interface User {
 }
 
 export  interface IQuestion {
-    questionId: string;
+    questionId: number;
     upVotes: number;
     mdContent: string;
     isDownVoted: boolean;
@@ -16,16 +16,16 @@ export  interface IQuestion {
     opName: string;
     postedOn: string;
     communityName: string;
-    communityId: string;
+    communityId: number;
     isUpvoted: boolean;
     isDownvoted: boolean;
   }
 
   export interface IAnswer {
-    answerId: string;
-    questionId: string;
+    answerId: number;
+    questionId: number;
     opName: string;
-    postedOn: string; // ISO date format as string
+    postedOn: string;
     upVotes: number;
     mdContent: string;
     isDownVoted: boolean;
@@ -33,6 +33,7 @@ export  interface IQuestion {
     downVotes: number;
     isVerified: boolean;
     enabledVerify: boolean;
+    canVerify: boolean;
   }
 
   export interface IReply {

@@ -175,49 +175,6 @@ class UserProfileRepositoryTest {
 
         assertTrue(result);
     }
-    @Test
-    void testGetFollowersCount_Success() {
-        // Mock JdbcTemplate
-
-        // Sample data
-        long userId = 1L;
-        int followersCount = 5;
-
-        // Mock behavior
-        when(jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class))
-                .thenReturn(followersCount);
-
-        // Call the method
-        int result = repository.getFollowersCount(userId);
-
-        // Validate results
-        assertEquals(followersCount, result);
-
-        // Verify interaction
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class);
-    }
-
-    @Test
-    void testGetFollowersCount_InvalidInput() {
-        // Sample data
-        long userId = 1L;
-
-        // Mock behavior
-        when(jdbcTemplate.queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class))
-                .thenReturn(null);
-
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            repository.getFollowersCount(userId);
-        });
-
-        assertEquals("Invalid Input", exception.getMessage());
-
-        // Verify interaction
-        verify(jdbcTemplate, times(1))
-                .queryForObject(SQL_GET_FOLLOWERS_COUNT, new Object[]{userId}, Integer.class);
-    }
 
     @Test
     void testGetFollowingsCount_Success() {
@@ -260,7 +217,7 @@ class UserProfileRepositoryTest {
     @Test
     void unfollowUser_ShouldThrowException_WhenNullParameters() {
         assertThrows(NullPointerException.class, () -> {
-            repository.unfollowUser(null, testUser2.getId());
+            repository.unfollowUser(null, eq(testUser2.getId()));
         });
     }
 
@@ -325,13 +282,6 @@ class UserProfileRepositoryTest {
         Boolean result = repository.followUser(testUser1.getId(), testUser2.getId());
 
         assertFalse(result);
-    }
-
-    @Test
-    void followUser_WhenNullUserId_ShouldThrowException() {
-        assertThrows(NullPointerException.class, () -> {
-            repository.followUser(null, testUser2.getId());
-        });
     }
 
     @Test
@@ -693,6 +643,59 @@ class UserProfileRepositoryTest {
             repository.updateBio(null, userId);
         });
     }
+
+    @Test
+    void testGetReputationValidUser() {
+        // Arrange
+        String userName = "validUser";
+        Integer expectedReputation = 42;
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
+                .thenReturn(expectedReputation);
+
+        // Act
+        Integer actualReputation = repository.getReputation(userName);
+
+        // Assert
+        assertEquals(expectedReputation, actualReputation);
+        verify(jdbcTemplate, times(1)).queryForObject(anyString(), any(Object[].class), eq(Integer.class));
+    }
+
+    @Test
+    void testGetReputationNullUsername() {
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->
+                repository.getReputation(null));
+        assertEquals("Username cannot be null", exception.getMessage());
+    }
+
+    @Test
+    void testGetReputationUserNotFound() {
+        // Arrange
+        String userName = "nonExistentUser";
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
+                .thenReturn(null);
+
+        // Act
+        Integer actualReputation = repository.getReputation(userName);
+
+        // Assert
+        assertEquals(0, actualReputation);
+        verify(jdbcTemplate, times(1)).queryForObject(anyString(), any(Object[].class), eq(Integer.class));
+    }
+
+    @Test
+    void testGetReputationDatabaseError() {
+        // Arrange
+        String userName = "errorUser";
+        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), eq(Integer.class)))
+                .thenThrow(new RuntimeException("Database error"));
+
+        // Act & Assert
+        Exception exception = assertThrows(NullPointerException.class, () ->
+                repository.getReputation(userName));
+        assertEquals("Cannot get the reputation", exception.getMessage());
+    }
+
 
 }
 

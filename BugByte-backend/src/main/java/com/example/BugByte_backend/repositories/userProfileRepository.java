@@ -28,7 +28,7 @@ public class userProfileRepository {
                 WHERE f.follower_id = ?;
             """;
     private static final String SQL_GET_FOLLOWERS_COUNT = """
-                SELECT COUNT(* )
+                SELECT COUNT(*)
                 FROM followers f
                 JOIN users u ON f.follower_id = u.id
                 WHERE f.followed_id = ?;
@@ -51,6 +51,14 @@ public class userProfileRepository {
                 UPDATE users
                 SET bio = ?
                 WHERE id = ?;
+            """;
+
+    private static final String SQL_GET_REPUTATION = """
+            Select
+                reputation
+            FROM users
+            WHERE
+            user_name = ?
             """;
 
     @Autowired
@@ -126,6 +134,26 @@ public class userProfileRepository {
             throw new RuntimeException("Invalid Input");
 
         return count;
+    }
+
+    public Integer getReputation(String userName) {
+        if (userName == null) {
+            throw new IllegalArgumentException("Username cannot be null");
+        }
+
+        try {
+            Integer rep = jdbcTemplate.queryForObject(
+                    SQL_GET_REPUTATION,
+                    new Object[]{ userName },
+                    Integer.class
+            );
+
+            System.out.println("Reputation is : " + rep);
+            return  rep != null ? rep : 0;
+
+        } catch (Exception e) {
+            throw new NullPointerException("Cannot get the reputation");
+        }
     }
 
     private final RowMapper<User> userRowMapper = ((rs, rowNum) -> User.builder()

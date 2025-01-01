@@ -56,7 +56,7 @@ public class UserService {
         return user;
     }
 
-    private User getUser(String userName) {
+    public User getUser(String userName) {
         try {
             return this.getCachedUser(userName);
         } catch (Exception e) {
@@ -82,8 +82,10 @@ public class UserService {
             //userData.remove("id");
             int followersCount = userProfileRepository.getFollowersCount(user.getId());
             int followingsCount = userProfileRepository.getFollowingsCount(user.getId());
+            int reputationCount = userProfileRepository.getReputation(userName);
             userData.put("followersCount" , followersCount);
             userData.put("followingsCount" , followingsCount);
+            userData.put("reputation", reputationCount);
 
             return userData;
         } catch (Exception e) {

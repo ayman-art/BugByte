@@ -154,5 +154,16 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
     }
+    @RequestMapping(method =RequestMethod.GET , value = "/isAdmin/{userName}")
+    public boolean isAdmin(@RequestHeader("Authorization") String token ,
+                                     @PathVariable String userName) {
+        token = token.replace("Bearer ", "");
+        try {
+           return administrativeFacade.isAdmin(token , userName);
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing icons for Edit and Delete buttons
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import { MDXEditor, 
   headingsPlugin,
   listsPlugin,
@@ -19,6 +19,7 @@ import '@mdxeditor/editor/style.css';
 import imageUploadHandler, { languages, simpleSandpackConfig } from '../../utils/MDconfig';
 import PostModal from '../PostModal';
 import { IReply } from '../../types';
+import { editReply } from '../../API/PostAPI';
 
 interface ReplyProps extends IReply{
   onDelete: (replyId: string, answerId: string) => void;
@@ -26,40 +27,42 @@ interface ReplyProps extends IReply{
 
 const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdContent, onDelete }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  
+  const [mdContentState, setMdContentState] = useState(mdContent);
   const navigate = useNavigate();
+
+  const token = localStorage.getItem('authToken');
   const loggedInUsername = localStorage.getItem('name') || '';
   const isAdmin = localStorage.getItem('is_admin') === 'true';
+  const canEdit = loggedInUsername === opName;
+  const canDelete = loggedInUsername === opName || isAdmin;
 
 
 
-  const handleEditSave = (postDetails: { content: string }) => {
-    console.log(postDetails);
+  const handleEditSave = async (postDetails: { content: string }) => {
+    if (!postDetails.content.trim()) {
+      alert('Content cannot be empty');
+      return;
+    }
+    await editReply(replyId, postDetails.content, token!);
+    setMdContentState(postDetails.content);
     setIsEditModalOpen(false);
   }
 
-  // Navigate to the user's profile
-  const handleNavigateToProfile = () => {
-    navigate(`/Profile/${opName}`);
-  };
-
-  // Check if the logged-in user is the post owner
-  const canEdit = loggedInUsername === opName;
-  const canDelete = loggedInUsername === opName || isAdmin; // Admin can delete as well
 
   return (
     <div className="reply-container">
       <div className="reply-content">
         <header className="reply-header">
           <p className="op-name">
-            Replied by: <span className="op-link" onClick={handleNavigateToProfile}>{opName}</span>
+            Replied by: <span className="op-link" onClick={() => {navigate(`/Profile/${opName}`)}}>{opName}</span>
           </p>
         </header>
 
         {/* Use MDXEditor for markdown reply content */}
         <section className="reply-body">
           <MDXEditor
-            markdown={mdContent}
+            key={mdContentState}
+            markdown={mdContentState}
             readOnly
             plugins={[
               headingsPlugin(),
@@ -78,7 +81,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
           />
         </section>
 
-        <p className="reply-date">on {postedOn}</p>
+        <p className="post-date">on {new Date(postedOn).toLocaleString('en-US')}</p>
 
         <footer className="reply-footer"> 
           {/* Action buttons */}
@@ -103,7 +106,7 @@ const Reply: React.FC<ReplyProps> = ({ replyId, answerId, opName, postedOn, mdCo
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleEditSave}
-        initialData={{ content: mdContent }}
+        initialData={{ content: mdContentState }}
         type="md-only"
       />
     </div>

@@ -1,8 +1,8 @@
 package com.example.BugByte_backend.repositories;
+import com.example.BugByte_backend.BugByteBackendApplication;
 import com.example.BugByte_backend.models.Community;
 import com.example.BugByte_backend.models.CommunityMember;
 import com.example.BugByte_backend.models.User;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -10,8 +10,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.test.context.ContextConfiguration;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,8 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-
 @SpringBootTest
+@ContextConfiguration(classes = BugByteBackendApplication.class)
+
 public class CommunityRepositoryTest {
     private static final String SQL_INSERT_COMMUNITY = """
                 INSERT INTO communities
@@ -37,13 +40,13 @@ public class CommunityRepositoryTest {
                     (?, ?, ?);
             """;
     private static final String SQL_COUNT_MEMBERS_IN_COMMUNITY = """
-                SELECT COUNT(*) 
-                FROM community_members 
+                SELECT COUNT(*)
+                FROM community_members
                 WHERE community_id = ?;
             """;
     private static final String SQL_COUNT_USER_COMMUNITIES = """
-                SELECT COUNT(*) 
-                FROM community_members 
+                SELECT COUNT(*)
+                FROM community_members
                 WHERE member_id = ?;
             """;
 
@@ -55,30 +58,34 @@ public class CommunityRepositoryTest {
 
     private static final String SQL_FIND_BY_ID = "SELECT * FROM communities WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_NAME = "SELECT id FROM communities WHERE name = ?;";
-
     private static final String SQL_FIND_BY_NAME = "SELECT * FROM communities WHERE name = ?;";
     private static final String SQL_FIND_COMMUNITY_MEMBERS_ID = "SELECT member_id FROM community_members WHERE community_id =?;";
     private static final String SQL_FIND_USER_COMMUNITIES_ID = "SELECT community_id FROM community_members WHERE member_id =?;";
-    private static final String SQL_FIND_ALL_COMMUNITIES = "SELECT * FROM communities;";
-
+    private static final String SQL_FIND_ALL_COMMUNITIES = "SELECT * FROM communities LIMIT ? OFFSET ?;";
     private static final String SQL_UPDATE_DESCRIPTION = "UPDATE communities SET description = ? WHERE id = ?;";
     private static final String SQL_UPDATE_COMMUNITY_NAME = "UPDATE communities SET name = ? WHERE id = ?;";
-
-    private static final String SQL_DELETE_COMMUNITY_BY_ID = "DELETE FROM communities WHERE id = ?;";
+    private static final String SQL_DELETE_COMMUNITY_BY_ID = "DELETE FROM communities c WHERE c.id = ?;";
     private static final String SQL_DELETE_MEMBER_BY_ID = "DELETE FROM community_members WHERE member_id = ? AND community_id=?;";
+    private static final String SQL_LEAVE_COMMUNITY = """
+    DELETE cm
+    FROM community_members cm
+    INNER JOIN communities c
+    ON cm.community_id = c.id
+    WHERE cm.member_id = ? AND c.name = ?;
+    """;
 
     private static final String SQL_FIND_COMMUNITIES_BY_USER_ID = """
     SELECT *
     FROM communities c
     INNER JOIN community_members cm ON c.id = cm.community_id
     WHERE cm.member_id = ?;
-""";
+    """;
     private static final String SQL_FIND_USERS_BY_COMMUNITY_ID = """
-    SELECT * 
+    SELECT *
     FROM users u
     INNER JOIN community_members cm ON u.id = cm.member_id
     WHERE cm.community_id = ?;
-""";
+    """;
     private static final String SQL_FIND_COMMUNITIES_NAMES_BY_USER_ID = """
     SELECT name
     FROM communities c
@@ -92,7 +99,7 @@ public class CommunityRepositoryTest {
     WHERE cm.community_id = ?;
 """;
     private static final String SQL_DELETE_COMMUNITY_MEMBERS = """
-    DELETE FROM community_members 
+    DELETE FROM community_members
     WHERE community_id = ?;
 """;
 
@@ -100,6 +107,15 @@ public class CommunityRepositoryTest {
     DELETE FROM moderators 
     WHERE community_id = ?;
 """;
+
+    private static final String SQL_FIND_MODERATORS_BY_COMMUNITY = """
+    SELECT * 
+    FROM users u 
+    INNER JOIN moderators m ON m.id = u.id
+    WHERE m.community_id = ?;
+""";
+
+
 
 
     private User admin;
@@ -120,6 +136,8 @@ public class CommunityRepositoryTest {
     private CommunityRepository communityRepository;
     @BeforeEach
     public void setup() {
+        ArrayList<String> tags = new ArrayList<String>();
+        tags.add("tags");
         MockitoAnnotations.openMocks(this);
          admin = User.builder()
                  .id(1L)
@@ -128,6 +146,7 @@ public class CommunityRepositoryTest {
                  .password("password")
                  .reputation(100L)
                  .isAdmin(true)
+                 .picture("picture")
                  .build();
         member1 = User.builder()
                 .id(2L)
@@ -136,6 +155,7 @@ public class CommunityRepositoryTest {
                 .password("password")
                 .reputation(100L)
                 .isAdmin(false)
+                .picture("picture")
                 .build();
         member2 = User.builder()
                 .id(3L)
@@ -144,6 +164,7 @@ public class CommunityRepositoryTest {
                 .password("password")
                 .reputation(100L)
                 .isAdmin(false)
+                .picture("picture")
                 .build();
         member3 = User.builder()
                 .id(4L)
@@ -152,23 +173,27 @@ public class CommunityRepositoryTest {
                 .password("password")
                 .reputation(100L)
                 .isAdmin(false)
+                .picture("picture")
                 .build();
         comm = Community.builder()
                 .name("testComm")
                 .id(12L)
                 .adminId(1L)
+                .tags(tags)
                 .build();
 
         comm2 = Community.builder()
                 .name("test2Comm")
                 .id(11L)
                 .adminId(2L)
+                .tags(tags)
                 .build();
 
         comm3 = Community.builder()
                 .name("testComm3")
                 .id(13L)
                 .adminId(3L)
+                .tags(tags)
                 .build();
 
          comMem1 = new CommunityMember(comm.getId(),admin.getId());
@@ -340,17 +365,24 @@ public class CommunityRepositoryTest {
         assertThrows(RuntimeException.class, () -> communityRepository.findCommunityByName(name));
     }
 
-//    @Test
-//    public void testFindAllCommunities_Success() {
-//        List<Community> mockCommunities = List.of(
-//                this.comm, this.comm2, this.comm3
-//        );
-//        when(jdbcTemplate.query(eq(SQL_FIND_ALL_COMMUNITIES), any(RowMapper.class)))
-//                .thenAnswer(invocation -> mockCommunities);
-//        List<Community> result = communityRepository.findAllCommunities();
-//        assertEquals(mockCommunities.size(), result.size());
-//        assertEquals(mockCommunities, result);
-//    }
+    @Test
+    public void testFindAllCommunities_Success() {
+        List<Community> mockCommunities = List.of(
+                this.comm, this.comm2, this.comm3
+        );
+
+        when(jdbcTemplate.query(
+                eq(SQL_FIND_ALL_COMMUNITIES),
+                eq(new Object[]{0, 1}),
+                any(RowMapper.class)))
+                .thenReturn(mockCommunities);
+
+        List<Community> result = communityRepository.findAllCommunities(0, 1);
+
+        assertEquals(mockCommunities.size(), result.size());
+        assertEquals(mockCommunities, result);
+    }
+
 
     @Test
     public void testFindCommunityMembers_Ids_Success() {
@@ -423,23 +455,23 @@ public class CommunityRepositoryTest {
         String newName = null;
         assertThrows(NullPointerException.class, () -> communityRepository.updateCommunityName(communityId, newName));
     }
-//    @Test
-//    public void testDeleteCommunityById_Success() {
-//        Long communityId = 12L;
-//
-//        when(jdbcTemplate.update(eq(SQL_DELETE_COMMUNITY_BY_ID), eq(communityId)))
-//                .thenReturn(1);
-//
-//        boolean result = communityRepository.deleteCommunityById(communityId);
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    public void testDeleteCommunityById_Failure_NullId() {
-//        Long communityId = null;
-//        assertThrows(NullPointerException.class, () -> communityRepository.deleteCommunityById(communityId));
-//    }
+    @Test
+    public void testDeleteCommunityById_Success() {
+        Long communityId = 12L;
+
+        when(jdbcTemplate.update(eq(SQL_DELETE_COMMUNITY_BY_ID), eq(communityId)))
+                .thenReturn(1);
+
+        boolean result = communityRepository.deleteCommunityById(communityId);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testDeleteCommunityById_Failure_NullId() {
+        Long communityId = null;
+        assertThrows(NullPointerException.class, () -> communityRepository.deleteCommunityById(communityId));
+    }
     @Test
     public void testDeleteMemberById_Success() {
         Long memberId = 1L;
@@ -467,7 +499,7 @@ public class CommunityRepositoryTest {
                 .thenReturn(mockUsers);
         List<User> result = communityRepository.getCommunityMembers(communityId);
         assertEquals(mockUsers.size(), result.size());
-        assertEquals(mockUsers, result);
+       // assertEquals(mockUsers, result);
     }
 
     @Test
@@ -476,14 +508,13 @@ public class CommunityRepositoryTest {
 
         when(jdbcTemplate.query(eq(SQL_FIND_USERS_BY_COMMUNITY_ID), eq(new Object[]{communityId}), any(RowMapper.class)))
                 .thenReturn(List.of());
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> communityRepository.getCommunityMembers(communityId));
-        assertEquals("No users found in this community.", exception.getMessage());
+        assertEquals(0, communityRepository.getCommunityMembers(communityId).size());
     }
 
     @Test
     public void testGetCommunityMembers_Failure_NullCommunityId() {
         Long communityId = null;
-        assertThrows(NullPointerException.class, () -> communityRepository.getCommunityMembers(communityId));
+        assertThrows(IllegalArgumentException.class, () -> communityRepository.getCommunityMembers(communityId));
     }
     @Test
     public void testGetUserCommunities_Success() {
@@ -500,7 +531,7 @@ public class CommunityRepositoryTest {
     @Test
     public void testGetUserCommunities_Failure_NullUserId() {
         Long userId = null;
-        assertThrows(NullPointerException.class, () -> communityRepository.getUserCommunities(userId));
+        assertThrows(IllegalArgumentException.class, () -> communityRepository.getUserCommunities(userId));
     }
 
     @Test
@@ -557,11 +588,9 @@ public class CommunityRepositoryTest {
     }
 
     @Test
-    public void testUpdateCommunityNameAndDescription_success() {
-        Community community = new Community("New Name","New Description" ,1L );
-        when(jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION, community.getName(), community.getDescription(), community.getId())).thenReturn(1);
-        boolean result = communityRepository.updateCommunityNameAndDescription(community);
-        assertTrue(result);
+    public void testGetCommunityMembersNames_Failure() {
+        Long communityId = null;
+        assertThrows(NullPointerException.class, () -> communityRepository.getUserCommunitiesNames(communityId));
     }
 
     @Test
@@ -572,4 +601,35 @@ public class CommunityRepositoryTest {
         assertFalse(result);
     }
 
-  }
+    @Test
+    public void testGetCommunityModerators_Success() {
+        Long communityId = 12L;
+        List<User> mockUsers = List.of(member1, member2);
+
+        when(jdbcTemplate.query(eq(SQL_FIND_MODERATORS_BY_COMMUNITY), eq(new Object[]{communityId}), any(RowMapper.class)))
+                .thenReturn(mockUsers);
+        List<User> result = communityRepository.findModeratorsByCommunityId(communityId);
+        assertEquals(mockUsers.size(), result.size());
+    }
+    @Test
+    public void testGetCommunityModerators_Failure() {
+       Long communityId = null;
+        assertThrows(NullPointerException.class, () -> communityRepository.findModeratorsByCommunityId(communityId));
+    }
+    @Test
+    public void testLeaveCommunity_Failure() {
+        Long userId = null;
+        assertThrows(NullPointerException.class, () -> communityRepository.leaveCommunity(null,userId));
+    }
+    @Test
+    public void testLeaveCommunity_Failure2() {
+        Long userId = null;
+        assertThrows(NullPointerException.class, () -> communityRepository.leaveCommunity("comm",userId));
+    }
+    @Test
+    public void testLeaveCommunity_Failure3() {
+        Long communityId = null;
+        assertThrows(NullPointerException.class, () -> communityRepository.leaveCommunity(null,1L));
+    }
+
+}

@@ -37,10 +37,10 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             """;
 
     private static final String SQL_UPDATE_COMMUNITY_NAME_AND_DESCRIPTION = """
-    UPDATE communities
-    SET name = ?, description = ?
-    WHERE community_id = ?;
-""";
+        UPDATE communities
+        SET name = ?, description = ?
+        WHERE id = ?;
+    """;
 
     private static final String SQL_FIND_BY_ID = "SELECT * FROM communities WHERE id = ?;";
     private static final String SQL_FIND_ID_BY_NAME = "SELECT id FROM communities WHERE name = ?;";
@@ -50,7 +50,7 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     private static final String SQL_FIND_ALL_COMMUNITIES = "SELECT * FROM communities LIMIT ? OFFSET ?;";
     private static final String SQL_UPDATE_DESCRIPTION = "UPDATE communities SET description = ? WHERE id = ?;";
     private static final String SQL_UPDATE_COMMUNITY_NAME = "UPDATE communities SET name = ? WHERE id = ?;";
-    private static final String SQL_DELETE_COMMUNITY_BY_ID = "DELETE FROM communities WHERE id = ?;";
+    private static final String SQL_DELETE_COMMUNITY_BY_ID = "DELETE FROM communities c WHERE c.id = ?;";
     private static final String SQL_DELETE_MEMBER_BY_ID = "DELETE FROM community_members WHERE member_id = ? AND community_id=?;";
     private static final String SQL_LEAVE_COMMUNITY = """
     DELETE cm
@@ -104,7 +104,8 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private UserRepositoryImp userRepositoryImp = new UserRepositoryImp();
+    @Autowired
+    private UserRepositoryImp userRepositoryImp;
 
     @Override
     public Long insertCommunity(String name, Long adminId) {
@@ -165,8 +166,9 @@ public class CommunityRepository implements CommunityRepositoryInterface{
 
     @Override
     public Community findCommunityById(Long id) {
-        if( id == null)
+        if( id == null) {
             throw new NullPointerException("id is Null");
+        }
         Community com = jdbcTemplate.queryForObject(SQL_FIND_BY_ID, communityRowMapper,id);
         if(com == null)
             throw new RuntimeException("No community with this id: " + id);
@@ -225,23 +227,23 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         int rows = jdbcTemplate.update(SQL_UPDATE_COMMUNITY_NAME, newName, communityId);
         return rows == 1;
     }
-//
+
     @Override
     public  boolean deleteCommunityById(Long communityId) {
         if(communityId==null)
             throw new NullPointerException("communityId is null");
         boolean i = deleteCommunityMembers(communityId);
-        removeCommunityModerators(communityId);
+       // removeCommunityModerators(communityId);
         int rows = jdbcTemplate.update(SQL_DELETE_COMMUNITY_BY_ID, communityId);
         return rows == 1;
     }
 
-    private void removeCommunityModerators(Long communityId) {
-        if (communityId == null) {
-            throw new IllegalArgumentException("communityId is null");
-        }
-        int rows = jdbcTemplate.update(SQL_REMOVE_COMMUNITY_MODERATORS, communityId);
-    }
+//    private void removeCommunityModerators(Long communityId) {
+//        if (communityId == null) {
+//            throw new IllegalArgumentException("communityId is null");
+//        }
+//        int rows = jdbcTemplate.update(SQL_REMOVE_COMMUNITY_MODERATORS, communityId);
+//    }
 
     @Override
     public boolean deleteMemberById(Long memberId, Long communityId) {
@@ -254,46 +256,19 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     @Override
     public List<User> getCommunityMembers(Long communityId) {
         if (communityId == null)
-            throw new NullPointerException("communityId is null");
+            throw new IllegalArgumentException("communityId is null");
 
-        List<User> users = jdbcTemplate.query(SQL_FIND_USERS_BY_COMMUNITY_ID,
-                new Object[]{communityId}, (rs, rowNum) -> new User(
-                        rs.getLong("id"),
-                        rs.getString("user_name"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("bio"),
-                        rs.getLong("reputation"),
-                        rs.getBoolean("is_admin"),
-                        rs.getString("picture")
-                ));
-
-//        if (users.isEmpty())
-//            throw new RuntimeException("No users found in this community.");
-
-        return users;
+        return jdbcTemplate.query(SQL_FIND_USERS_BY_COMMUNITY_ID,
+                new Object[]{communityId}, userRowMapper);
     }
 
     @Override
     public List<Community> getUserCommunities(Long userId) {
         if (userId == null)
-            throw new NullPointerException("userId is null");
+            throw new IllegalArgumentException("userId is null");
 
-        List<Community> communities = jdbcTemplate.query(SQL_FIND_COMMUNITIES_BY_USER_ID,
-                new Object[] {userId},
-                (rs, rowNum) -> Community.builder()
-                        .id(rs.getLong("id"))
-                        .name(rs.getString("name"))
-                        .description(rs.getString("description"))
-                        .adminId(rs.getLong("admin_id"))
-                        .creationDate(rs.getDate("creation_date"))
-                        .build()
-        );
-
-//        if (communities.isEmpty())
-//            throw new RuntimeException("User is not a member of any communities.");
-
-        return communities;
+        return jdbcTemplate.query(SQL_FIND_COMMUNITIES_BY_USER_ID,
+                new Object[] {userId}, communityRowMapper);
     }
 
     @Override
@@ -341,27 +316,12 @@ public class CommunityRepository implements CommunityRepositoryInterface{
     }
 
     public List<User> findModeratorsByCommunityId(Long communityId) {
-        if (communityId == null) {
+        if (communityId == null)
             throw new NullPointerException("communityId is null");
-        }
-        System.out.println(communityId);
-        List<User> moderators = jdbcTemplate.query(SQL_FIND_MODERATORS_BY_COMMUNITY, new Long[]{communityId},new UserRowMapper());
-        return moderators;
+
+        return jdbcTemplate.query(SQL_FIND_MODERATORS_BY_COMMUNITY, new Long[]{communityId}, userRowMapper);
     }
-    private class UserRowMapper implements RowMapper<User> {
-        @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            User user = new User();
-            user.setId(rs.getLong("id"));
-            user.setUserName(rs.getString("user_name"));
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            user.setBio(rs.getString("bio"));
-            user.setReputation(rs.getLong("reputation"));
-            user.setIsAdmin(rs.getBoolean("is_admin"));
-            return user;
-        }
-    }
+
     public boolean  leaveCommunity(String communityName , Long memberId)
     {
         if(memberId==null || communityName==null)
@@ -369,6 +329,18 @@ public class CommunityRepository implements CommunityRepositoryInterface{
         int rows = jdbcTemplate.update(SQL_LEAVE_COMMUNITY, memberId, communityName);
         return rows == 1;
     }
+
+    private final RowMapper<User> userRowMapper = ((rs, rowNum) -> User.builder()
+            .id(rs.getLong("id"))
+            .userName(rs.getString("user_name"))
+            .email(rs.getString("email"))
+            .password(rs.getString("password"))
+            .bio(rs.getString("bio"))
+            .reputation(rs.getLong("reputation"))
+            .isAdmin(rs.getBoolean("is_admin"))
+            .picture(rs.getString("picture"))
+            .build()
+    );
 
     private final RowMapper<Community> communityRowMapper = ((rs, rowNum) -> Community.builder()
             .id(rs.getLong("id"))
@@ -378,7 +350,5 @@ public class CommunityRepository implements CommunityRepositoryInterface{
             .creationDate(rs.getDate("creation_date"))
             .build()
     );
-
-
 }
 
