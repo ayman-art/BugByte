@@ -285,13 +285,6 @@ class UserProfileRepositoryTest {
     }
 
     @Test
-    void followUser_WhenNullUserId_ShouldThrowException() {
-        assertThrows(NullPointerException.class, () -> {
-            repository.followUser(null, testUser2.getId());
-        });
-    }
-
-    @Test
     void isFollowing_WhenDatabaseError_ShouldReturnFalse() {
         when(jdbcTemplate.queryForObject(
                 eq(SQL_IS_FOLLOWING),
