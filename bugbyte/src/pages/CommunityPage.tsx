@@ -297,6 +297,46 @@ const CommunityPage: React.FC = () => {
             )}
           </div>
           <p>{community.description}</p>
+
+          <div style={{ padding: "20px" }}>
+            {community && (
+              <>
+                {userId === String(community.adminId) && (
+                  <button
+                    style={{
+                      margin: "10px",
+                      padding: "10px",
+                      backgroundColor: "#4CAF50",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                    }}
+                    onClick={() => setShowEditModal(true)}
+                  >
+                    Edit Community
+                  </button>
+                )}
+              </>
+            )}
+            {/* Edit Modal */}
+            <div>
+              <CommunityModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onSave={handleEditSave}
+                initialData={{
+                  name: community?.name || "",
+                  description: community?.description || "",
+                  tags: community?.tags,
+                }}
+              />
+            </div>
+          </div>
+
+          <button onClick={handleViewMembers} style={styles.viewMembersButton}>
+            View Members
+          </button>
+
           {!joined ? (
             <button style={styles.button} onClick={handleJoinClick}>
               Join Community
